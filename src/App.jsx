@@ -1,5 +1,6 @@
 import { useState } from "react"
 import * as pdfjsLib from "pdfjs-dist"
+import CirsmaNovertesanaPage from "./CirsmaNovertesanaPage"
 import { forestEngine } from "./forestEngine"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -763,6 +764,7 @@ log:true,small:true,veneer:true,tara:true,pulp:true,fire:true,chips:true
 const [extraSorts,setExtraSorts]=useState([])
 const [parseText,setParseText]=useState("")
 const [jaunaudzes,setJaunaudzes]=useState([])
+if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba}/>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
 if(page==="skice") return <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba}/>
 if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")}/>
@@ -1003,6 +1005,7 @@ alert("Cenas atjauninātas!")
 <div style={{display:"flex",gap:"10px",marginBottom:"20px",flexWrap:"wrap"}}>
 <button onClick={()=>setPage("skice")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas skice</button>
 <button onClick={()=>setPage("caurmers")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Caurmēra mērījumi</button>
+<button onClick={()=>setPage("cirsma")} style={{padding:"8px 16px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas novērtēšana</button>
 <button onClick={()=>setPage("dastojums")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Dastojuma aprēķini</button>
 {(()=>{
 const gatavs=izcirtumi.length>0&&izcirtumi.every(ic=>{
