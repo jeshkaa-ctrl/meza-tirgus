@@ -3,12 +3,291 @@ import * as pdfjsLib from "pdfjs-dist"
 import CirsmaNovertesanaPage from "./CirsmaNovertesanaPage"
 import PdfSkirotajsPage from "./PdfSkirotajsPage"
 import { forestEngine } from "./forestEngine"
+import { getBonitate } from "./bonityEngine"
+import { minDiameter, formFactor } from "./tables"
+import { calcSortimentsByQuality } from "./qualityEngine"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
 import.meta.url
 ).toString()
+// ========== CAURMERA PANELS ==========
+function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, onSaveState}) {
+  const [suga, setSuga] = useState(savedState?.suga||"P")
+  const [vecums, setVecums] = useState(savedState?.vecums||"")
+  const [h, setH] = useState(savedState?.h||"")
+  const [merijumi, setMerijumi] = useState(
+    savedState?.merijumi || Array.from({length:40}, (_,i) => ({d: 15+i, n: 0}))
+  )
 
+  const saglabat = (jaunie) => onSaveState?.({
+    suga: jaunie?.suga??suga,
+    vecums: jaunie?.vecums??vecums,
+    h: jaunie?.h??h,
+    merijumi: jaunie?.merijumi??merijumi
+  })
+
+  const notirit = () => {
+    if(window.confirm("Dzēst mērījumus?")) {
+      const tuksi = Array.from({length:40}, (_,i) => ({d: 15+i, n: 0}))
+      setMerijumi(tuksi)
+      setSuga("P"); setVecums(""); setH("")
+      onSaveState?.(null)
+    }
+  }
+
+  const updateN = (i, val) => {
+    const m = [...merijumi]
+    m[i] = {...m[i], n: Number(val)||0}
+    setMerijumi(m)
+    saglabat({merijumi:m})
+  }
+
+ const sumDN = merijumi.reduce((s,r) => s + r.d*r.n, 0)
+  const sumN = merijumi.reduce((s,r) => s + r.n, 0)
+  const videjaisD = sumN > 0 ? (sumDN / sumN).toFixed(1) : "—"
+
+ const bon = (vecums && h) ? getBonitate(suga, Number(vecums), Number(h)) : null
+  const minD = bon ? (minDiameter[suga]?.[bon] || 0) : 0
+  const cirteAtlauta = sumN > 0 && Math.round(parseFloat(videjaisD)) >= minD
+
+  // Krājas aprēķins
+  const [kvalitate, setKvalitate] = useState("A")
+  const [platiba, setPlatiba2] = useState("")
+  const kraja = (sumN > 0 && h) ? (() => {
+    const F = formFactor[suga] || 0.5
+    return merijumi.reduce((sum, r) => {
+      if(!r.n) return sum
+      const d = r.d / 100
+      const vol = Math.PI * (d/2)**2 * Number(h) * F * r.n
+      return sum + vol
+    }, 0)
+  })() : 0
+  const sortimenti = (() => {
+    if(kraja <= 0) return {}
+    if(suga === "B") {
+      const tot = kraja
+      if(kvalitate === "A1" || kvalitate === "A") {
+        return {log:0, veneer:tot*0.35, tara:tot*0.40, pulp:tot*0.20, chips:tot*0.05, small:0, fire:0}
+      } else if(kvalitate === "B") {
+        return {log:0, veneer:tot*0.15, tara:tot*0.35, pulp:tot*0.40, chips:tot*0.10, small:0, fire:0}
+      } else if(kvalitate === "C") {
+        return {log:0, veneer:0, tara:tot*0.20, pulp:tot*0.68, chips:tot*0.12, small:0, fire:0}
+      } else {
+        return {log:0, veneer:0, tara:0, pulp:tot*0.78, chips:tot*0.22, small:0, fire:0}
+      }
+    }
+    return calcSortimentsByQuality(kraja, suga, kvalitate, parseFloat(videjaisD))
+  })()
+  const sortimentNames = {log:"Zāģbaļķi",small:"Sīkbaļķi",veneer:"Finieris",tara:"Tara",pulp:"Papīrmalka",fire:"Malka",chips:"Šķelda"}
+
+  const exportPDF = () => {
+    const today = new Date().toLocaleDateString("lv-LV")
+    const aktiveRindas = merijumi.filter(r => r.n > 0)
+    const col1 = aktiveRindas.slice(0, Math.ceil(aktiveRindas.length/3))
+    const col2 = aktiveRindas.slice(Math.ceil(aktiveRindas.length/3), Math.ceil(aktiveRindas.length*2/3))
+    const col3 = aktiveRindas.slice(Math.ceil(aktiveRindas.length*2/3))
+    const maxRows = Math.max(col1.length, col2.length, col3.length)
+    let tabRindas = ""
+    for(let i=0; i<maxRows; i++) {
+      const r1=col1[i], r2=col2[i], r3=col3[i]
+      tabRindas += `<tr>
+        <td>${i+1}.</td>
+        <td>${r1?r1.d:""}</td><td>${r1?r1.n:""}</td><td>${r1?r1.d*r1.n:""}</td>
+        <td>${r2?r2.d:""}</td><td>${r2?r2.n:""}</td><td>${r2?r2.d*r2.n:""}</td>
+        <td>${r3?r3.d:""}</td><td>${r3?r3.n:""}</td><td>${r3?r3.d*r3.n:""}</td>
+      </tr>`
+    }
+    const html = `<html><head><meta charset="UTF-8"><style>
+body{font-family:Arial;font-size:10px;padding:20px;max-width:900px;margin:0 auto}
+h3{text-align:center;font-size:12px;margin-bottom:4px}
+table{border-collapse:collapse;width:100%;margin:8px 0}
+th{background:#1565c0;color:white;padding:3px 5px;font-size:9px;text-align:center}
+td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
+.info td{border:none;text-align:left;padding:2px 8px;font-size:10px}
+.result{padding:8px;margin:8px 0;border-radius:4px;font-weight:bold;font-size:11px}
+</style></head><body>
+<h3>Mežaudzes valdošās koku sugas pirmā stāva koku caurmēru mērījumi,<br/>uzmērot visus valdošās koku sugas pirmā stāva kokus</h3>
+<table class="info"><tbody>
+<tr><td><b>Īpašuma nosaukums:</b></td><td>${saimnieciba||"___________________"}</td><td><b>Kadastrs:</b></td><td>${kadastrs||"___________________"}</td></tr>
+<tr><td><b>Nogabals:</b></td><td>${nogabals||"___________________"}</td><td><b>Datums:</b></td><td>${today}</td></tr>
+<tr><td><b>Valdošā suga:</b></td><td>${suga}</td><td><b>Vecums:</b></td><td>${vecums||"—"} gadi</td></tr>
+<tr><td><b>Vidējais augstums:</b></td><td>${h||"—"} m</td><td><b>Bonitāte:</b></td><td>${bon||"—"}</td></tr>
+</tbody></table>
+<table>
+<thead><tr>
+<th>Nr.</th>
+<th>d (cm)</th><th>N</th><th>d×N</th>
+<th>d (cm)</th><th>N</th><th>d×N</th>
+<th>d (cm)</th><th>N</th><th>d×N</th>
+</tr></thead>
+<tbody>${tabRindas}</tbody>
+<tfoot>
+<tr style="background:#e3f2fd;font-weight:bold">
+  <td colspan="3">Caurmēru summa Σ(d×N)</td>
+  <td colspan="3">${sumDN}</td>
+  <td colspan="2">Koku skaits N</td>
+  <td>${sumN}</td>
+</tr>
+<tr style="background:#1565c0;color:white;font-weight:bold">
+  <td colspan="7">Vidējais caurmērs D = Σ(d×N) / N</td>
+  <td colspan="3">${videjaisD} cm</td>
+</tr>
+</tfoot>
+</table>
+<div style="display:flex;justify-content:space-between;margin-top:40px;font-size:10px">
+  <div>Izpildīja: ___________________________<br/><span style="font-size:8px">(vārds, uzvārds, paraksts, datums)</span></div>
+  <div>Iesniedza: ___________________________<br/><span style="font-size:8px">(vārds, uzvārds, paraksts, datums)</span></div>
+</div>
+<p style="font-size:8px;color:#888;margin-top:16px">* Sagatavots ar Meža tirgus kalkulatoru</p>
+</body></html>`
+    const win = window.open("","_blank")
+    win.document.write(html)
+    win.document.close()
+    win.print()
+  }
+
+  return (
+    <div style={{marginTop:"24px",padding:"20px",border:"2px solid #1565c0",borderRadius:"8px",background:"white"}}>
+      <h2 style={{color:"#1565c0",marginTop:0}}>📏 Caurmēra mērījumi</h2>
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"8px",marginBottom:"16px"}}>
+        <div>
+          <label style={{fontSize:"11px",fontWeight:"bold"}}>Valdošā suga:</label><br/>
+          <select value={suga} onChange={e=>{setSuga(e.target.value);saglabat({suga:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+            <option>P</option><option>E</option><option>B</option>
+          </select>
+        </div>
+        <div>
+          <label style={{fontSize:"11px",fontWeight:"bold"}}>Vecums (gadi):</label><br/>
+          <input type="number" value={vecums} onChange={e=>{setVecums(e.target.value);saglabat({vecums:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+        </div>
+        <div>
+          <label style={{fontSize:"11px",fontWeight:"bold"}}>Vidējais augstums (m):</label><br/>
+          <input type="number" value={h} onChange={e=>{setH(e.target.value);saglabat({h:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+        </div>
+        <div style={{display:"flex",alignItems:"flex-end"}}>
+          <button onClick={notirit} style={{padding:"4px 12px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>🗑 Dzēst mērījumus</button>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:"8px",marginBottom:"12px",flexWrap:"wrap",alignItems:"center"}}>
+        <button onClick={exportPDF} style={{padding:"6px 16px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Drukāt / Saglabāt PDF</button>
+        <label style={{padding:"6px 16px",background:"#1565c0",color:"white",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
+          📂 Augšupielādēt CSV
+          <input type="file" accept=".csv" style={{display:"none"}} onChange={e=>{
+            const file = e.target.files[0]; if(!file) return
+            const reader = new FileReader()
+            reader.onload = (ev) => {
+              const text = ev.target.result
+              const lines = text.split("\n").filter(l=>l.trim())
+              const jaunie = [...merijumi]
+              lines.forEach(line => {
+                const parts = line.split(";")
+                if(parts.length < 2) return
+                const d = parseInt(parts[0])
+                const n = parseInt(parts[1])
+                if(isNaN(d) || isNaN(n)) return
+                const idx = jaunie.findIndex(r => r.d === d)
+                if(idx !== -1) jaunie[idx] = {...jaunie[idx], n}
+              })
+              setMerijumi(jaunie)
+              saglabat({merijumi:jaunie})
+            }
+            reader.readAsText(file)
+          }}/>
+        </label>
+      </div>
+
+      {sumN > 0 && h && (
+        <div style={{marginTop:"16px",padding:"12px",border:"1px solid #225522",borderRadius:"6px",background:"#f0f8f0"}}>
+          <b style={{color:"#225522"}}>🌲 Krājas aprēķins</b>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",marginTop:"8px"}}>
+            
+            <div>
+              <label style={{fontSize:"11px",fontWeight:"bold"}}>Kvalitāte:</label><br/>
+              <select value={kvalitate} onChange={e=>setKvalitate(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+                <option>A1</option><option>A</option><option>B</option><option>C</option><option>D</option><option>Papīrmalka</option><option>Malka</option>
+              </select>
+            </div>
+          </div>
+          {kraja > 0 && (
+            <div style={{marginTop:"10px"}}>
+              <div style={{fontWeight:"bold",fontSize:"12px",color:"#225522",marginBottom:"6px"}}>Kopējā krāja: {kraja.toFixed(1)} m³</div>
+              <table border="1" cellPadding="3" style={{fontSize:"11px",width:"100%"}}>
+                <thead style={{background:"#225522",color:"white"}}>
+                  <tr><th>Sortiments</th><th>m³</th></tr>
+                </thead>
+                <tbody>
+                  {Object.keys(sortimenti).filter(k=>sortimenti[k]>0.1).map(k=>(
+                    <tr key={k}><td>{sortimentNames[k]}</td><td style={{textAlign:"right"}}>{sortimenti[k].toFixed(1)}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+{vecums && h && (
+        <div style={{marginBottom:"16px",padding:"12px",borderRadius:"6px",border:`2px solid ${cirteAtlauta?"#388e3c":"#c62828"}`,background:cirteAtlauta?"#e8f5e9":"#ffebee"}}>
+          <b style={{fontSize:"13px",color:cirteAtlauta?"#225522":"#c62828"}}>
+            {cirteAtlauta ? "✅ CIRTE ATĻAUTA" : "⛔ CIRTE NAV ATĻAUTA"}
+          </b><br/>
+          <span style={{fontSize:"11px"}}>
+            Bonitāte: <b>{bon||"—"}</b> | 
+            Minimālais caurmērs: <b>{minD} cm</b> | 
+            Uzmērītais vidējais D: <b>{videjaisD} cm</b>
+          </span>
+          {!cirteAtlauta && sumN > 0 && (
+            <div style={{marginTop:"6px",fontSize:"11px",color:"#c62828"}}>
+              ⚠️ Vidējais caurmērs {videjaisD} cm ir mazāks par minimālo {minD} cm — nav jēgas iesniegt iesniegumu
+            </div>
+          )}
+          {cirteAtlauta && (
+            <div style={{marginTop:"6px",fontSize:"11px",color:"#225522"}}>
+              ✓ Var iesniegt iesniegumu VMD par caurmēra cirtes apliecinājumu
+            </div>
+          )}
+        </div>
+      )}
+      <div style={{overflowX:"auto"}}>
+        <table border="1" cellPadding="4" style={{fontSize:"11px",minWidth:"600px",width:"100%"}}>
+          <thead style={{background:"#1565c0",color:"white"}}>
+            <tr>
+              <th>Nr.</th>
+              <th>Caurmērs d (cm)</th>
+              <th>Koku skaits N</th>
+              <th>d × N</th>
+            </tr>
+          </thead>
+          <tbody>
+            {merijumi.map((r,i) => (
+              <tr key={i} style={{background:i%2===0?"white":"#f0f4ff"}}>
+                <td>{i+1}.</td>
+                <td>{r.d}</td>
+                <td>
+                  <input type="number" value={r.n||""} onChange={e=>updateN(i,e.target.value)}
+                    style={{width:"60px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/>
+                </td>
+                <td style={{textAlign:"right"}}>{r.d * r.n || 0}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr style={{background:"#e3f2fd",fontWeight:"bold"}}>
+              <td colSpan="2">Kopsumma</td>
+              <td>{sumN}</td>
+              <td style={{textAlign:"right"}}>{sumDN}</td>
+            </tr>
+            <tr style={{background:"#1565c0",color:"white",fontWeight:"bold"}}>
+              <td colSpan="3">Vidējais caurmērs D = Σ(d×N) / N</td>
+              <td style={{textAlign:"right"}}>{videjaisD} cm</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  )
+}
 // ========== CIRSMAS SKICE ==========
 function CirsmaskicePage({onBack,kadastrsIn="",saimniecibaIn="",savedState,onSaveState}){
 const [kmlCoords,setKmlCoords]=useState(savedState?.kmlCoords||[])
@@ -16,23 +295,29 @@ const [kmlName,setKmlName]=useState(savedState?.kmlName||"")
 const [kadastrs,setKadastrs]=useState(savedState?.kadastrs||kadastrsIn)
 const [saimnieciba,setSaimnieciba]=useState(savedState?.saimnieciba||saimniecibaIn)
 const [nogabals,setNogabals]=useState(savedState?.nogabals||"")
+
 const [cirteVeids,setCirteVeids]=useState(savedState?.cirteVeids||"")
 const [cirteIzpilde,setCirteIzpilde]=useState(savedState?.cirteIzpilde||"")
 const [platiba,setPlatiba]=useState(savedState?.platiba||0)
+const [showCaurmers,setShowCaurmers]=useState(false)
+
+const [caurmersState, setCaurmersState] = useState(savedState?.caurmersState||null)
 
 const saglabat = (jaunie) => onSaveState?.({
   kmlCoords:jaunie?.kmlCoords??kmlCoords,
   kmlName:jaunie?.kmlName??kmlName,
   kadastrs:jaunie?.kadastrs??kadastrs,
+  saimnieciba:jaunie?.saimnieciba??saimnieciba,
   nogabals:jaunie?.nogabals??nogabals,
   cirteVeids:jaunie?.cirteVeids??cirteVeids,
   cirteIzpilde:jaunie?.cirteIzpilde??cirteIzpilde,
-  platiba:jaunie?.platiba??platiba
+  platiba:jaunie?.platiba??platiba,
+  caurmersState:jaunie?.caurmersState??caurmersState
 })
 
 const notirit = () => {
   if(window.confirm("Dzēst visu darbu?")) {
-    setKmlCoords([]); setKmlName(""); setKadastrs("")
+    setKmlCoords([]); setKmlName(""); setKadastrs(""); setSaimnieciba("")
     setNogabals(""); setCirteVeids(""); setCirteIzpilde(""); setPlatiba(0)
     onSaveState?.(null)
   }
@@ -274,7 +559,7 @@ td{border:1px solid #ccc;padding:3px 8px;font-size:10px}
 <h2>CIRSMAS SKICE</h2>
 <p style="text-align:center;font-size:11px">Valsts meža dienesta iesniegumam</p>
 <table>
-<tr><td class="label">Īpašuma nosaukums</td><td>${kadastrs||"___________________"}</td></tr>
+<tr><td class="label">Īpašuma nosaukums</td><td>${saimnieciba||"___________________"}</td></tr>
 <tr><td class="label">Kadastra numurs</td><td>${kadastrs||"___________________"}</td></tr>
 <tr><td class="label">Nogabala numurs</td><td>${nogabals||"___________________"}</td></tr>
 <tr><td class="label">Cirtes veids</td><td>${cirteVeids||"___________________"}</td></tr>
@@ -302,11 +587,14 @@ win.print()
 
 return(
 <div style={{padding:"40px",fontFamily:"Arial",maxWidth:"900px"}}>
-<div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap"}}>
-  <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
-  <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🗑 Dzēst visu</button>
-  <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🗺 LVM GEO</a>
-  {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📋 Kopēt kadastru</button>}
+<div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap",justifyContent:"space-between"}}>
+  <div style={{display:"flex",gap:"8px",alignItems:"center",flexWrap:"wrap"}}>
+    <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
+    <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🗑 Dzēst visu</button>
+    <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🗺 LVM GEO</a>
+    {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📋 Kopēt kadastru</button>}
+  </div>
+  <button onClick={()=>setShowCaurmers(v=>!v)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📏 Caurmēra mērījumi</button>
 </div>
 <h1>Cirsmas skice</h1>
 
@@ -327,6 +615,10 @@ return(
 <input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat({kadastrs:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
 </div>
 <div>
+<label style={{fontSize:"12px",fontWeight:"bold"}}>Saimniecības nosaukums:</label><br/>
+<input value={saimnieciba} onChange={e=>{setSaimnieciba(e.target.value);saglabat({saimnieciba:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+</div>
+<div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Nogabala numurs:</label><br/>
 <input value={nogabals} onChange={e=>{setNogabals(e.target.value);saglabat({nogabals:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
 </div>
@@ -337,17 +629,22 @@ return(
 <option>Galvenā cirte</option>
 <option>Kopšanas cirte</option>
 <option>Sanitārā cirte</option>
-<option>Rekonstruktīvā cirte</option>
 </select>
 </div>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Cirtes izpildes veids:</label><br/>
 <select value={cirteIzpilde} onChange={e=>{setCirteIzpilde(e.target.value);saglabat({cirteIzpilde:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
 <option value="">— izvēlies —</option>
-<option>Vienlaidus</option>
-<option>Kopšanas</option>
-<option>Sanitārā cirte pēc VMD atzinuma</option>
-<option>Sanitārā cirte</option>
+{cirteVeids==="Galvenā cirte" && <>
+  <option>Kailcirte</option>
+  <option>Kailcirte pēc caurmēra</option>
+  <option>Izlases cirte</option>
+</>}
+{cirteVeids==="Kopšanas cirte" && <option>Kopšanas cirte</option>}
+{cirteVeids==="Sanitārā cirte" && <>
+  <option>Sanitārā izlases cirte</option>
+  <option>Sanitārā kailcirte pēc VMD atzinuma</option>
+</>}
 </select>
 </div>
 </div>
@@ -411,6 +708,16 @@ Lejupielādēt SHP (LKS92)
 <div style={{padding:"40px",textAlign:"center",color:"#888",border:"2px dashed #ccc",borderRadius:"8px"}}>
 Augšupielādē KML failu no LVM GEO lai redzētu skici
 </div>
+)}
+
+{showCaurmers && (
+  <CaurmeraPanel 
+    kadastrs={kadastrs} 
+    nogabals={nogabals} 
+    saimnieciba={saimnieciba}
+    savedState={caurmersState}
+    onSaveState={(s)=>{setCaurmersState(s);saglabat({caurmersState:s})}}
+  />
 )}
 </div>
 )
@@ -1036,8 +1343,7 @@ alert("Cenas atjauninātas!")
 
 {/* PRO RĪKI */}
 <div style={{display:"flex",gap:"10px",marginBottom:"20px",flexWrap:"wrap"}}>
-<button onClick={()=>setPage("skice")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas skice</button>
-<button onClick={()=>setPage("caurmers")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Caurmēra mērījumi</button>
+<button onClick={()=>setPage("skice")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📐 Cirsmas skice un caurmēra mērījumi</button>
 <button onClick={()=>setPage("pdfSkirotajs")} style={{padding:"8px 16px",background:"#6a1b9a",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>PDF šķirotājs</button>
 <button onClick={()=>setPage("cirsma")} style={{padding:"8px 16px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas novērtēšana</button>
 <button onClick={()=>setPage("dastojums")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Dastojuma aprēķini</button>
