@@ -351,7 +351,9 @@ const handleSHP=async(event)=>{
     area+=coords[i].lon*coords[j].lat
     area-=coords[j].lon*coords[i].lat
   }
-  const jaunaPlatiba=Math.abs(area)/2*111320*71695/10000
+  const latCenter = coords.reduce((s,c)=>s+c.lat,0)/coords.length
+const lonM = 111320 * Math.cos(latCenter * Math.PI / 180)
+const jaunaPlatiba=Math.abs(area)/2*111320*lonM/10000
   setPlatiba(jaunaPlatiba)
   const props=features[0].properties||{}
   if(props.PARCELCODE) setKadastrs(props.PARCELCODE)
@@ -396,14 +398,14 @@ const j=(i+1)%(coords.length-1)
 area+=coords[i].lon*coords[j].lat
 area-=coords[j].lon*coords[i].lat
 }
-const areaWGS=Math.abs(area)/2
-// Pārvērš WGS84 grādus uz ha (aptuveni Latvijas platumam)
-const areaHa=areaWGS*111320*71695/10000
-setPlatiba(areaHa)
+const latCenter = coords.reduce((s,c)=>s+c.lat,0)/coords.length
+const lonM = 111320 * Math.cos(latCenter * Math.PI / 180)
+const jaunaPlatiba = Math.abs(area)/2 * 111320 * lonM / 10000
+setPlatiba(jaunaPlatiba)
 
 const nameMatch=text.match(/<n>(.*?)<\/n>/)
 if(nameMatch) setKmlName(nameMatch[1])
-saglabat({kmlCoords:coords, platiba:areaHa, kmlName:nameMatch?nameMatch[1]:kmlName})
+saglabat({kmlCoords:coords, platiba:jaunaPlatiba, kmlName:nameMatch?nameMatch[1]:kmlName})
 }
 
 // Pārvērš koordinātas uz SVG
@@ -562,7 +564,7 @@ td{border:1px solid #ccc;padding:3px 8px;font-size:10px}
 <table>
 <tr><td class="label">Īpašuma nosaukums</td><td>${saimnieciba||"___________________"}</td></tr>
 <tr><td class="label">Kadastra numurs</td><td>${kadastrs||"___________________"}</td></tr>
-<tr><td class="label">Nogabala numurs</td><td>${nogabals||"___________________"}</td></tr>
+<tr><td class="label">Nogabala(-u) numurs</td><td>${nogabals ? nogabals.split(";").map(n=>n.trim()).filter(n=>n).join(", ") : "___________________"}</td></tr>
 <tr><td class="label">Cirtes veids</td><td>${cirteVeids||"___________________"}</td></tr>
 <tr><td class="label">Cirtes izpildes veids</td><td>${cirteIzpilde||"___________________"}</td></tr>
 <tr><td class="label">Platība</td><td>${platiba>0 ? platiba.toFixed(2)+" ha" : "___________________"}</td></tr>
@@ -622,7 +624,24 @@ return(
 </div>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Nogabala numurs:</label><br/>
-<input value={nogabals} onChange={e=>{setNogabals(e.target.value);saglabat({nogabals:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+<input 
+  value={nogabals} 
+  onChange={e=>{
+    let val = e.target.value.replace(/,/g, ";")
+    setNogabals(val)
+    saglabat({nogabals:val})
+  }}
+  onKeyDown={e=>{
+    if(e.key===" "){
+      e.preventDefault()
+      const val = nogabals.trimEnd() + ";"
+      setNogabals(val)
+      saglabat({nogabals:val})
+    }
+  }}
+  style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}
+  placeholder="p.ē. 3;5.1;7"
+/>
 </div>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Cirtes veids:</label><br/>
@@ -631,6 +650,7 @@ return(
 <option>Galvenā cirte</option>
 <option>Kopšanas cirte</option>
 <option>Sanitārā cirte</option>
+<option>Jaunaudžu kopšana</option>
 </select>
 </div>
 <div>
@@ -647,6 +667,7 @@ return(
   <option>Sanitārā izlases cirte</option>
   <option>Sanitārā kailcirte pēc VMD atzinuma</option>
 </>}
+{cirteVeids==="Jaunaudžu kopšana" && <option>Jaunaudžu kopšana</option>}
 </select>
 </div>
 </div>
