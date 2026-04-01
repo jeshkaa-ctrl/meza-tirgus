@@ -2,7 +2,7 @@ import { useState } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { getBonitate } from "./bonityEngine"
 import { calcSortimentsByQuality } from "./qualityEngine"
-import { formFactor } from "./tables"
+import { formFactor, GminTable, GkritTable } from "./tables"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -10,10 +10,9 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).toString()
 
 const SUGAS = ["P","E","Lg","B","Ba","Bl","A","Oz","Os","G","M"]
-const KVALITATES = ["A1","A","B","C","D","Malka"]
-const AUGSNES_TIPI = ["Sl","Mr","Vr","Dm","Db","Nd","Vrs","Ds","Ks","Lk","Pv"]
-const PIEVESANA = ["Viegli","Vidēji","Smagi","Tikai ziemā"]
-const SEZONA = ["Visu gadu","Tikai ziemā (Lg)","Sausa vasara"]
+const KVALITATES = ["A1","A","B","C","D","Papīrmalka","Malka"]
+const AUGSNES_TIPI = ["Sl","Mr","Vr","Dm","Db","Nd","Vrs","Ds","Ks","Lk","Pv","Kp","As","Ap","Ln","Gr"]
+const PIEVESANA = ["Visu gadu","Sausa vasara","Vasara/Ziemā","Tikai ziemā"]
 const KVALITATE_COLORS = {
   A1:"#1b5e20", A:"#388e3c", B:"#81c784", C:"#fff176", D:"#ffb74d", Malka:"#e57373"
 }
@@ -26,12 +25,19 @@ const KVALITATE_DESC = {
   B:"B — Vidēja kvalitāte. Izteiktāka zarainums vai formas novirzes. Aptuveni puse zāģbaļķi, puse papīrmalka",
   C:"C — Zema kvalitāte. Ievērojami stumbra defekti, liela zarainums vai liektums. Galvenokārt papīrmalka",
   D:"D — Ļoti zema kvalitāte. Trupe, mehāniski bojājumi, stiprs liektums. Gandrīz visa papīrmalka vai malka",
+  Papīrmalka:"Papīrmalka — Jaunaudze vai sīkkoks. P/E/Lg/B/A → papīrmalka+šķelda, pārējie → malka+šķelda",
   Malka:"Malka — Nokaltis vai sanitārā cirte. Koksne izmantojama tikai malkai un šķeldai"
 }
-const CIRTE_VEIDS = ["Kailcirte","Caurmēra cirte","Kopšanas cirte","Sanitārā cirte"]
+const CIRTE_VEIDS = ["Galvenā cirte","Kopšanas cirte","Sanitārā cirte"]
+
+const CIRTE_IZPILDE = {
+  "Galvenā cirte": ["Kailcirte","Kailcirte pēc caurmēra","Izlases cirte"],
+  "Kopšanas cirte": ["Kopšanas cirte"],
+  "Sanitārā cirte": ["Sanitārā izlases cirte","Sanitārā kailcirte pēc VMD atzinuma"]
+}
 
 const defaultSuga = () => ({
-  suga:"P", vecums:0, h:0, g:0,
+  suga:"P", vecums:0, h:0, d:0, g:0,
   kvalitate:"A", bonitate:"", kraja:0, sortimenti:{}
 })
 
@@ -41,36 +47,57 @@ const defaultNogabals = () => ({
 })
 
 const defaultCirsma = () => ({
-  nosaukums:"", cirteVeids:"Kailcirte",
-  pievesana:"Vidēji", sezona:"Visu gadu",
+  cirteVeids:"Galvenā cirte",
+  cirteIzpilde:"Kailcirte",
+  pievesana:"Visu gadu",
   piezimes:"", nogabali:[defaultNogabals()],
   dastojums:null
 })
 
 const parseNum = (v) => parseFloat(String(v).replace(",",".")) || 0
 
-export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecibaIn=""}) {
-  const [kadastrs, setKadastrs] = useState(kadastrsIn)
-  const [saimnieciba, setSaimnieciba] = useState(saimniecibaIn)
-  const [cirsmas, setCirsmas] = useState([defaultCirsma()])
-  const [prices] = useState({
-    log:93, small:65, veneer:130, tara:48, pulp:50, fire:38, chips:15
+export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecibaIn="", savedState, onSaveState}) {
+  const [kadastrs, setKadastrs] = useState(savedState?.kadastrs ?? kadastrsIn)
+  const [saimnieciba, setSaimnieciba] = useState(savedState?.saimnieciba ?? saimniecibaIn)
+  const [cirsmas, setCirsmas] = useState(savedState?.cirsmas ?? [defaultCirsma()])
+const [prices, setPrices] = useState({
+    log:93, small:65, veneer:130, tara:48, pulp:50, fire:38, chips:12
   })
+  const [showPrices, setShowPrices] = useState(false)
+
+  const saglabat = (jaunasCircsmas, jaunaisKadastrs, jaunaSaimnieciba) => {
+    onSaveState?.({
+      kadastrs: jaunaisKadastrs ?? kadastrs,
+      saimnieciba: jaunaSaimnieciba ?? saimnieciba,
+      cirsmas: jaunasCircsmas ?? cirsmas
+    })
+  }
 
   const sortimentNames = {
     log:"Zāģbaļķi", small:"Sīkbaļķi", veneer:"Finieris",
     tara:"Tara", pulp:"Papīrmalka", fire:"Malka", chips:"Šķelda"
   }
 
-  // ---- Update helpers ----
   const updateCirsma = (ci, field, value) => {
-    const n = [...cirsmas]; n[ci] = {...n[ci], [field]: value}; setCirsmas(n)
+    const n = [...cirsmas]; n[ci] = {...n[ci], [field]: value}
+    setCirsmas(n); saglabat(n)
   }
 
   const updateNogabals = (ci, ni, field, value) => {
     const n = [...cirsmas]
     n[ci].nogabali[ni] = {...n[ci].nogabali[ni], [field]: value}
-    setCirsmas(n)
+    // Ja mainās platība — pārrēķina visas sugas
+    if(field === "platiba") {
+      const plat = parseNum(value) || 1
+      n[ci].nogabali[ni].sugas = n[ci].nogabali[ni].sugas.map(s => {
+        const g = parseNum(s.g)
+        const h = parseNum(s.h)
+        const F = formFactor[s.suga] || 0.5
+        const kraja = g * h * F * plat
+        return {...s, kraja, sortimenti: calcSortimentsByQuality(kraja, s.suga, s.kvalitate, parseNum(s.d))}
+      })
+    }
+    setCirsmas(n); saglabat(n)
   }
 
   const updateSuga = (ci, ni, si, field, value) => {
@@ -86,53 +113,115 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
       const F = formFactor[sp] || 0.5
       const plat = parseNum(nog.platiba) || 1
       suga.kraja = g * h * F * plat
-      suga.sortimenti = calcSortimentsByQuality(suga.kraja, sp, suga.kvalitate)
+      suga.sortimenti = calcSortimentsByQuality(suga.kraja, sp, suga.kvalitate, parseNum(suga.d))
     }
     if(field==="kvalitate"){
-      suga.sortimenti = calcSortimentsByQuality(parseNum(suga.kraja), suga.suga, value)
+      suga.sortimenti = calcSortimentsByQuality(parseNum(suga.kraja), suga.suga, value, parseNum(suga.d))
     }
     n[ci].nogabali[ni].sugas[si] = suga
-    setCirsmas(n)
+    setCirsmas(n); saglabat(n)
   }
 
   const addNogabals = (ci) => {
     const n = [...cirsmas]
     n[ci].nogabali = [...n[ci].nogabali, defaultNogabals()]
-    setCirsmas(n)
+    setCirsmas(n); saglabat(n)
   }
 
   const removeNogabals = (ci, ni) => {
     const n = [...cirsmas]
     n[ci].nogabali = n[ci].nogabali.filter((_,i)=>i!==ni)
-    setCirsmas(n)
+    setCirsmas(n); saglabat(n)
   }
 
   const addSuga = (ci, ni) => {
     const n = [...cirsmas]
     n[ci].nogabali[ni].sugas = [...n[ci].nogabali[ni].sugas, defaultSuga()]
-    setCirsmas(n)
+    setCirsmas(n); saglabat(n)
   }
 
   const removeSuga = (ci, ni, si) => {
     const n = [...cirsmas]
     n[ci].nogabali[ni].sugas = n[ci].nogabali[ni].sugas.filter((_,i)=>i!==si)
-    setCirsmas(n)
+    setCirsmas(n); saglabat(n)
   }
 
-  const addCirsma = () => setCirsmas([...cirsmas, defaultCirsma()])
-  const removeCirsma = (ci) => setCirsmas(cirsmas.filter((_,i)=>i!==ci))
+  const addCirsma = () => {
+    const n = [...cirsmas, defaultCirsma()]
+    setCirsmas(n); saglabat(n)
+  }
 
-  // ---- Totals ----
-  const calcNogabalsTotal = (nog) => {
+  const removeCirsma = (ci) => {
+    const n = cirsmas.filter((_,i)=>i!==ci)
+    setCirsmas(n); saglabat(n)
+  }
+
+  const notirit = () => {
+    if(window.confirm("Dzēst visu darbu? To nevarēs atjaunot.")) {
+      setCirsmas([defaultCirsma()])
+      setKadastrs("")
+      setSaimnieciba("")
+      onSaveState?.(null)
+    }
+  }
+
+  const calcNogabalsIznemPct = (nog, cirteVeids="") => {
+    const kopejaisG = nog.sugas.reduce((s, sg) => s + parseNum(sg.g), 0)
+    const valdosaSuga = nog.sugas.reduce((best, sg) => parseNum(sg.g) > parseNum(best.g) ? sg : best, nog.sugas[0])
+    let iznemPct = 1.0
+    if(kopejaisG > 0 && valdosaSuga) {
+      const h = Math.round(parseNum(valdosaSuga.h))
+      const sp = valdosaSuga.suga
+      const hClamped = Math.min(Math.max(h, 12), 35)
+      if(cirteVeids === "Kopšanas cirte") {
+        const gmin = GminTable[hClamped]?.[sp]
+        if(gmin && kopejaisG > gmin) { iznemPct = (kopejaisG - gmin) / kopejaisG }
+        else if(gmin) { iznemPct = 0 }
+      } else if(cirteVeids === "Sanitārā cirte") {
+        const gkrit = GkritTable[hClamped]?.[sp]
+        if(gkrit && kopejaisG > gkrit) { iznemPct = (kopejaisG - gkrit) / kopejaisG }
+        else if(gkrit) { iznemPct = 0 }
+      }
+    }
+    return iznemPct
+  }
+
+  const calcNogabalsTotal = (nog, cirteVeids="") => {
     const t = {log:0,small:0,veneer:0,tara:0,pulp:0,fire:0,chips:0}
-    nog.sugas.forEach(s => Object.keys(t).forEach(k => { t[k] += s.sortimenti[k]||0 }))
+
+    // Aprēķina kopējo G un valdošo sugu
+    const kopejaisG = nog.sugas.reduce((s, sg) => s + parseNum(sg.g), 0)
+    const valdosaSuga = nog.sugas.reduce((best, sg) => parseNum(sg.g) > parseNum(best.g) ? sg : best, nog.sugas[0])
+
+    // KK loģika
+    let iznemPct = 1.0
+    if(kopejaisG > 0 && valdosaSuga) {
+      const h = Math.round(parseNum(valdosaSuga.h))
+      const sp = valdosaSuga.suga
+      const hClamped = Math.min(Math.max(h, 12), 35)
+      if(cirteVeids === "Kopšanas cirte") {
+        const gmin = GminTable[hClamped]?.[sp]
+        if(gmin && kopejaisG > gmin) { iznemPct = (kopejaisG - gmin) / kopejaisG }
+        else if(gmin) { iznemPct = 0 }
+      } else if(cirteVeids === "Sanitārā cirte") {
+        const gkrit = GkritTable[hClamped]?.[sp]
+        if(gkrit && kopejaisG > gkrit) { iznemPct = (kopejaisG - gkrit) / kopejaisG }
+        else if(gkrit) { iznemPct = 0 }
+      }
+    }
+
+    nog.sugas.forEach(s => {
+      Object.keys(t).forEach(k => {
+        t[k] += (s.sortimenti[k]||0) * iznemPct
+      })
+    })
     return t
   }
 
   const calcCirsmaTotal = (cirsma) => {
     const t = {log:0,small:0,veneer:0,tara:0,pulp:0,fire:0,chips:0}
     cirsma.nogabali.forEach(nog => {
-      const nt = calcNogabalsTotal(nog)
+      const nt = calcNogabalsTotal(nog, cirsma.cirteVeids)
       Object.keys(t).forEach(k => { t[k] += nt[k] })
     })
     return t
@@ -141,7 +230,6 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
   const calcValue = (s) =>
     Object.keys(s).reduce((sum,k) => sum + (s[k]||0)*(prices[k]||0), 0)
 
-  // ---- Dastojums PDF ----
   const handleDastojumsPDF = async (ci, event) => {
     const file = event.target.files[0]; if(!file) return
     const reader = new FileReader()
@@ -169,12 +257,12 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
           }
         })
       })
-      const n = [...cirsmas]; n[ci].dastojums = result; setCirsmas(n)
+      const n = [...cirsmas]; n[ci].dastojums = result
+      setCirsmas(n); saglabat(n)
     }
     reader.readAsArrayBuffer(file)
   }
 
-  // ---- Export PDF ----
   const exportPDF = () => {
     const today = new Date().toLocaleDateString("lv-LV")
     let html = `<html><head><meta charset="UTF-8"><style>
@@ -204,24 +292,20 @@ tr:nth-child(even){background:#f0f8f0}
       Object.keys(kopaTotals).forEach(k => kopaTotals[k] += ct[k])
       kopaVertiba += cv
       const kopPlat = cirsma.nogabali.reduce((s,n)=>s+parseNum(n.platiba),0)
-
-      html += `<h2>Cirsma ${ci+1}${cirsma.nosaukums?" — "+cirsma.nosaukums:""} | ${cirsma.cirteVeids} | ${kopPlat.toFixed(2)} ha | ${cirsma.pievesana}</h2>`
-
+      html += `<h2>Cirsma ${ci+1} | ${cirsma.cirteVeids} — ${cirsma.cirteIzpilde||""} | ${kopPlat.toFixed(2)} ha | ${cirsma.pievesana}</h2>`
       cirsma.nogabali.forEach((nog, ni) => {
-        const nt = calcNogabalsTotal(nog)
+        const nt = calcNogabalsTotal(nog, cirsma.cirteVeids)
         const nv = calcValue(nt)
         const nVol = Object.values(nt).reduce((a,b)=>a+b,0)
         html += `<h3>Nogabals ${nog.nr||ni+1} — ${nog.platiba} ha | ${nog.augsneTips}</h3>`
-        html += `<table><thead><tr><th>Suga</th><th>Vec</th><th>H</th><th>G</th><th>Bon</th><th>Kval</th><th>Krāja m³</th><th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th></tr></thead><tbody>`
+        html += `<table><thead><tr><th>Suga</th><th>Vec</th><th>H</th><th>D</th><th>G</th><th>Bon</th><th>Kval</th><th>Krāja m³</th><th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th></tr></thead><tbody>`
         nog.sugas.forEach(s => {
-          html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.g}</td><td>${s.bonitate||"—"}</td><td>${s.kvalitate}</td><td>${s.kraja.toFixed(1)}</td><td>${(s.sortimenti.log||0).toFixed(1)}</td><td>${(s.sortimenti.veneer||0).toFixed(1)}</td><td>${(s.sortimenti.tara||0).toFixed(1)}</td><td>${(s.sortimenti.pulp||0).toFixed(1)}</td><td>${(s.sortimenti.fire||0).toFixed(1)}</td><td>${(s.sortimenti.chips||0).toFixed(1)}</td></tr>`
+         html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"—"}</td><td>${s.g}</td><td>${s.bonitate||"—"}</td><td>${s.kvalitate}</td><td>${s.kraja.toFixed(1)}</td><td>${(s.sortimenti.log||0).toFixed(1)}</td><td>${(s.sortimenti.veneer||0).toFixed(1)}</td><td>${(s.sortimenti.tara||0).toFixed(1)}</td><td>${(s.sortimenti.pulp||0).toFixed(1)}</td><td>${(s.sortimenti.fire||0).toFixed(1)}</td><td>${(s.sortimenti.chips||0).toFixed(1)}</td></tr>`
         })
         html += `</tbody></table><p class="kops">Nogabals kopā: ${nVol.toFixed(1)} m³ | ${nv.toFixed(0)} €</p>`
       })
-
       html += `<p class="kops">▶ Cirsma kopā: ${Object.values(ct).reduce((a,b)=>a+b,0).toFixed(1)} m³ | ${cv.toFixed(0)} €</p>`
       if(cirsma.piezimes) html += `<p><b>Piezīmes:</b> ${cirsma.piezimes}</p>`
-
       if(cirsma.dastojums && Object.keys(cirsma.dastojums).length > 0){
         html += `<h3>Salīdzinājums ar dastojumu</h3><table><thead><tr><th>Sortiments</th><th>Mērījumi m³</th><th>Dastojums m³</th><th>Starpība m³</th><th>%</th></tr></thead><tbody>`
         Object.keys(ct).forEach(k => {
@@ -246,27 +330,53 @@ tr:nth-child(even){background:#f0f8f0}
     win.document.write(html); win.document.close(); win.print()
   }
 
-  // ---- Render ----
   return (
     <div style={{padding:"40px",fontFamily:"Arial",maxWidth:"1200px"}}>
-      <button onClick={onBack} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button>
+      {/* Pogu josla augšā */}
+      <div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap"}}>
+        <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
+        <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🗑 Dzēst visu</button>
+        <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🗺 LVM GEO</a>
+        {kadastrs && (
+          <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>📋 Kopēt kadastru</button>
+        )}
+        <button onClick={()=>setShowPrices(!showPrices)} style={{padding:"6px 14px",background:"#f9a825",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>💰 Cenas</button>
+      </div>
+
       <h1 style={{color:"#225522"}}>🌲 Cirsmas novērtēšana</h1>
-<div style={{float:"right",width:"220px",padding:"10px",background:"white",border:"1px solid #ccc",borderRadius:"6px",fontSize:"11px",marginLeft:"16px"}}>
-  <b style={{fontSize:"12px",color:"#225522"}}>Kvalitātes klases:</b>
-  {Object.keys(KVALITATE_DESC).map(k=>(
-    <div key={k} style={{marginTop:"6px",padding:"4px 8px",borderRadius:"4px",background:KVALITATE_COLORS[k],color:KVALITATE_TEXT_COLORS[k]}}>
-      {KVALITATE_DESC[k]}
-    </div>
-  ))}
-</div>
+
+      {showPrices && (
+        <div style={{marginBottom:"16px",padding:"12px",background:"#f0f8f0",border:"1px solid #225522",borderRadius:"6px"}}>
+          <b style={{fontSize:"12px",color:"#225522"}}>Cenas €/m³:</b>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginTop:"8px"}}>
+            {Object.keys(prices).map(k=>(
+              <div key={k}>
+                <label style={{fontSize:"11px",fontWeight:"bold"}}>{sortimentNames[k]}:</label><br/>
+                <input type="number" value={prices[k]} onChange={e=>setPrices({...prices,[k]:Number(e.target.value)})} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+              </div>
+            ))}
+          </div>
+          <button onClick={()=>setShowPrices(false)} style={{marginTop:"8px",padding:"4px 12px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>Aizvērt</button>
+        </div>
+      )}
+
+      <div style={{float:"right",width:"220px",padding:"10px",background:"white",border:"1px solid #ccc",borderRadius:"6px",fontSize:"11px",marginLeft:"16px"}}>
+        <b style={{fontSize:"12px",color:"#225522"}}>Kvalitātes klases:</b>
+        {Object.keys(KVALITATE_DESC).map(k=>(
+          <div key={k} style={{marginTop:"6px",padding:"4px 8px",borderRadius:"4px",background:KVALITATE_COLORS[k],color:KVALITATE_TEXT_COLORS[k]}}>
+            {KVALITATE_DESC[k]}
+          </div>
+        ))}
+      </div>
+
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"20px",padding:"12px",background:"#f0f8f0",borderRadius:"6px",border:"1px solid #225522"}}>
         <div>
           <label style={{fontSize:"12px",fontWeight:"bold"}}>Kadastra numurs:</label><br/>
-          <input value={kadastrs} onChange={e=>setKadastrs(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+          <input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat(cirsmas,e.target.value,saimnieciba)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
         </div>
         <div>
           <label style={{fontSize:"12px",fontWeight:"bold"}}>Saimniecības nosaukums:</label><br/>
-          <input value={saimnieciba} onChange={e=>setSaimnieciba(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+          <input value={saimnieciba} onChange={e=>{setSaimnieciba(e.target.value);saglabat(cirsmas,kadastrs,e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
         </div>
       </div>
 
@@ -283,14 +393,21 @@ tr:nth-child(even){background:#f0f8f0}
             </div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginBottom:"16px",padding:"8px",background:"#f9f9f9",borderRadius:"4px"}}>
-              <div>
-                <label style={{fontSize:"11px",fontWeight:"bold"}}>Nosaukums:</label><br/>
-                <input value={cirsma.nosaukums} onChange={e=>updateCirsma(ci,"nosaukums",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}/>
-              </div>
+              
               <div>
                 <label style={{fontSize:"11px",fontWeight:"bold"}}>Cirtes veids:</label><br/>
-                <select value={cirsma.cirteVeids} onChange={e=>updateCirsma(ci,"cirteVeids",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}>
+                <select value={cirsma.cirteVeids} onChange={e=>{
+                  const n = [...cirsmas]
+                  n[ci] = {...n[ci], cirteVeids:e.target.value, cirteIzpilde:CIRTE_IZPILDE[e.target.value][0]}
+                  setCirsmas(n); saglabat(n)
+                }} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}>
                   {CIRTE_VEIDS.map(t=><option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{fontSize:"11px",fontWeight:"bold"}}>Izpildes veids:</label><br/>
+                <select value={cirsma.cirteIzpilde||CIRTE_IZPILDE[cirsma.cirteVeids]?.[0]} onChange={e=>updateCirsma(ci,"cirteIzpilde",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}>
+                  {(CIRTE_IZPILDE[cirsma.cirteVeids]||[]).map(t=><option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
@@ -299,12 +416,7 @@ tr:nth-child(even){background:#f0f8f0}
                   {PIEVESANA.map(p=><option key={p}>{p}</option>)}
                 </select>
               </div>
-              <div>
-                <label style={{fontSize:"11px",fontWeight:"bold"}}>Sezona:</label><br/>
-                <select value={cirsma.sezona} onChange={e=>updateCirsma(ci,"sezona",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}>
-                  {SEZONA.map(s=><option key={s}>{s}</option>)}
-                </select>
-              </div>
+              
               <div style={{gridColumn:"span 4"}}>
                 <label style={{fontSize:"11px",fontWeight:"bold"}}>Piezīmes:</label><br/>
                 <input value={cirsma.piezimes} onChange={e=>updateCirsma(ci,"piezimes",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}} placeholder="Dzīvnieku bojājumi, piepe, pievešanas apstākļi..."/>
@@ -312,7 +424,9 @@ tr:nth-child(even){background:#f0f8f0}
             </div>
 
             {cirsma.nogabali.map((nog, ni) => {
-              const nt = calcNogabalsTotal(nog)
+              const iznemPct = calcNogabalsIznemPct(nog, cirsma.cirteVeids)
+              
+              const nt = calcNogabalsTotal(nog, cirsma.cirteVeids)
               const nv = calcValue(nt)
               const nVol = Object.values(nt).reduce((a,b)=>a+b,0)
 
@@ -344,7 +458,7 @@ tr:nth-child(even){background:#f0f8f0}
                     <table border="1" cellPadding="3" style={{fontSize:"11px",width:"100%",minWidth:"850px"}}>
                       <thead style={{background:"#2e7d32",color:"white"}}>
                         <tr>
-                          <th>Suga</th><th>Vecums</th><th>H (m)</th><th>G (m²/ha)</th>
+                          <th>Suga</th><th>Vecums</th><th>H (m)</th><th>D (cm)</th><th>G (m²/ha)</th>
                           <th>Bonitāte</th><th>Kvalitāte</th><th>Krāja m³</th>
                           <th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th>
                           <th>Vērtība €</th><th></th>
@@ -360,6 +474,7 @@ tr:nth-child(even){background:#f0f8f0}
                             </td>
                             <td><input type="number" value={s.vecums||""} onChange={e=>updateSuga(ci,ni,si,"vecums",e.target.value)} style={{width:"42px",fontSize:"11px"}}/></td>
                             <td><input type="number" value={s.h||""} onChange={e=>updateSuga(ci,ni,si,"h",e.target.value)} style={{width:"38px",fontSize:"11px"}}/></td>
+                            <td><input type="number" value={s.d||""} onChange={e=>updateSuga(ci,ni,si,"d",e.target.value)} style={{width:"38px",fontSize:"11px"}}/></td>
                             <td><input value={s.g||""} onChange={e=>updateSuga(ci,ni,si,"g",e.target.value)} style={{width:"42px",fontSize:"11px"}}/></td>
                             <td style={{textAlign:"center",fontWeight:"bold",color:"#225522"}}>{s.bonitate||"—"}</td>
                             <td>
@@ -367,14 +482,14 @@ tr:nth-child(even){background:#f0f8f0}
                                 {KVALITATES.map(k=><option key={k}>{k}</option>)}
                               </select>
                             </td>
-                            <td style={{textAlign:"right"}}>{s.kraja.toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{(s.sortimenti.log||0).toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{(s.sortimenti.veneer||0).toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{(s.sortimenti.tara||0).toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{(s.sortimenti.pulp||0).toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{(s.sortimenti.fire||0).toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{(s.sortimenti.chips||0).toFixed(1)}</td>
-                            <td style={{textAlign:"right",fontWeight:"bold"}}>{calcValue(s.sortimenti).toFixed(0)}</td>
+                            <td style={{textAlign:"right"}}>{(s.kraja*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.log||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.veneer||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.tara||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.pulp||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.fire||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.chips||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right",fontWeight:"bold"}}>{(calcValue(s.sortimenti)*iznemPct).toFixed(0)}</td>
                             <td><button onClick={()=>removeSuga(ci,ni,si)} style={{background:"none",border:"none",color:"#c62828",cursor:"pointer",fontWeight:"bold"}}>×</button></td>
                           </tr>
                         ))}

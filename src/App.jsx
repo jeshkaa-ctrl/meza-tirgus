@@ -10,15 +10,34 @@ import.meta.url
 ).toString()
 
 // ========== CIRSMAS SKICE ==========
-function CirsmaskicePage({onBack,kadastrsIn="",saimniecibaIn=""}){
-const [kmlCoords,setKmlCoords]=useState([])
-const [kmlName,setKmlName]=useState("")
-const [kadastrs,setKadastrs]=useState(kadastrsIn)
-const [saimnieciba,setSaimnieciba]=useState(saimniecibaIn)
-const [nogabals,setNogabals]=useState("")
-const [cirteVeids,setCirteVeids]=useState("")
-const [cirteIzpilde,setCirteIzpilde]=useState("")
-const [platiba,setPlatiba]=useState(0)
+function CirsmaskicePage({onBack,kadastrsIn="",saimniecibaIn="",savedState,onSaveState}){
+const [kmlCoords,setKmlCoords]=useState(savedState?.kmlCoords||[])
+const [kmlName,setKmlName]=useState(savedState?.kmlName||"")
+const [kadastrs,setKadastrs]=useState(savedState?.kadastrs||kadastrsIn)
+const [saimnieciba,setSaimnieciba]=useState(savedState?.saimnieciba||saimniecibaIn)
+const [nogabals,setNogabals]=useState(savedState?.nogabals||"")
+const [cirteVeids,setCirteVeids]=useState(savedState?.cirteVeids||"")
+const [cirteIzpilde,setCirteIzpilde]=useState(savedState?.cirteIzpilde||"")
+const [platiba,setPlatiba]=useState(savedState?.platiba||0)
+
+const saglabat = (jaunie) => onSaveState?.({
+  kmlCoords:jaunie?.kmlCoords??kmlCoords,
+  kmlName:jaunie?.kmlName??kmlName,
+  kadastrs:jaunie?.kadastrs??kadastrs,
+  nogabals:jaunie?.nogabals??nogabals,
+  cirteVeids:jaunie?.cirteVeids??cirteVeids,
+  cirteIzpilde:jaunie?.cirteIzpilde??cirteIzpilde,
+  platiba:jaunie?.platiba??platiba
+})
+
+const notirit = () => {
+  if(window.confirm("Dzēst visu darbu?")) {
+    setKmlCoords([]); setKmlName(""); setKadastrs("")
+    setNogabals(""); setCirteVeids(""); setCirteIzpilde(""); setPlatiba(0)
+    onSaveState?.(null)
+  }
+}
+
 const handleSHP=async(event)=>{
   const file=event.target.files[0]
   if(!file) return
@@ -46,9 +65,11 @@ const handleSHP=async(event)=>{
     area+=coords[i].lon*coords[j].lat
     area-=coords[j].lon*coords[i].lat
   }
-  setPlatiba(Math.abs(area)/2*111320*71695/10000)
+  const jaunaPlatiba=Math.abs(area)/2*111320*71695/10000
+  setPlatiba(jaunaPlatiba)
   const props=features[0].properties||{}
   if(props.PARCELCODE) setKadastrs(props.PARCELCODE)
+  saglabat({kmlCoords:coords, platiba:jaunaPlatiba, kadastrs:props.PARCELCODE||kadastrs})
 }
 
 const lks92ToWgs84=(x,y)=>{
@@ -68,6 +89,7 @@ const lks92ToWgs84=(x,y)=>{
   const lon=lon0+(D-(1+2*T1+C1)*D**3/6+(5-2*C1+28*T1-3*C1**2+8*e2/(1-e2)+24*T1**2)*D**5/120)/Math.cos(phi1)
   return{lat:lat*180/Math.PI,lon:lon*180/Math.PI}
 }
+
 const handleKML=async(event)=>{
 const file=event.target.files[0]
 if(!file) return
@@ -81,7 +103,6 @@ const [lon,lat]=p.split(",").map(Number)
 return {lon,lat}
 })
 setKmlCoords(coords)
-
 // Aprēķina platību (Shoelace formula)
 let area=0
 for(let i=0;i<coords.length-1;i++){
@@ -96,6 +117,7 @@ setPlatiba(areaHa)
 
 const nameMatch=text.match(/<n>(.*?)<\/n>/)
 if(nameMatch) setKmlName(nameMatch[1])
+saglabat({kmlCoords:coords, platiba:areaHa, kmlName:nameMatch?nameMatch[1]:kmlName})
 }
 
 // Pārvērš koordinātas uz SVG
@@ -280,7 +302,12 @@ win.print()
 
 return(
 <div style={{padding:"40px",fontFamily:"Arial",maxWidth:"900px"}}>
-<button onClick={onBack} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakal</button>
+<div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap"}}>
+  <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
+  <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🗑 Dzēst visu</button>
+  <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🗺 LVM GEO</a>
+  {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📋 Kopēt kadastru</button>}
+</div>
 <h1>Cirsmas skice</h1>
 
 <div style={{display:"flex",gap:"16px",marginBottom:"16px",flexWrap:"wrap"}}>
@@ -297,15 +324,15 @@ return(
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"}}>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Kadastra numurs:</label><br/>
-<input value={kadastrs} onChange={e=>setKadastrs(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+<input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat({kadastrs:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
 </div>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Nogabala numurs:</label><br/>
-<input value={nogabals} onChange={e=>setNogabals(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+<input value={nogabals} onChange={e=>{setNogabals(e.target.value);saglabat({nogabals:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
 </div>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Cirtes veids:</label><br/>
-<select value={cirteVeids} onChange={e=>setCirteVeids(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+<select value={cirteVeids} onChange={e=>{setCirteVeids(e.target.value);saglabat({cirteVeids:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
 <option value="">— izvēlies —</option>
 <option>Galvenā cirte</option>
 <option>Kopšanas cirte</option>
@@ -315,7 +342,7 @@ return(
 </div>
 <div>
 <label style={{fontSize:"12px",fontWeight:"bold"}}>Cirtes izpildes veids:</label><br/>
-<select value={cirteIzpilde} onChange={e=>setCirteIzpilde(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+<select value={cirteIzpilde} onChange={e=>{setCirteIzpilde(e.target.value);saglabat({cirteIzpilde:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
 <option value="">— izvēlies —</option>
 <option>Vienlaidus</option>
 <option>Kopšanas</option>
@@ -765,12 +792,16 @@ log:true,small:true,veneer:true,tara:true,pulp:true,fire:true,chips:true
 const [extraSorts,setExtraSorts]=useState([])
 const [parseText,setParseText]=useState("")
 const [jaunaudzes,setJaunaudzes]=useState([])
-if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")}/>
-if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba}/>
+const [skirotajsState,setSkirotajsState]=useState(null)
+const [cirsmaState,setCirsmaState]=useState(null)
+const [skiceState,setSkiceState]=useState(null)
+const [caurmersState,setCaurmersState]=useState(null)
+if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
+if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState}/>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
-if(page==="skice") return <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba}/>
-if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")}/>
-if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakal</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
+if(page==="skice") return <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState}/>
+if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedState={caurmersState} onSaveState={setCaurmersState}/>
+if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 
 const landPrices={
 Ap:4500,Vr:4500,Nd:2500,Db:2500,Vrs:3000,Dm:3000,Kp:3000
@@ -1033,14 +1064,13 @@ Atjaunošanas pārskats
 })()}
 </div>
 
-{kadastrs && (
-<div style={{marginBottom:"8px"}}>
-<b>Kadastrs:</b> {kadastrs} | <b>Saimnieciba:</b> {saimnieciba}
-{" "}
-<a href={"https://www.lvmgeo.lv/kartes"} target="_blank" rel="noreferrer" style={{marginLeft:"12px",padding:"4px 10px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"12px"}}>LVM GEO</a>
-<button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{marginLeft:"8px",padding:"4px 10px",background:"#555",color:"white",border:"none",borderRadius:"4px",fontSize:"12px",cursor:"pointer"}}>Kopet kadastru</button>
+<div style={{marginBottom:"12px",display:"flex",gap:"8px",flexWrap:"wrap",alignItems:"center"}}>
+  <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"12px",fontWeight:"bold"}}>🗺 LVM GEO</a>
+  {kadastrs && <>
+    <span style={{fontSize:"12px"}}><b>Kadastrs:</b> {kadastrs} | <b>Saimniecība:</b> {saimnieciba}</span>
+    <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",fontSize:"12px",cursor:"pointer"}}>📋 Kopēt kadastru</button>
+  </>}
 </div>
-)}
 
 <input type="file" accept="application/pdf" onChange={handlePDF}/>
 

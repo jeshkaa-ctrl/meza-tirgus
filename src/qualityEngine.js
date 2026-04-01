@@ -1,6 +1,18 @@
 // Sortimentu sadalījums pēc sugas un kvalitātes klases
 // Klases: A1, A, B, C, D, Malka
-
+export const papirmalkaKlase = {
+  P:  {log:0, veneer:0, tara:0, pulp:0.85, fire:0,    chips:0.15},
+  E:  {log:0, veneer:0, tara:0, pulp:0.85, fire:0,    chips:0.15},
+  Lg: {log:0, veneer:0, tara:0, pulp:0.85, fire:0,    chips:0.15},
+  B:  {log:0, veneer:0, tara:0, pulp:0.85, fire:0,    chips:0.15},
+  A:  {log:0, veneer:0, tara:0, pulp:0.85, fire:0,    chips:0.15},
+  Ba: {log:0, veneer:0, tara:0, pulp:0,    fire:0.85, chips:0.15},
+  Bl: {log:0, veneer:0, tara:0, pulp:0,    fire:0.85, chips:0.15},
+  M:  {log:0, veneer:0, tara:0, pulp:0,    fire:0.85, chips:0.15},
+  Oz: {log:0, veneer:0, tara:0, pulp:0,    fire:0.85, chips:0.15},
+  Os: {log:0, veneer:0, tara:0, pulp:0,    fire:0.85, chips:0.15},
+  G:  {log:0, veneer:0, tara:0, pulp:0,    fire:0.85, chips:0.15},
+}
 export const qualitySortiments = {
   P: {
     A1:   {log:0.92, small:0,    veneer:0,    tara:0,    pulp:0.05, fire:0,    chips:0.03},
@@ -92,12 +104,27 @@ export const qualitySortiments = {
   },
 }
 
-export function calcSortimentsByQuality(volume, suga, kvalitate) {
+export function calcSortimentsByQuality(volume, suga, kvalitate, d=0) {
+  if(kvalitate === "Papīrmalka") {
+    const klase = papirmalkaKlase[suga] || papirmalkaKlase["P"]
+    const result = {}
+    Object.keys(klase).forEach(k => { result[k] = volume * klase[k] })
+    return result
+  }
   const sugas = qualitySortiments[suga] || qualitySortiments["P"]
   const klase = sugas[kvalitate] || sugas["C"]
   const result = {}
-  Object.keys(klase).forEach(k => {
-    result[k] = volume * klase[k]
-  })
+  Object.keys(klase).forEach(k => { result[k] = volume * klase[k] })
+
+  // Ja D < 18cm — nav zāģbaļķu un finieru, pārdale uz papīrmalku/šķeldu
+  if(d > 0 && d < 18) {
+    const noLog = (result.log||0) + (result.veneer||0) + (result.tara||0)
+    result.log = 0
+    result.veneer = 0
+    result.tara = d >= 12 ? noLog * 0.4 : 0
+    result.pulp = (result.pulp||0) + noLog * (d >= 12 ? 0.45 : 0.75)
+    result.chips = (result.chips||0) + noLog * (d >= 12 ? 0.15 : 0.25)
+  }
+
   return result
 }

@@ -54,6 +54,32 @@ export const GminTable = {
 }
 // Minimālais koku skaits atjaunošanai (MK noteikumi Nr.308, spēkā no 30.06.2022.)
 // P: 2000 gab/ha, pārējās sugas: 1500 gab/ha
+export const GkritTable = {
+12:  {P:7,  E:6,  B:4,  A:5,  Ba:5, Oz:5,  Os:4},
+13:  {P:8,  E:6,  B:5,  A:6,  Ba:6, Oz:5,  Os:4},
+14:  {P:8,  E:7,  B:5,  A:6,  Ba:6, Oz:6,  Os:5},
+15:  {P:8,  E:7,  B:5,  A:6,  Ba:6, Oz:6,  Os:5},
+16:  {P:8,  E:7,  B:6,  A:6,  Ba:6, Oz:6,  Os:5},
+17:  {P:8,  E:8,  B:6,  A:7,  Ba:7, Oz:6,  Os:6},
+18:  {P:8,  E:8,  B:6,  A:7,  Ba:7, Oz:7,  Os:6},
+19:  {P:8,  E:8,  B:6,  A:7,  Ba:7, Oz:7,  Os:6},
+20:  {P:9,  E:8,  B:6,  A:8,  Ba:8, Oz:7,  Os:6},
+21:  {P:9,  E:8,  B:7,  A:8,  Ba:8, Oz:7,  Os:6},
+22:  {P:9,  E:9,  B:7,  A:8,  Ba:8, Oz:8,  Os:6},
+23:  {P:9,  E:9,  B:7,  A:8,  Ba:8, Oz:8,  Os:6},
+24:  {P:9,  E:9,  B:7,  A:9,  Ba:9, Oz:8,  Os:7},
+25:  {P:9,  E:10, B:8,  A:9,  Ba:9, Oz:8,  Os:7},
+26:  {P:9,  E:10, B:8,  A:9,  Ba:9, Oz:8,  Os:7},
+27:  {P:9,  E:10, B:8,  A:10, Ba:10,Oz:9,  Os:7},
+28:  {P:9,  E:10, B:8,  A:10, Ba:10,Oz:9,  Os:7},
+29:  {P:9,  E:10, B:8,  A:10, Ba:10,Oz:9,  Os:7},
+30:  {P:9,  E:10, B:8,  A:10, Ba:10,Oz:9,  Os:7},
+31:  {P:9,  E:11, B:8,  A:10, Ba:10,Oz:9,  Os:7},
+32:  {P:9,  E:11, B:9,  A:10, Ba:10,Oz:9,  Os:7},
+33:  {P:10, E:11, B:9,  A:11, Ba:11,Oz:10, Os:7},
+34:  {P:10, E:11, B:9,  A:11, Ba:11,Oz:10, Os:7},
+35:  {P:10, E:11, B:9,  A:11, Ba:11,Oz:10, Os:7},
+}
 export const normalTreeCount = {
   P:    2000,
   E:    1500,
