@@ -497,6 +497,31 @@ tr:nth-child(even){background:#f0f8f0}
                     </table>
                   </div>
 
+              {(cirsma.cirteVeids === "Kopšanas cirte" || cirsma.cirteVeids === "Sanitārā cirte") && (() => {
+                    const kopG = nog.sugas.reduce((s, sg) => s + parseNum(sg.g), 0)
+                    const valdSuga = nog.sugas.reduce((best, sg) => parseNum(sg.g) > parseNum(best.g) ? sg : best, nog.sugas[0])
+                    const h = Math.round(parseNum(valdSuga?.h||0))
+                    const sp = valdSuga?.suga
+                    const hC = Math.min(Math.max(h, 12), 35)
+                    const isKK = cirsma.cirteVeids === "Kopšanas cirte"
+                    const gRef = isKK ? GminTable[hC]?.[sp] : GkritTable[hC]?.[sp]
+                    const label = isKK ? "minimālais (Gmin)" : "kritiskais (Gkrit)"
+                    const iznemG = gRef && kopG > gRef ? (kopG - gRef).toFixed(1) : 0
+                    const iznemPct2 = gRef && kopG > gRef ? ((kopG - gRef) / kopG * 100).toFixed(0) : 0
+                    return (
+                      <div style={{marginTop:"8px",padding:"8px 12px",borderRadius:"6px",fontSize:"11px",background: kopG > (gRef||0) ? "#e8f5e9" : "#fff8e1", border:`1px solid ${kopG > (gRef||0) ? "#388e3c" : "#f9a825"}`}}>
+                        <b>Nogabala šķērslaukumu analīze:</b><br/>
+                        Kopējais G: <b>{kopG.toFixed(1)} m²/ha</b> | {label}: <b>{gRef || "—"} m²/ha</b>
+                        {gRef && kopG > gRef ? (
+                          <span style={{color:"#225522"}}> | Izņemamais G: <b>{iznemG} m²/ha ({iznemPct2}%)</b> — krāja aprēķināta līdz {label} šķērslaukumam</span>
+                        ) : gRef ? (
+                          <span style={{color:"#e65100"}}> | ⚠️ Šķērslaukums zem {label} — {isKK ? "kopšana" : "sanitārā izlase"} nav iespējama</span>
+                        ) : (
+                          <span style={{color:"#888"}}> | Tabulas dati nav pieejami šai sugai/augstumam</span>
+                        )}
+                      </div>
+                    )
+                  })()}
                   <div style={{display:"flex",gap:"8px",marginTop:"6px",alignItems:"center"}}>
                     <button onClick={()=>addSuga(ci,ni)} style={{padding:"3px 10px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>+ Suga</button>
                     <span style={{fontSize:"11px",color:"#225522",fontWeight:"bold"}}>{nVol.toFixed(1)} m³ | {nv.toFixed(0)} €</span>
