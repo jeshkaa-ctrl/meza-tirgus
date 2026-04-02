@@ -6,6 +6,7 @@ import { forestEngine } from "./forestEngine"
 import { getBonitate } from "./bonityEngine"
 import { minDiameter, formFactor } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
+import StandardPage from "./StandardPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1342,7 +1343,7 @@ Drukāt / Saglabāt PDF
 )
 }
 // ========== GALVENA APP ==========
-function LandingPage({onEnter}){
+function LandingPage({onEnter, onStandard}){
 return(
 <div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2"}}>
 
@@ -1388,7 +1389,7 @@ return(
           {["PDF augšupielāde un nogabalu analīze","Ieteikumi par cirtes veidu","Saimnieciskā un tirgus vērtība","Ciršanas ieteikumi pēc vecuma un bonitātes","Atjaunošanas pārskats"].map((t,i)=>(
         <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
         ))}
-        <button onClick={onEnter} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
+        <button onClick={onStandard} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
           Sākt pamata versiju →
         </button>
       </div>
@@ -1481,7 +1482,8 @@ const [skirotajsState,setSkirotajsState]=useState(null)
 const [cirsmaState,setCirsmaState]=useState(null)
 const [skiceState,setSkiceState]=useState(null)
 const [caurmersState,setCaurmersState]=useState(null)
-if(page==="landing") return <LandingPage onEnter={()=>setPage("main")}/>
+if(page==="landing") return <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")}/>
+if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={()=>setPage("main")}/>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
 if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState}/>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
