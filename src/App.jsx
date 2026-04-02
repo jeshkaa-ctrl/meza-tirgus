@@ -289,6 +289,216 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
     </div>
   )
 }
+// ========== REKINA PANELIS ==========
+function RekinsPanel({kadastrs, saimnieciba, platiba, onClose}){
+const [sniedzejs, setSniedzejs] = useState(()=>JSON.parse(localStorage.getItem("rekins_sniedzejs")||"{}"))
+const [sanemejs, setSanemejs] = useState({nosaukums:saimnieciba||"", regNr:"", adrese:"", banka:"", kods:"", konts:""})
+const [rekinsNr, setRekinsNr] = useState(()=>{const n=Number(localStorage.getItem("rekins_nr")||0)+1;return n})
+const [datums, setDatums] = useState(new Date().toLocaleDateString("lv-LV"))
+const [apmaksaTermins, setApmaksaTermins] = useState(()=>{const d=new Date();d.setDate(d.getDate()+10);return d.toLocaleDateString("lv-LV")})
+const [periods, setPeriods] = useState("")
+const [pvnRezims, setPvnRezims] = useState("bez")
+const [rindas, setRindas] = useState([
+  {apraksts: kadastrs ? `Meža inventarizācija, kad.Nr. ${kadastrs}` : "", mervieniba:"ha", daudzums: platiba>0?platiba.toFixed(2):"", cena:"", summa:0}
+])
+const [izrakstija, setIzrakstija] = useState(sniedzejs.izrakstija||"")
+
+const saveSniedzejs = (jauns) => {
+  const j = {...sniedzejs, ...jauns}
+  setSniedzejs(j)
+  localStorage.setItem("rekins_sniedzejs", JSON.stringify(j))
+}
+
+const updateRinda = (i, field, val) => {
+  const n = [...rindas]
+  n[i] = {...n[i], [field]: val}
+  if(field==="daudzums" || field==="cena"){
+    const d = parseFloat(n[i].daudzums)||0
+    const c = parseFloat(n[i].cena)||0
+    n[i].summa = d*c
+  }
+  setRindas(n)
+}
+
+const pievienotRindu = () => setRindas([...rindas, {apraksts:"", mervieniba:"ha", daudzums:"", cena:"", summa:0}])
+const dzestRindu = (i) => setRindas(rindas.filter((_,j)=>j!==i))
+
+const kopaa = rindas.reduce((s,r)=>s+(r.summa||0), 0)
+const pvn = pvnRezims==="pvn21" ? kopaa*0.21 : 0
+const kopa_apmaksai = kopaa + pvn
+
+const skaitliVardos = (n) => {
+  const v = Math.floor(n)
+  const c = Math.round((n-v)*100)
+  const vieninieki = ["","viens","divi","trīs","četri","pieci","seši","septiņi","astoņi","deviņi","desmit","vienpadsmit","divpadsmit","trīspadsmit","četrpadsmit","piecpadsmit","sešpadsmit","septiņpadsmit","astoņpadsmit","deviņpadsmit"]
+  const desmiti = ["","","divdesmit","trīsdesmit","četrdesmit","piecdesmit","sešdesmit","septiņdesmit","astoņdesmit","deviņdesmit"]
+  const simti = ["","simts","divi simti","trīs simti","četri simti","pieci simti","seši simti","septiņi simti","astoņi simti","deviņi simti"]
+  let s = ""
+  if(v >= 1000) s += (v>=2000?vieninieki[Math.floor(v/1000)]+" ":"")+"tūkstoši "
+  const h = Math.floor((v%1000)/100)
+  if(h) s += simti[h]+" "
+  const t = Math.floor((v%100)/10)
+  const o = v%10
+  if(v%100 < 20) s += vieninieki[v%100]+" "
+  else { if(t) s += desmiti[t]+" "; if(o) s += vieninieki[o]+" " }
+  return s.trim()+" euro "+(c>0?`un ${c} centi`:"un 00 centi")
+}
+
+const exportRekins = () => {
+  localStorage.setItem("rekins_nr", rekinsNr)
+  const gads = new Date().getFullYear()
+  const html = `<html><head><meta charset="UTF-8">
+<style>
+body{font-family:Arial;font-size:11px;padding:24px;max-width:850px;margin:0 auto}
+h2{text-align:center;font-size:13px;margin:4px 0}
+table{border-collapse:collapse;width:100%;margin:8px 0}
+th{background:#225522;color:white;padding:4px 8px;font-size:10px;text-align:left}
+td{border:1px solid #ccc;padding:3px 8px;font-size:10px}
+.info td{border:none;padding:2px 4px}
+.label{font-weight:bold}
+.total{font-weight:bold;background:#f0f8f0}
+</style></head><body>
+<p style="text-align:right;font-size:11px">${datums} &nbsp;&nbsp;&nbsp; <b>Rēķins Nr. ${rekinsNr} - ${gads}</b></p>
+<table class="info"><tbody>
+<tr><td style="width:50%;vertical-align:top">
+<b>Pakalpojumu sniedzējs:</b><br/>
+${sniedzejs.nosaukums||"___________________"}<br/>
+Reģ.Nr. ${sniedzejs.regNr||"___________________"}<br/>
+${sniedzejs.adrese||"___________________"}<br/>
+Banka: ${sniedzejs.banka||"___________________"}<br/>
+Kods: ${sniedzejs.kods||"___________________"}<br/>
+Konts: ${sniedzejs.konts||"___________________"}
+</td><td style="vertical-align:top">
+<b>Pakalpojumu saņēmējs:</b><br/>
+${sanemejs.nosaukums||"___________________"}<br/>
+Reģ.Nr. ${sanemejs.regNr||"___________________"}<br/>
+${sanemejs.adrese||"___________________"}<br/>
+Banka: ${sanemejs.banka||"___________________"}<br/>
+Kods: ${sanemejs.kods||"___________________"}<br/>
+Konts: ${sanemejs.konts||"___________________"}
+</td></tr>
+</tbody></table>
+${periods?`<p><b>Pakalpojumu sniegšanas periods:</b> ${periods}</p>`:""}
+<p><b>Apmaksāt:</b> Līdz ${apmaksaTermins}</p>
+<table>
+<thead><tr><th>Nr.</th><th>Pakalpojuma nosaukums</th><th>Mērv.</th><th>Daudzums</th><th>Cena</th><th>Summa, EUR</th></tr></thead>
+<tbody>
+${rindas.map((r,i)=>`<tr><td>${i+1}</td><td>${r.apraksts}</td><td>${r.mervieniba}</td><td>${r.daudzums}</td><td>${parseFloat(r.cena||0).toFixed(2)}</td><td>${(r.summa||0).toFixed(2)}</td></tr>`).join("")}
+</tbody>
+<tfoot>
+<tr class="total"><td colspan="5">Kopā</td><td>${kopaa.toFixed(2)}</td></tr>
+${pvnRezims==="pvn21"?`<tr><td colspan="5">PVN 21%</td><td>${pvn.toFixed(2)}</td></tr><tr class="total"><td colspan="5">Kopā apmaksai</td><td>${kopa_apmaksai.toFixed(2)}</td></tr>`:""}
+${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>`:""}
+</tfoot>
+</table>
+<p>Summa apmaksai vārdiem: <b>${skaitliVardos(kopa_apmaksai)}</b></p>
+<div style="display:flex;justify-content:space-between;margin-top:30px;font-size:11px">
+<div>Rēķinu izrakstīja: <b>${izrakstija||"___________________"}</b> ___________________________</div>
+<div>${datums}</div>
+</div>
+<p style="font-size:9px;color:#888;margin-top:16px">Dokuments sagatavots elektroniski un derīgs bez paraksta.</p>
+</body></html>`
+  const win = window.open("","_blank")
+  win.document.write(html)
+  win.document.close()
+  win.print()
+}
+
+return(
+<div style={{marginTop:"24px",padding:"20px",border:"2px solid #e65100",borderRadius:"8px",background:"white"}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
+    <h2 style={{color:"#e65100",margin:0}}>🧾 Rēķina sagatave</h2>
+    <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>
+  </div>
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",marginBottom:"16px"}}>
+    <div style={{padding:"12px",background:"#f0f8f0",borderRadius:"6px",border:"1px solid #225522"}}>
+      <b style={{color:"#225522"}}>Pakalpojumu sniedzējs</b>
+      {[["nosaukums","Nosaukums"],["regNr","Reģ.Nr."],["adrese","Adrese"],["banka","Banka"],["kods","SWIFT kods"],["konts","Konts"]].map(([k,l])=>(
+        <div key={k} style={{marginTop:"6px"}}>
+          <label style={{fontSize:"10px",fontWeight:"bold"}}>{l}:</label><br/>
+          <input value={sniedzejs[k]||""} onChange={e=>saveSniedzejs({[k]:e.target.value})} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+        </div>
+      ))}
+      <div style={{marginTop:"6px"}}>
+        <label style={{fontSize:"10px",fontWeight:"bold"}}>Rēķinu izrakstīja:</label><br/>
+        <input value={izrakstija} onChange={e=>{setIzrakstija(e.target.value);saveSniedzejs({izrakstija:e.target.value})}} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+      </div>
+    </div>
+    <div style={{padding:"12px",background:"#fff8e1",borderRadius:"6px",border:"1px solid #f9a825"}}>
+      <b style={{color:"#e65100"}}>Pakalpojumu saņēmējs</b>
+      {[["nosaukums","Nosaukums"],["regNr","Reģ.Nr."],["adrese","Adrese"],["banka","Banka"],["kods","SWIFT kods"],["konts","Konts"]].map(([k,l])=>(
+        <div key={k} style={{marginTop:"6px"}}>
+          <label style={{fontSize:"10px",fontWeight:"bold"}}>{l}:</label><br/>
+          <input value={sanemejs[k]||""} onChange={e=>setSanemejs({...sanemejs,[k]:e.target.value})} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+        </div>
+      ))}
+    </div>
+  </div>
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"8px",marginBottom:"12px"}}>
+    <div>
+      <label style={{fontSize:"10px",fontWeight:"bold"}}>Rēķina Nr.:</label><br/>
+      <input value={rekinsNr} onChange={e=>setRekinsNr(e.target.value)} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+    </div>
+    <div>
+      <label style={{fontSize:"10px",fontWeight:"bold"}}>Datums:</label><br/>
+      <input value={datums} onChange={e=>setDatums(e.target.value)} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+    </div>
+    <div>
+      <label style={{fontSize:"10px",fontWeight:"bold"}}>Apmaksas termiņš:</label><br/>
+      <input value={apmaksaTermins} onChange={e=>setApmaksaTermins(e.target.value)} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+    </div>
+    <div>
+      <label style={{fontSize:"10px",fontWeight:"bold"}}>Periods:</label><br/>
+      <input value={periods} onChange={e=>setPeriods(e.target.value)} placeholder="piem. 2026. gada marts" style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
+    </div>
+  </div>
+  <div style={{marginBottom:"12px"}}>
+    <label style={{fontSize:"10px",fontWeight:"bold"}}>PVN režīms:</label><br/>
+    <select value={pvnRezims} onChange={e=>setPvnRezims(e.target.value)} style={{padding:"4px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}>
+      <option value="bez">Bez PVN</option>
+      <option value="pvn21">PVN 21%</option>
+      <option value="reversais">Reversais PVN (142. pants)</option>
+    </select>
+  </div>
+  <table border="1" cellPadding="4" style={{fontSize:"11px",width:"100%",marginBottom:"8px"}}>
+    <thead style={{background:"#225522",color:"white"}}>
+      <tr><th>Nr.</th><th>Pakalpojuma nosaukums</th><th>Mērv.</th><th>Daudzums</th><th>Cena €</th><th>Summa €</th><th></th></tr>
+    </thead>
+    <tbody>
+      {rindas.map((r,i)=>(
+        <tr key={i}>
+          <td>{i+1}</td>
+          <td><input value={r.apraksts} onChange={e=>updateRinda(i,"apraksts",e.target.value)} style={{width:"100%",border:"none",fontSize:"11px"}}/></td>
+          <td><input value={r.mervieniba} onChange={e=>updateRinda(i,"mervieniba",e.target.value)} style={{width:"40px",border:"none",fontSize:"11px"}}/></td>
+          <td><input type="number" value={r.daudzums} onChange={e=>updateRinda(i,"daudzums",e.target.value)} style={{width:"60px",border:"none",fontSize:"11px"}}/></td>
+          <td><input type="number" value={r.cena} onChange={e=>updateRinda(i,"cena",e.target.value)} style={{width:"60px",border:"none",fontSize:"11px"}}/></td>
+          <td style={{textAlign:"right"}}>{(r.summa||0).toFixed(2)}</td>
+          <td><button onClick={()=>dzestRindu(i)} style={{background:"none",border:"none",color:"#c62828",cursor:"pointer"}}>✕</button></td>
+        </tr>
+      ))}
+    </tbody>
+    <tfoot>
+      <tr style={{background:"#f0f8f0",fontWeight:"bold"}}>
+        <td colSpan="5">Kopā</td><td style={{textAlign:"right"}}>{kopaa.toFixed(2)}</td><td/>
+      </tr>
+      {pvnRezims==="pvn21" && <>
+        <tr><td colSpan="5">PVN 21%</td><td style={{textAlign:"right"}}>{pvn.toFixed(2)}</td><td/></tr>
+        <tr style={{background:"#e8f5e9",fontWeight:"bold"}}><td colSpan="5">Kopā apmaksai</td><td style={{textAlign:"right"}}>{kopa_apmaksai.toFixed(2)}</td><td/></tr>
+      </>}
+      {pvnRezims==="reversais" && <tr><td colSpan="7" style={{fontStyle:"italic",fontSize:"10px"}}>Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>}
+    </tfoot>
+  </table>
+  <button onClick={pievienotRindu} style={{padding:"4px 12px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px",marginBottom:"12px"}}>+ Pievienot rindu</button>
+  <div style={{padding:"8px",background:"#f0f8f0",borderRadius:"4px",marginBottom:"12px",fontSize:"11px"}}>
+    <b>Summa vārdiem:</b> {skaitliVardos(kopa_apmaksai)}
+  </div>
+  <button onClick={exportRekins} style={{padding:"8px 24px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
+    🖨 Drukāt / Saglabāt PDF
+  </button>
+</div>
+)
+}
+
 // ========== CIRSMAS SKICE ==========
 function CirsmaskicePage({onBack,kadastrsIn="",saimniecibaIn="",savedState,onSaveState}){
 const [kmlCoords,setKmlCoords]=useState(savedState?.kmlCoords||[])
@@ -303,6 +513,7 @@ const [platiba,setPlatiba]=useState(savedState?.platiba||0)
 const [showCaurmers,setShowCaurmers]=useState(false)
 
 const [caurmersState, setCaurmersState] = useState(savedState?.caurmersState||null)
+const [showRekins, setShowRekins] = useState(false)
 
 const saglabat = (jaunie) => onSaveState?.({
   kmlCoords:jaunie?.kmlCoords??kmlCoords,
@@ -516,51 +727,70 @@ URL.revokeObjectURL(url)
 }
 const exportSkice=()=>{
 const today=new Date().toLocaleDateString("lv-LV")
-const coordsTable=kmlCoords.slice(0,-1).map((c,i)=>
-`<tr><td>${i+1}</td><td>${c.lon.toFixed(6)}</td><td>${c.lat.toFixed(6)}</td></tr>`
-).join("")
 
 const svgContent=`
-<svg width="600" height="450" xmlns="http://www.w3.org/2000/svg">
-<rect width="600" height="450" fill="#f8f8f0" stroke="black" stroke-width="1"/>
+<svg width="750" height="500" xmlns="http://www.w3.org/2000/svg">
+<rect width="750" height="500" fill="#f8f8f0" stroke="black" stroke-width="1"/>
 <g stroke="#ddd" stroke-width="0.5">
-<line x1="100" y1="0" x2="100" y2="450"/><line x1="200" y1="0" x2="200" y2="450"/>
-<line x1="300" y1="0" x2="300" y2="450"/><line x1="400" y1="0" x2="400" y2="450"/>
-<line x1="500" y1="0" x2="500" y2="450"/>
-<line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
-<line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+<line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+<line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+<line x1="500" y1="0" x2="500" y2="500"/><line x1="600" y1="0" x2="600" y2="500"/>
+<line x1="700" y1="0" x2="700" y2="500"/>
+<line x1="0" y1="100" x2="750" y2="100"/><line x1="0" y1="200" x2="750" y2="200"/>
+<line x1="0" y1="300" x2="750" y2="300"/><line x1="0" y1="400" x2="750" y2="400"/>
 </g>
 ${kmlCoords.length>0 ? `<polygon points="${polyPoints}" fill="rgba(34,85,34,0.15)" stroke="#225522" stroke-width="2.5"/>` : ""}
 ${points.slice(0,-1).map((p,i)=>`
 <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="#225522"/>
 <text x="${(p.x+8).toFixed(1)}" y="${(p.y+4).toFixed(1)}" font-size="12" fill="#225522" font-weight="bold">${i+1}</text>
 `).join("")}
-<g transform="translate(560,40)">
+<g transform="translate(710,40)">
 <line x1="0" y1="25" x2="0" y2="-25" stroke="black" stroke-width="2"/>
 <polygon points="0,-25 -7,-8 7,-8" fill="black"/>
 <text x="-4" y="38" font-size="13" font-weight="bold" fill="black">N</text>
 </g>
-<g transform="translate(20,430)">
+<g transform="translate(20,480)">
 <rect x="0" y="-8" width="50" height="8" fill="black"/>
 <rect x="50" y="-8" width="50" height="8" fill="white" stroke="black" stroke-width="1"/>
 <text x="0" y="6" font-size="9">0</text>
 <text x="90" y="6" font-size="9">100m</text>
 </g>
-${platiba>0 ? `<text x="300" y="225" font-size="14" fill="#225522" font-weight="bold" text-anchor="middle">${platiba.toFixed(2)} ha</text>` : ""}
+${platiba>0 ? `<text x="375" y="250" font-size="16" fill="#225522" font-weight="bold" text-anchor="middle">${platiba.toFixed(2)} ha</text>` : ""}
 </svg>`
+
+const pts = kmlCoords.slice(0,-1)
+const col1 = pts.slice(0, Math.ceil(pts.length/4))
+const col2 = pts.slice(Math.ceil(pts.length/4), Math.ceil(pts.length*2/4))
+const col3 = pts.slice(Math.ceil(pts.length*2/4), Math.ceil(pts.length*3/4))
+const col4 = pts.slice(Math.ceil(pts.length*3/4))
+const maxRows = Math.max(col1.length, col2.length, col3.length, col4.length)
+let coordRows = ""
+for(let i=0; i<maxRows; i++){
+  const p1=col1[i], p2=col2[i], p3=col3[i], p4=col4[i]
+  const idx1=i+1
+  const idx2=col1.length+i+1
+  const idx3=col1.length+col2.length+i+1
+  const idx4=col1.length+col2.length+col3.length+i+1
+  coordRows+=`<tr>
+    <td>${p1?idx1:""}</td><td>${p1?p1.lon.toFixed(5):""}</td><td>${p1?p1.lat.toFixed(5):""}</td>
+    <td style="border-left:2px solid #225522">${p2?idx2:""}</td><td>${p2?p2.lon.toFixed(5):""}</td><td>${p2?p2.lat.toFixed(5):""}</td>
+    <td style="border-left:2px solid #225522">${p3?idx3:""}</td><td>${p3?p3.lon.toFixed(5):""}</td><td>${p3?p3.lat.toFixed(5):""}</td>
+    <td style="border-left:2px solid #225522">${p4?idx4:""}</td><td>${p4?p4.lon.toFixed(5):""}</td><td>${p4?p4.lat.toFixed(5):""}</td>
+  </tr>`
+}
 
 const html=`<html><head><meta charset="UTF-8">
 <style>
-body{font-family:Arial;font-size:11px;padding:20px;max-width:800px;margin:0 auto}
-h2{text-align:center;font-size:16px}
-table{border-collapse:collapse;width:100%;margin-bottom:12px}
+body{font-family:Arial;font-size:11px;padding:12px;max-width:900px;margin:0 auto}
+h2{text-align:center;font-size:15px;margin:4px 0}
+table{border-collapse:collapse;width:100%;margin-bottom:6px}
 th{background:#225522;color:white;padding:4px 8px;font-size:10px}
 td{border:1px solid #ccc;padding:3px 8px;font-size:10px}
 .label{background:#f0f0f0;font-weight:bold;width:35%}
-.sign{display:flex;justify-content:space-between;margin-top:20px;font-size:11px}
+.paraksts{display:flex;justify-content:space-between;margin-top:20px;padding-top:12px;border-top:1px solid #ccc;font-size:11px;page-break-inside:avoid}
 </style></head><body>
 <h2>CIRSMAS SKICE</h2>
-<p style="text-align:center;font-size:11px">Valsts meža dienesta iesniegumam</p>
+<p style="text-align:center;font-size:11px;margin:2px 0">Valsts meža dienesta iesniegumam</p>
 <table>
 <tr><td class="label">Īpašuma nosaukums</td><td>${saimnieciba||"___________________"}</td></tr>
 <tr><td class="label">Kadastra numurs</td><td>${kadastrs||"___________________"}</td></tr>
@@ -571,23 +801,27 @@ td{border:1px solid #ccc;padding:3px 8px;font-size:10px}
 <tr><td class="label">Datums</td><td>${today}</td></tr>
 </table>
 ${svgContent}
-<br/>
-<table>
-<thead><tr><th>Punkts</th><th>Garums (WGS84)</th><th>Platums (WGS84)</th></tr></thead>
-<tbody>${coordsTable}</tbody>
+<table style="font-size:8px;width:100%;margin-top:8px">
+  <thead><tr>
+    <th>Nr</th><th>Garums</th><th>Platums</th>
+    <th style="border-left:2px solid #888">Nr</th><th>Garums</th><th>Platums</th>
+    <th style="border-left:2px solid #888">Nr</th><th>Garums</th><th>Platums</th>
+    <th style="border-left:2px solid #888">Nr</th><th>Garums</th><th>Platums</th>
+  </tr></thead>
+  <tbody>${coordRows}</tbody>
 </table>
-<div class="sign">
-<div>Sastādīja: ___________________</div>
-<div>Paraksts: ___________________</div>
+<div class="paraksts">
+  <div>Sastādīja: ___________________________<br/><span style="font-size:9px">(vārds, uzvārds)</span></div>
+  <div>Datums: ___________________________</div>
+  <div>Paraksts: ___________________________</div>
 </div>
-<p style="font-size:9px;color:#888;margin-top:16px">* Skice sagatavota ar Meža tirgus kalkulatoru. Koordinātas WGS84. Ziemeļi uz augšu.</p>
+<p style="font-size:9px;color:#888;margin-top:8px">* Skice sagatavota ar Meža tirgus kalkulatoru. Koordinātas WGS84. Ziemeļi uz augšu.</p>
 </body></html>`
 const win=window.open("","_blank")
 win.document.write(html)
 win.document.close()
 win.print()
 }
-
 return(
 <div style={{padding:"40px",fontFamily:"Arial",maxWidth:"900px"}}>
 <div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap",justifyContent:"space-between"}}>
@@ -721,6 +955,9 @@ return(
 <button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
 Drukāt / Saglabāt PDF
 </button>
+<button onClick={()=>setShowRekins(true)} style={{marginLeft:"10px",padding:"8px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
+🧾 Izveidot rēķinu
+</button>
 <button onClick={downloadSHP} style={{marginLeft:"10px",padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
 Lejupielādēt SHP (LKS92)
 </button>
@@ -733,8 +970,17 @@ Augšupielādē KML failu no LVM GEO lai redzētu skici
 </div>
 )}
 
+{showRekins && (
+  <RekinsPanel
+    kadastrs={kadastrs}
+    saimnieciba={saimnieciba}
+    platiba={platiba}
+    onClose={()=>setShowRekins(false)}
+  />
+)}
+
 {showCaurmers && (
-  <CaurmeraPanel 
+  <CaurmeraPanel
     kadastrs={kadastrs} 
     nogabals={nogabals} 
     saimnieciba={saimnieciba}
@@ -1096,8 +1342,114 @@ Drukāt / Saglabāt PDF
 )
 }
 // ========== GALVENA APP ==========
+function LandingPage({onEnter}){
+return(
+<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2"}}>
+
+  {/* HERO */}
+  <div style={{background:"#1a3a1a",padding:"40px 40px 50px",textAlign:"center"}}>
+    <MezaTirgusLogo/>
+    <p style={{color:"#aaa",fontSize:"15px",marginTop:"16px",maxWidth:"600px",margin:"16px auto 0"}}>
+      Darbarīks meža speciālistam un meža īpašniekam
+    </p>
+    <div style={{display:"flex",gap:"12px",justifyContent:"center",marginTop:"28px",flexWrap:"wrap"}}>
+      <button onClick={onEnter} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"16px",fontWeight:"bold",cursor:"pointer"}}>
+        Sākt bezmaksas →
+      </button>
+      <div style={{position:"relative",display:"inline-block"}}
+  onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
+  onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
+  <button onClick={onEnter} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid #4caf50",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>
+    Pilnā versija ▾
+  </button>
+  <div className="pilna-menu" style={{display:"none",position:"absolute",top:"100%",left:0,background:"white",border:"1px solid #225522",borderRadius:"6px",padding:"8px 0",minWidth:"200px",zIndex:100,marginTop:"4px"}}>
+    {["📐 Cirsmas skice","📏 Caurmēra mērījumi","🌲 Dastojumu aprēķini","🧾 Rēķinu izveide","📊 Cirsmu vērtēšana"].map((t,i)=>(
+      <div key={i} onClick={onEnter} style={{padding:"8px 16px",fontSize:"13px",color:"#225522",cursor:"pointer",borderBottom:"1px solid #f0f0f0"}}>{t}</div>
+    ))}
+  </div>
+</div>
+    </div>
+  </div>
+
+  {/* KAS IR MEŽA TIRGUS */}
+  <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0"}}>
+    <h2 style={{color:"#225522",fontSize:"22px",textAlign:"center",marginBottom:"8px"}}>Kas ir Meža tirgus?</h2>
+    <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"36px",maxWidth:"700px",margin:"0 auto 36px"}}>
+      Meža tirgus ir platforma kas apvieno meža inventarizāciju, cirsmu vērtēšanu, 
+      dastojumu aprēķinus, dokumentu sagatavošanu un rēķinu izveidi vienā vietā. 
+      Visi aprēķini tiek veikti pēc Latvijā atzītām meža uzmērīšanas metodēm un formulām.
+    </p>
+
+    {/* BEZMAKSAS / MAKSAS */}
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"24px",marginBottom:"40px"}}>
+      <div style={{background:"white",border:"2px solid #4caf50",borderRadius:"10px",padding:"24px"}}>
+        <div style={{color:"#4caf50",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>✓ Bezmaksas</div>
+        
+          {["PDF augšupielāde un nogabalu analīze","Ieteikumi par cirtes veidu","Saimnieciskā un tirgus vērtība","Ciršanas ieteikumi pēc vecuma un bonitātes","Atjaunošanas pārskats"].map((t,i)=>(
+        <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
+        ))}
+      </div>
+      <div style={{background:"white",border:"2px solid #225522",borderRadius:"10px",padding:"24px"}}>
+        <div style={{color:"#225522",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>★ Pilnā versija</div>
+        {["Cirsmas skice (KML/SHP) ar PDF","Caurmēra mērījumi ar izdruku","Krautuves vērtība","Sortimentu sadalījums un vērtība","Dastojumu aprēķini","Rēķinu izveide un drukāšana","PDF šķirotājs"].map((t,i)=>(
+          <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
+        ))}
+        <button onClick={onEnter} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
+          Izmēģināt pilno versiju →
+        </button>
+      </div>
+    </div>
+
+    {/* KĀ TIEK APRĒĶINĀTS */}
+    <div style={{background:"white",border:"1px solid #d0e4c8",borderRadius:"10px",padding:"24px",marginBottom:"40px"}}>
+      <h3 style={{color:"#225522",marginTop:0}}>Kā tiek veikti aprēķini?</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",fontSize:"13px",color:"#444"}}>
+        <div><b>Kubatūra</b><br/>Aprēķināta pēc Latvijā atzītajiem formas faktoriem katrai koku sugai atsevišķi.</div>
+        <div><b>Bonitāte</b><br/>Noteikta pēc augstuma un vecuma attiecības — Latvijas meža bonitātes tabulām.</div>
+        <div><b>Sortimentu sadalījums</b><br/>Aprēķināts pēc vidējā caurmēra un kvalitātes klases katrai sugai.</div>
+        <div><b>Tirgus vērtība</b><br/>Balstīta uz aktuālajām sortimentu cenām ko lietotājs var atjaunināt jebkurā brīdī.</div>
+        <div><b>Cirsmas krāja</b><br/>Aprēķināta pēc šķērslaukuma un vidējā augstuma — Latvijas meža inventarizācijas metodika.</div>
+        <div><b>Precizitāte</b><br/>Aprēķinu precizitāte ir tieši atkarīga no inventarizācijas datu precizitātes.</div>
+      </div>
+    </div>
+
+  </div>
+
+  {/* FOOTER */}
+  <div style={{background:"#1a3a1a",padding:"24px",textAlign:"center",marginTop:"20px"}}>
+    <p style={{color:"#666",fontSize:"12px",margin:0}}>© 2026 Meža tirgus · meža-tirgus.lv · Darbarīks meža speciālistam un meža īpašniekam</p>
+  </div>
+
+</div>
+)
+}
+
+function MezaTirgusLogo(){
+return(
+<svg width="240" height="72" viewBox="0 0 300 86" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="86" rx="10" fill="#f0f6ec" stroke="#225522" strokeWidth="2"/>
+  <rect x="10" y="8" width="68" height="70" rx="5" fill="white" stroke="#225522" strokeWidth="1"/>
+  <line x1="10" y1="30" x2="78" y2="30" stroke="#c8dcc0" strokeWidth="0.6"/>
+  <line x1="10" y1="52" x2="78" y2="52" stroke="#c8dcc0" strokeWidth="0.6"/>
+  <line x1="32" y1="8" x2="32" y2="78" stroke="#c8dcc0" strokeWidth="0.6"/>
+  <line x1="56" y1="8" x2="56" y2="78" stroke="#c8dcc0" strokeWidth="0.6"/>
+  <polygon points="16,14 50,10 64,38 58,66 40,72 12,56 10,30" fill="rgba(34,85,34,0.1)" stroke="#225522" strokeWidth="1.6"/>
+  <polygon points="24,18 20,28 28,28" fill="#225522"/>
+  <polygon points="44,13 40,23 48,23" fill="#225522"/>
+  <polygon points="36,42 32,52 40,52" fill="#2e7d32"/>
+  <polygon points="54,36 50,46 58,46" fill="#2e7d32"/>
+  <rect x="10" y="58" width="16" height="14" rx="3" fill="#225522"/>
+  <text x="18" y="69" fontFamily="Arial" fontSize="9" fontWeight="bold" fill="white" textAnchor="middle">€</text>
+  <line x1="88" y1="8" x2="88" y2="78" stroke="#d0e4c8" strokeWidth="1"/>
+  <text x="194" y="34" fontFamily="Georgia, serif" fontSize="20" fontWeight="bold" fill="#225522" textAnchor="middle">MEŽA</text>
+  <text x="194" y="56" fontFamily="Georgia, serif" fontSize="20" fontWeight="bold" fill="#1b5e20" textAnchor="middle">TIRGUS</text>
+  <text x="194" y="70" fontFamily="Arial" fontSize="6.5" fill="#999" textAnchor="middle" letterSpacing="1.2">DARBARĪKS MEŽA SPECIĀLISTAM UN MEŽA ĪPAŠNIEKAM</text>
+</svg>
+)
+}
+
 function App(){
-const [page,setPage]=useState("main")
+const [page,setPage]=useState("landing")
 
 const [rows,setRows]=useState([])
 const [izcirtumi,setIzcirtumi]=useState([])
@@ -1126,6 +1478,7 @@ const [skirotajsState,setSkirotajsState]=useState(null)
 const [cirsmaState,setCirsmaState]=useState(null)
 const [skiceState,setSkiceState]=useState(null)
 const [caurmersState,setCaurmersState]=useState(null)
+if(page==="landing") return <LandingPage onEnter={()=>setPage("main")}/>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
 if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState}/>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
@@ -1362,14 +1715,14 @@ alert("Cenas atjauninātas!")
 </div>
 )}
 
-<h1>Meža tirgus</h1>
+<MezaTirgusLogo/>
 
 {/* PRO RĪKI */}
 <div style={{display:"flex",gap:"10px",marginBottom:"20px",flexWrap:"wrap"}}>
-<button onClick={()=>setPage("skice")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📐 Cirsmas skice un caurmēra mērījumi</button>
+<button onClick={()=>setPage("skice")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📐 Cirsmas skice, caurmērs un dastojums</button>
 <button onClick={()=>setPage("pdfSkirotajs")} style={{padding:"8px 16px",background:"#6a1b9a",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>PDF šķirotājs</button>
 <button onClick={()=>setPage("cirsma")} style={{padding:"8px 16px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas novērtēšana</button>
-<button onClick={()=>setPage("dastojums")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Dastojuma aprēķini</button>
+
 {(()=>{
 const gatavs=izcirtumi.length>0&&izcirtumi.every(ic=>{
 if(!ic.formula||!ic.formula.trim()) return false
