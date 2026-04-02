@@ -1388,13 +1388,16 @@ return(
           {["PDF augšupielāde un nogabalu analīze","Ieteikumi par cirtes veidu","Saimnieciskā un tirgus vērtība","Ciršanas ieteikumi pēc vecuma un bonitātes","Atjaunošanas pārskats"].map((t,i)=>(
         <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
         ))}
+        <button onClick={onEnter} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
+          Sākt pamata versiju →
+        </button>
       </div>
       <div style={{background:"white",border:"2px solid #225522",borderRadius:"10px",padding:"24px"}}>
         <div style={{color:"#225522",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>★ Pilnā versija</div>
         {["Cirsmas skice (KML/SHP) ar PDF","Caurmēra mērījumi ar izdruku","Krautuves vērtība","Sortimentu sadalījums un vērtība","Dastojumu aprēķini","Rēķinu izveide un drukāšana","PDF šķirotājs"].map((t,i)=>(
           <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
         ))}
-        <button onClick={onEnter} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
+        <button onClick={onEnter} style={{marginTop:"8px",width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
           Izmēģināt pilno versiju →
         </button>
       </div>
