@@ -1345,10 +1345,10 @@ Drukāt / Saglabāt PDF
 // ========== GALVENA APP ==========
 function LandingPage({onEnter, onStandard}){
 return(
-<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2"}}>
+<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2",maxWidth:"100%",overflowX:"hidden"}}>
 
   {/* HERO */}
-  <div style={{background:"#1a3a1a",padding:"40px 40px 50px",textAlign:"center"}}>
+ <div style={{background:"#1a3a1a",padding:"40px 40px 50px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center"}}>
     <MezaTirgusLogo/>
     <p style={{color:"#aaa",fontSize:"15px",marginTop:"16px",maxWidth:"600px",margin:"16px auto 0"}}>
       Darbarīks meža speciālistam un meža īpašniekam
@@ -1373,7 +1373,7 @@ return(
   </div>
 
   {/* KAS IR MEŽA TIRGUS */}
-  <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0"}}>
+  <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box"}}>
     <h2 style={{color:"#225522",fontSize:"22px",textAlign:"center",marginBottom:"8px"}}>Kas ir Meža tirgus?</h2>
     <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"36px",maxWidth:"700px",margin:"0 auto 36px"}}>
       Meža tirgus ir platforma kas apvieno meža inventarizāciju, cirsmu vērtēšanu, 
@@ -1720,7 +1720,10 @@ alert("Cenas atjauninātas!")
 </div>
 )}
 
-<MezaTirgusLogo/>
+<div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"16px"}}>
+  <MezaTirgusLogo/>
+  <button onClick={()=>setPage("landing")} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>← Sākumlapa</button>
+</div>
 
 {/* PRO RĪKI */}
 <div style={{display:"flex",gap:"10px",marginBottom:"20px",flexWrap:"wrap"}}>
