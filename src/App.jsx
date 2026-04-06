@@ -1732,7 +1732,7 @@ alert("Cenas atjauninātas!")
 <button onClick={()=>setPage("cirsma")} style={{padding:"8px 16px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas novērtēšana</button>
 
 {(()=>{
-const gatavs=izcirtumi.length>0&&izcirtumi.every(ic=>{
+const gatavs=izcirtumi.length>0&&izcirtumi.some(ic=>{
 if(!ic.formula||!ic.formula.trim()) return false
 if(!ic.h||Number(ic.h)===0) return false
 if(!ic.koki||Number(ic.koki)===0) return false
@@ -1787,6 +1787,13 @@ Atjaunošanas pārskats
 {izcirtumi.length>0 && (
 <div style={{background:"#fff8e1",border:"1px solid #f9a825",borderRadius:"6px",padding:"12px",margin:"16px 0"}}>
 <b>Izcirtumi — nepieciešama atjaunošana</b>
+<button onClick={()=>{
+  const gatavs = izcirtumi.some(ic=>ic.formula&&ic.h>0&&ic.koki>0)
+  if(gatavs) setShowAtjParskats(true)
+  else alert("Aizpildiet vismaz vienam nogabalam: sugu, augstumu un koku skaitu!")
+}} style={{marginLeft:"12px",padding:"4px 12px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+  📋 Izveidot atjaunošanas pārskatu
+</button>
 <table border="1" cellPadding="6" style={{marginTop:"8px",width:"100%"}}>
 <thead style={{background:"#f9a825"}}>
 <tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Cirtes veids</th><th>Gads</th><th>Atjaunot līdz</th><th>Formula</th><th>H (m)</th><th>Koki/ha</th><th>Statuss</th></tr>

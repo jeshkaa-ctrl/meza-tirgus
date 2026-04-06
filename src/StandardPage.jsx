@@ -7,12 +7,130 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 import.meta.url
 ).toString()
 
+function AtjaunosanaParskats({izcirtumi, kadastrs, saimnieciba, onClose}){
+const [virsmezn, setVirsmezn] = useState("")
+const [mezn, setMezn] = useState("")
+const [vards, setVards] = useState(()=>localStorage.getItem("parskats_vards")||"")
+const [personas, setPersonas] = useState(()=>localStorage.getItem("parskats_personas")||"")
+const [adrese, setAdrese] = useState(()=>localStorage.getItem("parskats_adrese")||"")
+const [talrunis, setTalrunis] = useState(()=>localStorage.getItem("parskats_talrunis")||"")
+const [adminTerit, setAdminTerit] = useState(()=>localStorage.getItem("parskats_adminTerit")||"")
+const [gads, setGads] = useState(new Date().getFullYear())
+
+const saglabatLoc = (key, val) => localStorage.setItem(key, val)
+
+const exportParskats = () => {
+  const today = new Date().toLocaleDateString("lv-LV")
+  const tabula = izcirtumi.filter(ic=>ic.formula&&ic.h>0&&ic.koki>0).map(ic=>`<tr>
+    <td>${kadastrs||"—"}</td>
+    <td>—</td>
+    <td>${ic.nog}</td>
+    <td>${ic.platiba}</td>
+    <td>${ic.formula||"—"}</td>
+    <td>${ic.h||"—"}</td>
+    <td>${ic.koki||"—"}</td>
+    <td>${ic.atjVeids||"Dabiski atjaunojot"}</td>
+    <td>—</td>
+    <td></td>
+  </tr>`).join("")
+
+  const html=`<html><head><meta charset="UTF-8">
+<style>
+body{font-family:"Times New Roman",serif;font-size:11px;padding:20px;max-width:900px;margin:0 auto}
+h2{text-align:center;font-size:13px;font-weight:bold}
+p{margin:4px 0}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:9px}
+th{border:1px solid black;padding:3px 4px;text-align:center;font-weight:bold}
+td{border:1px solid black;padding:3px 4px}
+.sign{display:flex;justify-content:space-between;margin-top:20px}
+</style></head><body>
+<p style="text-align:right">Valsts meža dienesta</p>
+<p style="text-align:right"><b>${virsmezn||"_______________"} virsmežniecībai</b></p>
+<p style="text-align:right">${mezn||"_______________"} mežniecībai</p>
+<br/>
+<h2>Pārskats ${gads}. gadā par darbībām meža zemēs, kurām nav nepieciešams apliecinājums</h2>
+<p style="text-align:center;font-size:9px">Pārskata saņemšanas datums: ____________</p>
+<br/>
+<table style="width:100%;border:none;font-size:11px">
+<tr><td style="border:none;width:50%"><b>Īpašnieks:</b> ${vards||"___________________"}</td><td style="border:none"><b>Personas kods:</b> ${personas||"___________________"}</td></tr>
+<tr><td style="border:none"><b>Adrese:</b> ${adrese||"___________________"}</td><td style="border:none"><b>Tālrunis:</b> ${talrunis||"___________________"}</td></tr>
+<tr><td style="border:none"><b>Īpašuma nosaukums:</b> ${saimnieciba||"___________________"}</td><td style="border:none"><b>Administratīvā teritorija:</b> ${adminTerit||"___________________"}</td></tr>
+</table>
+<br/>
+<p>Apliecinu, ka esmu ${gads}. gadā veicis šādas darbības savā īpašumā vai tiesiskajā valdījumā:</p>
+<p><b>Darbības veids – meža atjaunošana</b></p>
+<table>
+<thead><tr>
+<th>Zemes vienības kadastra apzīmējums</th>
+<th>Kvartāla Nr.</th>
+<th>Nogabala Nr.</th>
+<th>Atjaunotā platība, ha</th>
+<th>Valdošā koku suga</th>
+<th>Vidējais koku augstums, m</th>
+<th>Vidējais koku skaits, gab/ha</th>
+<th>Galvenais atjaunošanas veids</th>
+<th>MRM saskaņojuma datums</th>
+<th>Piezīmes</th>
+</tr></thead>
+<tbody>${tabula}</tbody>
+</table>
+<div class="sign">
+<div>Datums: ${today}</div>
+<div>Paraksts: ___________________</div>
+<div>Paraksta atšifrējums: ___________________</div>
+</div>
+<p style="font-size:8px;margin-top:20px">* Šo veidlapu izstrādājis VMD un tai ir ieteikuma raksturs</p>
+</body></html>`
+  const win = window.open("","_blank")
+  win.document.write(html)
+  win.document.close()
+  win.print()
+}
+
+return(
+<div style={{marginTop:"24px",padding:"20px",border:"2px solid #225522",borderRadius:"8px",background:"white",marginBottom:"24px"}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
+    <h2 style={{color:"#225522",margin:0}}>📋 Atjaunošanas pārskats</h2>
+    <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>
+  </div>
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"}}>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Virsmežniecība:</label><br/>
+    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Mežniecība:</label><br/>
+    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Vārds, uzvārds:</label><br/>
+    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Personas kods:</label><br/>
+    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Adrese:</label><br/>
+    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Tālrunis:</label><br/>
+    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Administratīvā teritorija:</label><br/>
+    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Pārskata gads:</label><br/>
+    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+  </div>
+  <div style={{background:"#f0f8f0",padding:"12px",borderRadius:"6px",marginBottom:"16px",fontSize:"12px"}}>
+    <b>Nogabali pārskatā:</b> {izcirtumi.filter(ic=>ic.formula&&ic.h>0&&ic.koki>0).length} no {izcirtumi.length}
+    {izcirtumi.filter(ic=>!ic.formula||!ic.h||!ic.koki).length>0 && (
+      <span style={{color:"#c62828",marginLeft:"12px"}}>⚠️ {izcirtumi.filter(ic=>!ic.formula||!ic.h||!ic.koki).length} nogabali bez datiem — netiks iekļauti</span>
+    )}
+  </div>
+  <button onClick={exportParskats} style={{padding:"8px 24px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
+    🖨 Drukāt / Saglabāt PDF
+  </button>
+</div>
+)
+}
+
 function StandardPage({onBack, onPilna}){
 const [rows, setRows] = useState([])
 const [izcirtumi, setIzcirtumi] = useState([])
 const [jaunaudzes, setJaunaudzes] = useState([])
 const [kadastrs, setKadastrs] = useState("")
 const [saimnieciba, setSaimnieciba] = useState("")
+const [showAtjParskats, setShowAtjParskats] = useState(false)
 
 const handlePDF = async(event) => {
   const file = event.target.files[0]
@@ -169,16 +287,34 @@ return(
   )}
   {izcirtumi.length>0 && (
   <div style={{background:"#fff8e1",border:"1px solid #f9a825",borderRadius:"6px",padding:"12px",marginBottom:"24px"}}>
+   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
     <b>Izcirtumi — nepieciešama atjaunošana</b>
+    <button onClick={()=>{
+      const gatavs = izcirtumi.some(ic=>ic.formula&&ic.h>0&&ic.koki>0)
+      if(gatavs) setShowAtjParskats(true)
+      else alert("Aizpildiet vismaz vienam nogabalam: sugu, augstumu un koku skaitu!")
+    }} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+      📋 Izveidot atjaunošanas pārskatu
+    </button>
+    </div>
     <table border="1" cellPadding="6" style={{marginTop:"8px",width:"100%",fontSize:"11px"}}>
       <thead style={{background:"#f9a825"}}>
-        <tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Cirtes veids</th><th>Gads</th><th>Atjaunot līdz</th></tr>
+        <tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Cirtes veids</th><th>Gads</th><th>Atjaunot līdz</th><th>Suga</th><th>H (m)</th><th>Koki/ha</th><th>Atj. veids</th></tr>
       </thead>
       <tbody>
         {izcirtumi.map((ic,i)=>(
           <tr key={i} style={{background:ic.atjaunGads<=new Date().getFullYear()?"#ffcccc":"#fffde7"}}>
             <td>{ic.nog}</td><td>{ic.platiba} ha</td><td>{ic.tips}</td>
             <td>{ic.cirteVeids}</td><td>{ic.cirteGads}</td><td><b>{ic.atjaunGads}</b></td>
+            <td><input value={ic.formula||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],formula:e.target.value};setIzcirtumi(n)}} placeholder="p.ē. 10P" style={{width:"60px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
+            <td><input type="number" value={ic.h||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],h:parseFloat(e.target.value)||0};setIzcirtumi(n)}} placeholder="m" style={{width:"45px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
+            <td><input type="number" value={ic.koki||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],koki:Number(e.target.value)};setIzcirtumi(n)}} placeholder="gab" style={{width:"55px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
+            <td><select value={ic.atjVeids||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],atjVeids:e.target.value};setIzcirtumi(n)}} style={{padding:"2px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}>
+              <option value="">—</option>
+              <option>Dabiski atjaunojot</option>
+              <option>Stādot</option>
+              <option>Sējot</option>
+            </select></td>
           </tr>
         ))}
       </tbody>
@@ -211,6 +347,15 @@ return(
     </div>
   </div>
   )}
+  {showAtjParskats && (
+  <AtjaunosanaParskats
+    izcirtumi={izcirtumi}
+    kadastrs={kadastrs}
+    saimnieciba={saimnieciba}
+    onClose={()=>setShowAtjParskats(false)}
+  />
+  )}
+
   {rows.length>0 && (
   <div style={{background:"#1a3a1a",borderRadius:"10px",padding:"20px",textAlign:"center",marginBottom:"24px"}}>
   <p style={{color:"#aaa",fontSize:"13px",marginBottom:"12px"}}>Lai iegūtu detalizētu sortimentu sadalījumu, cirsmas skici, caurmēra mērījumus un rēķinu izveidi — kā arī iespēju labot augšupielādēto datu vērtības un formulas —</p>
