@@ -15,6 +15,7 @@ export default function DastojumsPanel({kadastrs, saimnieciba, onClose}){
   const [rezultati, setRezultati] = useState(null)
   const [cenas, setCenas] = useState(DEFAULT_CENAS)
   const [showCenas, setShowCenas] = useState(false)
+  const [eko, setEko] = useState(SUGAS.map(s=>({suga:s,skaits:0,d:0})))
 
   const pievienotStavu = () => setStavi([...stavi,{suga:"E",hVid:0,merijumi:tuksiMerijumi()}])
   const dzestStavu = (i) => setStavi(stavi.filter((_,j)=>j!==i))
@@ -23,16 +24,34 @@ export default function DastojumsPanel({kadastrs, saimnieciba, onClose}){
     const n=[...stavi]; n[i]={...n[i],[field]:val}; setStavi(n)
   }
 
+  const updateEko = (si, field, val) => {
+    const n=[...eko]; n[si]={...n[si],[field]:Math.max(0,Number(val)||0)}; setEko(n)
+  }
+
   const updateMerijums = (si, di, field, val) => {
     const n=[...stavi]
     n[si].merijumi[di]={...n[si].merijumi[di],[field]:Math.max(0,Number(val)||0)}
     setStavi(n)
   }
 
+  const calcEkoRez = () => {
+    return eko
+      .filter(r=>r.skaits>0 && r.d>0)
+      .map(r=>{
+        const hVid = stavi.find(s=>s.suga===r.suga)?.hVid || 20
+        const h = calcH(r.d, hVid, r.suga)
+        const vol = r.skaits * Math.PI * Math.pow(r.d/200,2) * h * 0.47
+        const vertiba = vol * ((cenas.log+cenas.tara)/2)
+        return {...r, h, vol, vertiba}
+      })
+  }
+
   const apreklinat = () => {
     const rez = stavi.map(s=>calcDastojums(s, cenas))
     setRezultati(rez)
   }
+
+  const ekoRez = rezultati ? calcEkoRez() : []
 
   React.useEffect(()=>{
     if(rezultati) {
@@ -98,6 +117,25 @@ ${tabulas}
 <span style="color:#666">Šķeldas vērtība: ${rezultati.reduce((s,r)=>s+(r.sortTotals.chips||0)*15,0).toFixed(0)} €</span><br/>
 <b style="font-size:13px">Kopējā vērtība: ${kopaVertiba.toFixed(0)} €</b>
 </div>
+${ekoRez.length>0?`
+<div style="margin-top:12px;padding:12px;background:#fdf6f0;border:1px solid #6a4c2a;border-radius:4px">
+<b style="color:#6a4c2a">🌳 Ekoloģiskie koki</b>
+<table border="1" cellpadding="3" style="font-size:9px;border-collapse:collapse;width:100%;margin-top:6px">
+<thead style="background:#6a4c2a;color:white"><tr>
+<th>Suga</th><th>Skaits</th><th>d (cm)</th><th>h (m)</th><th>m³</th><th>Apt. vērtība</th>
+</tr></thead><tbody>
+${ekoRez.map(r=>`<tr>
+<td>${r.suga}</td><td>${r.skaits}</td><td>${r.d}</td>
+<td>${r.h.toFixed(1)}</td><td>${r.vol.toFixed(3)}</td><td>${r.vertiba.toFixed(0)} €</td>
+</tr>`).join("")}
+</tbody>
+<tfoot><tr style="background:#f0e8e0;font-weight:bold">
+<td colspan="3">Kopā</td><td>—</td>
+<td>${ekoRez.reduce((s,r)=>s+r.vol,0).toFixed(3)}</td>
+<td>${ekoRez.reduce((s,r)=>s+r.vertiba,0).toFixed(0)} €</td>
+</tr></tfoot></table>
+<p style="font-size:8px;color:#6a4c2a">* Ekoloģisko koku vērtība nav ieskaitīta cirsmas kopējā vērtībā</p>
+</div>`:""}
 <div style="display:flex;justify-content:space-between;margin-top:30px;font-size:10px">
 <div>Uzmērīja: ___________________________</div>
 <div>Novērtēja: ___________________________</div>
@@ -172,6 +210,33 @@ ${tabulas}
     </div>
     ))}
 
+    <div style={{border:"2px solid #6a4c2a",borderRadius:"8px",padding:"16px",marginBottom:"16px",background:"white"}}>
+      <b style={{color:"#6a4c2a"}}>🌳 Ekoloģiskie koki</b>
+      <div style={{overflowX:"auto",marginTop:"10px"}}>
+        <table border="1" cellPadding="4" style={{fontSize:"11px",minWidth:"500px"}}>
+          <thead style={{background:"#6a4c2a",color:"white"}}>
+            <tr><th>Suga</th><th>Skaits</th><th>d (cm)</th><th>h (m)</th><th>m³</th></tr>
+          </thead>
+          <tbody>
+            {eko.map((row,i)=>{
+              const hVid = stavi.find(s=>s.suga===row.suga)?.hVid||20
+              const h = row.d>0 ? calcH(row.d,hVid,row.suga) : 0
+              const vol = row.d>0&&row.skaits>0 ? row.skaits*Math.PI*Math.pow(row.d/200,2)*h*0.47 : 0
+              return(
+              <tr key={i} style={{background:i%2===0?"white":"#fdf6f0"}}>
+                <td style={{fontWeight:"bold",textAlign:"center"}}>{row.suga}</td>
+                <td><input type="number" min="0" value={row.skaits||""} onChange={e=>updateEko(i,"skaits",e.target.value)} style={{width:"55px",border:"none",textAlign:"center",background:"transparent"}}/></td>
+                <td><input type="number" min="0" value={row.d||""} onChange={e=>updateEko(i,"d",e.target.value)} style={{width:"55px",border:"none",textAlign:"center",background:"transparent"}}/></td>
+                <td style={{textAlign:"center",color:"#666"}}>{h>0?h.toFixed(1):"—"}</td>
+                <td style={{textAlign:"center",fontWeight:"bold",color:vol>0?"#6a4c2a":"#ccc"}}>{vol>0?vol.toFixed(3):"—"}</td>
+              </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div style={{background:"#f0f6ec",border:"1px solid #225522",borderRadius:"6px",padding:"12px",marginBottom:"16px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
         <b style={{color:"#225522"}}>💶 Sortimentu cenas (€/m³)</b>
@@ -216,6 +281,37 @@ ${tabulas}
         <b>Kopējā krāja: {rezultati.reduce((s,r)=>s+r.kopaKraja,0).toFixed(2)} m³</b><br/>
         <b style={{color:"#225522",fontSize:"16px"}}>Kopējā vērtība: {rezultati.reduce((s,r)=>s+r.vertiba,0).toFixed(0)} €</b>
       </div>
+      {ekoRez.length>0 && (
+      <div style={{padding:"12px",background:"#fdf6f0",borderRadius:"6px",border:"1px solid #6a4c2a",marginTop:"8px"}}>
+        <b style={{color:"#6a4c2a"}}>🌳 Ekoloģiskie koki</b>
+        <table style={{width:"100%",fontSize:"11px",marginTop:"8px",borderCollapse:"collapse"}}>
+          <thead><tr style={{background:"#6a4c2a",color:"white"}}>
+            <th style={{padding:"3px"}}>Suga</th><th>Skaits</th><th>d (cm)</th><th>h (m)</th><th>m³</th><th>Apt. vērtība</th>
+          </tr></thead>
+          <tbody>
+            {ekoRez.map((r,i)=>(
+            <tr key={i} style={{background:i%2===0?"white":"#fdf6f0",textAlign:"center"}}>
+              <td style={{fontWeight:"bold"}}>{r.suga}</td>
+              <td>{r.skaits}</td>
+              <td>{r.d}</td>
+              <td>{r.h.toFixed(1)}</td>
+              <td>{r.vol.toFixed(3)}</td>
+              <td>{r.vertiba.toFixed(0)} €</td>
+            </tr>
+            ))}
+          </tbody>
+          <tfoot><tr style={{background:"#f0e8e0",fontWeight:"bold",textAlign:"center"}}>
+            <td colSpan="3">Kopā</td>
+            <td>—</td>
+            <td>{ekoRez.reduce((s,r)=>s+r.vol,0).toFixed(3)}</td>
+            <td>{ekoRez.reduce((s,r)=>s+r.vertiba,0).toFixed(0)} €</td>
+          </tr></tfoot>
+        </table>
+        <div style={{marginTop:"8px",fontSize:"11px",color:"#6a4c2a"}}>
+          * Ekoloģisko koku vērtība <b>nav ieskaitīta</b> cirsmas kopējā vērtībā
+        </div>
+      </div>
+      )}
     </div>
     )}
   </div>
