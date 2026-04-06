@@ -56,7 +56,7 @@ const defaultCirsma = () => ({
 
 const parseNum = (v) => parseFloat(String(v).replace(",",".")) || 0
 
-export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecibaIn="", savedState, onSaveState}) {
+export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecibaIn="", savedState, onSaveState, user, onReg}) {
   const [kadastrs, setKadastrs] = useState(savedState?.kadastrs ?? kadastrsIn)
   const [saimnieciba, setSaimnieciba] = useState(savedState?.saimnieciba ?? saimniecibaIn)
   const [cirsmas, setCirsmas] = useState(savedState?.cirsmas ?? [defaultCirsma()])
@@ -574,7 +574,10 @@ tr:nth-child(even){background:#f0f8f0}
 
       <div style={{display:"flex",gap:"10px",marginBottom:"20px"}}>
         <button onClick={addCirsma} style={{padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>+ Pievienot cirsmu</button>
-        <button onClick={exportPDF} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"14px"}}>Drukāt / Saglabāt PDF</button>
+      {user
+          ? <button onClick={exportPDF} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"14px"}}>🖨 Drukāt / Saglabāt PDF</button>
+          : <button onClick={()=>onReg?.()} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"14px"}}>🔒 Reģistrējies lai drukātu PDF</button>
+        }
       </div>
     </div>
   )

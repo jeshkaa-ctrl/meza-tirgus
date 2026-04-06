@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react"
+import { useAuth } from "./useAuth"
+import RegModal from "./RegModal"
 import * as pdfjsLib from "pdfjs-dist"
 import CirsmaNovertesanaPage from "./CirsmaNovertesanaPage"
 import PdfSkirotajsPage from "./PdfSkirotajsPage"
@@ -502,7 +504,7 @@ return(
 }
 
 // ========== CIRSMAS SKICE ==========
-function CirsmaskicePage({onBack,kadastrsIn="",saimniecibaIn="",savedState,onSaveState}){
+function CirsmaskicePage({onBack,kadastrsIn="",saimniecibaIn="",savedState,onSaveState,user,onReg}){
 const [kmlCoords,setKmlCoords]=useState(savedState?.kmlCoords||[])
 const [kmlName,setKmlName]=useState(savedState?.kmlName||"")
 const [kadastrs,setKadastrs]=useState(savedState?.kadastrs||kadastrsIn)
@@ -956,9 +958,10 @@ return(
 </tbody>
 </table>
 
-<button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-Drukāt / Saglabāt PDF
-</button>
+{user
+  ? <button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt / Saglabāt PDF</button>
+  : <button onClick={()=>onReg?.()} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+}
 <button onClick={()=>setShowRekins(true)} style={{marginLeft:"10px",padding:"8px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
 🧾 Izveidot rēķinu
 </button>
@@ -998,6 +1001,8 @@ Augšupielādē KML failu no LVM GEO lai redzētu skici
     kadastrs={kadastrs}
     saimnieciba={saimnieciba}
     onClose={()=>setShowDastojums(false)}
+    user={user}
+    onReg={onReg}
   />
 )}
 </div>
@@ -1465,6 +1470,8 @@ return(
 
 function App(){
 const [page,setPage]=useState("landing")
+const { user, registreties, iziet } = useAuth()
+const [showReg, setShowReg] = useState(false)
 
 const [rows,setRows]=useState([])
 const [izcirtumi,setIzcirtumi]=useState([])
@@ -1500,7 +1507,7 @@ const [papilduNogabali,setPapilduNogabali]=useState([])
 const jkRef=React.useRef(null)
 const atjRef=React.useRef(null)
 const ieaudRef=React.useRef(null)
-if(page==="landing") return <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")}/>
+if(page==="landing") return <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>setShowReg(true)}/>
 if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={(data)=>{
   if(data){
     setRows(data.rows||[])
@@ -1512,9 +1519,9 @@ if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPil
   setTimeout(()=>setPage("main"),50)
 }}/>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
-if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState}/>
+if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>setShowReg(true)}/>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
-if(page==="skice") return <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState}/>
+if(page==="skice") return <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState} user={user} onReg={()=>setShowReg(true)}/>
 if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedState={caurmersState} onSaveState={setCaurmersState}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 
@@ -1688,6 +1695,7 @@ win.print()
 
 return(
 <div style={{padding:"40px",fontFamily:"Arial"}}>
+{showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
 
 {showCustomModal && (
 <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center"}}>

@@ -10,7 +10,7 @@ function tuksiMerijumi(){
   return D_KLASES.map(d=>({d,resni:0,videj:0,tiev:0,malka:0}))
 }
 
-export default function DastojumsPanel({kadastrs, saimnieciba, onClose}){
+export default function DastojumsPanel({kadastrs, saimnieciba, onClose, user, onReg}){
   const [stavi, setStavi] = useState([{suga:"P",hVid:0,merijumi:tuksiMerijumi()}])
   const [rezultati, setRezultati] = useState(null)
   const [cenas, setCenas] = useState(DEFAULT_CENAS)
@@ -260,7 +260,11 @@ ${ekoRez.map(r=>`<tr>
     <div style={{display:"flex",gap:"8px",marginBottom:"16px",flexWrap:"wrap"}}>
       <button onClick={pievienotStavu} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>+ Pievienot sugu</button>
       <button onClick={apreklinat} style={{padding:"6px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>📊 Aprēķināt</button>
-      {rezultati && <button onClick={exportPDF} style={{padding:"6px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt PDF</button>}
+      {rezultati && (
+  user
+    ? <button onClick={exportPDF} style={{padding:"6px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt PDF</button>
+    : <button onClick={()=>setShowReg(true)} style={{padding:"6px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+)}
     </div>
 
     {rezultati && (
