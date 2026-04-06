@@ -1,9 +1,10 @@
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { calcDastojums, calcH } from "./dastojumsEngine"
 
 const SUGAS = ["P","E","B","A","Ba","Bl","M","Oz","Os","G"]
 const D_KLASES = [8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68]
-const CENAS = {log:93,small:65,veneer:130,tara:48,pulp:50,fire:38,chips:15}
+const DEFAULT_CENAS = {log:93,small:65,veneer:130,tara:48,pulp:50,fire:38,chips:15}
+const CENU_NOSAUKUMI = {log:"Zāģbaļķi",small:"Sīkbaļķi",veneer:"Finieris",tara:"Tara",pulp:"Papīrmalka",fire:"Malka",chips:"Šķelda"}
 
 function tuksiMerijumi(){
   return D_KLASES.map(d=>({d,resni:0,videj:0,tiev:0,malka:0}))
@@ -12,6 +13,8 @@ function tuksiMerijumi(){
 export default function DastojumsPanel({kadastrs, saimnieciba, onClose}){
   const [stavi, setStavi] = useState([{suga:"P",hVid:0,merijumi:tuksiMerijumi()}])
   const [rezultati, setRezultati] = useState(null)
+  const [cenas, setCenas] = useState(DEFAULT_CENAS)
+  const [showCenas, setShowCenas] = useState(false)
 
   const pievienotStavu = () => setStavi([...stavi,{suga:"E",hVid:0,merijumi:tuksiMerijumi()}])
   const dzestStavu = (i) => setStavi(stavi.filter((_,j)=>j!==i))
@@ -27,9 +30,16 @@ export default function DastojumsPanel({kadastrs, saimnieciba, onClose}){
   }
 
   const apreklinat = () => {
-    const rez = stavi.map(s=>calcDastojums(s, CENAS))
+    const rez = stavi.map(s=>calcDastojums(s, cenas))
     setRezultati(rez)
   }
+
+  React.useEffect(()=>{
+    if(rezultati) {
+      const rez = stavi.map(s=>calcDastojums(s, cenas))
+      setRezultati(rez)
+    }
+  },[cenas])
 
   const exportPDF = () => {
     if(!rezultati) return
@@ -81,7 +91,12 @@ td{border:1px solid #ccc;padding:2px 5px;font-size:9px}
 ${tabulas}
 <div style="margin-top:16px;padding:12px;background:#f0f8f0;border:1px solid #225522;border-radius:4px">
 <b>Kopējā cirsmas krāja: ${kopaKraja.toFixed(2)} m³</b><br/>
-<b>Cirsmas vērtība: ${kopaVertiba.toFixed(0)} €</b>
+<b>Likvīdā krāja: ${rezultati.reduce((s,r)=>s+r.likvida,0).toFixed(2)} m³</b><br/>
+<b>Atliekas: ${rezultati.reduce((s,r)=>s+r.atlikasVol,0).toFixed(2)} m³</b><br/>
+<hr style="border:none;border-top:1px solid #ccc;margin:8px 0"/>
+<b>Cirsmas vērtība (bez šķeldas): ${(kopaVertiba - rezultati.reduce((s,r)=>s+(r.sortTotals.chips||0)*15,0)).toFixed(0)} €</b><br/>
+<span style="color:#666">Šķeldas vērtība: ${rezultati.reduce((s,r)=>s+(r.sortTotals.chips||0)*15,0).toFixed(0)} €</span><br/>
+<b style="font-size:13px">Kopējā vērtība: ${kopaVertiba.toFixed(0)} €</b>
 </div>
 <div style="display:flex;justify-content:space-between;margin-top:30px;font-size:10px">
 <div>Uzmērīja: ___________________________</div>
@@ -157,6 +172,26 @@ ${tabulas}
     </div>
     ))}
 
+    <div style={{background:"#f0f6ec",border:"1px solid #225522",borderRadius:"6px",padding:"12px",marginBottom:"16px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
+        <b style={{color:"#225522"}}>💶 Sortimentu cenas (€/m³)</b>
+        <button onClick={()=>setShowCenas(!showCenas)} style={{padding:"3px 10px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>
+          {showCenas?"Paslēpt":"Rediģēt"}
+        </button>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",fontSize:"12px"}}>
+        {Object.keys(cenas).map(k=>(
+          <div key={k}>
+            <label style={{fontSize:"10px",color:"#666"}}>{CENU_NOSAUKUMI[k]}:</label><br/>
+            {showCenas
+              ? <input type="number" value={cenas[k]} onChange={e=>setCenas({...cenas,[k]:Number(e.target.value)})} style={{width:"70px",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/>
+              : <b>{cenas[k]} €</b>
+            }
+          </div>
+        ))}
+      </div>
+    </div>
+
     <div style={{display:"flex",gap:"8px",marginBottom:"16px",flexWrap:"wrap"}}>
       <button onClick={pievienotStavu} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>+ Pievienot sugu</button>
       <button onClick={apreklinat} style={{padding:"6px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>📊 Aprēķināt</button>
@@ -170,8 +205,9 @@ ${tabulas}
       <div key={i} style={{marginBottom:"16px"}}>
         <b>{r.suga} — {r.kopaSkaits} koki, krāja: {r.kopaKraja.toFixed(2)} m³</b>
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginTop:"8px",fontSize:"12px"}}>
-          <div><b>Lietkoksne:</b><br/>{r.lietkoksne.toFixed(2)} m³</div>
-          <div><b>Malka:</b><br/>{r.malkaVol.toFixed(2)} m³</div>
+          <div><b>Kopējā krāja:</b><br/>{r.kopaKraja.toFixed(2)} m³</div>
+          <div><b>Atliekas ({Math.round(r.atlikas*100)}%):</b><br/>{r.atlikasVol.toFixed(2)} m³</div>
+          <div><b>Likvīdā krāja:</b><br/>{r.likvida.toFixed(2)} m³</div>
           <div><b>Vērtība:</b><br/>{r.vertiba.toFixed(0)} €</div>
         </div>
       </div>

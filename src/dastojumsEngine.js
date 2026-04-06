@@ -1,3 +1,18 @@
+// Atlikumu faktori - zari, galotne, celms (nelikvīdā daļa)
+// Likvīdā krāja = kopējā krāja × (1 - atlikas)
+const atlikasFaktors = {
+  P:  0.12,
+  E:  0.13,
+  B:  0.16,
+  A:  0.18,
+  Ba: 0.20,
+  Bl: 0.20,
+  M:  0.18,
+  Oz: 0.14,
+  Os: 0.15,
+  G:  0.15,
+}
+
 // Curtis regresijas koeficienti h aprēķinam no d
 const curtisA = {
   P: 3.8, E: 3.2, B: 4.1, A: 3.5,
@@ -37,27 +52,65 @@ export function calcVolume(d, h, suga) {
 
 // Sortimentu sadalījums pēc d klases un kvalitātes
 export function calcSortiments(d, suga, kvalitate) {
-  // Resni (d >= 24): zāģbaļķi + finieris
-  // Vidēji (d 16-20): sīkbaļķi + tara  
-  // Tievāki (d 8-12): papīrmalka
-  // Malka: malka + šķelda
-  
+  const isSkujkoks = ["P","E","Lg"].includes(suga)
+  const isBerzs = suga === "B"
+  const isApse = suga === "A"
+  const isAlksnis = ["Ba","Bl","M"].includes(suga)
+
   if (kvalitate === "resni") {
-    if (d >= 32) return {log: 0.65, veneer: 0.15, tara: 0.10, pulp: 0.05, fire: 0.03, chips: 0.02}
-    if (d >= 24) return {log: 0.55, veneer: 0.10, tara: 0.15, pulp: 0.12, fire: 0.05, chips: 0.03}
-    return {log: 0.40, tara: 0.25, pulp: 0.20, fire: 0.10, chips: 0.05}
+    if (d >= 32) {
+      if(isBerzs) return {log:0.20, veneer:0.40, tara:0.20, pulp:0.15, fire:0.03, chips:0.02}
+      if(isSkujkoks) return {log:0.65, small:0.15, veneer:0, tara:0, pulp:0.12, fire:0.05, chips:0.03}
+      if(isApse) return {log:0.55, veneer:0, small:0, tara:0, pulp:0.35, fire:0.07, chips:0.03}
+    if(isAlksnis) {
+      if(d >= 24) return {log:0, veneer:0, tara:0.65, pulp:0, fire:0.28, chips:0.07}
+      return {log:0, veneer:0, tara:0.45, pulp:0, fire:0.45, chips:0.10}
+    }
+    return {log:0.55, small:0.15, veneer:0, tara:0.10, pulp:0.12, fire:0.05, chips:0.03}
+    }
+    if (d >= 24) {
+      if(isBerzs) return {log:0.10, veneer:0.30, tara:0.30, pulp:0.22, fire:0.05, chips:0.03}
+      if(isSkujkoks) return {log:0.50, small:0.20, veneer:0, tara:0, pulp:0.22, fire:0.05, chips:0.03}
+      if(isApse) return {log:0.45, veneer:0, tara:0, pulp:0.42, fire:0.08, chips:0.05}
+      if(isAlksnis) return {log:0, veneer:0, tara:0.65, pulp:0, fire:0.28, chips:0.07}
+      return {log:0.35, small:0, veneer:0, tara:0.20, pulp:0.30, fire:0.10, chips:0.05}
+    }
+    if(isSkujkoks) return {log:0.30, small:0.25, veneer:0, tara:0, pulp:0.35, fire:0.07, chips:0.03}
+    if(isApse) return {log:0.20, veneer:0, tara:0, pulp:0.60, fire:0.14, chips:0.06}
+    if(isAlksnis) return {log:0, veneer:0, tara:0.45, pulp:0, fire:0.45, chips:0.10}
+    return {log:0.20, small:0, veneer:0, tara:0.20, pulp:0.45, fire:0.10, chips:0.05}
   }
   if (kvalitate === "videj") {
-    if (d >= 24) return {log: 0.40, tara: 0.25, pulp: 0.20, fire: 0.10, chips: 0.05}
-    if (d >= 16) return {small: 0.35, tara: 0.25, pulp: 0.25, fire: 0.10, chips: 0.05}
-    return {pulp: 0.60, fire: 0.25, chips: 0.15}
+    if (d >= 24) {
+      if(isSkujkoks) return {log:0.25, small:0.30, veneer:0, tara:0, pulp:0.35, fire:0.07, chips:0.03}
+      if(isBerzs) return {log:0, veneer:0.15, tara:0.35, pulp:0.40, fire:0.07, chips:0.03}
+      if(isApse) return {log:0, veneer:0, tara:0, pulp:0.75, fire:0.18, chips:0.07}
+      if(isAlksnis) return {log:0, veneer:0, tara:0.25, pulp:0, fire:0.65, chips:0.10}
+      return {log:0.15, small:0.20, veneer:0, tara:0.20, pulp:0.35, fire:0.07, chips:0.03}
+    }
+    if (d >= 16) {
+      if(isSkujkoks) return {small:0.45, veneer:0, tara:0, pulp:0.42, fire:0.08, chips:0.05}
+      if(isBerzs) return {small:0, veneer:0, tara:0.40, pulp:0.45, fire:0.10, chips:0.05}
+      if(isApse) return {log:0, veneer:0, tara:0, pulp:0.72, fire:0.20, chips:0.08}
+      if(isAlksnis) return {log:0, veneer:0, tara:0.30, pulp:0, fire:0.60, chips:0.10}
+      return {small:0.25, tara:0.20, pulp:0.42, fire:0.08, chips:0.05}
+    }
+    // d < 16 — nav tara
+    if(isAlksnis) return {log:0, veneer:0, tara:0, pulp:0, fire:0.82, chips:0.18}
+    if(isBerzs) return {pulp:0.65, fire:0.25, chips:0.10}
+    return {pulp:0.60, fire:0.28, chips:0.12}
   }
-  if (kvalitate === "tiev") {
-    if (d >= 16) return {small: 0.25, tara: 0.20, pulp: 0.35, fire: 0.15, chips: 0.05}
-    return {pulp: 0.55, fire: 0.30, chips: 0.15}
+ if (kvalitate === "tiev") {
+    if (d >= 16) {
+      if(isSkujkoks) return {small:0.30, pulp:0.55, fire:0.10, chips:0.05}
+      if(isBerzs) return {tara:0.20, pulp:0.60, fire:0.15, chips:0.05}
+      if(isApse) return {pulp:0.72, fire:0.20, chips:0.08}
+      if(isAlksnis) return {tara:0, pulp:0, fire:0.80, chips:0.20}
+      return {pulp:0.65, fire:0.25, chips:0.10}
+    }
+    return {pulp:0.70, fire:0.20, chips:0.10}
   }
-  // malka
-  return {fire: 0.70, chips: 0.30}
+  return {fire:0.75, chips:0.25}
 }
 
 // Galvenā dastojuma aprēķina funkcija
@@ -104,6 +157,9 @@ export function calcDastojums(stavs, cenas) {
     }
   }
 
+ const atlikas = atlikasFaktors[suga] || 0.15
+  const likvida = kopaKraja * (1 - atlikas)
+  const atlikasVol = kopaKraja * atlikas
   const lietkoksne = sortTotals.log + sortTotals.small + sortTotals.veneer + sortTotals.tara + sortTotals.pulp
   const malkaVol = sortTotals.fire + sortTotals.chips
   
@@ -112,6 +168,7 @@ export function calcDastojums(stavs, cenas) {
 
   return {
     suga, hVid, kopaSkaits, kopaKraja,
+    likvida, atlikasVol, atlikas,
     lietkoksne, malkaVol,
     sortTotals, vertiba, rindas
   }
