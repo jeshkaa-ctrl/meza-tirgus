@@ -7,6 +7,7 @@ import { getBonitate } from "./bonityEngine"
 import { minDiameter, formFactor } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
 import StandardPage, { JaunaudžuParskats, AtjaunosanaParskats, IeaudzesanaParskats } from "./StandardPage"
+import DastojumsPanel from "./DastojumsPanel"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -512,6 +513,7 @@ const [cirteVeids,setCirteVeids]=useState(savedState?.cirteVeids||"")
 const [cirteIzpilde,setCirteIzpilde]=useState(savedState?.cirteIzpilde||"")
 const [platiba,setPlatiba]=useState(savedState?.platiba||0)
 const [showCaurmers,setShowCaurmers]=useState(false)
+const [showDastojums,setShowDastojums]=useState(false)
 
 const [caurmersState, setCaurmersState] = useState(savedState?.caurmersState||null)
 const [showRekins, setShowRekins] = useState(false)
@@ -833,7 +835,8 @@ return(
 <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#5d4037",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🏛 VMD</a>
     {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📋 Kopēt kadastru</button>}
   </div>
-  <button onClick={()=>setShowCaurmers(v=>!v)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📏 Caurmēra mērījumi</button>
+<button onClick={()=>setShowCaurmers(v=>!v)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📏 Caurmēra mērījumi</button>
+<button onClick={()=>setShowDastojums(v=>!v)} style={{padding:"6px 14px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🌲 Dastojums</button>
 </div>
 <h1>Cirsmas skice</h1>
 
@@ -987,6 +990,14 @@ Augšupielādē KML failu no LVM GEO lai redzētu skici
     saimnieciba={saimnieciba}
     savedState={caurmersState}
     onSaveState={(s)=>{setCaurmersState(s);saglabat({caurmersState:s})}}
+  />
+)}
+
+{showDastojums && (
+  <DastojumsPanel
+    kadastrs={kadastrs}
+    saimnieciba={saimnieciba}
+    onClose={()=>setShowDastojums(false)}
   />
 )}
 </div>
@@ -1747,27 +1758,7 @@ alert("Cenas atjauninātas!")
 <button onClick={()=>setPage("pdfSkirotajs")} style={{padding:"8px 16px",background:"#6a1b9a",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>PDF šķirotājs</button>
 <button onClick={()=>setPage("cirsma")} style={{padding:"8px 16px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas novērtēšana</button>
 
-{(()=>{
-const gatavs=izcirtumi.length>0&&izcirtumi.some(ic=>{
-if(!ic.formula||!ic.formula.trim()) return false
-if(!ic.h||Number(ic.h)===0) return false
-if(!ic.koki||Number(ic.koki)===0) return false
-const matches=ic.formula.match(/(\d+)(Bl|Ba|Oz|Os|P|E|B|A|M|G)/g)||[]
-if(!matches||matches.length===0) return false
-const summa=matches.reduce((s,m)=>{const n=parseInt(m.match(/\d+/)[0]);return s+(n<=10?n*10:n)},0)
-return summa===100
-})
-return(
-<button
-onClick={()=>setPage("atjaunosana")}
-disabled={!gatavs}
-style={{padding:"8px 16px",background:gatavs?"#2e7d32":"#aaa",color:"white",border:"none",borderRadius:"4px",cursor:gatavs?"pointer":"not-allowed"}}
-title={!gatavs?"Aizpildiet visiem izcirtumiem: formula (summa=10), H un koki/ha":""}
->
-Atjaunošanas pārskats
-</button>
-)
-})()}
+
 </div>
 
 <div style={{marginBottom:"12px",display:"flex",gap:"8px",flexWrap:"wrap",alignItems:"center"}}>
