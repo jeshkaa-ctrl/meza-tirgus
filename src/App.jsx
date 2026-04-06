@@ -1354,7 +1354,7 @@ return(
       Darbarīks meža speciālistam un meža īpašniekam
     </p>
     <div style={{display:"flex",gap:"12px",justifyContent:"center",marginTop:"28px",flexWrap:"wrap"}}>
-      <button onClick={onEnter} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"16px",fontWeight:"bold",cursor:"pointer"}}>
+      <button onClick={onStandard} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"16px",fontWeight:"bold",cursor:"pointer"}}>
         Sākt bezmaksas →
       </button>
       <div style={{position:"relative",display:"inline-block"}}

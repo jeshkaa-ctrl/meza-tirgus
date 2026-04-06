@@ -112,7 +112,8 @@ const economicValue = totalMoney + totalLandValue + stadijumuVertiba
 const marketValue = rows.reduce((sum,row)=>{const calc=forestEngine(row);return sum+(calc.marketValue||0)},0)+totalLandValue+stadijumuVertiba
 
 return(
-<div style={{padding:"24px",fontFamily:"Arial",maxWidth:"1000px",margin:"0 auto"}}>
+<div style={{padding:"0",fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2"}}>
+<div style={{maxWidth:"1000px",margin:"0 auto",padding:"24px"}}></div>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"24px",flexWrap:"wrap",gap:"8px"}}>
     <button onClick={onBack} style={{padding:"8px 16px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Sākumlapa</button>
     <button onClick={onPilna} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>Turpināt pilnajā versijā →</button>
@@ -212,7 +213,7 @@ return(
   )}
   {rows.length>0 && (
   <div style={{background:"#1a3a1a",borderRadius:"10px",padding:"20px",textAlign:"center",marginBottom:"24px"}}>
-    <p style={{color:"#aaa",fontSize:"13px",marginBottom:"12px"}}>Lai iegūtu detalizētu sortimentu sadalījumu, cirsmas skici, caurmēra mērījumus un rēķinu izveidi —</p>
+  <p style={{color:"#aaa",fontSize:"13px",marginBottom:"12px"}}>Lai iegūtu detalizētu sortimentu sadalījumu, cirsmas skici, caurmēra mērījumus un rēķinu izveidi — kā arī iespēju labot augšupielādēto datu vērtības un formulas —</p>
     <button onClick={onPilna} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"15px",fontWeight:"bold",cursor:"pointer"}}>
       Turpināt pilnajā versijā →
     </button>
