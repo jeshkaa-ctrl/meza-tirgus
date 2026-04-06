@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState, useRef } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import CirsmaNovertesanaPage from "./CirsmaNovertesanaPage"
 import PdfSkirotajsPage from "./PdfSkirotajsPage"
@@ -6,7 +6,7 @@ import { forestEngine } from "./forestEngine"
 import { getBonitate } from "./bonityEngine"
 import { minDiameter, formFactor } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
-import StandardPage from "./StandardPage"
+import StandardPage, { JaunaudžuParskats, AtjaunosanaParskats, IeaudzesanaParskats } from "./StandardPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1482,8 +1482,24 @@ const [skirotajsState,setSkirotajsState]=useState(null)
 const [cirsmaState,setCirsmaState]=useState(null)
 const [skiceState,setSkiceState]=useState(null)
 const [caurmersState,setCaurmersState]=useState(null)
+const [showAtjParskats,setShowAtjParskats]=useState(false)
+const [showJkParskats,setShowJkParskats]=useState(false)
+const [showIeaudParskats,setShowIeaudParskats]=useState(false)
+const [papilduNogabali,setPapilduNogabali]=useState([])
+const jkRef=React.useRef(null)
+const atjRef=React.useRef(null)
+const ieaudRef=React.useRef(null)
 if(page==="landing") return <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")}/>
-if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={()=>setPage("main")}/>
+if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={(data)=>{
+  if(data){
+    setRows(data.rows||[])
+    setIzcirtumi(data.izcirtumi||[])
+    setJaunaudzes(data.jaunaudzes||[])
+    setKadastrs(data.kadastrs||"")
+    setSaimnieciba(data.saimnieciba||"")
+  }
+  setTimeout(()=>setPage("main"),50)
+}}/>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
 if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState}/>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
@@ -1767,9 +1783,19 @@ Atjaunošanas pārskats
 
 {jaunaudzes.length>0 && (
 <div style={{background:"#e8f5e9",border:"1px solid #388e3c",borderRadius:"6px",padding:"12px",margin:"16px 0"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
 <b>Jaunaudžu kopšana</b>
+<button onClick={()=>{
+  const gatavs = jaunaudzes.some(ja=>ja.koki>0)
+  if(!gatavs){alert("Aizpildiet vismaz vienam nogabalam koku skaitu!");return}
+  setShowJkParskats(true)
+  setTimeout(()=>jkRef.current?.scrollIntoView({behavior:"smooth"}),100)
+}} style={{padding:"6px 14px",background:"#388e3c",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+  📋 Jaunaudžu kopšanas pārskats
+</button>
+</div>
 <table border="1" cellPadding="6" style={{marginTop:"8px",width:"100%"}}>
-<thead style={{background:"#388e3c",color:"white"}}><tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Kopšanas gads</th></tr></thead>
+<thead style={{background:"#388e3c",color:"white"}}><tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Kopšanas gads</th><th>Valdošā suga</th><th>Augstums (m)</th><th>Audzes sastāvs</th><th>Koki/ha</th></tr></thead>
 <tbody>
 {jaunaudzes.map((ja,i)=>(
 <tr key={i}>
@@ -1777,6 +1803,10 @@ Atjaunošanas pārskats
 <td style={{color:ja.kopšanasGads<=new Date().getFullYear()?"#c62828":"black",fontWeight:ja.kopšanasGads<=new Date().getFullYear()?"bold":"normal"}}>
 {ja.kopšanasGads<=new Date().getFullYear()?ja.kopšanasGads+" — Kavēta kopšana / nav iesniegts pārskats":ja.kopšanasGads}
 </td>
+<td>{ja.tips||"—"}</td>
+<td><input type="number" step="0.1" min="0.1" value={ja.h||""} onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],h:parseFloat(e.target.value)||0};setJaunaudzes(n)}} placeholder="m" style={{width:"45px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
+<td><input value={ja.formula||""} onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],formula:e.target.value};setJaunaudzes(n)}} placeholder="p.ē. 10B" style={{width:"60px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
+<td><input type="number" value={ja.koki||""} onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],koki:Number(e.target.value)};setJaunaudzes(n)}} placeholder="gab" style={{width:"55px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
 </tr>
 ))}
 </tbody>
@@ -1786,14 +1816,27 @@ Atjaunošanas pārskats
 
 {izcirtumi.length>0 && (
 <div style={{background:"#fff8e1",border:"1px solid #f9a825",borderRadius:"6px",padding:"12px",margin:"16px 0"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px",flexWrap:"wrap",gap:"8px"}}>
 <b>Izcirtumi — nepieciešama atjaunošana</b>
+<div style={{display:"flex",gap:"8px"}}>
 <button onClick={()=>{
   const gatavs = izcirtumi.some(ic=>ic.formula&&ic.h>0&&ic.koki>0)
-  if(gatavs) setShowAtjParskats(true)
-  else alert("Aizpildiet vismaz vienam nogabalam: sugu, augstumu un koku skaitu!")
-}} style={{marginLeft:"12px",padding:"4px 12px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
-  📋 Izveidot atjaunošanas pārskatu
+  if(!gatavs){alert("Aizpildiet vismaz vienam nogabalam: sugu, augstumu un koku skaitu!");return}
+  setShowAtjParskats(true)
+  setTimeout(()=>atjRef.current?.scrollIntoView({behavior:"smooth"}),100)
+}} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+  📋 Atjaunošanas pārskats
 </button>
+<button onClick={()=>{
+  const gatavs = izcirtumi.some(ic=>ic.atjVeids==="Stādot"&&ic.formula&&ic.h>0&&ic.koki>0)
+  if(!gatavs){alert("Aizpildiet vismaz vienam nogabalam atjaunošanas veidu 'Stādot', sugu, augstumu un koku skaitu!");return}
+  setShowIeaudParskats(true)
+  setTimeout(()=>ieaudRef.current?.scrollIntoView({behavior:"smooth"}),100)
+}} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+  🌱 Ieaudzēšanas pārskats
+</button>
+</div>
+</div>
 <table border="1" cellPadding="6" style={{marginTop:"8px",width:"100%"}}>
 <thead style={{background:"#f9a825"}}>
 <tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Cirtes veids</th><th>Gads</th><th>Atjaunot līdz</th><th>Formula</th><th>H (m)</th><th>Koki/ha</th><th>Statuss</th></tr>
@@ -1803,7 +1846,7 @@ Atjaunošanas pārskats
 <tr key={i} style={{background:ic.atjaunGads<=new Date().getFullYear()?"#ffcccc":"#fffde7"}}>
 <td>{ic.nog}</td><td>{ic.platiba} ha</td><td>{ic.tips}</td><td>{ic.cirteVeids}</td><td>{ic.cirteGads}</td><td><b>{ic.atjaunGads}</b></td>
 <td><input style={{width:"90px"}} value={ic.formula} placeholder="p.ē. 10P" onChange={e=>updateIzcirtums(i,"formula",e.target.value)}/></td>
-<td><input type="number" style={{width:"45px"}} value={ic.h||""} placeholder="m" onChange={e=>updateIzcirtums(i,"h",parseFloat(e.target.value.replace(",",".")))}/></td>
+<td><input type="number" step="0.1" min="0.1" style={{width:"45px"}} value={ic.h||""} placeholder="m" onChange={e=>updateIzcirtums(i,"h",parseFloat(e.target.value.replace(",",".")))}/></td>
 <td><input type="number" style={{width:"55px"}} value={ic.koki||""} placeholder="gab" onChange={e=>updateIzcirtums(i,"koki",Number(e.target.value))}/></td>
 <td style={{fontSize:"10px",maxWidth:"180px"}}>
 {(()=>{
@@ -1910,6 +1953,42 @@ return(
 </div>
 )
 })()}
+
+{showJkParskats && (
+<div ref={jkRef}>
+<JaunaudžuParskats
+  jaunaudzes={jaunaudzes}
+  rows={rows}
+  kadastrs={kadastrs}
+  saimnieciba={saimnieciba}
+  papilduNogabali={papilduNogabali}
+  setPapilduNogabali={setPapilduNogabali}
+  onClose={()=>setShowJkParskats(false)}
+/>
+</div>
+)}
+
+{showAtjParskats && (
+<div ref={atjRef}>
+<AtjaunosanaParskats
+  izcirtumi={izcirtumi}
+  kadastrs={kadastrs}
+  saimnieciba={saimnieciba}
+  onClose={()=>setShowAtjParskats(false)}
+/>
+</div>
+)}
+
+{showIeaudParskats && (
+<div ref={ieaudRef}>
+<IeaudzesanaParskats
+  izcirtumi={izcirtumi}
+  kadastrs={kadastrs}
+  saimnieciba={saimnieciba}
+  onClose={()=>setShowIeaudParskats(false)}
+/>
+</div>
+)}
 
 <br/>
 {!editing&&rows.length>0&&<button onClick={()=>setEditing(true)}>Labot datus</button>}

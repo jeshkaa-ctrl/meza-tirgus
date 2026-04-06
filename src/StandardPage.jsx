@@ -553,14 +553,37 @@ const economicValue = totalMoney + totalLandValue + stadijumuVertiba
 const marketValue = rows.reduce((sum,row)=>{const calc=forestEngine(row);return sum+(calc.marketValue||0)},0)+totalLandValue+stadijumuVertiba
 
 return(
-<div style={{padding:"0",fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2"}}>
-<div style={{maxWidth:"1000px",margin:"0 auto",padding:"24px"}}></div>
-  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"24px",flexWrap:"wrap",gap:"8px"}}>
-    <button onClick={onBack} style={{padding:"8px 16px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Sākumlapa</button>
-    <button onClick={onPilna} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>Turpināt pilnajā versijā →</button>
+<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2"}}>
+  {/* HERO */}
+  <div style={{background:"#1a3a1a",padding:"32px 40px",color:"white"}}>
+    <div style={{maxWidth:"1000px",margin:"0 auto"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"24px",flexWrap:"wrap",gap:"8px"}}>
+        <button onClick={onBack} style={{padding:"8px 16px",background:"rgba(255,255,255,0.15)",color:"white",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"4px",cursor:"pointer"}}>← Sākumlapa</button>
+       <button onClick={()=>onPilna({rows,izcirtumi,jaunaudzes,kadastrs,saimnieciba})} style={{padding:"8px 20px",background:"#4caf50",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>Turpināt pilnajā versijā →</button>
+      </div>
+      <h1 style={{margin:"0 0 8px",fontSize:"28px"}}>Pamata versija</h1>
+      <p style={{color:"#aaa",margin:"0 0 28px",fontSize:"14px"}}>Augšupielādē meža inventarizācijas PDF un saņem īpašuma analīzi</p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"16px",marginBottom:"8px"}}>
+        <div style={{background:"rgba(255,255,255,0.08)",borderRadius:"8px",padding:"16px",textAlign:"center"}}>
+          <div style={{fontSize:"28px",marginBottom:"8px"}}>📄</div>
+          <div style={{fontWeight:"bold",fontSize:"14px",marginBottom:"4px"}}>1. Augšupielādē</div>
+          <div style={{fontSize:"12px",color:"#aaa"}}>Meža inventarizācijas PDF no VMD</div>
+        </div>
+        <div style={{background:"rgba(255,255,255,0.08)",borderRadius:"8px",padding:"16px",textAlign:"center"}}>
+          <div style={{fontSize:"28px",marginBottom:"8px"}}>📊</div>
+          <div style={{fontWeight:"bold",fontSize:"14px",marginBottom:"4px"}}>2. Saņem analīzi</div>
+          <div style={{fontSize:"12px",color:"#aaa"}}>Nogabalu ieteikumi, saimnieciskā un tirgus vērtība</div>
+        </div>
+        <div style={{background:"rgba(255,255,255,0.08)",borderRadius:"8px",padding:"16px",textAlign:"center"}}>
+          <div style={{fontSize:"28px",marginBottom:"8px"}}>📋</div>
+          <div style={{fontWeight:"bold",fontSize:"14px",marginBottom:"4px"}}>3. Sagatavo pārskatus</div>
+          <div style={{fontSize:"12px",color:"#aaa"}}>Atjaunošanas, jaunaudžu un ieaudzēšanas pārskati VMD</div>
+        </div>
+      </div>
+    </div>
   </div>
-  <h1 style={{color:"#225522",marginBottom:"4px"}}>Pamata versija</h1>
-  <p style={{color:"#888",fontSize:"13px",marginBottom:"24px"}}>Augšupielādē meža inventarizācijas PDF un saņem īpašuma analīzi</p>
+
+<div style={{maxWidth:"1000px",margin:"0 auto",padding:"24px"}}></div>
   <div style={{background:"#f0f6ec",border:"1px solid #225522",borderRadius:"8px",padding:"16px",marginBottom:"24px"}}>
     <b style={{color:"#225522"}}>📄 Augšupielādēt meža inventarizācijas PDF</b><br/>
     <input type="file" accept="application/pdf" onChange={handlePDF} style={{marginTop:"8px"}}/>
@@ -655,7 +678,7 @@ return(
             <td>{ic.nog}</td><td>{ic.platiba} ha</td><td>{ic.tips}</td>
             <td>{ic.cirteVeids}</td><td>{ic.cirteGads}</td><td><b>{ic.atjaunGads}</b></td>
             <td><input value={ic.formula||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],formula:e.target.value};setIzcirtumi(n)}} placeholder="p.ē. 10P" style={{width:"60px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
-            <input type="number" step="0.1" min="0.1" value={ic.h||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],h:parseFloat(e.target.value)||0};setIzcirtumi(n)}} placeholder="m" style={{width:"45px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/>
+            <td><input type="number" step="0.1" min="0.1" value={ic.h||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],h:parseFloat(e.target.value)||0};setIzcirtumi(n)}} placeholder="m" style={{width:"45px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
             <td><input type="number" value={ic.koki||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],koki:Number(e.target.value)};setIzcirtumi(n)}} placeholder="gab" style={{width:"55px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/></td>
             <td><select value={ic.atjVeids||""} onChange={e=>{const n=[...izcirtumi];n[i]={...n[i],atjVeids:e.target.value};setIzcirtumi(n)}} style={{padding:"2px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}>
               <option value="">—</option>
@@ -731,19 +754,12 @@ return(
   </div>
   )}
 
-  {showIeaudParskats && (
-  <IeaudzesanaParskats
-    izcirtumi={izcirtumi}
-    kadastrs={kadastrs}
-    saimnieciba={saimnieciba}
-    onClose={()=>setShowIeaudParskats(false)}
-  />
-  )}
+  
 
   {rows.length>0 && (
   <div style={{background:"#1a3a1a",borderRadius:"10px",padding:"20px",textAlign:"center",marginBottom:"24px"}}>
   <p style={{color:"#aaa",fontSize:"13px",marginBottom:"12px"}}>Lai iegūtu detalizētu sortimentu sadalījumu, cirsmas skici, caurmēra mērījumus un rēķinu izveidi — kā arī iespēju labot augšupielādēto datu vērtības un formulas —</p>
-    <button onClick={onPilna} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"15px",fontWeight:"bold",cursor:"pointer"}}>
+    <button onClick={()=>onPilna({rows,izcirtumi,jaunaudzes,kadastrs,saimnieciba})} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"15px",fontWeight:"bold",cursor:"pointer"}}>
       Turpināt pilnajā versijā →
     </button>
   </div>
@@ -752,4 +768,5 @@ return(
 )
 }
 
+export { JaunaudžuParskats, AtjaunosanaParskats, IeaudzesanaParskats }
 export default StandardPage
