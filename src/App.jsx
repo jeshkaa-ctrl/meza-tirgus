@@ -21,7 +21,7 @@ function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, on
   const [vecums, setVecums] = useState(savedState?.vecums||"")
   const [h, setH] = useState(savedState?.h||"")
   const [merijumi, setMerijumi] = useState(
-    savedState?.merijumi || Array.from({length:40}, (_,i) => ({d: 15+i, n: 0}))
+    savedState?.merijumi || Array.from({length:50}, (_,i) => ({d: 15+i, n: 0}))
   )
 
   const saglabat = (jaunie) => onSaveState?.({
@@ -47,7 +47,27 @@ function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, on
     saglabat({merijumi:m})
   }
 
- const sumDN = merijumi.reduce((s,r) => s + r.d*r.n, 0)
+ const [jaunsD, setJaunsD] = useState("")
+  const [jaunsN, setJaunsN] = useState("")
+
+  const pievienotManuali = () => {
+    const d = Math.round(parseFloat(jaunsD)||0)
+    const n = Math.max(0, parseInt(jaunsN)||0)
+    if(!d || d < 5) return
+    const esošs = merijumi.findIndex(r => r.d === d)
+    let jauniM
+    if(esošs !== -1) {
+      jauniM = [...merijumi]
+      jauniM[esošs] = {...jauniM[esošs], n: jauniM[esošs].n + n}
+    } else {
+      jauniM = [...merijumi, {d, n}].sort((a,b) => a.d - b.d)
+    }
+    setMerijumi(jauniM)
+    saglabat({merijumi: jauniM})
+    setJaunsD(""); setJaunsN("")
+  }
+
+  const sumDN = merijumi.reduce((s,r) => s + r.d*r.n, 0)
   const sumN = merijumi.reduce((s,r) => s + r.n, 0)
   const videjaisD = sumN > 0 ? (sumDN / sumN).toFixed(1) : "—"
 
@@ -177,6 +197,12 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
       <div style={{display:"flex",gap:"8px",marginBottom:"12px",flexWrap:"wrap",alignItems:"center"}}>
         <button onClick={exportPDF} style={{padding:"6px 16px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Drukāt / Saglabāt PDF</button>
         <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#5d4037",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🏛 VMD</a>
+        <div style={{display:"flex",gap:"6px",alignItems:"center",background:"#f0f4ff",padding:"6px 10px",borderRadius:"6px",border:"1px solid #1565c0"}}>
+          <span style={{fontSize:"11px",fontWeight:"bold",color:"#1565c0"}}>Manuāli:</span>
+          <input type="number" value={jaunsD} onChange={e=>setJaunsD(e.target.value)} placeholder="d (cm)" style={{width:"60px",padding:"4px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/>
+          <input type="number" value={jaunsN} onChange={e=>setJaunsN(e.target.value)} placeholder="skaits" style={{width:"55px",padding:"4px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/>
+          <button onClick={pievienotManuali} style={{padding:"4px 10px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>+ Pievienot</button>
+        </div>
         <label style={{padding:"6px 16px",background:"#1565c0",color:"white",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
           📂 Augšupielādēt CSV
           <input type="file" accept=".csv" style={{display:"none"}} onChange={e=>{
@@ -1359,7 +1385,7 @@ Drukāt / Saglabāt PDF
 )
 }
 // ========== GALVENA APP ==========
-function LandingPage({onEnter, onStandard}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg}){
 return(
 <div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2",maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -1373,6 +1399,13 @@ return(
       <button onClick={onStandard} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"16px",fontWeight:"bold",cursor:"pointer"}}>
         Sākt bezmaksas →
       </button>
+      {user
+        ? <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+            <span style={{color:"#aaa",fontSize:"14px"}}>👤 {user.vards}</span>
+            <button onClick={onIziet} style={{padding:"8px 20px",background:"transparent",color:"#aaa",border:"1px solid #aaa",borderRadius:"6px",fontSize:"14px",cursor:"pointer"}}>Iziet</button>
+          </div>
+        : <button onClick={onReg} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid white",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>Reģistrēties</button>
+      }
       <div style={{position:"relative",display:"inline-block"}}
   onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
   onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
@@ -1507,7 +1540,10 @@ const [papilduNogabali,setPapilduNogabali]=useState([])
 const jkRef=React.useRef(null)
 const atjRef=React.useRef(null)
 const ieaudRef=React.useRef(null)
-if(page==="landing") return <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>setShowReg(true)}/>
+if(page==="landing") return <>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>setShowReg(true)}/>
+  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={(data)=>{
   if(data){
     setRows(data.rows||[])
