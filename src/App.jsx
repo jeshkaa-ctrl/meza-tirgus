@@ -1512,7 +1512,7 @@ return(
 
 function App(){
 const [page,setPage]=useState("landing")
-const { user, registreties, iziet } = useAuth()
+const { user, registreties, pieteikties, iziet } = useAuth()
 const [showReg, setShowReg] = useState(false)
 const [regAtpakal, setRegAtpakal] = useState(null)
 
@@ -1752,7 +1752,7 @@ win.print()
 
 return(
 <div style={{padding:"40px",fontFamily:"Arial"}}>
-{showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
+{showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
 
 {showCustomModal && (
 <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center"}}>
