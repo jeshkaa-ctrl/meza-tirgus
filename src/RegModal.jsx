@@ -83,8 +83,17 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
   const [bazesNovads, setBazesNovads] = useState("")
   const [papilduNovadi, setPapilduNovadi] = useState([])
   const [epasts, setEpasts] = useState("")
-  const [parole, setParole] = useState("")
+ const [parole, setParole] = useState("")
+  const [parole2, setParole2] = useState("")
   const [kludas, setKludas] = useState("")
+
+  const paroleSpeks = () => {
+    if (parole.length === 0) return null
+    if (parole.length < 8) return "vaja"
+    if (!/\d/.test(parole)) return "vaja"
+    return "labi"
+  }
+  const speks = paroleSpeks()
 
   const pievienotNovadu = (novads) => {
     if (!papilduNovadi.includes(novads) && novads !== bazesNovads) {
@@ -102,7 +111,9 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
       if (tips === "uznemums" && !uznemums.trim()) return setKludas("Ievadi uzņēmuma nosaukumu!")
       if (tips === "uznemums" && !bazesNovads) return setKludas("Izvēlies bāzes novadu!")
       if (!epasts.includes("@")) return setKludas("Nepareizs e-pasts!")
-      if (parole.length < 6) return setKludas("Parolei jābūt vismaz 6 simboli!")
+      if (parole.length < 8) return setKludas("Parolei jābūt vismaz 8 simboli!")
+      if (!/\d/.test(parole)) return setKludas("Parolei jābūt vismaz viens cipars!")
+      if (parole !== parole2) return setKludas("Paroles nesakrīt!")
       onRegistreties({ vards, uznemums, darbiba, talrunis, bazesNovads, papilduNovadi, epasts, parole, tips })
     } else {
       if (!epasts.includes("@")) return setKludas("Nepareizs e-pasts!")
@@ -180,9 +191,20 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
           <label style={{fontSize:"11px",fontWeight:"bold"}}>E-pasts:</label><br/>
           <input type="email" value={epasts} onChange={e=>setEpasts(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
+        <div style={{marginBottom:"10px"}}>
+          <label style={{fontSize:"11px",fontWeight:"bold"}}>Parole:</label>
+          <span style={{fontSize:"10px",color:"#888",marginLeft:"8px"}}>min. 8 simboli, vismaz 1 cipars</span><br/>
+          <input type="password" value={parole} onChange={e=>setParole(e.target.value)}
+            style={{width:"100%",padding:"6px",border:`1px solid ${speks==="labi"?"#388e3c":speks==="vaja"?"#c62828":"#ccc"}`,borderRadius:"4px",fontSize:"13px",boxSizing:"border-box",background:speks==="labi"?"#f0fff0":speks==="vaja"?"#fff0f0":"white"}}/>
+          {speks==="vaja" && <span style={{fontSize:"10px",color:"#c62828"}}>⛔ Par īsu vai nav cipara</span>}
+          {speks==="labi" && <span style={{fontSize:"10px",color:"#388e3c"}}>✓ Parole ir derīga</span>}
+        </div>
         <div style={{marginBottom:"16px"}}>
-          <label style={{fontSize:"11px",fontWeight:"bold"}}>Parole:</label><br/>
-          <input type="password" value={parole} onChange={e=>setParole(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
+          <label style={{fontSize:"11px",fontWeight:"bold"}}>Atkārtot paroli:</label><br/>
+          <input type="password" value={parole2} onChange={e=>setParole2(e.target.value)}
+            style={{width:"100%",padding:"6px",border:`1px solid ${parole2.length>0?(parole===parole2?"#388e3c":"#c62828"):"#ccc"}`,borderRadius:"4px",fontSize:"13px",boxSizing:"border-box",background:parole2.length>0?(parole===parole2?"#f0fff0":"#fff0f0"):"white"}}/>
+          {parole2.length>0 && parole!==parole2 && <span style={{fontSize:"10px",color:"#c62828"}}>⛔ Paroles nesakrīt</span>}
+          {parole2.length>0 && parole===parole2 && speks==="labi" && <span style={{fontSize:"10px",color:"#388e3c"}}>✓ Paroles sakrīt</span>}
         </div>
 
         <button onClick={iesniegt} style={{width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:"8px"}}>
