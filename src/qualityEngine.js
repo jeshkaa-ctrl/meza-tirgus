@@ -105,6 +105,17 @@ export const qualitySortiments = {
 }
 
 export function calcSortimentsByQuality(volume, suga, kvalitate, d=0) {
+  // d < 6cm — tikai šķelda
+  if(d > 0 && d < 6) {
+    return {chips: volume}
+  }
+  // d < 6cm vai papīrmalkas/malkas kvalitāte ar d < 6 — šķelda
+  if(kvalitate === "Papīrmalka" && d > 0 && d < 6) {
+    return {chips: volume}
+  }
+  if(kvalitate === "Malka" && d > 0 && d < 6) {
+    return {chips: volume}
+  }
   if(kvalitate === "Papīrmalka") {
     const klase = papirmalkaKlase[suga] || papirmalkaKlase["P"]
     const result = {}

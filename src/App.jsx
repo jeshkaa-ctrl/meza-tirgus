@@ -195,7 +195,10 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
         </div>
       </div>
       <div style={{display:"flex",gap:"8px",marginBottom:"12px",flexWrap:"wrap",alignItems:"center"}}>
-        <button onClick={exportPDF} style={{padding:"6px 16px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Drukāt / Saglabāt PDF</button>
+      {user
+          ? <button onClick={exportPDF} style={{padding:"6px 16px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt / Saglabāt PDF</button>
+          : <button onClick={()=>onReg?.()} style={{padding:"6px 16px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+        }
         <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#5d4037",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🏛 VMD</a>
         <div style={{display:"flex",gap:"6px",alignItems:"center",background:"#f0f4ff",padding:"6px 10px",borderRadius:"6px",border:"1px solid #1565c0"}}>
           <span style={{fontSize:"11px",fontWeight:"bold",color:"#1565c0"}}>Manuāli:</span>
@@ -320,7 +323,7 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
   )
 }
 // ========== REKINA PANELIS ==========
-function RekinsPanel({kadastrs, saimnieciba, platiba, onClose}){
+function RekinsPanel({kadastrs, saimnieciba, platiba, onClose, user, onReg}){
 const [sniedzejs, setSniedzejs] = useState(()=>JSON.parse(localStorage.getItem("rekins_sniedzejs")||"{}"))
 const [sanemejs, setSanemejs] = useState({nosaukums:saimnieciba||"", regNr:"", adrese:"", banka:"", kods:"", konts:""})
 const [rekinsNr, setRekinsNr] = useState(()=>{const n=Number(localStorage.getItem("rekins_nr")||0)+1;return n})
@@ -522,9 +525,10 @@ return(
   <div style={{padding:"8px",background:"#f0f8f0",borderRadius:"4px",marginBottom:"12px",fontSize:"11px"}}>
     <b>Summa vārdiem:</b> {skaitliVardos(kopa_apmaksai)}
   </div>
-  <button onClick={exportRekins} style={{padding:"8px 24px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
-    🖨 Drukāt / Saglabāt PDF
-  </button>
+  {user
+    ? <button onClick={exportRekins} style={{padding:"8px 24px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🖨 Drukāt / Saglabāt PDF</button>
+    : <button onClick={()=>onReg?.()} style={{padding:"8px 24px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
+  }
 </div>
 )
 }
@@ -1009,6 +1013,8 @@ Augšupielādē KML failu no LVM GEO lai redzētu skici
     saimnieciba={saimnieciba}
     platiba={platiba}
     onClose={()=>setShowRekins(false)}
+    user={user}
+    onReg={onReg}
   />
 )}
 
@@ -1019,6 +1025,8 @@ Augšupielādē KML failu no LVM GEO lai redzētu skici
     saimnieciba={saimnieciba}
     savedState={caurmersState}
     onSaveState={(s)=>{setCaurmersState(s);saglabat({caurmersState:s})}}
+    user={user}
+    onReg={onReg}
   />
 )}
 
@@ -1168,9 +1176,10 @@ style={{padding:"6px",border:"1px solid #ccc",borderRadius:"4px",width:"120px",f
 </b>
 </div>
 
-<button onClick={exportPDF} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-Drukāt / Saglabāt PDF
-</button>
+{user
+  ? <button onClick={exportPDF} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt / Saglabāt PDF</button>
+  : <button onClick={()=>onReg?.()} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+}
 </div>
 )}
 </div>
