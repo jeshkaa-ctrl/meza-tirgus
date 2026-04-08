@@ -21,7 +21,7 @@ function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, on
   const [vecums, setVecums] = useState(savedState?.vecums||"")
   const [h, setH] = useState(savedState?.h||"")
   const [merijumi, setMerijumi] = useState(
-    savedState?.merijumi || Array.from({length:50}, (_,i) => ({d: 15+i, n: 0}))
+    savedState?.merijumi || Array.from({length:40}, (_,i) => ({d: 15+i, n: 0}))
   )
 
   const saglabat = (jaunie) => onSaveState?.({
@@ -986,7 +986,7 @@ return(
 
 {user
   ? <button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt / Saglabāt PDF</button>
-  : <button onClick={()=>onReg?.()} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+  : <button onClick={()=>{ console.log("onReg:", onReg); onReg?.() }} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
 }
 <button onClick={()=>setShowRekins(true)} style={{marginLeft:"10px",padding:"8px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
 🧾 Izveidot rēķinu
@@ -1505,6 +1505,12 @@ function App(){
 const [page,setPage]=useState("landing")
 const { user, registreties, iziet } = useAuth()
 const [showReg, setShowReg] = useState(false)
+const [regAtpakal, setRegAtpakal] = useState(null)
+
+const atvertReg = (atpakal) => {
+  setRegAtpakal(atpakal || page)
+  setShowReg(true)
+}
 
 const [rows,setRows]=useState([])
 const [izcirtumi,setIzcirtumi]=useState([])
@@ -1541,8 +1547,8 @@ const jkRef=React.useRef(null)
 const atjRef=React.useRef(null)
 const ieaudRef=React.useRef(null)
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>setShowReg(true)}/>
-  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")}/>
+  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={(data)=>{
   if(data){
@@ -1555,9 +1561,15 @@ if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPil
   setTimeout(()=>setPage("main"),50)
 }}/>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
-if(page==="cirsma") return <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>setShowReg(true)}/>
+if(page==="cirsma") return <>
+  <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>atvertReg("cirsma")}/>
+  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
-if(page==="skice") return <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState} user={user} onReg={()=>setShowReg(true)}/>
+if(page==="skice") return <>
+  <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState} user={user} onReg={()=>atvertReg("skice")}/>
+  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedState={caurmersState} onSaveState={setCaurmersState}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 
