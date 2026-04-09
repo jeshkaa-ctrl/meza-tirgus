@@ -10,6 +10,7 @@ import { minDiameter, formFactor } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
 import StandardPage, { JaunaudžuParskats, AtjaunosanaParskats, IeaudzesanaParskats } from "./StandardPage"
 import DastojumsPanel from "./DastojumsPanel"
+import SludinajumiPage from "./SludinajumiPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1394,7 +1395,7 @@ Drukāt / Saglabāt PDF
 )
 }
 // ========== GALVENA APP ==========
-function LandingPage({onEnter, onStandard, user, onIziet, onReg}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi}){
 return(
 <div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2",maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -1415,6 +1416,9 @@ return(
           </div>
         : <button onClick={onReg} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid white",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>Reģistrēties</button>
       }
+      <button onClick={onSludinajumi} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid #4caf50",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>
+        📢 Sludinājumi
+      </button>
       <div style={{position:"relative",display:"inline-block"}}
   onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
   onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
@@ -1555,8 +1559,12 @@ const [papilduNogabali,setPapilduNogabali]=useState([])
 const jkRef=React.useRef(null)
 const atjRef=React.useRef(null)
 const ieaudRef=React.useRef(null)
+if(page==="sludinajumi") return <>
+  <SludinajumiPage user={user} onBack={()=>setPage("main")}/>
+  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")}/>
   {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPilna={(data)=>{
@@ -1812,9 +1820,15 @@ alert("Cenas atjauninātas!")
 </div>
 )}
 
-<div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"16px"}}>
+<div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"16px",flexWrap:"wrap"}}>
   <MezaTirgusLogo/>
   <button onClick={()=>setPage("landing")} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>← Sākumlapa</button>
+  <button onClick={()=>setPage("sludinajumi")} style={{padding:"6px 14px",background:"#388e3c",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
+    📢 Sludinājumi
+  </button>
+  {user && <span style={{fontSize:"12px",color:"#225522"}}>👤 {user.vards}</span>}
+  {user && <button onClick={iziet} style={{padding:"6px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>Iziet</button>}
+  {!user && <button onClick={()=>atvertReg("main")} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔑 Pieteikties</button>}
 </div>
 
 {/* PRO RĪKI */}

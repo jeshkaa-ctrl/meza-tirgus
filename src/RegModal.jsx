@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { NOVADI } from "./novadi"
 
-const DARBIBAS_VEIDI = [
+export const DARBIBAS_VEIDI = [
   // Meža apsaimniekošana
   "Meža īpašnieks",
   "Meža apsaimniekotājs",
