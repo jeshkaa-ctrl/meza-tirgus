@@ -261,7 +261,7 @@ export default function CirsmaNovertesanaMobile({ onBack }) {
             </div>
             <div style={{flex:1}}>
               <span style={S.lbl}>Platība (ha)</span>
-              <input style={{...S.inp,marginBottom:0}} type="number" inputMode="decimal" step="0.01" value={nog.platiba} placeholder="1.5"
+<input style={{...S.inp,marginBottom:0}} inputMode="decimal" step="0.01" value={nog.platiba} placeholder="1.5"
                 onChange={e=>updNog({platiba:e.target.value})}/>
             </div>
           </div>
@@ -317,13 +317,32 @@ export default function CirsmaNovertesanaMobile({ onBack }) {
               </button>
             ))}
           </div>
-          {nog.otrsStavs && (
-            <button style={{...S.btnG,marginTop:8}} onClick={()=>{setAktStavs('otrais');setSkats('g_merijumi')}}>
-              📍 2. stāva G mērījumi
+          {nog.otrsStavs && nog.otraSStavaSugas?.length>0 && (
+          <button style={S.btnG} onClick={()=>{setAktStavs('otrais');setAktSi(0);setSkats('d_merijumi')}}>
+            📏 2. stāva D mērījumi un kvalitāte
+            <div style={{fontSize:12,fontWeight:400,marginTop:2}}>{nog.otraSStavaSugas.filter(s=>s.diametri.length>0).length}/{nog.otraSStavaSugas.length} sugām ievadīti</div>
+          </button>
+        )}
+
+      {nog.otrsStavs && nog.otraSStavaSugas?.length>0 && (
+            <button style={S.btnG} onClick={()=>{setAktStavs('otrais');setAktSi(0);setSkats('d_merijumi')}}>
+              📏 2. stāva D mērījumi un kvalitāte
             </button>
           )}
+          {nog.otrsStavs && nog.otraSStavaSugas?.some(s=>s.diametri.length>0) && (
+            <button style={S.btnG} onClick={()=>{setAktStavs('otrais');setSkats('augstumi')}}>
+              📐 2. stāva augstumi
+            </button>
+          )}
+          {nog.otrsStavs && (
+            <button style={{...S.btnG,marginTop:8}} onClick={()=>{
+              const n=JSON.parse(JSON.stringify(cirsma));
+              if(!n.nogabali[aktNi].otrsStavsVietas||n.nogabali[aktNi].otrsStavsVietas.length===0){n.nogabali[aktNi].otrsStavsVietas=[defaultVieta()]}
+              if(!n.nogabali[aktNi].otraSStavaSugas){n.nogabali[aktNi].otraSStavaSugas=[]}
+              sv(n); setAktStavs('otrais'); setSkats('g_merijumi')
+            }}>📍 2. stāva G mērījumi</button>
+          )}
         </div>
-
         {cirsma.nogabali.length>1 && (
           <button style={S.btnR} onClick={()=>{
             if(!window.confirm('Dzēst šo nogabalu?')) return
