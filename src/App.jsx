@@ -13,6 +13,7 @@ import DastojumsPanel from "./DastojumsPanel"
 import SludinajumiPage from "./SludinajumiPage"
 import CaurmeraMobile from "./CaurmeraMobile"
 import CirsmaNovertesanaMobile from "./CirsmaNovertesanaMobile"
+import DastojumsPDFKalkulators from "./DastojumsPDFKalkulators"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1611,6 +1612,7 @@ if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedSta
 if(page==="rekini") return <RekinuKratuve onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rekini")}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
+if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 
 const landPrices={
@@ -1862,6 +1864,7 @@ alert("Cenas atjauninātas!")
 <button onClick={()=>setPage("rekini")} style={{padding:"8px 16px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🧾 Rēķinu krātuve</button>
 <button onClick={()=>setPage("caurmers_mobile")} style={{padding:"8px 16px",background:"#0f1117",color:"#4ade80",border:"1px solid #4ade80",borderRadius:"4px",cursor:"pointer"}}>📏 Caurmērs (mobilais)</button>
 <button onClick={()=>setPage("cirsma_mobile")} style={{padding:"8px 16px",background:"#0f1117",color:"#4ade80",border:"1px solid #4ade80",borderRadius:"4px",cursor:"pointer"}}>🌲 Cirsmas vērtēšana (mobilais)</button>
+<button onClick={()=>setPage("dastojums_pdf")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📄 Dastojuma kalkulators</button>
 
 
 </div>
