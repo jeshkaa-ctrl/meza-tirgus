@@ -1438,7 +1438,7 @@ Drukāt / Saglabāt PDF
 // ========== GALVENA APP ==========
 function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi}){
 return(
-<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#f6f9f2",maxWidth:"100%",overflowX:"hidden"}}>
+<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#d4dfc4",maxWidth:"100%",overflowX:"hidden"}}>
 
   {/* HERO */}
  <div style={{background:"#1a3a1a",padding:"40px 40px 50px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center"}}>
@@ -1477,19 +1477,25 @@ return(
 
   {/* KAS IR MEŽA TIRGUS */}
   <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box"}}>
+ <div style={{background:"#c8d4b0",border:"1px solid #b0c090",borderRadius:"12px",padding:"32px 40px",marginBottom:"24px"}}>
     <h2 style={{color:"#225522",fontSize:"22px",textAlign:"center",marginBottom:"8px"}}>Kas ir Meža tirgus?</h2>
-    <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"36px",maxWidth:"700px",margin:"0 auto 36px"}}>
-      Meža tirgus ir platforma kas apvieno meža inventarizāciju, cirsmu vērtēšanu, 
-      dastojumu aprēķinus, dokumentu sagatavošanu un rēķinu izveidi vienā vietā. 
-      Visi aprēķini tiek veikti pēc Latvijā atzītām meža uzmērīšanas metodēm un formulām.
+    <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"16px",maxWidth:"700px",margin:"0 auto 16px"}}>
+      Latvijas meži ir mūsu kopīgais mantojums, un to apsaimniekošana prasa zināšanas, laiku un uzticamus partnerus. Meža tirgus ir digitāla platforma, kas apvieno visus meža darbiniekus vienā kopējā telpā — mežsaimnieki, harvesteru operatori, meža uzņēmumi, mežsargi un īpašnieki var sazināties, izteikt piedāvājumus, publicēt sludinājumus un rīkot izsoles. Mūsu mērķis ir vienkāršs: savest kopā īpašnieku ar pakalpojuma sniedzēju — ātri, pārskatāmi un bez liekiem starpniekiem.
     </p>
+    <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"16px",maxWidth:"700px",margin:"0 auto 16px"}}>
+      Platformā pieejami profesionāli rīki ikdienas darbam — cirsmu vērtēšana, dastojumu aprēķini, dokumentu sagatavošana un rēķinu izveide. Mobilās aplikācijas kalkulatori ir domāti lietošanai tieši mežā — caurmēra mērīšana, kubatūras un sortimentu aprēķini ar vērtību reāllaikā. Visi aprēķini notiek jūsu ierīcē pēc Latvijā atzītām meža uzmērīšanas metodēm un formulām.
+    </p>
+    <p style={{textAlign:"center",color:"#225522",fontSize:"14px",fontWeight:"bold",maxWidth:"700px",margin:"0 auto 36px"}}>
+      Jūsu dati nekur netiek saglabāti. Meža tirgus nav inventarizācijas sistēma — tā ir tikšanās vieta cilvēkiem, kuriem rūp mežs.
+    </p>
+  </div>
 
     {/* BEZMAKSAS / MAKSAS */}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"24px",marginBottom:"40px"}}>
       <div style={{background:"white",border:"2px solid #4caf50",borderRadius:"10px",padding:"24px"}}>
         <div style={{color:"#4caf50",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>✓ Bezmaksas</div>
         
-          {["PDF augšupielāde un nogabalu analīze","Ieteikumi par cirtes veidu","Saimnieciskā un tirgus vērtība","Ciršanas ieteikumi pēc vecuma un bonitātes","Atjaunošanas pārskats"].map((t,i)=>(
+      {["PDF augšupielāde un nogabalu analīze","Ieteikumi par cirtes veidu","Saimnieciskā un tirgus vērtība","Ciršanas ieteikumi pēc vecuma un bonitātes","Atjaunošanas pārskats","Jaunaudžu kopšanas pārskats (drīzumā)","Sludinājumi un piedāvājumi","Izsoles — pērc un pārdod (maksas)"].map((t,i)=>(
         <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
         ))}
         <button onClick={onStandard} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
@@ -1498,7 +1504,7 @@ return(
       </div>
       <div style={{background:"white",border:"2px solid #225522",borderRadius:"10px",padding:"24px"}}>
         <div style={{color:"#225522",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>★ Pilnā versija</div>
-        {["Cirsmas skice (KML/SHP) ar PDF","Caurmēra mērījumi ar izdruku","Krautuves vērtība","Sortimentu sadalījums un vērtība","Dastojumu aprēķini","Rēķinu izveide un drukāšana","PDF šķirotājs"].map((t,i)=>(
+        {["Cirsmas skice (KML/SHP) ar PDF","Caurmēra mērījumi ar izdruku","Krautuves vērtība","Sortimentu sadalījums un vērtība","Dastojumu aprēķini","Rēķinu izveide un drukāšana","PDF šķirotājs","Mobilā cirsmu vērtēšana laukā","Iekšējais čats ar kolēģiem","Izsoles ar PDF analīzi"].map((t,i)=>(
           <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
         ))}
         <button onClick={onEnter} style={{marginTop:"8px",width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
@@ -1809,7 +1815,7 @@ win.print()
 }
 
 return(
-<div style={{padding:"40px",fontFamily:"Arial"}}>
+<div style={{padding:"40px",fontFamily:"Arial",background:"#0d1a0d",minHeight:"100vh",color:"white"}}>
 {user && <GlobalHeader user={user} onIziet={iziet} onOpenChat={()=>setShowChat(true)} onNavigate={(p)=>setPage(p)}/>}
 {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
 
@@ -1883,16 +1889,92 @@ alert("Cenas atjauninātas!")
 </div>
 
 {/* PRO RĪKI */}
-<div style={{display:"flex",gap:"10px",marginBottom:"20px",flexWrap:"wrap"}}>
-<button onClick={()=>setPage("skice")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📐 Cirsmas skice, caurmērs un dastojums</button>
-<button onClick={()=>setPage("pdfSkirotajs")} style={{padding:"8px 16px",background:"#6a1b9a",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>PDF šķirotājs</button>
-<button onClick={()=>setPage("cirsma")} style={{padding:"8px 16px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Cirsmas novērtēšana</button>
-<button onClick={()=>setPage("rekini")} style={{padding:"8px 16px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🧾 Rēķinu krātuve</button>
-<button onClick={()=>setPage("caurmers_mobile")} style={{padding:"8px 16px",background:"#0f1117",color:"#4ade80",border:"1px solid #4ade80",borderRadius:"4px",cursor:"pointer"}}>📏 Caurmērs (mobilais)</button>
-<button onClick={()=>setPage("cirsma_mobile")} style={{padding:"8px 16px",background:"#0f1117",color:"#4ade80",border:"1px solid #4ade80",borderRadius:"4px",cursor:"pointer"}}>🌲 Cirsmas vērtēšana (mobilais)</button>
-<button onClick={()=>setPage("dastojums_pdf")} style={{padding:"8px 16px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📄 Dastojuma kalkulators</button>
+<div style={{background:"#111f11",border:"1px solid #1e2e1e",borderRadius:"12px",padding:"16px",marginBottom:"20px"}}>
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"12px"}}>
 
+    {/* CIRSMU DARBI */}
+    <div style={{background:"#111f11",border:"1px solid #1e2e1e",borderRadius:"10px",padding:"14px"}}>
+      <div style={{color:"#4caf50",fontSize:"11px",fontWeight:"bold",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"10px",paddingBottom:"6px",borderBottom:"1px solid #2d4a2d"}}>📐 Cirsmu darbi</div>
+      <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
+        <div onClick={()=>setPage("skice")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>🗺</span>
+            <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Cirsmas skice</span>
+          </div>
+          <div style={{color:"#7ab87a",fontSize:"11px"}}>KML/SHP fails → skice ar koordinātām un PDF VMD iesniegumam</div>
+        </div>
+        <div onClick={()=>setPage("cirsma")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>🌲</span>
+            <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Cirsmas novērtēšana</span>
+          </div>
+          <div style={{color:"#7ab87a",fontSize:"11px"}}>PDF no VMD → nogabalu analīze, cirsmas vērtība, ieteikumi</div>
+        </div>
+        <div onClick={()=>setPage("cirsma_mobile")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>📱</span>
+            <span style={{color:"#4caf50",fontSize:"13px",fontWeight:"bold"}}>Cirsmas vērtēšana</span>
+            <span style={{background:"#2d4a2d",color:"#4caf50",fontSize:"9px",padding:"1px 5px",borderRadius:"4px"}}>MOBILAIS</span>
+          </div>
+          <div style={{color:"#7ab87a",fontSize:"11px"}}>Laukā — G mērījumi, Bitterlich, sortimentu aprēķini reāllaikā</div>
+        </div>
+      </div>
+    </div>
 
+    {/* MĒRĪJUMI */}
+    <div style={{background:"#111f11",border:"1px solid #1e2e1e",borderRadius:"10px",padding:"14px"}}>
+      <div style={{color:"#4caf50",fontSize:"11px",fontWeight:"bold",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"10px",paddingBottom:"6px",borderBottom:"1px solid #2d4a2d"}}>📏 Mērījumi & Aprēķini</div>
+      <div style={{display:"flex",flexDirection:"column",gap:"8px"}}>
+        <div onClick={()=>setPage("skice")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>📏</span>
+            <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Caurmēra mērījumi</span>
+          </div>
+          <div style={{color:"#7ab87a",fontSize:"11px"}}>Koku caurmēru tabula, vidējais D, ciršanas atļauja pēc bonitātes</div>
+        </div>
+        <div onClick={()=>setPage("caurmers_mobile")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>📱</span>
+            <span style={{color:"#4caf50",fontSize:"13px",fontWeight:"bold"}}>Caurmērs</span>
+            <span style={{background:"#2d4a2d",color:"#4caf50",fontSize:"9px",padding:"1px 5px",borderRadius:"4px"}}>MOBILAIS</span>
+          </div>
+          <div style={{color:"#7ab87a",fontSize:"11px"}}>Ātra caurmēru ievade laukā, viens pirksts, tūlītējs rezultāts</div>
+        </div>
+        <div onClick={()=>setPage("dastojums_pdf")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>📄</span>
+            <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Dastojuma kalkulators</span>
+          </div>
+          <div style={{color:"#7ab87a",fontSize:"11px"}}>Mežvērtes PDF → sortimentu apjomi, krautuves vērtība, izdruka</div>
+        </div>
+      </div>
+    </div>
+
+    {/* BIZNESS + PAPILDRĪKI */}
+    <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
+      <div style={{background:"#0f2b0f",border:"1px solid #2d4a2d",borderRadius:"10px",padding:"14px",flex:1}}>
+        <div style={{color:"#e65100",fontSize:"11px",fontWeight:"bold",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"10px",paddingBottom:"6px",borderBottom:"1px solid #2d4a2d"}}>💼 Bizness</div>
+        <div onClick={()=>setPage("rekini")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>🧾</span>
+            <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Rēķinu krātuve</span>
+          </div>
+          <div style={{color:"#ffaa70",fontSize:"11px"}}>Rēķinu izveide, drukāšana, mēneša un gada pārskats</div>
+        </div>
+      </div>
+      <div style={{background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:"10px",padding:"14px"}}>
+        <div style={{color:"#888",fontSize:"11px",fontWeight:"bold",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"8px",paddingBottom:"6px",borderBottom:"1px solid #1a2a1a"}}>🛠 Papildrīki</div>
+        <div onClick={()=>setPage("pdfSkirotajs")} style={{background:"#111",border:"1px solid #1a2a1a",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>✂️</span>
+            <span style={{color:"#aaa",fontSize:"13px",fontWeight:"bold"}}>PDF šķirotājs</span>
+          </div>
+          <div style={{color:"#666",fontSize:"11px"}}>Sadala VMD daudzīpašumu PDF pa kadastriem atsevišķos dokumentos</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <div style={{marginBottom:"12px",display:"flex",gap:"8px",flexWrap:"wrap",alignItems:"center"}}>
@@ -1904,7 +1986,16 @@ alert("Cenas atjauninātas!")
   </>}
 </div>
 
-<input type="file" accept="application/pdf" onChange={handlePDF}/>
+<div style={{background:"#0f2b0f",border:"1px solid #2d4a2d",borderRadius:"8px",padding:"12px 16px",marginBottom:"12px",display:"flex",alignItems:"center",gap:"12px",flexWrap:"wrap"}}>
+  <div>
+    <div style={{color:"white",fontSize:"13px",fontWeight:"bold",marginBottom:"2px"}}>📂 Augšupielādēt VMD inventarizācijas PDF</div>
+    <div style={{color:"#7ab87a",fontSize:"11px"}}>Meža inventarizācijas dokuments no VMD vai Mežvērtes — nogabalu apraksti, formula, vecums, krāja</div>
+  </div>
+  <label style={{padding:"8px 18px",background:"#225522",color:"white",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold",whiteSpace:"nowrap",border:"1px solid #4caf50"}}>
+    📄 Izvēlēties PDF
+    <input type="file" accept="application/pdf" onChange={handlePDF} style={{display:"none"}}/>
+  </label>
+</div>
 
 {jaunaudzes.length>0 && (
 <div style={{background:"#e8f5e9",border:"1px solid #388e3c",borderRadius:"6px",padding:"12px",margin:"16px 0"}}>
@@ -2139,12 +2230,32 @@ return(<tr key={k}><td>{sortimentNames[k]}</td><td>{volume.toFixed(1)}</td><td>{
 </table>
 
 <br/>
-<h2>Kubikmetru summa: {totalVolume.toFixed(1)} m³</h2>
-<h2>Sortimentu vērtība: {totalMoney.toFixed(0)} €</h2>
-<h2>Zemes vērtība: {totalLandValue.toFixed(0)} €</h2>
-<h1>Saimnieciskā vērtība: {economicValueTotal.toFixed(0)} €</h1>
-<h1>Tirgus vērtība: {marketValue.toFixed(0)} €</h1>
-<h2>Krautuves vērtība: {roadsideValue.toFixed(0)} €</h2>
+<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"12px",margin:"20px 0",background:"#0f2b0f",borderRadius:"10px",padding:"16px",border:"1px solid #2d4a2d"}}>
+  <div style={{textAlign:"center",padding:"12px",background:"#1a3a1a",borderRadius:"8px"}}>
+    <div style={{color:"#7ab87a",fontSize:"11px",marginBottom:"4px"}}>Kopējā krāja</div>
+    <div style={{color:"white",fontSize:"20px",fontWeight:"bold"}}>{totalVolume.toFixed(1)} m³</div>
+  </div>
+  <div style={{textAlign:"center",padding:"12px",background:"#1a3a1a",borderRadius:"8px"}}>
+    <div style={{color:"#7ab87a",fontSize:"11px",marginBottom:"4px"}}>Sortimentu vērtība</div>
+    <div style={{color:"#4caf50",fontSize:"20px",fontWeight:"bold"}}>{totalMoney.toFixed(0)} €</div>
+  </div>
+  <div style={{textAlign:"center",padding:"12px",background:"#1a3a1a",borderRadius:"8px"}}>
+    <div style={{color:"#7ab87a",fontSize:"11px",marginBottom:"4px"}}>Zemes vērtība</div>
+    <div style={{color:"#4caf50",fontSize:"20px",fontWeight:"bold"}}>{totalLandValue.toFixed(0)} €</div>
+  </div>
+  <div style={{textAlign:"center",padding:"12px",background:"#1a3a1a",borderRadius:"8px"}}>
+    <div style={{color:"#7ab87a",fontSize:"11px",marginBottom:"4px"}}>Krautuves vērtība</div>
+    <div style={{color:"#4caf50",fontSize:"20px",fontWeight:"bold"}}>{roadsideValue.toFixed(0)} €</div>
+  </div>
+  <div style={{textAlign:"center",padding:"16px",background:"#225522",borderRadius:"8px",border:"1px solid #4caf50"}}>
+    <div style={{color:"#a8d8a8",fontSize:"11px",marginBottom:"4px"}}>Saimnieciskā vērtība</div>
+    <div style={{color:"white",fontSize:"24px",fontWeight:"bold"}}>{economicValueTotal.toFixed(0)} €</div>
+  </div>
+  <div style={{textAlign:"center",padding:"16px",background:"#1b5e20",borderRadius:"8px",border:"2px solid #4caf50"}}>
+    <div style={{color:"#a8d8a8",fontSize:"11px",marginBottom:"4px"}}>Tirgus vērtība</div>
+    <div style={{color:"#4caf50",fontSize:"28px",fontWeight:"bold"}}>{marketValue.toFixed(0)} €</div>
+  </div>
+</div>
 {stadijumuVertiba>0&&<p style={{color:"#225522",fontWeight:"bold"}}>* Stādījumu vērtība: {stadijumuVertiba.toFixed(0)} € (1500 €/ha)</p>}
 
 </div>
