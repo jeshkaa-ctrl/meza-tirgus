@@ -549,7 +549,7 @@ return(
   </div>
   {user
     ? <button onClick={exportRekins} style={{padding:"8px 24px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🖨 Drukāt / Saglabāt PDF</button>
-    : <button onClick={()=>onReg?.()} style={{padding:"8px 24px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
+: <button onClick={()=>{ console.log("onReg:", onReg); onReg?.() }} style={{padding:"8px 24px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
   }
 </div>
 )
@@ -697,6 +697,19 @@ y:svgH-pad-(lat-minLat)*scale // ziemeļi uz augšu!
 
 const points=kmlCoords.map(c=>toSVG(c.lon,c.lat))
 const polyPoints=points.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")
+const wgs84ToLks92=(lon,lat)=>{
+const a=6378137.0,f=1/298.257222101,k0=0.9996
+const lon0=24*Math.PI/180,FE=500000,FN=-6000000
+const e2=2*f-f*f,e4=e2*e2,e6=e4*e2
+const latR=lat*Math.PI/180,lonR=lon*Math.PI/180
+const N=a/Math.sqrt(1-e2*Math.sin(latR)**2)
+const T=Math.tan(latR)**2,C=e2/(1-e2)*Math.cos(latR)**2
+const A2=Math.cos(latR)*(lonR-lon0)
+const M=a*((1-e2/4-3*e4/64-5*e6/256)*latR-(3*e2/8+3*e4/32+45*e6/1024)*Math.sin(2*latR)+(15*e4/256+45*e6/1024)*Math.sin(4*latR)-(35*e6/3072)*Math.sin(6*latR))
+const x=FE+k0*N*(A2+(1-T+C)*A2**3/6+(5-18*T+T**2+72*C-58*e2/(1-e2))*A2**5/120)
+const y=FN+k0*(M+N*Math.tan(latR)*(A2**2/2+(5-T+9*C+4*C**2)*A2**4/24+(61-58*T+T**2+600*C-330*e2/(1-e2))*A2**6/720))
+return[x,y]
+}
 const downloadSHP=()=>{
 if(!kmlCoords.length) return
 const wgs84ToLks92=(lon,lat)=>{
@@ -867,12 +880,17 @@ ${svgContent}
   </tr></thead>
   <tbody>${coordRows}</tbody>
 </table>
-<div class="paraksts">
-  <div>Sastādīja: ___________________________<br/><span style="font-size:9px">(vārds, uzvārds)</span></div>
-  <div>Datums: ___________________________</div>
-  <div>Paraksts: ___________________________</div>
+<div style="margin-top:12px;font-size:10px">
+  <b>Piesaiste:</b> 1.virsotnes koordināta: ${kmlCoords[0] ? wgs84ToLks92(kmlCoords[0].lon, kmlCoords[0].lat)[0].toFixed(2) + "&nbsp;&nbsp;&nbsp;&nbsp;" + wgs84ToLks92(kmlCoords[0].lon, kmlCoords[0].lat)[1].toFixed(2) : "— —"}
 </div>
-<p style="font-size:9px;color:#888;margin-top:8px">* Skice sagatavota ar Meža tirgus kalkulatoru. Koordinātas WGS84. Ziemeļi uz augšu.</p>
+<div style="margin-top:12px;padding:10px;border:1px solid #ccc;font-size:11px;max-width:520px">
+  Apliecinu, ka cirsmas robeža apvidū ir zināma un zemes vienības robežzīmes un robežstigas apvidū ir ierīkotas un uzturētas atbilstoši normatīvajiem aktiem par zemes kadastrālo uzmērīšanu.
+</div>
+<div class="paraksts">
+  <div>Sagatavoja: ___________________________<br/><span style="font-size:9px">(vārds, uzvārds, paraksts)</span></div>
+  <div>${today}</div>
+</div>
+<p style="font-size:9px;color:#888;margin-top:8px">* Skice sagatavota ar Meža tirgus kalkulatoru. Koordinātas LKS92. Ziemeļi uz augšu.</p>
 </body></html>`
 const win=window.open("","_blank")
 win.document.write(html)
@@ -1609,7 +1627,10 @@ if(page==="skice") return <>
   {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedState={caurmersState} onSaveState={setCaurmersState}/>
-if(page==="rekini") return <RekinuKratuve onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rekini")}/>
+if(page==="rekini") return <>
+  <RekinuKratuve onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rekini")}/>
+  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
 if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
