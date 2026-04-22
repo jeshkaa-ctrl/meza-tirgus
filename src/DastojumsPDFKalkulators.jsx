@@ -13,7 +13,8 @@ const SORT_NAMES = {
 const DEFAULT_PRICES = {log:73, small:55, veneer:130, tara:48, pulp:50, fire:38, chips:12}
 const DEFAULT_IZMAKSAS = {zaglesana:18, pievesana:12}
 
-function parseMezvertePDF(txt) {
+export function parseMezvertePDF(txt) {
+
   const result = {
     nogabali:[], kopaKraja:0,
     log:0, small:0, veneer:0, tara:0, pulp:0, fire:0, chips:0

@@ -1875,7 +1875,7 @@ alert("Cenas atjauninātas!")
   <MezaTirgusLogo/>
   <button onClick={()=>setPage("landing")} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>← Sākumlapa</button>
   <button onClick={()=>setPage("sludinajumi")} style={{padding:"6px 14px",background:"#388e3c",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
-    📢 Sludinājumi
+    📢 Sludinājumi & Izsoles
   </button>
   {user && <span style={{fontSize:"12px",color:"#225522"}}>👤 {user.vards}</span>}
   {user && <button onClick={iziet} style={{padding:"6px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>Iziet</button>}
