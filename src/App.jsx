@@ -14,6 +14,8 @@ import SludinajumiPage from "./SludinajumiPage"
 import CaurmeraMobile from "./CaurmeraMobile"
 import CirsmaNovertesanaMobile from "./CirsmaNovertesanaMobile"
 import DastojumsPDFKalkulators from "./DastojumsPDFKalkulators"
+import GlobalHeader from "./GlobalHeader"
+import ChatPage from "./ChatPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1558,6 +1560,7 @@ const [page,setPage]=useState("landing")
 const { user, registreties, pieteikties, iziet } = useAuth()
 const [showReg, setShowReg] = useState(false)
 const [regAtpakal, setRegAtpakal] = useState(null)
+const [showChat, setShowChat] = useState(false)
 
 const atvertReg = (atpakal) => {
   setRegAtpakal(atpakal || page)
@@ -1631,6 +1634,7 @@ if(page==="rekini") return <>
   <RekinuKratuve onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rekini")}/>
   {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
+if(showChat) return <ChatPage user={user} onBack={()=>setShowChat(false)}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
 if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
@@ -1806,6 +1810,7 @@ win.print()
 
 return(
 <div style={{padding:"40px",fontFamily:"Arial"}}>
+{user && <GlobalHeader user={user} onIziet={iziet} onOpenChat={()=>setShowChat(true)} onNavigate={(p)=>setPage(p)}/>}
 {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
 
 {showCustomModal && (
