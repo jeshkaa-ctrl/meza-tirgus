@@ -11,10 +11,8 @@ const SORT_NAMES = {
   tara:"Tara", pulp:"Papīrmalka", fire:"Malka", chips:"Atlikumi/Šķelda"
 }
 const DEFAULT_PRICES = {log:73, small:55, veneer:130, tara:48, pulp:50, fire:38, chips:12}
-const DEFAULT_IZMAKSAS = {zaglesana:18, pievesana:12}
 
 export function parseMezvertePDF(txt) {
-
   const result = {
     nogabali:[], kopaKraja:0,
     log:0, small:0, veneer:0, tara:0, pulp:0, fire:0, chips:0
@@ -53,10 +51,8 @@ export function parseMezvertePDF(txt) {
     return s
   }
 
-  // Sadala tekstu pa lapām
   const lapas = txt.split(/Cirsmas krāja,\s*m3:/)
 
-  // Iegūst Kopā rindas
   const krajaRegex = /(\d[\d\s.,]+\d)\s+Kopā:\s+[\d.,]+\s*[\d.,]*\s*Cirsmas krāja/g
   let m
   const kopaRindas = []
@@ -89,7 +85,7 @@ export function parseMezvertePDF(txt) {
     result.fire  += kopa.malka
     result.chips += kopa.atlik
 
-   Object.keys(SUGAS_MAP).forEach(nos => {
+    Object.keys(SUGAS_MAP).forEach(nos => {
       const suga = SUGAS_MAP[nos]
       const regex = new RegExp(nos + '\\s+([\\d\\s.,]+?)(?=' +
         Object.keys(SUGAS_MAP).join('|') + '|Kopā)', 'g')
@@ -102,7 +98,6 @@ export function parseMezvertePDF(txt) {
         const resna  = nums[4] || 0
         const videja = nums[5] || 0
         const tieva  = nums[6] || 0
-        
         const s = getSortiments(suga, resna, videja, tieva)
         result.log    += s.log
         result.small  += s.small
@@ -137,10 +132,48 @@ export default function DastojumsPDFKalkulators({ onBack }) {
           const tc = await pg.getTextContent()
           tc.items.forEach(i => { txt += i.str + " " })
         }
-        const parsed = parseMezvertePDF(txt)
-        setDati(parsed)
-        if(parsed.saimnieciba) setSaimnieciba(parsed.saimnieciba)
-        if(parsed.kadastrs) setKadastrs(parsed.kadastrs)
+      const parsed = parseMezvertePDF(txt)
+        try {
+          const API_KEY = import.meta.env.VITE_ANTHROPIC_KEY || ""
+          const response = await fetch("https://api.anthropic.com/v1/messages", {
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json",
+              "x-api-key": API_KEY,
+              "anthropic-version": "2023-06-01",
+              "anthropic-dangerous-direct-browser-access": "true"
+            },
+            body: JSON.stringify({
+              model:"claude-sonnet-4-5",
+              max_tokens:1000,
+              messages:[{role:"user",content:`Šis ir Mežvērtes cirsmas novērtējuma PDF teksts. Izvelc sortimentu apjomus m³. Atgriezies TIKAI ar JSON bez komentāriem:\n{"kopaKraja":0,"log":0,"small":0,"veneer":0,"tara":0,"pulp":0,"fire":0,"chips":0,"saimnieciba":"","kadastrs":"","nogabali":[{"nr":"","platiba":""}]}\n\nPDF teksts:\n${txt.slice(0,3000)}`}]
+            })
+          })
+          const data = await response.json()
+          const aiTxt = data.content?.[0]?.text||""
+          const clean = aiTxt.replace(/```json|```/g,"").trim()
+          const aiData = JSON.parse(clean)
+          const final = {
+            kopaKraja: aiData.kopaKraja||parsed.kopaKraja||0,
+            log: aiData.log||parsed.log||0,
+            small: aiData.small||parsed.small||0,
+            veneer: aiData.veneer||parsed.veneer||0,
+            tara: aiData.tara||parsed.tara||0,
+            pulp: aiData.pulp||parsed.pulp||0,
+            fire: aiData.fire||parsed.fire||0,
+            chips: aiData.chips||parsed.chips||0,
+            saimnieciba: aiData.saimnieciba||parsed.saimnieciba||"",
+            kadastrs: aiData.kadastrs||parsed.kadastrs||"",
+            nogabali: aiData.nogabali?.length>0?aiData.nogabali:parsed.nogabali||[]
+          }
+          setDati(final)
+          if(final.saimnieciba) setSaimnieciba(final.saimnieciba)
+          if(final.kadastrs) setKadastrs(final.kadastrs)
+        } catch(e) {
+          setDati(parsed)
+          if(parsed.saimnieciba) setSaimnieciba(parsed.saimnieciba)
+          if(parsed.kadastrs) setKadastrs(parsed.kadastrs)
+        }
         setLoading(false)
       }
       reader.readAsArrayBuffer(file)
