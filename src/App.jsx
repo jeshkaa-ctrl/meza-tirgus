@@ -16,7 +16,7 @@ import CirsmaNovertesanaMobile from "./CirsmaNovertesanaMobile"
 import DastojumsPDFKalkulators from "./DastojumsPDFKalkulators"
 import GlobalHeader from "./GlobalHeader"
 import ChatPage from "./ChatPage"
-
+import PavadzimesRegistrs from "./PavadzimesRegistrs"
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
 import.meta.url
@@ -328,6 +328,8 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
     </div>
   )
 }
+const getKlienti = () => { try { return JSON.parse(localStorage.getItem("rekins_klienti") || "[]") } catch { return [] } }
+const saveKlients = (klients) => { if (!klients.nosaukums) return; const esosie = getKlienti(); const jauIndex = esosie.findIndex(k => k.nosaukums === klients.nosaukums); if (jauIndex !== -1) { esosie[jauIndex] = { ...esosie[jauIndex], ...klients }; localStorage.setItem("rekins_klienti", JSON.stringify(esosie)) } else { localStorage.setItem("rekins_klienti", JSON.stringify([klients, ...esosie])) } }
 // ========== REKINA PANELIS ==========
 function RekinsPanel({kadastrs, saimnieciba, platiba, onClose, user, onReg}){
 const [sniedzejs, setSniedzejs] = useState(()=>JSON.parse(localStorage.getItem("rekins_sniedzejs")||"{}"))
@@ -341,7 +343,10 @@ const [rindas, setRindas] = useState([
   {apraksts: kadastrs ? `Meža inventarizācija, kad.Nr. ${kadastrs}` : "", mervieniba:"ha", daudzums: platiba>0?platiba.toFixed(2):"", cena:"", summa:0}
 ])
 const [izrakstija, setIzrakstija] = useState(sniedzejs.izrakstija||"")
-
+const [klientuPiedav, setKlientuPiedav] = useState([])
+const [showPiedav, setShowPiedav] = useState(false)
+const handleNosaukums = (val) => { setSanemejs({...sanemejs, nosaukums: val}); if (val.length < 1) { setKlientuPiedav([]); setShowPiedav(false); return }; const atbilst = getKlienti().filter(k => k.nosaukums.toLowerCase().includes(val.toLowerCase())).slice(0, 6); setKlientuPiedav(atbilst); setShowPiedav(atbilst.length > 0) }
+const izveleties = (klients) => { setSanemejs({ nosaukums: klients.nosaukums||"", regNr: klients.regNr||"", adrese: klients.adrese||"", banka: klients.banka||"", kods: klients.kods||"", konts: klients.konts||"" }); setShowPiedav(false); setKlientuPiedav([]) }
 const saveSniedzejs = (jauns) => {
   const j = {...sniedzejs, ...jauns}
   setSniedzejs(j)
@@ -400,6 +405,7 @@ const saglabataisRekinis = {
   apmaksaTermins,
   izrakstija
 }
+saveKlients({...sanemejs})
 const esosie = JSON.parse(localStorage.getItem("rekinu_kratuve") || "[]")
 localStorage.setItem("rekinu_kratuve", JSON.stringify([saglabataisRekinis, ...esosie]))
   const gads = new Date().getFullYear()
@@ -483,7 +489,21 @@ return(
     </div>
     <div style={{padding:"12px",background:"#fff8e1",borderRadius:"6px",border:"1px solid #f9a825"}}>
       <b style={{color:"#e65100"}}>Pakalpojumu saņēmējs</b>
-      {[["nosaukums","Nosaukums"],["regNr","Reģ.Nr."],["adrese","Adrese"],["banka","Banka"],["kods","SWIFT kods"],["konts","Konts"]].map(([k,l])=>(
+      <div style={{marginTop:"6px",position:"relative"}}>
+        <label style={{fontSize:"10px",fontWeight:"bold"}}>Nosaukums:</label><br/>
+        <input value={sanemejs.nosaukums||""} onChange={e=>handleNosaukums(e.target.value)} onBlur={()=>setTimeout(()=>setShowPiedav(false),150)} onFocus={()=>sanemejs.nosaukums&&handleNosaukums(sanemejs.nosaukums)} placeholder="Raksti klienta nosaukumu..." style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px",boxSizing:"border-box"}}/>
+        {showPiedav && klientuPiedav.length > 0 && (
+          <div style={{position:"absolute",top:"100%",left:0,right:0,background:"white",border:"1px solid #f9a825",borderRadius:"4px",zIndex:100,boxShadow:"0 4px 12px rgba(0,0,0,0.15)",maxHeight:"200px",overflowY:"auto"}}>
+            {klientuPiedav.map((k,i)=>(
+              <div key={i} onMouseDown={()=>izveleties(k)} style={{padding:"8px 10px",cursor:"pointer",borderBottom:"1px solid #f5f5f5",fontSize:"11px"}} onMouseEnter={e=>e.currentTarget.style.background="#fff8e1"} onMouseLeave={e=>e.currentTarget.style.background="white"}>
+                <div style={{fontWeight:"bold",color:"#e65100"}}>{k.nosaukums}</div>
+                {k.regNr && <div style={{fontSize:"10px",color:"#888"}}>Reģ.Nr. {k.regNr}{k.adrese?" · "+k.adrese:""}</div>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {[["regNr","Reģ.Nr."],["adrese","Adrese"],["banka","Banka"],["kods","SWIFT kods"],["konts","Konts"]].map(([k,l])=>(
         <div key={k} style={{marginTop:"6px"}}>
           <label style={{fontSize:"10px",fontWeight:"bold"}}>{l}:</label><br/>
           <input value={sanemejs[k]||""} onChange={e=>setSanemejs({...sanemejs,[k]:e.target.value})} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
@@ -1438,96 +1458,145 @@ Drukāt / Saglabāt PDF
 // ========== GALVENA APP ==========
 function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi}){
 return(
-<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#d4dfc4",maxWidth:"100%",overflowX:"hidden"}}>
+<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#080f08",maxWidth:"100%",overflowX:"hidden"}}>
 
   {/* HERO */}
- <div style={{background:"#1a3a1a",padding:"40px 40px 50px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center"}}>
-    <MezaTirgusLogo/>
-    <p style={{color:"#aaa",fontSize:"15px",marginTop:"16px",maxWidth:"600px",margin:"16px auto 0"}}>
-      Darbarīks meža speciālistam un meža īpašniekam
-    </p>
-    <div style={{display:"flex",gap:"12px",justifyContent:"center",marginTop:"28px",flexWrap:"wrap"}}>
-      <button onClick={onStandard} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"16px",fontWeight:"bold",cursor:"pointer"}}>
-        Sākt bezmaksas →
+ <div style={{background:"linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 60%, #0f2a0f 100%)",padding:"56px 40px 64px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative",overflow:"hidden"}}>
+  {/* Dekoratīvs fona elements */}
+  <div style={{position:"absolute",top:"-60px",right:"-60px",width:"300px",height:"300px",background:"radial-gradient(circle, rgba(76,175,80,0.08) 0%, transparent 70%)",pointerEvents:"none"}}/>
+  <div style={{position:"absolute",bottom:"-40px",left:"-40px",width:"200px",height:"200px",background:"radial-gradient(circle, rgba(76,175,80,0.05) 0%, transparent 70%)",pointerEvents:"none"}}/>
+
+  <MezaTirgusLogo/>
+
+  <h1 style={{color:"white",fontSize:"32px",fontWeight:800,margin:"24px 0 8px",letterSpacing:"-0.03em",lineHeight:1.2}}>
+    Meža vērtība — vienā skatā
+  </h1>
+  <p style={{color:"#7ab87a",fontSize:"16px",maxWidth:"520px",margin:"0 auto 32px",lineHeight:1.6}}>
+    Profesionāli rīki meža speciālistam — cirsmu vērtēšana, dastojumi, rēķini un pavadzīmes vienā platformā.
+  </p>
+
+  <div style={{display:"flex",gap:"12px",justifyContent:"center",flexWrap:"wrap"}}>
+    <button onClick={onStandard} style={{padding:"13px 32px",background:"linear-gradient(135deg, #4caf50, #2e7d32)",color:"white",border:"none",borderRadius:"8px",fontSize:"15px",fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(76,175,80,0.3)"}}>
+      Sākt bezmaksas →
+    </button>
+    {user
+      ? <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+          <span style={{color:"#7ab87a",fontSize:"14px",padding:"8px 14px",background:"rgba(255,255,255,0.05)",borderRadius:"8px",border:"1px solid #2d5a2d"}}>👤 {user.vards}</span>
+          <button onClick={onIziet} style={{padding:"11px 20px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer"}}>Iziet</button>
+        </div>
+      : <button onClick={onReg} style={{padding:"13px 32px",background:"transparent",color:"white",border:"2px solid rgba(255,255,255,0.3)",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600}}>Reģistrēties</button>
+    }
+    <button onClick={onSludinajumi} style={{padding:"13px 28px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer"}}>
+      📢 Sludinājumi
+    </button>
+    <div style={{position:"relative",display:"inline-block"}}
+      onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
+      onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
+      <button onClick={onEnter} style={{padding:"13px 28px",background:"transparent",color:"#4caf50",border:"2px solid #4caf50",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600}}>
+        Pilnā versija ▾
       </button>
-      {user
-        ? <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
-            <span style={{color:"#aaa",fontSize:"14px"}}>👤 {user.vards}</span>
-            <button onClick={onIziet} style={{padding:"8px 20px",background:"transparent",color:"#aaa",border:"1px solid #aaa",borderRadius:"6px",fontSize:"14px",cursor:"pointer"}}>Iziet</button>
-          </div>
-        : <button onClick={onReg} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid white",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>Reģistrēties</button>
-      }
-      <button onClick={onSludinajumi} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid #4caf50",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>
-        📢 Sludinājumi
-      </button>
-      <div style={{position:"relative",display:"inline-block"}}
-  onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
-  onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
-  <button onClick={onEnter} style={{padding:"12px 32px",background:"transparent",color:"white",border:"2px solid #4caf50",borderRadius:"6px",fontSize:"16px",cursor:"pointer"}}>
-    Pilnā versija ▾
-  </button>
-  <div className="pilna-menu" style={{display:"none",position:"absolute",top:"100%",left:0,background:"white",border:"1px solid #225522",borderRadius:"6px",padding:"8px 0",minWidth:"200px",zIndex:100,marginTop:"4px"}}>
-    {["📐 Cirsmas skice","📏 Caurmēra mērījumi","🌲 Dastojumu aprēķini","🧾 Rēķinu izveide","📊 Cirsmu vērtēšana"].map((t,i)=>(
-      <div key={i} onClick={onEnter} style={{padding:"8px 16px",fontSize:"13px",color:"#225522",cursor:"pointer",borderBottom:"1px solid #f0f0f0"}}>{t}</div>
-    ))}
-  </div>
-</div>
+      <div className="pilna-menu" style={{display:"none",position:"absolute",top:"100%",left:0,background:"#1a2e1a",border:"1px solid #2d5a2d",borderRadius:"8px",padding:"8px 0",minWidth:"220px",zIndex:100,marginTop:"6px",boxShadow:"0 8px 24px rgba(0,0,0,0.4)"}}>
+        {["📐 Cirsmas skice","📏 Caurmēra mērījumi","🌲 Dastojumu aprēķini","🧾 Rēķinu izveide","📊 Cirsmu vērtēšana"].map((t,i)=>(
+          <div key={i} onClick={onEnter} style={{padding:"10px 16px",fontSize:"13px",color:"#a8d8a8",cursor:"pointer",borderBottom:"1px solid #1a2e1a"}}
+            onMouseEnter={e=>e.currentTarget.style.background="#225522"}
+            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>{t}</div>
+        ))}
+      </div>
     </div>
   </div>
+</div>
 
   {/* KAS IR MEŽA TIRGUS */}
-  <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box"}}>
- <div style={{background:"#c8d4b0",border:"1px solid #b0c090",borderRadius:"12px",padding:"32px 40px",marginBottom:"24px"}}>
-    <h2 style={{color:"#225522",fontSize:"22px",textAlign:"center",marginBottom:"8px"}}>Kas ir Meža tirgus?</h2>
-    <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"16px",maxWidth:"700px",margin:"0 auto 16px"}}>
-      Latvijas meži ir mūsu kopīgais mantojums, un to apsaimniekošana prasa zināšanas, laiku un uzticamus partnerus. Meža tirgus ir digitāla platforma, kas apvieno visus meža darbiniekus vienā kopējā telpā — mežsaimnieki, harvesteru operatori, meža uzņēmumi, mežsargi un īpašnieki var sazināties, izteikt piedāvājumus, publicēt sludinājumus un rīkot izsoles. Mūsu mērķis ir vienkāršs: savest kopā īpašnieku ar pakalpojuma sniedzēju — ātri, pārskatāmi un bez liekiem starpniekiem.
-    </p>
-    <p style={{textAlign:"center",color:"#555",fontSize:"14px",marginBottom:"16px",maxWidth:"700px",margin:"0 auto 16px"}}>
-      Platformā pieejami profesionāli rīki ikdienas darbam — cirsmu vērtēšana, dastojumu aprēķini, dokumentu sagatavošana un rēķinu izveide. Mobilās aplikācijas kalkulatori ir domāti lietošanai tieši mežā — caurmēra mērīšana, kubatūras un sortimentu aprēķini ar vērtību reāllaikā. Visi aprēķini notiek jūsu ierīcē pēc Latvijā atzītām meža uzmērīšanas metodēm un formulām.
-    </p>
-    <p style={{textAlign:"center",color:"#225522",fontSize:"14px",fontWeight:"bold",maxWidth:"700px",margin:"0 auto 36px"}}>
-      Jūsu dati nekur netiek saglabāti. Meža tirgus nav inventarizācijas sistēma — tā ir tikšanās vieta cilvēkiem, kuriem rūp mežs.
-    </p>
+  <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box",background:"#080f08"}}>
+<div style={{background:"linear-gradient(135deg, #1a2e1a, #0f1f0f)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"40px",marginBottom:"24px"}}>
+  <h2 style={{color:"#4caf50",fontSize:"24px",textAlign:"center",marginBottom:"24px",fontWeight:800,letterSpacing:"-0.02em"}}>Kas ir Meža tirgus?</h2>
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"24px",marginBottom:"24px"}}>
+    {[
+      {icon:"🌲",title:"Meža rīki",text:"Cirsmu vērtēšana, dastojumi, caurmēra mērījumi — viss vienā vietā."},
+      {icon:"🤝",title:"Savienojam",text:"Īpašnieki, mežsaimnieki, harvesteru operatori — vienā platformā."},
+      {icon:"📱",title:"Laukā & birojā",text:"Mobilās aplikācijas laukā, pilnā versija birojā — aprēķini reāllaikā."},
+    ].map((item,i)=>(
+      <div key={i} style={{textAlign:"center",padding:"20px 16px",background:"rgba(76,175,80,0.05)",borderRadius:"10px",border:"1px solid #1e3a1e"}}>
+        <div style={{fontSize:"32px",marginBottom:"10px"}}>{item.icon}</div>
+        <div style={{color:"#4caf50",fontWeight:700,fontSize:"14px",marginBottom:"6px"}}>{item.title}</div>
+        <div style={{color:"#7ab87a",fontSize:"13px",lineHeight:1.6}}>{item.text}</div>
+      </div>
+    ))}
   </div>
+  <p style={{textAlign:"center",color:"#4a7a4a",fontSize:"13px",margin:0,fontStyle:"italic"}}>
+    🔒 Jūsu dati nekur netiek saglabāti. Meža tirgus nav inventarizācijas sistēma — tā ir tikšanās vieta cilvēkiem, kuriem rūp mežs.
+  </p>
+</div>
 
     {/* BEZMAKSAS / MAKSAS */}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"24px",marginBottom:"40px"}}>
-      <div style={{background:"white",border:"2px solid #4caf50",borderRadius:"10px",padding:"24px"}}>
-        <div style={{color:"#4caf50",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>✓ Bezmaksas</div>
-        
-      {["PDF augšupielāde un nogabalu analīze","Ieteikumi par cirtes veidu","Saimnieciskā un tirgus vērtība","Ciršanas ieteikumi pēc vecuma un bonitātes","Atjaunošanas pārskats","Jaunaudžu kopšanas pārskats (drīzumā)","Sludinājumi un piedāvājumi","Izsoles — pērc un pārdod (maksas)"].map((t,i)=>(
-        <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
+      <div style={{background:"linear-gradient(160deg,#0f1f0f,#1a2e1a)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"28px"}}>
+        <div style={{color:"#4caf50",fontWeight:800,fontSize:"18px",marginBottom:"6px"}}>✓ Bezmaksas</div>
+        <div style={{color:"#4a7a4a",fontSize:"12px",marginBottom:"20px"}}>Sāc bez maksas uzreiz</div>
+        {[
+          {icon:"📄",text:"PDF augšupielāde un nogabalu analīze"},
+          {icon:"🌲",text:"Ieteikumi par cirtes veidu"},
+          {icon:"💰",text:"Saimnieciskā un tirgus vērtība"},
+          {icon:"📏",text:"Ciršanas ieteikumi pēc vecuma un bonitātes"},
+          {icon:"🌱",text:"Atjaunošanas pārskats"},
+          {icon:"🪓",text:"Jaunaudžu kopšanas pārskats"},
+          {icon:"📢",text:"Sludinājumi un piedāvājumi"},
+        ].map((t,i)=>(
+          <div key={i} style={{fontSize:"13px",color:"#a8d8a8",padding:"7px 0",borderBottom:"1px solid #1e3a1e",display:"flex",alignItems:"center",gap:"8px"}}>
+            <span style={{fontSize:"15px"}}>{t.icon}</span>{t.text}
+          </div>
         ))}
-        <button onClick={onStandard} style={{marginTop:"16px",width:"100%",padding:"10px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
+        <button onClick={onStandard} style={{marginTop:"20px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#4caf50,#2e7d32)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
           Sākt pamata versiju →
         </button>
       </div>
-      <div style={{background:"white",border:"2px solid #225522",borderRadius:"10px",padding:"24px"}}>
-        <div style={{color:"#225522",fontWeight:"bold",fontSize:"16px",marginBottom:"16px"}}>★ Pilnā versija</div>
-        {["Cirsmas skice (KML/SHP) ar PDF","Caurmēra mērījumi ar izdruku","Krautuves vērtība","Sortimentu sadalījums un vērtība","Dastojumu aprēķini","Rēķinu izveide un drukāšana","PDF šķirotājs","Mobilā cirsmu vērtēšana laukā","Iekšējais čats ar kolēģiem","Izsoles ar PDF analīzi"].map((t,i)=>(
-          <div key={i} style={{fontSize:"13px",color:"#333",padding:"6px 0",borderBottom:"1px solid #f0f0f0"}}>✓ {t}</div>
+      <div style={{background:"linear-gradient(160deg,#1a1000,#2a1f00)",border:"1px solid #4a3800",borderRadius:"16px",padding:"28px"}}>
+        <div style={{color:"#ffc107",fontWeight:800,fontSize:"18px",marginBottom:"6px"}}>★ Pilnā versija</div>
+        <div style={{color:"#7a6a00",fontSize:"12px",marginBottom:"20px"}}>Visi rīki profesionālim</div>
+        {[
+          {icon:"🗺",text:"Cirsmas skice (KML/SHP) ar PDF"},
+          {icon:"📏",text:"Caurmēra mērījumi ar izdruku"},
+          {icon:"🌲",text:"Krautuves vērtība"},
+          {icon:"📊",text:"Sortimentu sadalījums un vērtība"},
+          {icon:"🪵",text:"Dastojumu aprēķini"},
+          {icon:"🧾",text:"Rēķinu izveide un drukāšana"},
+          {icon:"✂️",text:"PDF šķirotājs"},
+          {icon:"📱",text:"Mobilā cirsmu vērtēšana laukā"},
+          {icon:"💬",text:"Iekšējais čats ar kolēģiem"},
+          {icon:"🏷",text:"Izsoles ar PDF analīzi"},
+        ].map((t,i)=>(
+          <div key={i} style={{fontSize:"13px",color:"#ffe082",padding:"7px 0",borderBottom:"1px solid #3a2e00",display:"flex",alignItems:"center",gap:"8px"}}>
+            <span style={{fontSize:"15px"}}>{t.icon}</span>{t.text}
+          </div>
         ))}
-        <button onClick={onEnter} style={{marginTop:"8px",width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>
+        <button onClick={onEnter} style={{marginTop:"20px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#ffc107,#e65100)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
           Izmēģināt pilno versiju →
         </button>
       </div>
     </div>
 
-    {/* KĀ TIEK APRĒĶINĀTS */}
-    <div style={{background:"white",border:"1px solid #d0e4c8",borderRadius:"10px",padding:"24px",marginBottom:"40px"}}>
-      <h3 style={{color:"#225522",marginTop:0}}>Kā tiek veikti aprēķini?</h3>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",fontSize:"13px",color:"#444"}}>
-        <div><b>Kubatūra</b><br/>Aprēķināta pēc Latvijā atzītajiem formas faktoriem katrai koku sugai atsevišķi.</div>
-        <div><b>Bonitāte</b><br/>Noteikta pēc augstuma un vecuma attiecības — Latvijas meža bonitātes tabulām.</div>
-        <div><b>Sortimentu sadalījums</b><br/>Aprēķināts pēc vidējā caurmēra un kvalitātes klases katrai sugai.</div>
-        <div><b>Tirgus vērtība</b><br/>Balstīta uz aktuālajām sortimentu cenām ko lietotājs var atjaunināt jebkurā brīdī.</div>
-        <div><b>Cirsmas krāja</b><br/>Aprēķināta pēc šķērslaukuma un vidējā augstuma — Latvijas meža inventarizācijas metodika.</div>
-        <div><b>Precizitāte</b><br/>Aprēķinu precizitāte ir tieši atkarīga no inventarizācijas datu precizitātes.</div>
+   {/* KĀ TIEK APRĒĶINĀTS */}
+    <div style={{background:"linear-gradient(160deg,#0f1f0f,#1a2e1a)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"32px",marginBottom:"40px"}}>
+      <h3 style={{color:"#4caf50",marginTop:0,fontSize:"20px",fontWeight:800,textAlign:"center",marginBottom:"24px",letterSpacing:"-0.02em"}}>Kā tiek veikti aprēķini?</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"16px"}}>
+        {[
+          {icon:"🪵",title:"Kubatūra",text:"Pēc Latvijā atzītajiem formas faktoriem katrai koku sugai atsevišķi."},
+          {icon:"📊",title:"Bonitāte",text:"Pēc augstuma un vecuma attiecības — Latvijas meža bonitātes tabulām."},
+          {icon:"🌲",title:"Sortimentu sadalījums",text:"Pēc vidējā caurmēra un kvalitātes klases katrai sugai."},
+          {icon:"💰",title:"Tirgus vērtība",text:"Balstīta uz aktuālajām sortimentu cenām ko var atjaunināt jebkurā brīdī."},
+          {icon:"📐",title:"Cirsmas krāja",text:"Pēc šķērslaukuma un vidējā augstuma — Latvijas meža inventarizācijas metodika."},
+          {icon:"✓",title:"Precizitāte",text:"Aprēķinu precizitāte ir tieši atkarīga no inventarizācijas datu precizitātes."},
+        ].map((item,i)=>(
+          <div key={i} style={{background:"rgba(76,175,80,0.05)",border:"1px solid #1e3a1e",borderRadius:"10px",padding:"16px"}}>
+            <div style={{fontSize:"24px",marginBottom:"8px"}}>{item.icon}</div>
+            <div style={{color:"#4caf50",fontWeight:700,fontSize:"13px",marginBottom:"6px"}}>{item.title}</div>
+            <div style={{color:"#7ab87a",fontSize:"12px",lineHeight:1.6}}>{item.text}</div>
+          </div>
+        ))}
       </div>
     </div>
 
   </div>
-
   {/* FOOTER */}
   <div style={{background:"#1a3a1a",padding:"24px",textAlign:"center",marginTop:"20px"}}>
     <p style={{color:"#666",fontSize:"12px",margin:0}}>© 2026 Meža tirgus · meža-tirgus.lv · Darbarīks meža speciālistam un meža īpašniekam</p>
@@ -1539,24 +1608,15 @@ return(
 
 function MezaTirgusLogo(){
 return(
-<svg width="240" height="72" viewBox="0 0 300 86" xmlns="http://www.w3.org/2000/svg">
-  <rect width="300" height="86" rx="10" fill="#f0f6ec" stroke="#225522" strokeWidth="2"/>
-  <rect x="10" y="8" width="68" height="70" rx="5" fill="white" stroke="#225522" strokeWidth="1"/>
-  <line x1="10" y1="30" x2="78" y2="30" stroke="#c8dcc0" strokeWidth="0.6"/>
-  <line x1="10" y1="52" x2="78" y2="52" stroke="#c8dcc0" strokeWidth="0.6"/>
-  <line x1="32" y1="8" x2="32" y2="78" stroke="#c8dcc0" strokeWidth="0.6"/>
-  <line x1="56" y1="8" x2="56" y2="78" stroke="#c8dcc0" strokeWidth="0.6"/>
-  <polygon points="16,14 50,10 64,38 58,66 40,72 12,56 10,30" fill="rgba(34,85,34,0.1)" stroke="#225522" strokeWidth="1.6"/>
-  <polygon points="24,18 20,28 28,28" fill="#225522"/>
-  <polygon points="44,13 40,23 48,23" fill="#225522"/>
-  <polygon points="36,42 32,52 40,52" fill="#2e7d32"/>
-  <polygon points="54,36 50,46 58,46" fill="#2e7d32"/>
-  <rect x="10" y="58" width="16" height="14" rx="3" fill="#225522"/>
-  <text x="18" y="69" fontFamily="Arial" fontSize="9" fontWeight="bold" fill="white" textAnchor="middle">€</text>
-  <line x1="88" y1="8" x2="88" y2="78" stroke="#d0e4c8" strokeWidth="1"/>
-  <text x="194" y="34" fontFamily="Georgia, serif" fontSize="20" fontWeight="bold" fill="#225522" textAnchor="middle">MEŽA</text>
-  <text x="194" y="56" fontFamily="Georgia, serif" fontSize="20" fontWeight="bold" fill="#1b5e20" textAnchor="middle">TIRGUS</text>
-  <text x="194" y="70" fontFamily="Arial" fontSize="6.5" fill="#999" textAnchor="middle" letterSpacing="1.2">DARBARĪKS MEŽA SPECIĀLISTAM UN MEŽA ĪPAŠNIEKAM</text>
+<svg width="200" height="52" viewBox="0 0 200 52" xmlns="http://www.w3.org/2000/svg">
+<rect width="200" height="52" rx="8" fill="#0f1a0f"/>
+  <polygon points="22,38 30,18 38,38" fill="#2e7d32"/>
+  <polygon points="18,38 30,12 42,38" fill="#1b5e20" opacity="0.6"/>
+  <rect x="27" y="37" width="6" height="8" rx="1" fill="#1b5e20"/>
+  <line x1="52" y1="8" x2="52" y2="44" stroke="#1e3a1e" strokeWidth="1"/>
+  <text x="64" y="24" fontFamily="Arial" fontSize="15" fontWeight="800" fill="#4caf50" letterSpacing="1">MEŽA</text>
+  <text x="64" y="40" fontFamily="Arial" fontSize="15" fontWeight="800" fill="#81c784" letterSpacing="1">TIRGUS</text>
+  <circle cx="188" cy="10" r="4" fill="#4caf50"/>
 </svg>
 )
 }
@@ -1579,7 +1639,7 @@ const [editing,setEditing]=useState(false)
 const [hoverRow,setHoverRow]=useState(null)
 const [kadastrs,setKadastrs]=useState("")
 const [saimnieciba,setSaimnieciba]=useState("")
-const [showPriceModal,setShowPriceModal]=useState(false)
+
 const [showCustomModal,setShowCustomModal]=useState(false)
 const [harvestCostPerM3,setHarvestCostPerM3]=useState(18)
 const [forwardCostPerM3,setForwardCostPerM3]=useState(12)
@@ -1594,7 +1654,7 @@ const [activeSort,setActiveSort]=useState({
 log:true,small:true,veneer:true,tara:true,pulp:true,fire:true,chips:true
 })
 const [extraSorts,setExtraSorts]=useState([])
-const [parseText,setParseText]=useState("")
+
 const [jaunaudzes,setJaunaudzes]=useState([])
 const [skirotajsState,setSkirotajsState]=useState(null)
 const [cirsmaState,setCirsmaState]=useState(null)
@@ -1644,6 +1704,7 @@ if(showChat) return <ChatPage user={user} onBack={()=>setShowChat(false)}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
 if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
+if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 
 const landPrices={
@@ -1725,8 +1786,8 @@ tips:tokens[i+3]||"",formula:formulaStr,bon:tokens[j+1]||"",
 h:Number(tokens[j+2])||0,d:Number(tokens[j+3])||0,vec:dominantAge,
 biez:Number(tokens[j+5])||0,
 g:Number(tokens[j+6])>100?0:Number(tokens[j+6])||0,
-koki:Number(tokens[j+6])>100?Number(tokens[j+6]):Number(tokens[j+7])||0,
-krm3ha:Number(tokens[j+6])>100?Number(tokens[j+7])||0:Number(tokens[j+8])||0,
+koki:Number(tokens[j+6])>100?Number(tokens[j+6]):Number(tokens[j+7])>=1000?Number(tokens[j+7]):0,
+krm3ha:Number(tokens[j+6])>100?Number(tokens[j+7])||0:Number(tokens[j+7])>=1000?Number(tokens[j+8])||0:Number(tokens[j+7])||0,
 speciesAges,plantacija:isPlantacija,harvestType:"",izcelsanas
 })
 }
@@ -1796,8 +1857,8 @@ const html=`<html><head><meta charset="UTF-8"><style>body{font-family:Arial;font
 <p><b>Kadastra numurs:</b> ${kadastrs} | <b>Saimniecība:</b> ${saimnieciba}</p>
 <p>Datums: ${today} | Platība: ${totalArea.toFixed(2)} ha | Nogabali: ${rows.length+izcirtumi.length}</p>
 ${izcirtumi.length>0?`<div class="warn"><b>Izcirtumi</b><table><thead><tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Cirtes veids</th><th>Gads</th><th>Atjaunot līdz</th><th>Formula</th><th>H</th><th>Koki/ha</th><th>Statuss</th></tr></thead><tbody>${izcirtumi.map(ic=>`<tr><td>${ic.nog}</td><td>${ic.platiba} ha</td><td>${ic.tips}</td><td>${ic.cirteVeids}</td><td>${ic.cirteGads}</td><td><b>${ic.atjaunGads}</b></td><td>${ic.formula||"—"}</td><td>${ic.h||"—"}</td><td>${ic.koki||"—"}</td><td>${ic.formula?"Atjaunots":"Jāiesniedz VMD"}</td></tr>`).join("")}</tbody></table></div>`:""}
-<table><thead><tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Formula</th><th>H</th><th>D</th><th>Vec</th><th>G</th><th>Ieteiktā cirte</th><th>Krāja m³</th><th>Vērtība €</th></tr></thead><tbody>
-${rows.map(r=>{const calc=forestEngine(r);return`<tr><td>${r.nog}</td><td>${r.platiba}</td><td>${r.tips}</td><td>${r.formula}</td><td>${r.h}</td><td>${r.d}</td><td>${r.vec}</td><td>${r.g}</td><td>${calc.decision}</td><td>${(calc.cutVolume||0).toFixed(1)}</td><td>${(calc.marketValue||0).toFixed(0)}</td></tr>`}).join("")}
+<table><thead><tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Formula</th><th>H</th><th>D</th><th>Vec</th><th>G</th><th>Ieteiktā cirte</th><th>VMD krāja m³/ha</th><th>Aprēķ. krāja m³/ha</th><th>Cirsmas krāja m³</th><th>Vērtība €</th></tr></thead><tbody>
+${rows.map(r=>{const calc=forestEngine(r);const ff={P:0.45,E:0.48,B:0.52,A:0.42,Ba:0.38,Bl:0.38,M:0.46,Oz:0.52,Os:0.50,G:0.52};const sp=(r.formula?.match(/(\d+)(Bl|Ba|Oz|Os|P|E|B|A|M|G)/)||[])[2]||"B";const ak=r.g&&r.h?(r.g*r.h*(ff[sp]||0.5)).toFixed(0):"—";return`<tr><td>${r.nog}</td><td>${r.platiba}</td><td>${r.tips}</td><td>${r.formula}</td><td>${r.h}</td><td>${r.d}</td><td>${r.vec}</td><td>${r.g}</td><td>${calc.decision}</td><td>${r.krm3ha||"—"}</td><td>${ak}</td><td>${(calc.cutVolume||0).toFixed(1)}</td><td>${(calc.marketValue||0).toFixed(0)}</td></tr>`}).join("")}
 </tbody></table>
 <table><thead><tr><th>Sortiments</th><th>m³</th><th>Cena €</th><th>Vērtība €</th></tr></thead><tbody>
 ${Object.keys(sortimentTotals).filter(k=>activeSort[k]!==false).map(k=>`<tr><td>${sortimentNames[k]}</td><td>${sortimentTotals[k].toFixed(1)}</td><td>${prices[k]||0}</td><td>${(sortimentTotals[k]*(prices[k]||0)).toFixed(0)}</td></tr>`).join("")}
@@ -1815,14 +1876,14 @@ win.print()
 }
 
 return(
-<div style={{padding:"40px",fontFamily:"Arial",background:"#0d1a0d",minHeight:"100vh",color:"white"}}>
+<div style={{fontFamily:"'Inter',Arial,sans-serif",background:"#080f08",minHeight:"100vh",color:"#e8f0e8"}}>
 {user && <GlobalHeader user={user} onIziet={iziet} onOpenChat={()=>setShowChat(true)} onNavigate={(p)=>setPage(p)}/>}
 {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
 
 {showCustomModal && (
 <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center"}}>
-<div style={{background:"white",padding:"30px",borderRadius:"8px",minWidth:"500px",maxHeight:"80vh",overflow:"auto"}}>
-<h2>Personalizēt izstrādi</h2>
+<div style={{background:"white",padding:"30px",borderRadius:"8px",minWidth:"500px",maxHeight:"80vh",overflow:"auto",color:"#111"}}>
+<h2 style={{color:"#111"}}>Personalizēt izstrādi</h2>
 <h3>Izstrādes izmaksas</h3>
 <table border="1" cellPadding="6"><thead><tr><th>Parametrs</th><th>€/m³</th></tr></thead><tbody>
 <tr><td>Harvesteris</td><td><input type="number" value={harvestCostPerM3} onChange={e=>setHarvestCostPerM3(Number(e.target.value))} style={{width:"60px"}}/></td></tr>
@@ -1857,36 +1918,7 @@ return(
 </div>
 )}
 
-{showPriceModal && (
-<div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center"}}>
-<div style={{background:"white",padding:"30px",borderRadius:"8px",minWidth:"500px",maxHeight:"80vh",overflow:"auto"}}>
-<h2>Atjaunināt cenas</h2>
-<p>Ielīmē tekstu no LVM, LVMI vai citas lapas:</p>
-<textarea value={parseText} onChange={e=>setParseText(e.target.value)} style={{width:"100%",height:"200px",marginBottom:"10px"}} placeholder="Ielīmē tekstu ar cenām šeit..."/>
-<br/>
-<button onClick={()=>{
-const text=parseText.toLowerCase()
-const newPrices={...customPrices}
-const patterns={log:["zāģbaļķi","zāģbaļķ"],small:["sīkbaļķi","sīkbaļķ"],veneer:["finieris"],tara:["tara"],pulp:["papīrmalka"],fire:["malka"],chips:["šķelda"]}
-Object.keys(patterns).forEach(k=>{patterns[k].forEach(pat=>{const idx=text.indexOf(pat);if(idx!==-1){const snippet=text.slice(idx,idx+30);const match=snippet.match(/(\d+[\.,]\d+|\d+)/);if(match){const val=parseFloat(match[1].replace(",","."));if(val>5&&val<500)newPrices[k]=val}}})})
-setCustomPrices(newPrices)
-alert("Cenas atjauninātas!")
-}} style={{marginRight:"10px",padding:"8px 16px",background:"#225522",color:"white",border:"none",borderRadius:"4px"}}>Parsēt cenas</button>
-<button onClick={()=>setShowPriceModal(false)} style={{padding:"8px 16px"}}>Aizvērt</button>
-</div>
-</div>
-)}
 
-<div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"16px",flexWrap:"wrap"}}>
-  <MezaTirgusLogo/>
-  <button onClick={()=>setPage("landing")} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>← Sākumlapa</button>
-  <button onClick={()=>setPage("sludinajumi")} style={{padding:"6px 14px",background:"#388e3c",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
-    📢 Sludinājumi & Izsoles
-  </button>
-  {user && <span style={{fontSize:"12px",color:"#225522"}}>👤 {user.vards}</span>}
-  {user && <button onClick={iziet} style={{padding:"6px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>Iziet</button>}
-  {!user && <button onClick={()=>atvertReg("main")} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔑 Pieteikties</button>}
-</div>
 
 {/* PRO RĪKI */}
 <div style={{background:"#111f11",border:"1px solid #1e2e1e",borderRadius:"12px",padding:"16px",marginBottom:"20px"}}>
@@ -1901,7 +1933,13 @@ alert("Cenas atjauninātas!")
             <span style={{fontSize:"16px"}}>🗺</span>
             <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Cirsmas skice</span>
           </div>
-          <div style={{color:"#7ab87a",fontSize:"11px"}}>KML/SHP fails → skice ar koordinātām un PDF VMD iesniegumam</div>
+        <div style={{color:"#7ab87a",fontSize:"11px"}}>KML/SHP fails → skice ar koordinātām un PDF VMD iesniegumam</div>
+<div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:6}}>
+  {["📏 Caurmēri","🌲 Dastojums","⬇ SHP","🧾 Rēķins*"].map((t,i)=>(
+    <span key={i} style={{fontSize:"10px",background:"rgba(76,175,80,0.1)",color:"#4a7a4a",padding:"2px 6px",borderRadius:4,border:"1px solid #1e3a1e"}}>{t}</span>
+  ))}
+  <div style={{fontSize:"10px",color:"#4a7a4a",marginTop:4,width:"100%"}}>* Rēķins pieejams pēc skices izveides</div>
+</div>
         </div>
         <div onClick={()=>setPage("cirsma")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer"}}>
           <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
@@ -1959,7 +1997,14 @@ alert("Cenas atjauninātas!")
             <span style={{fontSize:"16px"}}>🧾</span>
             <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Rēķinu krātuve</span>
           </div>
-          <div style={{color:"#ffaa70",fontSize:"11px"}}>Rēķinu izveide, drukāšana, mēneša un gada pārskats</div>
+         <div style={{color:"#ffaa70",fontSize:"11px"}}>Rēķinu izveide, drukāšana, mēneša un gada pārskats</div>
+        </div>
+        <div onClick={()=>setPage("pavadzimes")} style={{background:"#1a3a1a",border:"1px solid #2d4a2d",borderRadius:"6px",padding:"10px 12px",cursor:"pointer",marginTop:"8px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>📋</span>
+            <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Pavadzīmju reģistrs</span>
+          </div>
+          <div style={{color:"#ffaa70",fontSize:"11px"}}>Foto → OCR → automātiska reģistrācija</div>
         </div>
       </div>
       <div style={{background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:"10px",padding:"14px"}}>
@@ -2097,9 +2142,9 @@ return <span style={{color:"#225522",fontWeight:"bold"}}>✓ Atjaunots</span>
 
 <div style={{maxHeight:"500px",overflow:"auto"}}>
 <table border="1" cellPadding="6">
-<thead style={{position:"sticky",top:0,background:"#eee"}}>
+<thead style={{position:"sticky",top:0,background:"#1a3a1a"}}>
 <tr>
-<th>Nog</th><th>Platība</th><th>Tips</th><th>Formula</th><th>H</th><th>D</th><th>Vecums</th><th>Biez</th><th>G</th><th>Koki/ha</th><th>Ieteiktā cirte</th><th>Izvēlētā cirte</th><th>Cirsmas krāja m³</th><th>Vērtība €</th>
+<th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Nog</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Platība</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Tips</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Formula</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>H</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>D</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Vecums</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Biez</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>G</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Koki/ha</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Ieteiktā cirte</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Izvēlētā cirte</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>VMD krāja m³/ha</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Aprēķ. krāja m³/ha</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Cirsmas krāja m³</th><th style={{color:"#4caf50",padding:"8px 6px",fontSize:"11px",fontWeight:700,borderBottom:"2px solid #4caf50"}}>Vērtība €</th>
 </tr>
 </thead>
 <tbody>
@@ -2107,7 +2152,7 @@ return <span style={{color:"#225522",fontWeight:"bold"}}>✓ Atjaunots</span>
 const calc=forestEngine(r)
 const treeCount=r.g>100?r.g:r.koki>0?r.koki:""
 return(
-<tr key={i} onMouseEnter={()=>setHoverRow(i)} onMouseLeave={()=>setHoverRow(null)} style={{background:hoverRow===i?"#e8f5e9":"white"}}>
+<tr key={i} onMouseEnter={()=>setHoverRow(i)} onMouseLeave={()=>setHoverRow(null)} style={{background:hoverRow===i?"#e8f5e9":"white", color:"#111"}}>
 <td>{r.nog}</td>
 <td>{editing?<input style={{width:"50px"}} value={r.platiba} onChange={e=>updateCell(i,"platiba",e.target.value)}/>:r.platiba}</td>
 <td>{editing?<input style={{width:"40px"}} value={r.tips} onChange={e=>updateCell(i,"tips",e.target.value)}/>:r.tips}</td>
@@ -2131,6 +2176,8 @@ return(
 <option>Rekonstruktīvā vienlaidus cirte</option>
 </select>:r.harvestType}
 </td>
+<td>{r.krm3ha||"—"}</td>
+<td>{(()=>{const ff={P:0.45,E:0.48,B:0.52,A:0.42,Ba:0.38,Bl:0.38,M:0.46,Oz:0.52,Os:0.50,G:0.52};const sp=(r.formula?.match(/(\d+)(Bl|Ba|Oz|Os|P|E|B|A|M|G)/)||[])[2]||"B";return r.g&&r.h?(r.g*r.h*(ff[sp]||0.5)).toFixed(0):"—"})()}</td>
 <td>{(calc.cutVolume||0).toFixed(1)}</td>
 <td>{(calc.marketValue||0).toFixed(0)}</td>
 </tr>
@@ -2157,7 +2204,7 @@ if(kailcirteGrupa.includes(dec)){kcHa+=row.platiba;kcVol+=vol}
 if(kopsanasGrupa.includes(dec)){kkHa+=row.platiba;kkVol+=vol}
 })
 return(
-<div style={{margin:"16px 0",padding:"12px",background:"#f0f8f0",border:"1px solid #225522",borderRadius:"6px"}}>
+<div style={{margin:"16px 0",padding:"12px",background:"#f0f8f0",border:"1px solid #225522",borderRadius:"6px",color:"#111"}}>
 <b>Cirsmu kopsavilkums</b>
 <table border="1" cellPadding="6" style={{marginTop:"8px"}}>
 <thead style={{background:"#225522",color:"white"}}><tr><th>Cirtes veids</th><th>Platība (ha)</th><th>Kopā m³</th><th>Vidēji m³/ha</th></tr></thead>
@@ -2214,16 +2261,26 @@ return(
 <button onClick={exportPDF}>Izdrukāt PDF</button>
 <button onClick={()=>{if(window.confirm("Vai PDF ir saglabāts? Visi dati tiks dzēsti!")){setRows([]);setIzcirtumi([]);setKadastrs("");setSaimnieciba("")}}} style={{marginLeft:"10px",padding:"6px 12px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Notīrīt visu</button>
 <button onClick={()=>setShowCustomModal(true)} style={{marginLeft:"10px"}}>Personalizēt izstrādi</button>
-<button onClick={()=>setShowPriceModal(true)} style={{marginLeft:"10px"}}>Atjaunināt cenas</button>
+
 
 <br/><br/>
-<h2>Sortimentu sadalījums</h2>
-<table border="1" cellPadding="6">
-<thead><tr><th>Sortiments</th><th>m³</th><th>Cena €</th><th>Vērtība €</th></tr></thead>
+<h2 style={{color:"#4caf50",fontSize:"16px",fontWeight:600,marginBottom:"12px",letterSpacing:"0.05em",textTransform:"uppercase"}}>Sortimentu sadalījums</h2>
+<table style={{borderCollapse:"collapse",width:"260px"}}>
+<thead><tr style={{borderBottom:"2px solid #2d5a2d"}}>
+<th style={{color:"#4caf50",padding:"8px 12px",textAlign:"left",fontSize:"11px",fontWeight:700}}>Sortiments</th>
+<th style={{color:"#4caf50",padding:"8px 12px",textAlign:"right",fontSize:"11px",fontWeight:700}}>m³</th>
+<th style={{color:"#4caf50",padding:"8px 12px",textAlign:"right",fontSize:"11px",fontWeight:700}}>Cena €</th>
+<th style={{color:"#4caf50",padding:"8px 12px",textAlign:"right",fontSize:"11px",fontWeight:700}}>Vērtība €</th>
+</tr></thead>
 <tbody>
-{Object.keys(sortimentTotals).filter(k=>activeSort[k]!==false).map(k=>{
+{Object.keys(sortimentTotals).filter(k=>activeSort[k]!==false).map((k,i)=>{
 const volume=sortimentTotals[k],price=prices[k]||0
-return(<tr key={k}><td>{sortimentNames[k]}</td><td>{volume.toFixed(1)}</td><td>{price}</td><td>{(volume*price).toFixed(0)}</td></tr>)
+return(<tr key={k} style={{borderBottom:"1px solid #1e3a1e",background:i%2===0?"#0f1a0f":"#111f11"}}>
+<td style={{padding:"7px 12px",fontSize:"12px",color:"#e8f0e8"}}>{sortimentNames[k]}</td>
+<td style={{padding:"7px 12px",fontSize:"12px",color:"#e8f0e8",textAlign:"right"}}>{volume.toFixed(1)}</td>
+<td style={{padding:"7px 12px",fontSize:"12px",color:"#7ab87a",textAlign:"right"}}>{price}</td>
+<td style={{padding:"7px 12px",fontSize:"12px",color:"#4caf50",fontWeight:600,textAlign:"right"}}>{(volume*price).toFixed(0)}</td>
+</tr>)
 })}
 {extraSorts.map((s,i)=>(<tr key={"extra"+i}><td>{s.name}</td><td>{(s.volume||0).toFixed(1)}</td><td>{s.price||0}</td><td>{((s.volume||0)*(s.price||0)).toFixed(0)}</td></tr>))}
 </tbody>
