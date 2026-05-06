@@ -331,28 +331,29 @@ tr:nth-child(even){background:#f0f8f0}
   }
 
   return (
-    <div style={{padding:"40px",fontFamily:"Arial",maxWidth:"1200px"}}>
+    <div style={{minHeight:"100vh",background:"#080f08",color:"#e8f5e9",fontFamily:"Arial,sans-serif"}}>
       {/* Pogu josla augšā */}
-      <div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap"}}>
-        <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
-        <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🗑 Dzēst visu</button>
-        <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🗺 LVM GEO</a>
-        {kadastrs && (
-          <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>📋 Kopēt kadastru</button>
-        )}
-        <button onClick={()=>setShowPrices(!showPrices)} style={{padding:"6px 14px",background:"#f9a825",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>💰 Cenas</button>
+      <div style={{background:"#1b3a1b",borderBottom:"2px solid #4caf50",padding:"12px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:"8px"}}>
+        <div style={{display:"flex",gap:"8px",alignItems:"center",flexWrap:"wrap"}}>
+          <button onClick={onBack} style={{padding:"6px 14px",background:"transparent",border:"none",color:"#4caf50",fontSize:"16px",cursor:"pointer"}}>← Atpakaļ</button>
+          <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>🗑 Dzēst visu</button>
+          <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"6px",textDecoration:"none",fontSize:"12px"}}>🗺 LVM GEO</a>
+          {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>📋 Kopēt kadastru</button>}
+          <button onClick={()=>setShowPrices(!showPrices)} style={{padding:"6px 14px",background:"#f9a825",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>💰 Cenas</button>
+        </div>
       </div>
 
-      <h1 style={{color:"#225522"}}>🌲 Cirsmas novērtēšana</h1>
+      <div style={{padding:"20px 24px",maxWidth:"1200px",margin:"0 auto"}}>
+      <h1 style={{color:"#4caf50",fontSize:"22px",fontWeight:800,marginBottom:"20px"}}>🌲 Cirsmas novērtēšana</h1>
 
       {showPrices && (
-        <div style={{marginBottom:"16px",padding:"12px",background:"#f0f8f0",border:"1px solid #225522",borderRadius:"6px"}}>
-          <b style={{fontSize:"12px",color:"#225522"}}>Cenas €/m³:</b>
+        <div style={{marginBottom:"16px",padding:"16px",background:"#141f14",border:"1px solid #2d5a2d",borderRadius:"10px"}}>
+          <b style={{fontSize:"12px",color:"#4caf50"}}>Cenas €/m³:</b>
           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginTop:"8px"}}>
             {Object.keys(prices).map(k=>(
               <div key={k}>
-                <label style={{fontSize:"11px",fontWeight:"bold"}}>{sortimentNames[k]}:</label><br/>
-                <input type="number" value={prices[k]} onChange={e=>setPrices({...prices,[k]:Number(e.target.value)})} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+                <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold"}}>{sortimentNames[k]}:</label><br/>
+                <input type="number" value={prices[k]} onChange={e=>setPrices({...prices,[k]:Number(e.target.value)})} style={{width:"100%",padding:"6px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"4px",color:"#e8f5e9"}}/>
               </div>
             ))}
           </div>
@@ -360,8 +361,8 @@ tr:nth-child(even){background:#f0f8f0}
         </div>
       )}
 
-      <div style={{float:"right",width:"220px",padding:"10px",background:"white",border:"1px solid #ccc",borderRadius:"6px",fontSize:"11px",marginLeft:"16px"}}>
-        <b style={{fontSize:"12px",color:"#225522"}}>Kvalitātes klases:</b>
+      <div style={{float:"right",width:"220px",padding:"12px",background:"#141f14",border:"1px solid #2d5a2d",borderRadius:"10px",fontSize:"11px",marginLeft:"16px"}}>
+        <b style={{fontSize:"12px",color:"#4caf50"}}>Kvalitātes klases:</b>
         {Object.keys(KVALITATE_DESC).map(k=>(
           <div key={k} style={{marginTop:"6px",padding:"4px 8px",borderRadius:"4px",background:KVALITATE_COLORS[k],color:KVALITATE_TEXT_COLORS[k]}}>
             {KVALITATE_DESC[k]}
@@ -369,14 +370,14 @@ tr:nth-child(even){background:#f0f8f0}
         ))}
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"20px",padding:"12px",background:"#f0f8f0",borderRadius:"6px",border:"1px solid #225522"}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"20px",padding:"16px",background:"#141f14",borderRadius:"10px",border:"1px solid #2d5a2d"}}>
         <div>
-          <label style={{fontSize:"12px",fontWeight:"bold"}}>Kadastra numurs:</label><br/>
-          <input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat(cirsmas,e.target.value,saimnieciba)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+          <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Kadastra numurs:</label>
+          <input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat(cirsmas,e.target.value,saimnieciba)}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
         <div>
-          <label style={{fontSize:"12px",fontWeight:"bold"}}>Saimniecības nosaukums:</label><br/>
-          <input value={saimnieciba} onChange={e=>{setSaimnieciba(e.target.value);saglabat(cirsmas,kadastrs,e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+          <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Saimniecības nosaukums:</label>
+          <input value={saimnieciba} onChange={e=>{setSaimnieciba(e.target.value);saglabat(cirsmas,kadastrs,e.target.value)}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
       </div>
 
@@ -386,13 +387,13 @@ tr:nth-child(even){background:#f0f8f0}
         const kopPlat = cirsma.nogabali.reduce((s,n)=>s+parseNum(n.platiba),0)
 
         return (
-          <div key={ci} style={{border:"2px solid #225522",borderRadius:"8px",padding:"16px",marginBottom:"24px",background:"white"}}>
+          <div key={ci} style={{border:"2px solid #2d5a2d",borderRadius:"10px",padding:"16px",marginBottom:"24px",background:"#141f14"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-              <h2 style={{margin:0,color:"#225522"}}>Cirsma {ci+1} — {kopPlat.toFixed(2)} ha</h2>
+              <h2 style={{margin:0,color:"#4caf50"}}>Cirsma {ci+1} — {kopPlat.toFixed(2)} ha</h2>
               {cirsmas.length>1 && <button onClick={()=>removeCirsma(ci)} style={{background:"#c62828",color:"white",border:"none",borderRadius:"4px",padding:"4px 10px",cursor:"pointer"}}>Dzēst</button>}
             </div>
 
-            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginBottom:"16px",padding:"8px",background:"#f9f9f9",borderRadius:"4px"}}>
+           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginBottom:"16px",padding:"12px",background:"#0f2b0f",borderRadius:"8px",border:"1px solid #1e3a1e"}}>
               
               <div>
                 <label style={{fontSize:"11px",fontWeight:"bold"}}>Cirtes veids:</label><br/>
@@ -431,7 +432,7 @@ tr:nth-child(even){background:#f0f8f0}
               const nVol = Object.values(nt).reduce((a,b)=>a+b,0)
 
               return (
-                <div key={ni} style={{border:"1px solid #aad4aa",borderRadius:"6px",padding:"12px",marginBottom:"12px",background:"#fafff8"}}>
+            <div key={ni} style={{border:"1px solid #2d5a2d",borderRadius:"8px",padding:"12px",marginBottom:"12px",background:"#0f1a0f"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
                     <b style={{color:"#225522",fontSize:"13px"}}>Nogabals {ni+1}</b>
                     {cirsma.nogabali.length>1 && <button onClick={()=>removeNogabals(ci,ni)} style={{background:"none",border:"1px solid #c62828",color:"#c62828",borderRadius:"4px",padding:"2px 8px",cursor:"pointer",fontSize:"11px"}}>Dzēst nog.</button>}
@@ -456,7 +457,7 @@ tr:nth-child(even){background:#f0f8f0}
 
                   <div style={{overflowX:"auto"}}>
                     <table border="1" cellPadding="3" style={{fontSize:"11px",width:"100%",minWidth:"850px"}}>
-                      <thead style={{background:"#2e7d32",color:"white"}}>
+                      <thead style={{background:"#225522",color:"#e8f5e9"}}>
                         <tr>
                           <th>Suga</th><th>Vecums</th><th>H (m)</th><th>D (cm)</th><th>G (m²/ha)</th>
                           <th>Bonitāte</th><th>Kvalitāte</th><th>Krāja m³</th>
@@ -466,17 +467,17 @@ tr:nth-child(even){background:#f0f8f0}
                       </thead>
                       <tbody>
                         {nog.sugas.map((s, si) => (
-                          <tr key={si} style={{background:si%2===0?"white":"#f0f8f0"}}>
+                          <tr key={si} style={{background:si%2===0?"#0f1a0f":"#141f14",color:"#e8f5e9"}}>
                             <td>
                               <select value={s.suga} onChange={e=>updateSuga(ci,ni,si,"suga",e.target.value)} style={{padding:"2px",fontSize:"11px"}}>
                                 {SUGAS.map(sg=><option key={sg}>{sg}</option>)}
                               </select>
                             </td>
-                            <td><input type="number" value={s.vecums||""} onChange={e=>updateSuga(ci,ni,si,"vecums",e.target.value)} style={{width:"42px",fontSize:"11px"}}/></td>
-                            <td><input type="number" value={s.h||""} onChange={e=>updateSuga(ci,ni,si,"h",e.target.value)} style={{width:"38px",fontSize:"11px"}}/></td>
-                            <td><input type="number" value={s.d||""} onChange={e=>updateSuga(ci,ni,si,"d",e.target.value)} style={{width:"38px",fontSize:"11px"}}/></td>
-                            <td><input value={s.g||""} onChange={e=>updateSuga(ci,ni,si,"g",e.target.value)} style={{width:"42px",fontSize:"11px"}}/></td>
-                            <td style={{textAlign:"center",fontWeight:"bold",color:"#225522"}}>{s.bonitate||"—"}</td>
+                            <td><input type="number" value={s.vecums||""} onChange={e=>updateSuga(ci,ni,si,"vecums",e.target.value)} style={{width:"42px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
+                            <td><input type="number" value={s.h||""} onChange={e=>updateSuga(ci,ni,si,"h",e.target.value)} style={{width:"38px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
+                            <td><input type="number" value={s.d||""} onChange={e=>updateSuga(ci,ni,si,"d",e.target.value)} style={{width:"38px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
+                            <td><input value={s.g||""} onChange={e=>updateSuga(ci,ni,si,"g",e.target.value)} style={{width:"42px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
+                            <td style={{textAlign:"center",fontWeight:"bold",color:"#4caf50"}}>{s.bonitate||"—"}</td>
                             <td>
                               <select value={s.kvalitate} onChange={e=>updateSuga(ci,ni,si,"kvalitate",e.target.value)} style={{padding:"2px",fontSize:"11px"}}>
                                 {KVALITATES.map(k=><option key={k}>{k}</option>)}
@@ -532,7 +533,7 @@ tr:nth-child(even){background:#f0f8f0}
 
             <div style={{display:"flex",gap:"8px",marginTop:"8px",alignItems:"center",flexWrap:"wrap"}}>
               <button onClick={()=>addNogabals(ci)} style={{padding:"5px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>+ Pievienot nogabalu</button>
-              <div style={{padding:"8px 12px",background:"#e8f5e9",borderRadius:"4px",fontSize:"12px",fontWeight:"bold"}}>
+              <div style={{padding:"8px 12px",background:"#1b3a1b",border:"1px solid #4caf50",borderRadius:"6px",fontSize:"12px",fontWeight:"bold",color:"#4caf50"}}>
                 Cirsma kopā: {Object.values(ct).reduce((a,b)=>a+b,0).toFixed(1)} m³ | {cv.toFixed(0)} €
               </div>
               <div style={{display:"flex",alignItems:"center",gap:"6px"}}>
@@ -572,12 +573,13 @@ tr:nth-child(even){background:#f0f8f0}
         )
       })}
 
-      <div style={{display:"flex",gap:"10px",marginBottom:"20px"}}>
-        <button onClick={addCirsma} style={{padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>+ Pievienot cirsmu</button>
+    <div style={{display:"flex",gap:"10px",marginBottom:"20px"}}>
+        <button onClick={addCirsma} style={{padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold"}}>+ Pievienot cirsmu</button>
       {user
-          ? <button onClick={exportPDF} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"14px"}}>🖨 Drukāt / Saglabāt PDF</button>
-          : <button onClick={()=>onReg?.()} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"14px"}}>🔒 Reģistrējies lai drukātu PDF</button>
+          ? <button onClick={exportPDF} style={{padding:"8px 20px",background:"#225522",color:"white",border:"1px solid #4caf50",borderRadius:"6px",cursor:"pointer",fontSize:"14px",fontWeight:"bold"}}>🖨 Drukāt / Saglabāt PDF</button>
+          : <button onClick={()=>onReg?.()} style={{padding:"8px 20px",background:"#555",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"14px"}}>🔒 Reģistrējies lai drukātu PDF</button>
         }
+      </div>
       </div>
     </div>
   )
