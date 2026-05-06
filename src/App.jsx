@@ -921,64 +921,51 @@ win.document.close()
 win.print()
 }
 return(
-<div style={{padding:"40px",fontFamily:"Arial",maxWidth:"900px"}}>
-<div style={{display:"flex",gap:"8px",marginBottom:"16px",alignItems:"center",flexWrap:"wrap",justifyContent:"space-between"}}>
+<div style={{minHeight:"100vh",background:"#080f08",color:"#e8f5e9",fontFamily:"Arial,sans-serif"}}>
+<div style={{background:"#1b3a1b",borderBottom:"2px solid #4caf50",padding:"12px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:"8px"}}>
   <div style={{display:"flex",gap:"8px",alignItems:"center",flexWrap:"wrap"}}>
-    <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
-    <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🗑 Dzēst visu</button>
-   <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🗺 LVM GEO</a>
-<a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#5d4037",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🏛 VMD</a>
-    {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📋 Kopēt kadastru</button>}
+    <button onClick={onBack} style={{padding:"6px 14px",background:"transparent",border:"none",color:"#4caf50",fontSize:"16px",cursor:"pointer"}}>← Atpakaļ</button>
+    <button onClick={notirit} style={{padding:"6px 14px",background:"#c62828",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>🗑 Dzēst visu</button>
+    <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#2e7d32",color:"white",borderRadius:"6px",textDecoration:"none",fontSize:"12px"}}>🗺 LVM GEO</a>
+    <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#5d4037",color:"white",borderRadius:"6px",textDecoration:"none",fontSize:"12px"}}>🏛 VMD</a>
+    {kadastrs && <button onClick={()=>navigator.clipboard.writeText(kadastrs)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>📋 Kopēt kadastru</button>}
   </div>
-<button onClick={()=>setShowCaurmers(v=>!v)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>📏 Caurmēra mērījumi</button>
-<button onClick={()=>setShowDastojums(v=>!v)} style={{padding:"6px 14px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🌲 Dastojums</button>
+  <div style={{display:"flex",gap:"8px"}}>
+    <button onClick={()=>setShowCaurmers(v=>!v)} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>📏 Caurmēra mērījumi</button>
+    <button onClick={()=>setShowDastojums(v=>!v)} style={{padding:"6px 14px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"12px"}}>🌲 Dastojums</button>
+  </div>
 </div>
-<h1>Cirsmas skice</h1>
 
-<div style={{display:"flex",gap:"16px",marginBottom:"16px",flexWrap:"wrap"}}>
+<div style={{padding:"24px",maxWidth:"960px",margin:"0 auto"}}>
+<h1 style={{color:"#4caf50",fontSize:"22px",fontWeight:800,marginBottom:"20px",letterSpacing:"-0.02em"}}>📐 Cirsmas skice</h1>
+
+<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px",padding:"16px",background:"#141f14",borderRadius:"10px",border:"1px solid #2d5a2d"}}>
 <div>
-<label style={{fontWeight:"bold"}}>Augšupielādēt KML failu:</label><br/>
-<input type="file" accept=".kml" onChange={handleKML} style={{marginTop:"4px"}}/>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Augšupielādēt KML failu:</label>
+<input type="file" accept=".kml" onChange={handleKML} style={{color:"#e8f5e9",fontSize:"12px"}}/>
 </div>
 <div>
-<label style={{fontWeight:"bold"}}>Augšupielādēt SHP failu (.zip):</label><br/>
-<input type="file" accept=".zip" onChange={handleSHP} style={{marginTop:"4px"}}/>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Augšupielādēt SHP failu (.zip):</label>
+<input type="file" accept=".zip" onChange={handleSHP} style={{color:"#e8f5e9",fontSize:"12px"}}/>
 </div>
 </div>
 
 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"}}>
 <div>
-<label style={{fontSize:"12px",fontWeight:"bold"}}>Kadastra numurs:</label><br/>
-<input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat({kadastrs:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Kadastra numurs:</label>
+<input value={kadastrs} onChange={e=>{setKadastrs(e.target.value);saglabat({kadastrs:e.target.value})}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px",boxSizing:"border-box"}}/>
 </div>
 <div>
-<label style={{fontSize:"12px",fontWeight:"bold"}}>Saimniecības nosaukums:</label><br/>
-<input value={saimnieciba} onChange={e=>{setSaimnieciba(e.target.value);saglabat({saimnieciba:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Saimniecības nosaukums:</label>
+<input value={saimnieciba} onChange={e=>{setSaimnieciba(e.target.value);saglabat({saimnieciba:e.target.value})}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px",boxSizing:"border-box"}}/>
 </div>
 <div>
-<label style={{fontSize:"12px",fontWeight:"bold"}}>Nogabala numurs:</label><br/>
-<input 
-  value={nogabals} 
-  onChange={e=>{
-    let val = e.target.value.replace(/,/g, ";")
-    setNogabals(val)
-    saglabat({nogabals:val})
-  }}
-  onKeyDown={e=>{
-    if(e.key===" "){
-      e.preventDefault()
-      const val = nogabals.trimEnd() + ";"
-      setNogabals(val)
-      saglabat({nogabals:val})
-    }
-  }}
-  style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}
-  placeholder="p.ē. 3;5.1;7"
-/>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Nogabala numurs:</label>
+<input value={nogabals} onChange={e=>{let val=e.target.value.replace(/,/g,";");setNogabals(val);saglabat({nogabals:val})}} onKeyDown={e=>{if(e.key===" "){e.preventDefault();const val=nogabals.trimEnd()+";";setNogabals(val);saglabat({nogabals:val})}}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px",boxSizing:"border-box"}} placeholder="p.ē. 3;5.1;7"/>
 </div>
 <div>
-<label style={{fontSize:"12px",fontWeight:"bold"}}>Cirtes veids:</label><br/>
-<select value={cirteVeids} onChange={e=>{setCirteVeids(e.target.value);saglabat({cirteVeids:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Cirtes veids:</label>
+<select value={cirteVeids} onChange={e=>{setCirteVeids(e.target.value);saglabat({cirteVeids:e.target.value})}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px"}}>
 <option value="">— izvēlies —</option>
 <option>Galvenā cirte</option>
 <option>Kopšanas cirte</option>
@@ -987,19 +974,12 @@ return(
 </select>
 </div>
 <div>
-<label style={{fontSize:"12px",fontWeight:"bold"}}>Cirtes izpildes veids:</label><br/>
-<select value={cirteIzpilde} onChange={e=>{setCirteIzpilde(e.target.value);saglabat({cirteIzpilde:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+<label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold",display:"block",marginBottom:"4px"}}>Cirtes izpildes veids:</label>
+<select value={cirteIzpilde} onChange={e=>{setCirteIzpilde(e.target.value);saglabat({cirteIzpilde:e.target.value})}} style={{width:"100%",padding:"8px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"6px",color:"#e8f5e9",fontSize:"13px"}}>
 <option value="">— izvēlies —</option>
-{cirteVeids==="Galvenā cirte" && <>
-  <option>Kailcirte</option>
-  <option>Kailcirte pēc caurmēra</option>
-  <option>Izlases cirte</option>
-</>}
+{cirteVeids==="Galvenā cirte" && <><option>Kailcirte</option><option>Kailcirte pēc caurmēra</option><option>Izlases cirte</option></>}
 {cirteVeids==="Kopšanas cirte" && <option>Kopšanas cirte</option>}
-{cirteVeids==="Sanitārā cirte" && <>
-  <option>Sanitārā izlases cirte</option>
-  <option>Sanitārā kailcirte pēc VMD atzinuma</option>
-</>}
+{cirteVeids==="Sanitārā cirte" && <><option>Sanitārā izlases cirte</option><option>Sanitārā kailcirte pēc VMD atzinuma</option></>}
 {cirteVeids==="Jaunaudžu kopšana" && <option>Jaunaudžu kopšana</option>}
 </select>
 </div>
@@ -1007,42 +987,43 @@ return(
 
 {kmlCoords.length>0 && (
 <div>
-<div style={{border:"1px solid #225522",borderRadius:"6px",overflow:"hidden",marginBottom:"12px"}}>
+<div style={{border:"2px solid #225522",borderRadius:"10px",overflow:"hidden",marginBottom:"16px"}}>
 <svg width="100%" viewBox={`0 0 ${svgW} ${svgH}`} xmlns="http://www.w3.org/2000/svg">
-<rect width={svgW} height={svgH} fill="#f8f8f0"/>
-<g stroke="#ddd" strokeWidth="0.5">
+<rect width={svgW} height={svgH} fill="#0a1a0a"/>
+<g stroke="#1a3a1a" strokeWidth="0.5">
 {[100,200,300,400,500].map(x=><line key={x} x1={x} y1="0" x2={x} y2={svgH}/>)}
 {[100,200,300,400].map(y=><line key={y} x1="0" y1={y} x2={svgW} y2={y}/>)}
 </g>
-<polygon points={polyPoints} fill="rgba(34,85,34,0.15)" stroke="#225522" strokeWidth="2.5"/>
+<polygon points={polyPoints} fill="rgba(76,175,80,0.15)" stroke="#4caf50" strokeWidth="2.5"/>
 {points.slice(0,-1).map((p,i)=>(
 <g key={i}>
-<circle cx={p.x} cy={p.y} r="5" fill="#225522"/>
-<text x={p.x+8} y={p.y+4} fontSize="12" fill="#225522" fontWeight="bold">{i+1}</text>
+<circle cx={p.x} cy={p.y} r="5" fill="#4caf50"/>
+<text x={p.x+8} y={p.y+4} fontSize="12" fill="#81c784" fontWeight="bold">{i+1}</text>
 </g>
 ))}
 {platiba>0 && (
-<text x={svgW/2} y={svgH/2} fontSize="14" fill="#225522" fontWeight="bold" textAnchor="middle">{platiba.toFixed(2)} ha</text>
+<text x={svgW/2} y={svgH/2} fontSize="16" fill="#4caf50" fontWeight="bold" textAnchor="middle">{platiba.toFixed(2)} ha</text>
 )}
 <g transform="translate(560,40)">
-<line x1="0" y1="25" x2="0" y2="-25" stroke="black" strokeWidth="2"/>
-<polygon points="0,-25 -7,-8 7,-8" fill="black"/>
-<text x="-4" y="38" fontSize="13" fontWeight="bold" fill="black">N</text>
+<line x1="0" y1="25" x2="0" y2="-25" stroke="#4caf50" strokeWidth="2"/>
+<polygon points="0,-25 -7,-8 7,-8" fill="#4caf50"/>
+<text x="-4" y="38" fontSize="13" fontWeight="bold" fill="#4caf50">N</text>
 </g>
 <g transform="translate(20,430)">
-<rect x="0" y="-8" width="50" height="8" fill="black"/>
-<rect x="50" y="-8" width="50" height="8" fill="white" stroke="black" strokeWidth="1"/>
-<text x="0" y="6" fontSize="9">0</text>
-<text x="90" y="6" fontSize="9">100m</text>
+<rect x="0" y="-8" width="50" height="8" fill="#4caf50"/>
+<rect x="50" y="-8" width="50" height="8" fill="#0a1a0a" stroke="#4caf50" strokeWidth="1"/>
+<text x="0" y="6" fontSize="9" fill="#81c784">0</text>
+<text x="90" y="6" fontSize="9" fill="#81c784">100m</text>
 </g>
 </svg>
 </div>
 
-<table border="1" cellPadding="4" style={{fontSize:"11px",marginBottom:"12px"}}>
+<div style={{overflowX:"auto",marginBottom:"16px"}}>
+<table border="1" cellPadding="4" style={{fontSize:"11px",width:"100%",borderCollapse:"collapse"}}>
 <thead><tr style={{background:"#225522",color:"white"}}><th>Punkts</th><th>Garums (WGS84)</th><th>Platums (WGS84)</th></tr></thead>
 <tbody>
 {kmlCoords.slice(0,-1).map((c,i)=>(
-<tr key={i}>
+<tr key={i} style={{background:i%2===0?"#0f1a0f":"#141f14",color:"#e8f5e9"}}>
 <td>{i+1}</td>
 <td>{c.lon.toFixed(6)}</td>
 <td>{c.lat.toFixed(6)}</td>
@@ -1050,58 +1031,31 @@ return(
 ))}
 </tbody>
 </table>
+</div>
 
+<div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
 {user
-  ? <button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt / Saglabāt PDF</button>
-  : <button onClick={()=>{ console.log("onReg:", onReg); onReg?.() }} style={{padding:"8px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+  ? <button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"1px solid #4caf50",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🖨 Drukāt / Saglabāt PDF</button>
+  : <button onClick={()=>{onReg?.()}} style={{padding:"8px 20px",background:"#555",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
 }
-<button onClick={()=>setShowRekins(true)} style={{marginLeft:"10px",padding:"8px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-🧾 Izveidot rēķinu
-</button>
-<button onClick={downloadSHP} style={{marginLeft:"10px",padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-Lejupielādēt SHP (LKS92)
-</button>
+<button onClick={()=>setShowRekins(true)} style={{padding:"8px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🧾 Izveidot rēķinu</button>
+<button onClick={downloadSHP} style={{padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"13px"}}>⬇ Lejupielādēt SHP</button>
+</div>
 </div>
 )}
 
 {kmlCoords.length===0 && (
-<div style={{padding:"40px",textAlign:"center",color:"#888",border:"2px dashed #ccc",borderRadius:"8px"}}>
-Augšupielādē KML failu no LVM GEO lai redzētu skici
+<div style={{padding:"48px",textAlign:"center",color:"#4a7a4a",border:"2px dashed #2d5a2d",borderRadius:"10px",background:"#0f1a0f"}}>
+<div style={{fontSize:"48px",marginBottom:"12px"}}>🗺</div>
+<div style={{fontSize:"16px",fontWeight:"bold",color:"#4caf50",marginBottom:"6px"}}>Augšupielādē KML vai SHP failu</div>
+<div style={{fontSize:"13px"}}>No LVM GEO → eksportē KML → augšupielādē šeit</div>
 </div>
 )}
 
-{showRekins && (
-  <RekinsPanel
-    kadastrs={kadastrs}
-    saimnieciba={saimnieciba}
-    platiba={platiba}
-    onClose={()=>setShowRekins(false)}
-    user={user}
-    onReg={onReg}
-  />
-)}
-
-{showCaurmers && (
-  <CaurmeraPanel
-    kadastrs={kadastrs} 
-    nogabals={nogabals} 
-    saimnieciba={saimnieciba}
-    savedState={caurmersState}
-    onSaveState={(s)=>{setCaurmersState(s);saglabat({caurmersState:s})}}
-    user={user}
-    onReg={onReg}
-  />
-)}
-
-{showDastojums && (
-  <DastojumsPanel
-    kadastrs={kadastrs}
-    saimnieciba={saimnieciba}
-    onClose={()=>setShowDastojums(false)}
-    user={user}
-    onReg={onReg}
-  />
-)}
+{showRekins && <RekinsPanel kadastrs={kadastrs} saimnieciba={saimnieciba} platiba={platiba} onClose={()=>setShowRekins(false)} user={user} onReg={onReg}/>}
+{showCaurmers && <CaurmeraPanel kadastrs={kadastrs} nogabals={nogabals} saimnieciba={saimnieciba} savedState={caurmersState} onSaveState={(s)=>{setCaurmersState(s);saglabat({caurmersState:s})}} user={user} onReg={onReg}/>}
+{showDastojums && <DastojumsPanel kadastrs={kadastrs} saimnieciba={saimnieciba} onClose={()=>setShowDastojums(false)} user={user} onReg={onReg}/>}
+</div>
 </div>
 )
 }
