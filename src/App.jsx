@@ -17,6 +17,7 @@ import DastojumsPDFKalkulators from "./DastojumsPDFKalkulators"
 import GlobalHeader from "./GlobalHeader"
 import ChatPage from "./ChatPage"
 import PavadzimesRegistrs from "./PavadzimesRegistrs"
+import RpAndrasPortals from "./RpAndrasPortals"
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
 import.meta.url
@@ -1705,6 +1706,8 @@ if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
 if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
 if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")}/>
+if(page==="rpandras") return <RpAndrasPortals onBack={()=>setPage("main")}/>
+if(page==="rpandras") return <RpAndrasPortals onBack={()=>setPage("main")}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 
 const landPrices={
@@ -2005,6 +2008,13 @@ return(
             <span style={{color:"white",fontSize:"13px",fontWeight:"bold"}}>Pavadzīmju reģistrs</span>
           </div>
           <div style={{color:"#ffaa70",fontSize:"11px"}}>Foto → OCR → automātiska reģistrācija</div>
+        </div>
+        <div onClick={()=>setPage("rpandras")} style={{background:"#1a3a1a",border:"1px solid #4caf50",borderRadius:"6px",padding:"10px 12px",cursor:"pointer",marginTop:"8px"}}>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"3px"}}>
+            <span style={{fontSize:"16px"}}>🌲</span>
+            <span style={{color:"#4caf50",fontSize:"13px",fontWeight:"bold"}}>RP Andras portāls</span>
+          </div>
+          <div style={{color:"#ffaa70",fontSize:"11px"}}>Vadības panelis — algas, rēķini, Excel</div>
         </div>
       </div>
       <div style={{background:"#0f1a0f",border:"1px solid #1a2a1a",borderRadius:"10px",padding:"14px"}}>
