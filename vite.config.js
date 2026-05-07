@@ -3,6 +3,22 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+ server: {
+    host: true,
+    proxy: {
+      '/api/anthropic': {
+        target: 'https://api.anthropic.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/anthropic/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader('x-api-key', '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')
+            proxyReq.setHeader('anthropic-version', '2023-06-01')
+          })
+        }
+      }
+    }
+  },
   plugins: [
     react(),
     VitePWA({

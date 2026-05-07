@@ -188,6 +188,7 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
               {/* Menu punkti */}
               {[
                 { icon: "✉️", label: "Ziņojumi", badge: nelasitas, action: () => { onOpenChat?.(); setMenuOpen(false) } },
+                { icon: "🏠", label: "Sākumlapa", action: () => { onNavigate?.("landing"); setMenuOpen(false) } },
                 { icon: "🧾", label: "Mani rēķini", action: () => { onNavigate?.("rekini"); setMenuOpen(false) } },
                 { icon: "📢", label: "Mani sludinājumi", action: () => { onNavigate?.("sludinajumi"); setMenuOpen(false) } },
                 { icon: "🔑", label: "Mainīt paroli", action: () => { onNavigate?.("parole"); setMenuOpen(false) } },

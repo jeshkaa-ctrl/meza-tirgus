@@ -237,19 +237,20 @@ ${Object.keys(SORT_NAMES).filter(k=>(dati[k]||0)>0.01).map(k=>`<tr><td>${SORT_NA
     win.print()
   }
 
-  return (
-    <div style={{padding:"32px",fontFamily:"Arial",maxWidth:"900px"}}>
-      <div style={{display:"flex",gap:"8px",marginBottom:"20px",alignItems:"center",flexWrap:"wrap"}}>
-        <button onClick={onBack} style={{padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>← Atpakaļ</button>
-        <h1 style={{margin:0,color:"#225522",fontSize:"18px"}}>📄 Dastojuma kalkulators</h1>
+ return (
+    <div style={{minHeight:"100vh",background:"#080f08",color:"#e8f5e9",fontFamily:"Arial,sans-serif"}}>
+      <div style={{background:"#1b3a1b",borderBottom:"2px solid #4caf50",padding:"12px 20px",display:"flex",alignItems:"center",gap:"16px"}}>
+        <button onClick={onBack} style={{background:"transparent",border:"none",color:"#4caf50",fontSize:"16px",cursor:"pointer"}}>← Atpakaļ</button>
+        <h1 style={{margin:0,color:"#4caf50",fontSize:"18px",fontWeight:800}}>📄 Dastojuma kalkulators</h1>
       </div>
 
-      <div style={{padding:"16px",background:"#f0f8f0",border:"1px solid #225522",borderRadius:"8px",marginBottom:"16px"}}>
-        <b style={{color:"#225522"}}>1. Augšupielādē Mežvērtes dastojuma PDF</b>
+      <div style={{padding:"24px",maxWidth:"900px",margin:"0 auto"}}>
+      <div style={{padding:"16px",background:"#141f14",border:"1px solid #2d5a2d",borderRadius:"10px",marginBottom:"16px"}}>
+        <b style={{color:"#4caf50"}}>1. Augšupielādē Mežvērtes dastojuma PDF</b>
         <div style={{marginTop:"8px",display:"flex",gap:"12px",alignItems:"center",flexWrap:"wrap"}}>
           <input type="file" accept="application/pdf" onChange={e=>{if(e.target.files[0])parseDastojums(e.target.files[0])}}/>
-          {loading && <span style={{color:"#1565c0"}}>⏳ Lasa PDF...</span>}
-          {dati && !loading && <span style={{color:"#225522",fontWeight:"bold"}}>✓ Ielādēts — {dati.nogabali?.length||0} nogabali, krāja: {dati.kopaKraja.toFixed(2)} m³</span>}
+          {loading && <span style={{color:"#81c784"}}>⏳ Lasa PDF...</span>}
+          {dati && !loading && <span style={{color:"#4caf50",fontWeight:"bold"}}>✓ Ielādēts — {dati.nogabali?.length||0} nogabali, krāja: {dati.kopaKraja.toFixed(2)} m³</span>}
         </div>
       </div>
 
@@ -352,6 +353,8 @@ ${Object.keys(SORT_NAMES).filter(k=>(dati[k]||0)>0.01).map(k=>`<tr><td>${SORT_NA
           )}
         </>
       )}
+      
+    </div>
     </div>
   )
 }

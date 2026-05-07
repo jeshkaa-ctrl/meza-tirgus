@@ -469,9 +469,9 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
 }
 
 return(
-<div style={{marginTop:"24px",padding:"20px",border:"2px solid #e65100",borderRadius:"8px",background:"white"}}>
+<div style={{marginTop:"24px",padding:"20px",border:"2px solid #4caf50",borderRadius:"8px",background:"#f0f8f0"}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
-    <h2 style={{color:"#e65100",margin:0}}>🧾 Rēķina sagatave</h2>
+    <h2 style={{color:"#225522",margin:0}}>🧾 Rēķina sagatave</h2>
     <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>
   </div>
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"16px",marginBottom:"16px"}}>
@@ -488,8 +488,8 @@ return(
         <input value={izrakstija} onChange={e=>{setIzrakstija(e.target.value);saveSniedzejs({izrakstija:e.target.value})}} style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px"}}/>
       </div>
     </div>
-    <div style={{padding:"12px",background:"#fff8e1",borderRadius:"6px",border:"1px solid #f9a825"}}>
-      <b style={{color:"#e65100"}}>Pakalpojumu saņēmējs</b>
+    <div style={{padding:"12px",background:"#e8f5e9",borderRadius:"6px",border:"1px solid #4caf50"}}>
+      <b style={{color:"#225522"}}>Pakalpojumu saņēmējs</b>
       <div style={{marginTop:"6px",position:"relative"}}>
         <label style={{fontSize:"10px",fontWeight:"bold"}}>Nosaukums:</label><br/>
         <input value={sanemejs.nosaukums||""} onChange={e=>handleNosaukums(e.target.value)} onBlur={()=>setTimeout(()=>setShowPiedav(false),150)} onFocus={()=>sanemejs.nosaukums&&handleNosaukums(sanemejs.nosaukums)} placeholder="Raksti klienta nosaukumu..." style={{width:"100%",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"11px",boxSizing:"border-box"}}/>
@@ -571,7 +571,7 @@ return(
     <b>Summa vārdiem:</b> {skaitliVardos(kopa_apmaksai)}
   </div>
   {user
-    ? <button onClick={exportRekins} style={{padding:"8px 24px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🖨 Drukāt / Saglabāt PDF</button>
+? <button onClick={exportRekins} style={{padding:"8px 24px",background:"#225522",color:"white",border:"1px solid #4caf50",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🖨 Drukāt / Saglabāt PDF</button>
 : <button onClick={()=>{ console.log("onReg:", onReg); onReg?.() }} style={{padding:"8px 24px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
   }
 </div>
@@ -2383,13 +2383,14 @@ ${r.pvnRezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">R
   )
 
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial", maxWidth: "1000px" }}>
-      <div style={{ display: "flex", gap: "8px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-        <button onClick={onBack} style={{ padding: "6px 14px", background: "#555", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>← Atpakaļ</button>
-        <h2 style={{ margin: 0, color: "#e65100" }}>🧾 Rēķinu krātuve</h2>
-        {user && <span style={{ fontSize: "12px", color: "#555" }}>👤 {user.vards}</span>}
-        <button onClick={() => setShowJaunsRekins(true)} style={{ padding: "8px 20px", background: "#e65100", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}>+ Izveidot rēķinu</button>
+    <div style={{ minHeight:"100vh", background:"#080f08", color:"#e8f5e9", fontFamily: "Arial", padding:"0" }}>
+      <div style={{ background:"#1b3a1b", borderBottom:"2px solid #4caf50", padding:"12px 20px", display:"flex", gap:"8px", alignItems:"center", flexWrap:"wrap" }}>
+        <button onClick={onBack} style={{ padding:"6px 14px", background:"transparent", border:"none", color:"#4caf50", fontSize:"16px", cursor:"pointer" }}>← Atpakaļ</button>
+        <h2 style={{ margin:0, color:"#4caf50" }}>🧾 Rēķinu krātuve</h2>
+        {user && <span style={{ fontSize:"12px", color:"#81c784" }}>👤 {user.vards}</span>}
+        <button onClick={() => setShowJaunsRekins(true)} style={{ padding:"8px 20px", background:"#225522", color:"white", border:"1px solid #4caf50", borderRadius:"6px", cursor:"pointer", fontWeight:"bold" }}>+ Izveidot rēķinu</button>
       </div>
+      <div style={{padding:"24px", maxWidth:"1000px", margin:"0 auto"}}></div>
 
       {showJaunsRekins && (
         <RekinsPanel
