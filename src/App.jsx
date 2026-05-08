@@ -1717,6 +1717,27 @@ formula:"",h:0,koki:0,atjaunosanas:true
 })
 }
 
+// Jaunaudžu kopšanas parsēšana
+const jaunaudzeArr=[]
+const jkRegex = /(\d+) ([\d,.]+) Mežaudze (\w+) ([\wēāīūčšžģķļņ\/\d]+).*?Nepieciešamais jaunaudžu kopšanas gads: (\d{4})/g
+let jkMatch
+while((jkMatch=jkRegex.exec(cleanTxt))!==null){
+  const formula = jkMatch[4]||""
+  const valdSuga = formula.match(/\d+([A-ZĒĀĪŪČŠŽĢĶĻŅa-zēāīūčšžģķļņ]+)/)?.[1]||""
+  // Izlaižam Ba, A, Bl sugām nav obligāta kopšana
+  if(!["Ba","A","Bl"].includes(valdSuga)){
+    jaunaudzeArr.push({
+      nog:jkMatch[1],
+      platiba:Number(jkMatch[2].replace(",","."))||0,
+      tips:jkMatch[3],
+      formula:formula,
+      jkGads:Number(jkMatch[5]),
+      h:0, koki:0, jaunkFormula:""
+    })
+  }
+}
+setJaunaudzes(jaunaudzeArr)
+
 for(let i=0;i<tokens.length-3;i++){
 const num0=parseFloat((tokens[i]||"").replace(",","."))
 const num1=parseFloat((tokens[i+1]||"").replace(",","."))
@@ -1751,8 +1772,7 @@ speciesAges,plantacija:isPlantacija,harvestType:"",izcelsanas
 })
 }
 }
-const jaunaudzeArr=[]
-const jaunaudzeRegex=/(\d+) ([\d,.]+) Mežaudze (\w+).*?jaunaudžu kopšanas gads:\s*(\d{4})/g
+
 let jaMatch
 while((jaMatch=jaunaudzeRegex.exec(cleanTxt))!==null){
 jaunaudzeArr.push({
@@ -2111,7 +2131,38 @@ return <span style={{color:"#225522",fontWeight:"bold"}}>✓ Atjaunots</span>
 </table>
 </div>
 )}
-
+{jaunaudzes.length>0 && (
+<div style={{background:"#e8f5e9",border:"1px solid #4caf50",borderRadius:"6px",padding:"12px",margin:"16px 0"}}>
+<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px",flexWrap:"wrap",gap:"8px"}}>
+<b>🪓 Jaunaudžu kopšana nepieciešama</b>
+<button onClick={()=>{
+  setShowJkParskats(true)
+  setTimeout(()=>jkRef.current?.scrollIntoView({behavior:"smooth"}),100)
+}} style={{padding:"6px 14px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+  🪓 Jaunaudžu kopšanas pārskats
+</button>
+</div>
+<table border="1" cellPadding="6" style={{marginTop:"8px",width:"100%"}}>
+<thead style={{background:"#4caf50",color:"white"}}>
+<tr><th>Nog</th><th>Platība</th><th>Tips</th><th>Formula</th><th>JK gads</th><th>Jaun. sugu sastāvs</th><th>H (m)</th><th>Koki/ha</th></tr>
+</thead>
+<tbody>
+{jaunaudzes.map((jk,i)=>(
+<tr key={i} style={{background:jk.jkGads<=new Date().getFullYear()?"#ffcccc":"#f1f8f1"}}>
+<td>{jk.nog}</td>
+<td>{jk.platiba} ha</td>
+<td>{jk.tips}</td>
+<td>{jk.formula}</td>
+<td><b style={{color:jk.jkGads<=new Date().getFullYear()?"#c62828":"#225522"}}>{jk.jkGads}</b></td>
+<td><input style={{width:"100px"}} value={jk.jaunkFormula||""} placeholder="p.ē. 10P" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],jaunkFormula:e.target.value};setJaunaudzes(n)}}/></td>
+<td><input type="number" style={{width:"45px"}} value={jk.h||""} placeholder="m" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],h:parseFloat(e.target.value)||0};setJaunaudzes(n)}}/></td>
+<td><input type="number" style={{width:"55px"}} value={jk.koki||""} placeholder="gab" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],koki:Number(e.target.value)};setJaunaudzes(n)}}/></td>
+</tr>
+))}
+</tbody>
+</table>
+</div>
+)}
 <div style={{maxHeight:"500px",overflow:"auto"}}>
 <table border="1" cellPadding="6">
 <thead style={{position:"sticky",top:0,background:"#1a3a1a"}}>
