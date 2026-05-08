@@ -1,289 +1,391 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { PDFDocument } from "pdf-lib"
-import Tesseract from "tesseract.js"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
 ).toString()
 
-const defaultManuala = () => ({
-  kadastrs: "", kvartals: "", nosaukums: "",
-  log:0, pulp:0, fire:0, veneer:0, tara:0, chips:0
-})
+const API_KEY = import.meta.env.VITE_ANTHROPIC_KEY || ""
 
-export default function PdfSkirotajsPage({onBack, savedState, onSaveState}) {
-  const [normalie, setNormalie] = useState(savedState?.normalie || [])
-  const [problemas, setProblemas] = useState(savedState?.problemas || [])
-  const [manualas, setManualas] = useState(savedState?.manualas || [])
-  const [loading, setLoading] = useState(false)
-  const [progress, setProgress] = useState("")
-  const [pdfBytes, setPdfBytes] = useState(savedState?.pdfBytes || null)
+// Konvertē PDF lapu uz base64 bildi
+async function lapaUzBase64(pdfDoc, lapaNr) {
+  const page = await pdfDoc.getPage(lapaNr)
+  const viewport = page.getViewport({ scale: 2.0 })
+  const canvas = document.createElement("canvas")
+  canvas.width = viewport.width
+  canvas.height = viewport.height
+  const ctx = canvas.getContext("2d")
+  await page.render({ canvasContext: ctx, viewport }).promise
+  return canvas.toDataURL("image/jpeg", 0.85).split(",")[1]
+}
 
-  const lasitLapu = async (page) => {
-    const tc = await page.getTextContent()
-    const txt = tc.items.map(i => i.str).join("")
-    const txtSpace = tc.items.map(i => i.str).join(" ")
-    if(txt.length > 20) return { txt, txtSpace }
-
-    const viewport = page.getViewport({scale: 2.0})
-    const canvas = document.createElement("canvas")
-    canvas.width = viewport.width
-    canvas.height = viewport.height
-    await page.render({canvasContext: canvas.getContext("2d"), viewport}).promise
-    const result = await Tesseract.recognize(canvas, "lav+eng", {
-      logger: m => { if(m.status === "recognizing text") setProgress(`OCR: ${Math.round(m.progress * 100)}%`) }
+// AI analizē vienu lapu
+async function aiAnalizeLapu(base64, lapaNr) {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-5",
+      max_tokens: 500,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
+          {
+            type: "text",
+            text: `Analizē šo Latvijas meža dokumenta lapu. Atgriezies TIKAI ar JSON bez komentāriem:
+{
+  "veids": "novertejums" vai "skice" vai "cits",
+  "kadastrs": "11 ciparu numurs vai null",
+  "nogabals": "nogabala numurs kā teksts, piem '6' vai '10,16' vai null",
+  "kvartals": "kvartāla numurs vai null",
+  "saimnieciba": "īpašuma nosaukums vai null",
+  "apraksts": "īss apraksts latviski"
+}`
+          }
+        ]
+      }]
     })
-    const ocrTxt = result.data.text
-    return { txt: ocrTxt.replace(/\s/g,""), txtSpace: ocrTxt }
+  })
+  const data = await response.json()
+  const txt = data.content?.[0]?.text || "{}"
+  try {
+    const parsed = JSON.parse(txt.replace(/```json|```/g, "").trim())
+    return { ...parsed, lapa: lapaNr }
+  } catch {
+    return { veids: "cits", lapa: lapaNr, apraksts: "Neizdevās analizēt" }
   }
+}
 
-  const iegutNosaukumu = (txtSpace, idx) => {
-    const visiSaim = [...txtSpace.matchAll(/Saimniec[iī]ba\s*[":]?\s*["„]?\s*([^"„\n\r]+?)(?:\s*["""]?\s*(?:Īpašnieks|Novads|Ipasnieks)|\s{2,}|$)/gi)]
-    const saim = visiSaim[idx] || visiSaim[0]
-    if(!saim) return "—"
-    return saim[1].trim().split(/\s+/).slice(0,4).join(" ")
-  }
+// Lejupielādē konkrētas lapas kā PDF
+async function lejupieladetLapas(pdfBytes, lapas, faila_nosaukums) {
+  const originalPdf = await PDFDocument.load(pdfBytes)
+  const jaunsPdf = await PDFDocument.create()
+  const kopetasLapas = await jaunsPdf.copyPages(originalPdf, lapas.map(l => l - 1))
+  kopetasLapas.forEach(l => jaunsPdf.addPage(l))
+  const bytes = await jaunsPdf.save()
+  const blob = new Blob([bytes], { type: "application/pdf" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = faila_nosaukums
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
-  const iegutKvartalu = (txtSpace, idx) => {
-    const visi = [...txtSpace.matchAll(/Kvartal[^\s\d:]{0,4}\s*:?\s*(\d+)/gi)]
-    const kv = visi[idx] || visi[0]
-    return kv ? kv[1] : "—"
-  }
+export default function PdfSkirotajsPage({ onBack, onOpenDastojums }) {
+  const [stadija, setStadija] = useState("upload") // upload | analize | rezultati
+  const [progress, setProgress] = useState("")
+  const [progressPct, setProgressPct] = useState(0)
+  const [lapuAnalizes, setLapuAnalizes] = useState([])
+  const [pdfBytes, setPdfBytes] = useState(null)
+  const [kopejaisLapuSkaits, setKopejaisLapuSkaits] = useState(0)
+  const [skirosanaVeriba, setSkirosanaVeriba] = useState("nogabals") // nogabals | veids | lapas
+  const [grupas, setGrupas] = useState([])
+  const [skirotasGrupas, setSkirotasGrupas] = useState(false)
 
-  const handlePDF = async (event) => {
-    const file = event.target.files[0]
-    if(!file) return
-    setLoading(true)
-    setNormalie([])
-    setProblemas([])
-    setManualas([])
-    setProgress("")
+  const handlePDF = useCallback(async (file) => {
+    if (!file) return
+    setStadija("analize")
+    setProgress("Ielādē PDF...")
+    setProgressPct(0)
+    setLapuAnalizes([])
 
     const arrayBuffer = await file.arrayBuffer()
-    const uint8 = new Uint8Array(arrayBuffer.slice(0))
-    const uint8PdfLib = new Uint8Array(arrayBuffer.slice(0))
-    setPdfBytes(uint8PdfLib)
+    const pdfBytesArr = new Uint8Array(arrayBuffer.slice(0))
+    setPdfBytes(arrayBuffer)
 
-    const pdf = await pdfjsLib.getDocument(uint8).promise
-    const normalieMap = {}
-    const problemasArr = []
+    const pdfDoc = await pdfjsLib.getDocument(pdfBytesArr).promise
+    const kopejais = pdfDoc.numPages
+    setKopejaisLapuSkaits(kopejais)
 
-    for(let p = 1; p <= pdf.numPages; p++) {
-      setProgress(`Apstrādā lapu ${p} no ${pdf.numPages}...`)
-      const page = await pdf.getPage(p)
-      const { txt, txtSpace } = await lasitLapu(page)
-
-      const visiKadastri = [...txtSpace.matchAll(/Kadastrs\s*:?\s*(\d{11})/gi)]
-
-      if(visiKadastri.length === 0) {
-        continue
-      } else if(visiKadastri.length === 1) {
-        const kad = visiKadastri[0][1]
-        const nosaukums = iegutNosaukumu(txtSpace, 0)
-        const kvartals = iegutKvartalu(txtSpace, 0)
-
-        if(!normalieMap[kad]) {
-          normalieMap[kad] = {kadastrs: kad, kvartals, nosaukums, lapas: []}
-        }
-        if(!normalieMap[kad].lapas.includes(p)) {
-          normalieMap[kad].lapas.push(p)
-        }
-      } else {
-        problemasArr.push({
-          lapa: p,
-          kadastri: visiKadastri.map(m => m[1]),
-          nosaukums: iegutNosaukumu(txtSpace, 0)
-        })
+    const analizes = []
+    for (let i = 1; i <= kopejais; i++) {
+      setProgress(`AI analizē lapu ${i} no ${kopejais}...`)
+      setProgressPct(Math.round((i - 1) / kopejais * 100))
+      try {
+        const base64 = await lapaUzBase64(pdfDoc, i)
+        const analize = await aiAnalizeLapu(base64, i)
+        analizes.push(analize)
+        setLapuAnalizes([...analizes])
+      } catch (e) {
+        analizes.push({ veids: "cits", lapa: i, apraksts: "Kļūda: " + e.message })
+        setLapuAnalizes([...analizes])
       }
     }
 
-    const norm = Object.values(normalieMap)
-    setNormalie(norm)
-    setProblemas(problemasArr)
-    setLoading(false)
-    setProgress("")
-    onSaveState?.({normalie: norm, problemas: problemasArr, manualas: [], pdfBytes: uint8PdfLib})
-  }
+    setProgressPct(100)
+    setProgress("Analīze pabeigta!")
+    setStadija("rezultati")
+    skirot(analizes, skirosanaVeriba)
+  }, [skirosanaVeriba])
 
-  const lejupieladet = async (ipasums) => {
-    try {
-      const originalPdf = await PDFDocument.load(pdfBytes)
-      const jaunsPdf = await PDFDocument.create()
-      const lapas = await jaunsPdf.copyPages(originalPdf, ipasums.lapas.map(l => l-1))
-      lapas.forEach(lapa => jaunsPdf.addPage(lapa))
-      const bytes = await jaunsPdf.save()
-      const blob = new Blob([bytes], {type: "application/pdf"})
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `${ipasums.kadastrs}_kv${ipasums.kvartals}_${ipasums.nosaukums}.pdf`
-      a.click()
-      URL.revokeObjectURL(url)
-    } catch(err) {
-      alert("Kļūda lejupielādējot: " + err.message)
+  const skirot = (analizes, veribaPec) => {
+    let jaunasGrupas = []
+
+    if (veribaPec === "nogabals") {
+      const grupasMap = {}
+      analizes.forEach(a => {
+        const atslega = a.nogabals || `lapa_${a.lapa}`
+        if (!grupasMap[atslega]) {
+          grupasMap[atslega] = {
+            nosaukums: a.nogabals ? `Nogabals ${a.nogabals}` : `Lapa ${a.lapa}`,
+            lapas: [],
+            kadastrs: a.kadastrs,
+            saimnieciba: a.saimnieciba,
+            irNovertejums: false
+          }
+        }
+        grupasMap[atslega].lapas.push(a.lapa)
+        if (a.veids === "novertejums") grupasMap[atslega].irNovertejums = true
+      })
+      jaunasGrupas = Object.values(grupasMap).sort((a, b) => a.lapas[0] - b.lapas[0])
+
+    } else if (veribaPec === "veids") {
+      const novertejumi = analizes.filter(a => a.veids === "novertejums")
+      const skices = analizes.filter(a => a.veids === "skice")
+      const citi = analizes.filter(a => a.veids === "cits")
+      if (novertejumi.length) jaunasGrupas.push({ nosaukums: "Cirsmu novērtējumi", lapas: novertejumi.map(a => a.lapa), irNovertejums: true })
+      if (skices.length) jaunasGrupas.push({ nosaukums: "Cirsmu skices", lapas: skices.map(a => a.lapa), irNovertejums: false })
+      if (citi.length) jaunasGrupas.push({ nosaukums: "Citi dokumenti", lapas: citi.map(a => a.lapa), irNovertejums: false })
+
+    } else if (veribaPec === "lapas") {
+      jaunasGrupas = analizes.map(a => ({
+        nosaukums: a.veids === "novertejums" ? `Novērtējums — nog. ${a.nogabals || a.lapa}` :
+                   a.veids === "skice" ? `Skice — nog. ${a.nogabals || a.lapa}` : `Lapa ${a.lapa}`,
+        lapas: [a.lapa],
+        kadastrs: a.kadastrs,
+        saimnieciba: a.saimnieciba,
+        irNovertejums: a.veids === "novertejums"
+      }))
     }
+
+    setGrupas(jaunasGrupas)
+    setSkirotasGrupas(true)
   }
 
-  const lejupieladetVisus = async () => {
-    for(const ip of normalie) {
-      await lejupieladet(ip)
-      await new Promise(r => setTimeout(r, 500))
-    }
+  const mainaSkirosanu = (jaunaVeriba) => {
+    setSkirosanaVeriba(jaunaVeriba)
+    if (lapuAnalizes.length > 0) skirot(lapuAnalizes, jaunaVeriba)
   }
 
-  const pievienotManualu = () => {
-    const jaunas = [...manualas, defaultManuala()]
-    setManualas(jaunas)
-    onSaveState?.({normalie, problemas, manualas: jaunas, pdfBytes})
+  const atvértDastojuma = async (grupa) => {
+    if (!onOpenDastojums) return
+    // Izveido pagaidu PDF no grupas lapām un padod tālāk
+    const originalPdf = await PDFDocument.load(pdfBytes)
+    const jaunsPdf = await PDFDocument.create()
+    const kopetasLapas = await jaunsPdf.copyPages(originalPdf, grupa.lapas.map(l => l - 1))
+    kopetasLapas.forEach(l => jaunsPdf.addPage(l))
+    const bytes = await jaunsPdf.save()
+    const blob = new Blob([bytes], { type: "application/pdf" })
+    const file = new File([blob], `${grupa.nosaukums}.pdf`, { type: "application/pdf" })
+    onOpenDastojums(file)
   }
 
-  const updateManuala = (idx, field, value) => {
-    const n = [...manualas]
-    n[idx] = {...n[idx], [field]: value}
-    setManualas(n)
-    onSaveState?.({normalie, problemas, manualas: n, pdfBytes})
+  const veidaKrasa = (veids) => {
+    if (veids === "novertejums") return "#4caf50"
+    if (veids === "skice") return "#81c784"
+    return "#4a7a4a"
   }
 
-  const dzestManualu = (idx) => {
-    const n = manualas.filter((_,i) => i !== idx)
-    setManualas(n)
-    onSaveState?.({normalie, problemas, manualas: n, pdfBytes})
-  }
-
-  const sortimentNames = {
-    log:"Zāģbaļķi", pulp:"Papīrmalka", fire:"Malka",
-    veneer:"Finieris", tara:"Tara", chips:"Šķelda"
+  const veidaEtiķete = (veids) => {
+    if (veids === "novertejums") return "📋 Novērtējums"
+    if (veids === "skice") return "🗺 Skice"
+    return "📄 Cits"
   }
 
   return (
-    <div style={{padding:"40px",fontFamily:"Arial",maxWidth:"960px"}}>
-      <button onClick={onBack} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button>
-      <h1 style={{color:"#225522"}}>🌲 PDF šķirotājs</h1>
-      <p style={{color:"#555"}}>Augšupielādē PDF ar vairāku īpašumu cirsmu novērtējumiem — sistēma automātiski sadala pa kadastra numuriem.</p>
+    <div style={{ minHeight: "100vh", background: "#080f08", color: "#e8f5e9", fontFamily: "Arial, sans-serif" }}>
 
-      <input type="file" accept="application/pdf" onChange={handlePDF} style={{marginBottom:"20px"}}/>
+      {/* HEADER */}
+      <div style={{ background: "#1b3a1b", borderBottom: "2px solid #4caf50", padding: "12px 20px", display: "flex", alignItems: "center", gap: "16px" }}>
+        <button onClick={onBack} style={{ background: "transparent", border: "none", color: "#4caf50", fontSize: "16px", cursor: "pointer" }}>← Atpakaļ</button>
+        <h1 style={{ margin: 0, color: "#4caf50", fontSize: "18px", fontWeight: 800 }}>✂️ PDF šķirotājs</h1>
+        {stadija === "rezultati" && (
+          <span style={{ fontSize: "12px", color: "#81c784", marginLeft: "8px" }}>
+            {kopejaisLapuSkaits} lapas · {grupas.length} grupas
+          </span>
+        )}
+      </div>
 
-      {loading && (
-        <div style={{padding:"12px",background:"#e3f2fd",borderRadius:"6px",marginBottom:"16px"}}>
-          <p style={{color:"#1565c0",margin:0}}>⏳ {progress || "Ielādē PDF..."}</p>
-        </div>
-      )}
+      <div style={{ padding: "24px", maxWidth: "960px", margin: "0 auto" }}>
 
-      {normalie.length > 0 && (
-        <div style={{marginBottom:"24px"}}>
-          <h2 style={{color:"#225522"}}>✅ Automātiski sadalīti — {normalie.length} kadastri</h2>
-          <table border="1" cellPadding="8" style={{width:"100%",borderCollapse:"collapse",marginBottom:"12px"}}>
-            <thead style={{background:"#225522",color:"white"}}>
-              <tr>
-                <th>Kadastrs</th>
-                <th>Kvartāls</th>
-                <th>Nosaukums</th>
-                <th>Lapas</th>
-                <th>Skaits</th>
-                <th>Lejupielādēt</th>
-              </tr>
-            </thead>
-            <tbody>
-              {normalie.map((ip, i) => (
-                <tr key={i} style={{background:i%2===0?"white":"#f0f8f0"}}>
-                  <td><b>{ip.kadastrs}</b></td>
-                  <td style={{textAlign:"center"}}>{ip.kvartals}</td>
-                  <td>{ip.nosaukums}</td>
-                  <td style={{fontSize:"11px",color:"#555"}}>{ip.lapas.join(", ")}</td>
-                  <td style={{textAlign:"center"}}>{ip.lapas.length}</td>
-                  <td>
-                    <button onClick={()=>lejupieladet(ip)} style={{padding:"4px 12px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-                      ⬇ PDF
-                    </button>
-                  </td>
-                </tr>
+        {/* UPLOAD */}
+        {stadija === "upload" && (
+          <div>
+            <p style={{ color: "#81c784", marginBottom: "24px", fontSize: "14px" }}>
+              Augšupielādē PDF — AI automātiski analizē katru lapu un piedāvā sadalīšanas iespējas. Strādā ar skenētiem, bildētiem un jebkāda formāta dokumentiem.
+            </p>
+
+            <div
+              onClick={() => document.getElementById("pdf-upload").click()}
+              style={{ border: "2px dashed #2d5a2d", borderRadius: "16px", padding: "64px 24px", textAlign: "center", cursor: "pointer", background: "#0f1a0f", transition: "all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "#4caf50"; e.currentTarget.style.background = "#141f14" }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "#2d5a2d"; e.currentTarget.style.background = "#0f1a0f" }}
+            >
+              <div style={{ fontSize: "56px", marginBottom: "16px" }}>📄</div>
+              <div style={{ fontSize: "18px", fontWeight: 700, color: "#4caf50", marginBottom: "8px" }}>Augšupielādē PDF</div>
+              <div style={{ fontSize: "13px", color: "#4a7a4a" }}>Uzspied vai ievelc failu šeit</div>
+              <input id="pdf-upload" type="file" accept="application/pdf"
+                onChange={e => { if (e.target.files[0]) handlePDF(e.target.files[0]) }}
+                style={{ display: "none" }} />
+            </div>
+
+            <div style={{ marginTop: "24px", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px" }}>
+              {[
+                { icon: "🌲", title: "Nogabali", text: "Sadala pēc nogabalu numuriem" },
+                { icon: "📋", title: "Novērtējumi/Skices", text: "Atdala novērtējumus no skicēm" },
+                { icon: "📄", title: "Pa lapām", text: "Katra lapa = atsevišķs fails" }
+              ].map((f, i) => (
+                <div key={i} style={{ padding: "16px", background: "#141f14", border: "1px solid #2d5a2d", borderRadius: "10px", textAlign: "center" }}>
+                  <div style={{ fontSize: "28px", marginBottom: "8px" }}>{f.icon}</div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#4caf50", marginBottom: "4px" }}>{f.title}</div>
+                  <div style={{ fontSize: "11px", color: "#4a7a4a" }}>{f.text}</div>
+                </div>
               ))}
-            </tbody>
-          </table>
-          <button onClick={lejupieladetVisus} style={{padding:"8px 20px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-            ⬇ Lejupielādēt visus ({normalie.length})
-          </button>
-          <button onClick={()=>{
-            setNormalie([]); setProblemas([]); setManualas([]); setPdfBytes(null)
-            onSaveState?.(null)
-          }} style={{marginLeft:"10px",padding:"8px 20px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-            🗑 Dzēst visu
-          </button>
-        </div>
-      )}
+            </div>
+          </div>
+        )}
 
-      {problemas.length > 0 && (
-        <div style={{marginBottom:"24px",padding:"16px",background:"#fff8e1",border:"1px solid #f9a825",borderRadius:"8px"}}>
-          <h2 style={{color:"#e65100",margin:"0 0 12px"}}>⚠️ Problēmlapas — {problemas.length} lapas ar vairākiem kadastriem</h2>
-          <p style={{fontSize:"12px",color:"#555",margin:"0 0 12px"}}>Šīs lapas satur vairākas cirsmas — aizpildi manuāli zemāk.</p>
-          <table border="1" cellPadding="6" style={{width:"100%",borderCollapse:"collapse"}}>
-            <thead style={{background:"#f9a825"}}>
-              <tr>
-                <th>Lapa</th>
-                <th>Atrasti kadastri</th>
-                <th>Nosaukums</th>
-              </tr>
-            </thead>
-            <tbody>
-              {problemas.map((p, i) => (
-                <tr key={i} style={{background:"white"}}>
-                  <td style={{textAlign:"center"}}>{p.lapa}</td>
-                  <td style={{fontSize:"11px"}}>{p.kadastri.join(", ")}</td>
-                  <td>{p.nosaukums}</td>
-                </tr>
+        {/* ANALĪZES PROGRESS */}
+        {stadija === "analize" && (
+          <div style={{ textAlign: "center", padding: "48px 0" }}>
+            <div style={{ fontSize: "48px", marginBottom: "24px", animation: "spin 2s linear infinite" }}>🔍</div>
+            <div style={{ fontSize: "16px", color: "#4caf50", fontWeight: 700, marginBottom: "12px" }}>{progress}</div>
+            <div style={{ background: "#141f14", borderRadius: "8px", height: "8px", overflow: "hidden", maxWidth: "400px", margin: "0 auto 24px" }}>
+              <div style={{ background: "#4caf50", height: "100%", width: `${progressPct}%`, transition: "width 0.3s", borderRadius: "8px" }} />
+            </div>
+
+            {lapuAnalizes.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", maxWidth: "600px", margin: "0 auto" }}>
+                {lapuAnalizes.map((a, i) => (
+                  <div key={i} style={{ padding: "6px 12px", background: "#141f14", border: `1px solid ${veidaKrasa(a.veids)}`, borderRadius: "6px", fontSize: "11px", color: veidaKrasa(a.veids) }}>
+                    {veidaEtiķete(a.veids)} · Lapa {a.lapa}
+                    {a.nogabals && <span style={{ color: "#81c784" }}> · Nog. {a.nogabals}</span>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* REZULTĀTI */}
+        {stadija === "rezultati" && (
+          <div>
+            {/* Analīzes kopsavilkums */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px", marginBottom: "20px" }}>
+              {[
+                { label: "Kopā lapas", value: kopejaisLapuSkaits, color: "#4caf50" },
+                { label: "Novērtējumi", value: lapuAnalizes.filter(a => a.veids === "novertejums").length, color: "#81c784" },
+                { label: "Skices", value: lapuAnalizes.filter(a => a.veids === "skice").length, color: "#4a7a4a" }
+              ].map((s, i) => (
+                <div key={i} style={{ background: "#141f14", border: "1px solid #2d5a2d", borderRadius: "10px", padding: "16px", textAlign: "center" }}>
+                  <div style={{ fontSize: "11px", color: "#4a7a4a", marginBottom: "4px" }}>{s.label}</div>
+                  <div style={{ fontSize: "28px", fontWeight: 700, color: s.color }}>{s.value}</div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
 
-      {(problemas.length > 0 || manualas.length > 0) && (
-        <div style={{marginBottom:"24px"}}>
-          <h2 style={{color:"#225522"}}>📝 Manuālā ievade</h2>
-          <p style={{fontSize:"12px",color:"#555"}}>Aizpildi problēmlapu datus manuāli.</p>
+            {/* Šķirošanas izvēle */}
+            <div style={{ background: "#141f14", border: "1px solid #2d5a2d", borderRadius: "10px", padding: "16px", marginBottom: "20px" }}>
+              <div style={{ fontSize: "13px", color: "#4caf50", fontWeight: 700, marginBottom: "12px" }}>✂️ Šķirot pēc:</div>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                {[
+                  { v: "nogabals", label: "🌲 Nogabaliem" },
+                  { v: "veids", label: "📋 Novērtējumi / Skices" },
+                  { v: "lapas", label: "📄 Katrai lapai atsevišķi" }
+                ].map(opt => (
+                  <button key={opt.v} onClick={() => mainaSkirosanu(opt.v)}
+                    style={{ padding: "8px 16px", background: skirosanaVeriba === opt.v ? "#225522" : "#0f1a0f", border: `2px solid ${skirosanaVeriba === opt.v ? "#4caf50" : "#2d5a2d"}`, borderRadius: "8px", color: skirosanaVeriba === opt.v ? "#4caf50" : "#81c784", fontSize: "13px", cursor: "pointer", fontWeight: skirosanaVeriba === opt.v ? 700 : 400 }}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {manualas.map((m, idx) => (
-            <div key={idx} style={{border:"1px solid #ccc",borderRadius:"6px",padding:"12px",marginBottom:"12px",background:"white"}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
-                <b style={{color:"#225522"}}>Manuālā cirsma {idx+1}</b>
-                <button onClick={()=>dzestManualu(idx)} style={{background:"#c62828",color:"white",border:"none",borderRadius:"4px",padding:"3px 10px",cursor:"pointer",fontSize:"11px"}}>Dzēst</button>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"8px",marginBottom:"10px"}}>
-                <div>
-                  <label style={{fontSize:"11px",fontWeight:"bold"}}>Kadastrs:</label><br/>
-                  <input value={m.kadastrs} onChange={e=>updateManuala(idx,"kadastrs",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}} placeholder="70460020132"/>
+            {/* Grupas */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+              {grupas.map((grupa, gi) => (
+                <div key={gi} style={{ background: "#141f14", border: `1px solid ${grupa.irNovertejums ? "#4caf50" : "#2d5a2d"}`, borderRadius: "10px", padding: "16px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                    <div>
+                      <div style={{ fontSize: "14px", fontWeight: 700, color: grupa.irNovertejums ? "#4caf50" : "#81c784" }}>
+                        {grupa.nosaukums}
+                      </div>
+                      <div style={{ fontSize: "11px", color: "#4a7a4a", marginTop: "4px" }}>
+                        Lapas: {grupa.lapas.join(", ")}
+                        {grupa.kadastrs && <span> · Kadastrs: {grupa.kadastrs}</span>}
+                        {grupa.saimnieciba && <span> · {grupa.saimnieciba}</span>}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      {grupa.irNovertejums && onOpenDastojums && (
+                        <button onClick={() => atvértDastojuma(grupa)}
+                          style={{ padding: "8px 16px", background: "#0f2b0f", border: "1px solid #4caf50", borderRadius: "8px", color: "#4caf50", fontSize: "12px", cursor: "pointer", fontWeight: 700 }}>
+                          📊 Dastojuma kalkulators
+                        </button>
+                      )}
+                      <button onClick={() => lejupieladetLapas(pdfBytes, grupa.lapas, `${grupa.nosaukums.replace(/\s+/g,"_")}.pdf`)}
+                        style={{ padding: "8px 16px", background: "#1b3a1b", border: "1px solid #2d5a2d", borderRadius: "8px", color: "#81c784", fontSize: "12px", cursor: "pointer" }}>
+                        ⬇ PDF
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label style={{fontSize:"11px",fontWeight:"bold"}}>Kvartāls:</label><br/>
-                  <input value={m.kvartals} onChange={e=>updateManuala(idx,"kvartals",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}} placeholder="7"/>
-                </div>
-                <div>
-                  <label style={{fontSize:"11px",fontWeight:"bold"}}>Nosaukums:</label><br/>
-                  <input value={m.nosaukums} onChange={e=>updateManuala(idx,"nosaukums",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}} placeholder="Saulgrieži"/>
-                </div>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:"8px"}}>
-                {Object.keys(sortimentNames).map(k => (
-                  <div key={k}>
-                    <label style={{fontSize:"10px",fontWeight:"bold"}}>{sortimentNames[k]} m³:</label><br/>
-                    <input type="number" value={m[k]||""} onChange={e=>updateManuala(idx,k,e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}/>
+              ))}
+            </div>
+
+            {/* Lejupielādēt visus */}
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <button onClick={async () => {
+                for (const grupa of grupas) {
+                  await lejupieladetLapas(pdfBytes, grupa.lapas, `${grupa.nosaukums.replace(/\s+/g,"_")}.pdf`)
+                  await new Promise(r => setTimeout(r, 600))
+                }
+              }} style={{ padding: "10px 20px", background: "#225522", border: "1px solid #4caf50", borderRadius: "8px", color: "#4caf50", fontSize: "13px", cursor: "pointer", fontWeight: 700 }}>
+                ⬇ Lejupielādēt visus ({grupas.length})
+              </button>
+
+              <button onClick={() => {
+                setStadija("upload")
+                setLapuAnalizes([])
+                setGrupas([])
+                setPdfBytes(null)
+              }} style={{ padding: "10px 20px", background: "transparent", border: "1px solid #2d5a2d", borderRadius: "8px", color: "#4a7a4a", fontSize: "13px", cursor: "pointer" }}>
+                🗑 Sākt no jauna
+              </button>
+            </div>
+
+            {/* Lapu kopsavilkums */}
+            <div style={{ marginTop: "24px", background: "#0f1a0f", border: "1px solid #1a3a1a", borderRadius: "10px", padding: "16px" }}>
+              <div style={{ fontSize: "12px", color: "#4a7a4a", fontWeight: 700, marginBottom: "12px" }}>📋 AI analīzes rezultāti pa lapām</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px,1fr))", gap: "8px" }}>
+                {lapuAnalizes.map((a, i) => (
+                  <div key={i} style={{ padding: "10px 12px", background: "#141f14", border: `1px solid ${veidaKrasa(a.veids)}`, borderRadius: "8px", fontSize: "11px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <span style={{ color: veidaKrasa(a.veids), fontWeight: 700 }}>{veidaEtiķete(a.veids)}</span>
+                      <span style={{ color: "#4a7a4a" }}>Lapa {a.lapa}</span>
+                    </div>
+                    {a.nogabals && <div style={{ color: "#81c784" }}>Nogabals: {a.nogabals}</div>}
+                    {a.kvartals && <div style={{ color: "#81c784" }}>Kvartāls: {a.kvartals}</div>}
+                    {a.kadastrs && <div style={{ color: "#4a7a4a" }}>Kadastrs: {a.kadastrs}</div>}
+                    <div style={{ color: "#4a7a4a", marginTop: "4px", fontSize: "10px" }}>{a.apraksts}</div>
                   </div>
                 ))}
               </div>
             </div>
-          ))}
+          </div>
+        )}
+      </div>
 
-          <button onClick={pievienotManualu} style={{padding:"8px 20px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>
-            + Pievienot manuālu cirsmu
-          </button>
-        </div>
-      )}
-
-      {!loading && normalie.length === 0 && problemas.length === 0 && pdfBytes && (
-        <p style={{color:"#c62828"}}>⚠️ Netika atrasts neviens kadastra numurs.</p>
-      )}
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 }

@@ -1612,6 +1612,7 @@ const [extraSorts,setExtraSorts]=useState([])
 
 const [jaunaudzes,setJaunaudzes]=useState([])
 const [skirotajsState,setSkirotajsState]=useState(null)
+const [dastojumsPdfFile,setDastojumsPdfFile]=useState(null)
 const [cirsmaState,setCirsmaState]=useState(null)
 const [skiceState,setSkiceState]=useState(null)
 const [caurmersState,setCaurmersState]=useState(null)
@@ -1640,7 +1641,7 @@ if(page==="standard") return <StandardPage onBack={()=>setPage("landing")} onPil
   }
   setTimeout(()=>setPage("main"),50)
 }}/>
-if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState}/>
+if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState} onOpenDastojums={(file)=>{setDastojumsPdfFile(file); setPage("dastojumsPDF")}}/>
 if(page==="cirsma") return <>
   <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>atvertReg("cirsma")}/>
   {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
@@ -1659,6 +1660,7 @@ if(showChat) return <ChatPage user={user} onBack={()=>setShowChat(false)}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
 if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
+if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
 if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")}/>
 if(page==="rpandras") return <RpAndrasPortals onBack={()=>setPage("main")}/>
 if(page==="rpandras") return <RpAndrasPortals onBack={()=>setPage("main")}/>
@@ -2059,6 +2061,12 @@ return(
   setTimeout(()=>ieaudRef.current?.scrollIntoView({behavior:"smooth"}),100)
 }} style={{padding:"6px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
   🌱 Ieaudzēšanas pārskats
+</button>
+<button onClick={()=>{
+  setShowJkParskats(true)
+  setTimeout(()=>jkRef.current?.scrollIntoView({behavior:"smooth"}),100)
+}} style={{padding:"6px 14px",background:"#2e7d32",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px"}}>
+  🪓 Jaunaudžu kopšanas pārskats
 </button>
 </div>
 </div>
