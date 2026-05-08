@@ -15,28 +15,29 @@ export const papirmalkaKlase = {
 }
 export const qualitySortiments = {
   P: {
-    A1:   {log:0.92, small:0,    veneer:0,    tara:0,    pulp:0.05, fire:0,    chips:0.03},
-    A:    {log:0.78, small:0,    veneer:0,    tara:0,    pulp:0.18, fire:0,    chips:0.04},
-    B:    {log:0.52, small:0,    veneer:0,    tara:0,    pulp:0.42, fire:0,    chips:0.06},
-    C:    {log:0.18, small:0,    veneer:0,    tara:0,    pulp:0.74, fire:0,    chips:0.08},
-    D:    {log:0,    small:0,    veneer:0,    tara:0,    pulp:0.88, fire:0,    chips:0.12},
-    Malka:{log:0,    small:0,    veneer:0,    tara:0,    pulp:0,    fire:0.85, chips:0.15},
+    A1:   {log:0.82, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.05, fire:0,    chips:0.03},
+    A:    {log:0.65, small:0,    veneer:0,    tara:0,    stara:0.13, pulp:0.18, fire:0,    chips:0.04},
+    B:    {log:0.42, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.42, fire:0,    chips:0.06},
+    C:    {log:0.12, small:0,    veneer:0,    tara:0,    stara:0.06, pulp:0.74, fire:0,    chips:0.08},
+    D:    {log:0,    small:0,    veneer:0,    tara:0,    stara:0,    pulp:0.88, fire:0,    chips:0.12},
+    Malka:{log:0,    small:0,    veneer:0,    tara:0,    stara:0,    pulp:0,    fire:0.85, chips:0.15},
   },
   E: {
-    A1:   {log:0.82, small:0,    veneer:0,    tara:0,    pulp:0.14, fire:0,    chips:0.04},
-    A:    {log:0.68, small:0,    veneer:0,    tara:0,    pulp:0.26, fire:0,    chips:0.06},
-    B:    {log:0.44, small:0,    veneer:0,    tara:0,    pulp:0.48, fire:0,    chips:0.08},
-    C:    {log:0.14, small:0,    veneer:0,    tara:0,    pulp:0.76, fire:0,    chips:0.10},
-    D:    {log:0,    small:0,    veneer:0,    tara:0,    pulp:0.82, fire:0,    chips:0.18},
-    Malka:{log:0,    small:0,    veneer:0,    tara:0,    pulp:0,    fire:0.85, chips:0.15},
+    A1:   {log:0.72, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.14, fire:0,    chips:0.04},
+    A:    {log:0.58, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.26, fire:0,    chips:0.06},
+    B:    {log:0.34, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.48, fire:0,    chips:0.08},
+    C:    {log:0.08, small:0,    veneer:0,    tara:0,    stara:0.06, pulp:0.76, fire:0,    chips:0.10},
+    D:    {log:0,    small:0,    veneer:0,    tara:0,    stara:0,    pulp:0.82, fire:0,    chips:0.18},
+    Malka:{log:0,    small:0,    veneer:0,    tara:0,    stara:0,    pulp:0,    fire:0.85, chips:0.15},
   },
+ 
   Lg: {
-    A1:   {log:0.82, small:0,    veneer:0,    tara:0,    pulp:0.14, fire:0,    chips:0.04},
-    A:    {log:0.68, small:0,    veneer:0,    tara:0,    pulp:0.26, fire:0,    chips:0.06},
-    B:    {log:0.44, small:0,    veneer:0,    tara:0,    pulp:0.48, fire:0,    chips:0.08},
-    C:    {log:0.14, small:0,    veneer:0,    tara:0,    pulp:0.76, fire:0,    chips:0.10},
-    D:    {log:0,    small:0,    veneer:0,    tara:0,    pulp:0.82, fire:0,    chips:0.18},
-    Malka:{log:0,    small:0,    veneer:0,    tara:0,    pulp:0,    fire:0.85, chips:0.15},
+    A1:   {log:0.72, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.14, fire:0,    chips:0.04},
+    A:    {log:0.58, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.26, fire:0,    chips:0.06},
+    B:    {log:0.34, small:0,    veneer:0,    tara:0,    stara:0.10, pulp:0.48, fire:0,    chips:0.08},
+    C:    {log:0.08, small:0,    veneer:0,    tara:0,    stara:0.06, pulp:0.76, fire:0,    chips:0.10},
+    D:    {log:0,    small:0,    veneer:0,    tara:0,    stara:0,    pulp:0.82, fire:0,    chips:0.18},
+    Malka:{log:0,    small:0,    veneer:0,    tara:0,    stara:0,    pulp:0,    fire:0.85, chips:0.15},
   },
   B: {
     A1:   {log:0.20, small:0,    veneer:0.45, tara:0.20, pulp:0.12, fire:0,    chips:0.03},
@@ -104,7 +105,7 @@ export const qualitySortiments = {
   },
 }
 
-export function calcSortimentsByQuality(volume, suga, kvalitate, d=0) {
+export function calcSortimentsByQuality(volume, suga, kvalitate, d=0, prices={}) {
   // d < 6cm — tikai šķelda
   if(d > 0 && d < 6) {
     return {chips: volume}
@@ -128,13 +129,34 @@ export function calcSortimentsByQuality(volume, suga, kvalitate, d=0) {
   Object.keys(klase).forEach(k => { result[k] = volume * klase[k] })
 
   // Ja D < 18cm — nav zāģbaļķu un finieru, pārdale uz papīrmalku/šķeldu
-  if(d > 0 && d < 18) {
-    const noLog = (result.log||0) + (result.veneer||0) + (result.tara||0)
+ if(d > 0 && d < 18) {
+    const noLog = (result.log||0) + (result.veneer||0) + (result.tara||0) + (result.stara||0)
     result.log = 0
     result.veneer = 0
-    result.tara = d >= 12 ? noLog * 0.4 : 0
-    result.pulp = (result.pulp||0) + noLog * (d >= 12 ? 0.45 : 0.75)
-    result.chips = (result.chips||0) + noLog * (d >= 12 ? 0.15 : 0.25)
+    result.tara = 0
+    const irSkujkoks = suga === "P" || suga === "E" || suga === "Lg"
+    const staraPrice = prices.stara || 65
+    const pulpPrice = prices.pulp || 50
+    const taraIzdeviga = staraPrice > pulpPrice
+    if(irSkujkoks && d >= 14 && taraIzdeviga) {
+      // Tara izdevīgāka — lielāks tara procents
+      const taraPct = Math.min(0.85, 0.55 + (staraPrice - pulpPrice) / pulpPrice * 0.3)
+      result.stara = noLog * taraPct
+      result.pulp = (result.pulp||0) + noLog * (1 - taraPct - 0.15)
+      result.chips = (result.chips||0) + noLog * 0.15
+    } else if(irSkujkoks && d >= 14) {
+      result.stara = noLog * 0.30
+      result.pulp = (result.pulp||0) + noLog * 0.55
+      result.chips = (result.chips||0) + noLog * 0.15
+    } else if(d >= 12) {
+      result.stara = 0
+      result.pulp = (result.pulp||0) + noLog * 0.85
+      result.chips = (result.chips||0) + noLog * 0.15
+    } else {
+      result.stara = 0
+      result.pulp = (result.pulp||0) + noLog * 0.75
+      result.chips = (result.chips||0) + noLog * 0.25
+    }
   }
 
   return result

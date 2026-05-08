@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -8,9 +8,9 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 
 const SORT_NAMES = {
   log:"Baļķis (Resnā)", small:"Sīkbaļķis (Vidējā+Tievā)", veneer:"Finieris",
-  tara:"Tara", pulp:"Papīrmalka", fire:"Malka", chips:"Atlikumi/Šķelda"
+  tara:"Tara", stara:"Skujkoku tara", pulp:"Papīrmalka", fire:"Malka", chips:"Atlikumi/Šķelda"
 }
-const DEFAULT_PRICES = {log:73, small:55, veneer:130, tara:48, pulp:50, fire:38, chips:12}
+const DEFAULT_PRICES = {log:73, small:55, veneer:130, tara:48, stara:65, pulp:50, fire:38, chips:12}
 
 export function parseMezvertePDF(txt) {
   const result = {
@@ -110,7 +110,7 @@ export function parseMezvertePDF(txt) {
   return result
 }
 
-export default function DastojumsPDFKalkulators({ onBack }) {
+export default function DastojumsPDFKalkulators({ onBack, initialFile }) {
   const [dati, setDati] = useState(null)
   const [saimnieciba, setSaimnieciba] = useState("")
   const [kadastrs, setKadastrs] = useState("")
@@ -118,6 +118,10 @@ export default function DastojumsPDFKalkulators({ onBack }) {
   const [izmaksas, setIzmaksas] = useState({zaglesana:"18", pievesana:"12"})
   const [loading, setLoading] = useState(false)
   const [apreklinats, setApreklinats] = useState(false)
+
+  React.useEffect(()=>{
+    if(initialFile) parseDastojums(initialFile)
+  }, [initialFile])
 
   const parseDastojums = async (file) => {
     setLoading(true)
@@ -185,7 +189,7 @@ export default function DastojumsPDFKalkulators({ onBack }) {
 
   const updateDati = (field, val) => {
     const d = {...dati, [field]: parseFloat(val)||0}
-    d.kopaKraja = ['log','small','tara','pulp','fire','chips','veneer'].reduce((s,k)=>s+(d[k]||0),0)
+    d.kopaKraja = ['log','small','tara','stara','pulp','fire','chips','veneer'].reduce((s,k)=>s+(d[k]||0),0)
     setDati(d)
   }
 
