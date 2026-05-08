@@ -61,7 +61,7 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
   const [saimnieciba, setSaimnieciba] = useState(savedState?.saimnieciba ?? saimniecibaIn)
   const [cirsmas, setCirsmas] = useState(savedState?.cirsmas ?? [defaultCirsma()])
 const [prices, setPrices] = useState({
-    log:93, small:65, veneer:130, tara:48, stara:65, pulp:50, fire:38, chips:12
+    log:93, small:65, veneer:130, tara:48, stara:65, gulsnis:80, pulp:50, fire:38, chips:12
   })
   const [showPrices, setShowPrices] = useState(false)
 
@@ -75,7 +75,7 @@ const [prices, setPrices] = useState({
 
   const sortimentNames = {
     log:"Zāģbaļķi", small:"Sīkbaļķi", veneer:"Finieris",
-    tara:"Tara", stara:"Skujkoku tara", pulp:"Papīrmalka", fire:"Malka", chips:"Šķelda"
+    tara:"Tara", stara:"Skujkoku tara", gulsnis:"Gūlsnis", pulp:"Papīrmalka", fire:"Malka", chips:"Šķelda"
   }
   const updateCirsma = (ci, field, value) => {
     const n = [...cirsmas]; n[ci] = {...n[ci], [field]: value}
@@ -186,7 +186,7 @@ const [prices, setPrices] = useState({
   }
 
   const calcNogabalsTotal = (nog, cirteVeids="") => {
-   const t = {log:0,small:0,veneer:0,tara:0,stara:0,pulp:0,fire:0,chips:0}
+   const t = {log:0,small:0,veneer:0,tara:0,stara:0,gulsnis:0,pulp:0,fire:0,chips:0}
 
     // Aprēķina kopējo G un valdošo sugu
     const kopejaisG = nog.sugas.reduce((s, sg) => s + parseNum(sg.g), 0)
@@ -218,7 +218,7 @@ const [prices, setPrices] = useState({
   }
 
   const calcCirsmaTotal = (cirsma) => {
-    const t = {log:0,small:0,veneer:0,tara:0,stara:0,pulp:0,fire:0,chips:0}
+    const t = {log:0,small:0,veneer:0,tara:0,stara:0,gulsnis:0,pulp:0,fire:0,chips:0}
     cirsma.nogabali.forEach(nog => {
       const nt = calcNogabalsTotal(nog, cirsma.cirteVeids)
       Object.keys(t).forEach(k => { t[k] += nt[k] })
@@ -282,7 +282,7 @@ tr:nth-child(even){background:#f0f8f0}
 <div class="sub">Cirsmas novērtēšanas pārskats</div>
 <p><b>Kadastrs:</b> ${kadastrs} | <b>Saimniecība:</b> ${saimnieciba} | <b>Datums:</b> ${today}</p>`
 
-    let kopaTotals = {log:0,small:0,veneer:0,tara:0,stara:0,pulp:0,fire:0,chips:0}
+    let kopaTotals = {log:0,small:0,veneer:0,tara:0,stara:0,gulsnis:0,pulp:0,fire:0,chips:0}
     let kopaVertiba = 0
 
     cirsmas.forEach((cirsma, ci) => {
@@ -297,9 +297,9 @@ tr:nth-child(even){background:#f0f8f0}
         const nv = calcValue(nt)
         const nVol = Object.values(nt).reduce((a,b)=>a+b,0)
         html += `<h3>Nogabals ${nog.nr||ni+1} — ${nog.platiba} ha | ${nog.augsneTips}</h3>`
-     html += `<table><thead><tr><th>Suga</th><th>Vec</th><th>H</th><th>D</th><th>G</th><th>Bon</th><th>Kval</th><th>Krāja m³</th><th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Skuj.tara</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th></tr></thead><tbody>`
+    html += `<table><thead><tr><th>Suga</th><th>Vec</th><th>H</th><th>D</th><th>G</th><th>Bon</th><th>Kval</th><th>Krāja m³</th><th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Skuj.tara</th><th>Gūlsnis</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th></tr></thead><tbody>`
         nog.sugas.forEach(s => {
-html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"—"}</td><td>${s.g}</td><td>${s.bonitate||"—"}</td><td>${s.kvalitate}</td><td>${s.kraja.toFixed(1)}</td><td>${(s.sortimenti.log||0).toFixed(1)}</td><td>${(s.sortimenti.veneer||0).toFixed(1)}</td><td>${(s.sortimenti.tara||0).toFixed(1)}</td><td>${(s.sortimenti.stara||0).toFixed(1)}</td><td>${(s.sortimenti.pulp||0).toFixed(1)}</td><td>${(s.sortimenti.fire||0).toFixed(1)}</td><td>${(s.sortimenti.chips||0).toFixed(1)}</td></tr>`
+html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"—"}</td><td>${s.g}</td><td>${s.bonitate||"—"}</td><td>${s.kvalitate}</td><td>${s.kraja.toFixed(1)}</td><td>${(s.sortimenti.log||0).toFixed(1)}</td><td>${(s.sortimenti.veneer||0).toFixed(1)}</td><td>${(s.sortimenti.tara||0).toFixed(1)}</td><td>${(s.sortimenti.stara||0).toFixed(1)}</td><td>${(s.sortimenti.gulsnis||0).toFixed(1)}</td><td>${(s.sortimenti.pulp||0).toFixed(1)}</td><td>${(s.sortimenti.fire||0).toFixed(1)}</td><td>${(s.sortimenti.chips||0).toFixed(1)}</td></tr>`
         })
         html += `</tbody></table><p class="kops">Nogabals kopā: ${nVol.toFixed(1)} m³ | ${nv.toFixed(0)} €</p>`
       })
@@ -460,7 +460,7 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
                         <tr>
                           <th>Suga</th><th>Vecums</th><th>H (m)</th><th>D (cm)</th><th>G (m²/ha)</th>
                           <th>Bonitāte</th><th>Kvalitāte</th><th>Krāja m³</th>
-                          <th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Skuj.tara</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th>
+                         <th>Zāģbaļķi</th><th>Finieris</th><th>Tara</th><th>Skuj.tara</th><th>Gūlsnis</th><th>Papīrmalka</th><th>Malka</th><th>Šķelda</th>
                           <th>Vērtība €</th><th></th>
                         </tr>
                       </thead>
@@ -486,7 +486,8 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
                             <td style={{textAlign:"right"}}>{((s.sortimenti.log||0)*iznemPct).toFixed(1)}</td>
                             <td style={{textAlign:"right"}}>{((s.sortimenti.veneer||0)*iznemPct).toFixed(1)}</td>
                            <td style={{textAlign:"right"}}>{((s.sortimenti.tara||0)*iznemPct).toFixed(1)}</td>
-                            <td style={{textAlign:"right"}}>{((s.sortimenti.stara||0)*iznemPct).toFixed(1)}</td>
+                           <td style={{textAlign:"right"}}>{((s.sortimenti.stara||0)*iznemPct).toFixed(1)}</td>
+                            <td style={{textAlign:"right"}}>{((s.sortimenti.gulsnis||0)*iznemPct).toFixed(1)}</td>
                             <td style={{textAlign:"right"}}>{((s.sortimenti.pulp||0)*iznemPct).toFixed(1)}</td>
                             <td style={{textAlign:"right"}}>{((s.sortimenti.fire||0)*iznemPct).toFixed(1)}</td>
                             <td style={{textAlign:"right"}}>{((s.sortimenti.chips||0)*iznemPct).toFixed(1)}</td>

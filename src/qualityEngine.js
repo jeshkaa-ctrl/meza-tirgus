@@ -106,17 +106,9 @@ export const qualitySortiments = {
 }
 
 export function calcSortimentsByQuality(volume, suga, kvalitate, d=0, prices={}) {
-  // d < 6cm — tikai šķelda
-  if(d > 0 && d < 6) {
-    return {chips: volume}
-  }
-  // d < 6cm vai papīrmalkas/malkas kvalitāte ar d < 6 — šķelda
-  if(kvalitate === "Papīrmalka" && d > 0 && d < 6) {
-    return {chips: volume}
-  }
-  if(kvalitate === "Malka" && d > 0 && d < 6) {
-    return {chips: volume}
-  }
+  if(d > 0 && d < 6) return {chips: volume}
+  if(kvalitate === "Papīrmalka" && d > 0 && d < 6) return {chips: volume}
+  if(kvalitate === "Malka" && d > 0 && d < 6) return {chips: volume}
   if(kvalitate === "Papīrmalka") {
     const klase = papirmalkaKlase[suga] || papirmalkaKlase["P"]
     const result = {}
@@ -128,8 +120,7 @@ export function calcSortimentsByQuality(volume, suga, kvalitate, d=0, prices={})
   const result = {}
   Object.keys(klase).forEach(k => { result[k] = volume * klase[k] })
 
-  // Ja D < 18cm — nav zāģbaļķu un finieru, pārdale uz papīrmalku/šķeldu
- if(d > 0 && d < 18) {
+  if(d > 0 && d < 18) {
     const noLog = (result.log||0) + (result.veneer||0) + (result.tara||0) + (result.stara||0)
     result.log = 0
     result.veneer = 0
@@ -139,7 +130,6 @@ export function calcSortimentsByQuality(volume, suga, kvalitate, d=0, prices={})
     const pulpPrice = prices.pulp || 50
     const taraIzdeviga = staraPrice > pulpPrice
     if(irSkujkoks && d >= 14 && taraIzdeviga) {
-      // Tara izdevīgāka — lielāks tara procents
       const taraPct = Math.min(0.85, 0.55 + (staraPrice - pulpPrice) / pulpPrice * 0.3)
       result.stara = noLog * taraPct
       result.pulp = (result.pulp||0) + noLog * (1 - taraPct - 0.15)
@@ -159,5 +149,20 @@ export function calcSortimentsByQuality(volume, suga, kvalitate, d=0, prices={})
     }
   }
 
+  const irMasivs = ["P","E","Lg","B","A","Oz","Os"].includes(suga)
+  if(d >= 35 && irMasivs) {
+    const gulsnisCena = prices.gulsnis || 80
+    const logCena = prices.log || 93
+    const gulsnisAttieciba = gulsnisCena / logCena
+    if(gulsnisAttieciba >= 0.75) {
+      const gulsnisProc = Math.min(0.4, (gulsnisAttieciba - 0.75) * 1.6)
+      const noLog = result.log || 0
+      result.gulsnis = noLog * gulsnisProc
+      result.log = noLog * (1 - gulsnisProc)
+    }
+  }
+
   return result
 }
+
+ 
