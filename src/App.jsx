@@ -1719,21 +1719,27 @@ formula:"",h:0,koki:0,atjaunosanas:true
 
 // Jaunaudžu kopšanas parsēšana
 const jaunaudzeArr=[]
-const jkRegex = /(\d+) ([\d,.]+) Mežaudze (\w+) ([\wēāīūčšžģķļņ\/\d]+).*?Nepieciešamais jaunaudžu kopšanas gads: (\d{4})/g
+const jkRegex = /Nepieciešamais jaunaudžu kopšanas gads: (\d{4})/g
 let jkMatch
 while((jkMatch=jkRegex.exec(cleanTxt))!==null){
-  const formula = jkMatch[4]||""
-  const valdSuga = formula.match(/\d+([A-ZĒĀĪŪČŠŽĢĶĻŅa-zēāīūčšžģķļņ]+)/)?.[1]||""
-  // Izlaižam Ba, A, Bl sugām nav obligāta kopšana
-  if(!["Ba","A","Bl"].includes(valdSuga)){
-    jaunaudzeArr.push({
-      nog:jkMatch[1],
-      platiba:Number(jkMatch[2].replace(",","."))||0,
-      tips:jkMatch[3],
-      formula:formula,
-      jkGads:Number(jkMatch[5]),
-      h:0, koki:0, jaunkFormula:""
-    })
+  const jkGads = Number(jkMatch[1])
+  const pirmsIdx = jkMatch.index
+  const pirmsText = cleanTxt.slice(Math.max(0, pirmsIdx-400), pirmsIdx)
+  const nogabaliPirms = [...pirmsText.matchAll(/(\d+) ([\d,.]+) Mežaudze (\w+) ([\wēāīūčšžģķļņ\/\d]+)/g)]
+  if(nogabaliPirms.length > 0){
+    const pedigeisNog = nogabaliPirms[nogabaliPirms.length-1]
+    const formula = pedigeisNog[4]||""
+    const valdSuga = formula.match(/\d+([A-ZĒĀĪŪČŠŽĢĶĻŅa-zēāīūčšžģķļņ]+)/)?.[1]||""
+    if(!["Ba","A","Bl"].includes(valdSuga)){
+      jaunaudzeArr.push({
+        nog: pedigeisNog[1],
+        platiba: Number(pedigeisNog[2].replace(",","."))||0,
+        tips: pedigeisNog[3],
+        formula: formula,
+        jkGads: jkGads,
+        h:0, koki:0, jaunkFormula:""
+      })
+    }
   }
 }
 setJaunaudzes(jaunaudzeArr)
@@ -2154,9 +2160,9 @@ return <span style={{color:"#225522",fontWeight:"bold"}}>✓ Atjaunots</span>
 <td>{jk.tips}</td>
 <td>{jk.formula}</td>
 <td><b style={{color:jk.jkGads<=new Date().getFullYear()?"#c62828":"#225522"}}>{jk.jkGads}</b></td>
-<td><input style={{width:"100px"}} value={jk.jaunkFormula||""} placeholder="p.ē. 10P" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],jaunkFormula:e.target.value};setJaunaudzes(n)}}/></td>
-<td><input type="number" style={{width:"45px"}} value={jk.h||""} placeholder="m" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],h:parseFloat(e.target.value)||0};setJaunaudzes(n)}}/></td>
-<td><input type="number" style={{width:"55px"}} value={jk.koki||""} placeholder="gab" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],koki:Number(e.target.value)};setJaunaudzes(n)}}/></td>
+<td><input style={{width:"100px",background:"white",color:"#111"}} value={jk.jaunkFormula||""} placeholder="p.ē. 10P" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],jaunkFormula:e.target.value};setJaunaudzes(n)}}/></td>
+<td><input type="number" style={{width:"45px",background:"white",color:"#111"}} value={jk.h||""} placeholder="m" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],h:parseFloat(e.target.value)||0};setJaunaudzes(n)}}/></td>
+<td><input type="number" style={{width:"55px",background:"white",color:"#111"}} value={jk.koki||""} placeholder="gab" onChange={e=>{const n=[...jaunaudzes];n[i]={...n[i],koki:Number(e.target.value)};setJaunaudzes(n)}}/></td>
 </tr>
 ))}
 </tbody>

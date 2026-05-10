@@ -91,28 +91,28 @@ td{border:1px solid black;padding:3px 4px}
 }
 
 return(
-<div style={{marginTop:"24px",padding:"20px",border:"2px solid #388e3c",borderRadius:"8px",background:"white",marginBottom:"24px"}}>
+<div style={{marginTop:"24px",padding:"20px",border:"2px solid #4caf50",borderRadius:"10px",background:"#141f14",color:"#e8f5e9",marginBottom:"24px"}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
-    <h2 style={{color:"#388e3c",margin:0}}>📋 Jaunaudžu kopšanas pārskats</h2>
+  <h2 style={{color:"#4caf50",margin:0}}>📋 Jaunaudžu kopšanas pārskats</h2>
     <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>
   </div>
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"}}>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Virsmežniecība:</label><br/>
-    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Mežniecība:</label><br/>
-    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Vārds, uzvārds:</label><br/>
-    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Personas kods:</label><br/>
-    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Adrese:</label><br/>
-    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Tālrunis:</label><br/>
-    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Administratīvā teritorija:</label><br/>
-    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Pārskata gads:</label><br/>
-    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Virsmežniecība:</label><br/>
+    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Mežniecība:</label><br/>
+    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Vārds, uzvārds:</label><br/>
+    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Personas kods:</label><br/>
+    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Adrese:</label><br/>
+    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Tālrunis:</label><br/>
+    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Administratīvā teritorija:</label><br/>
+    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Pārskata gads:</label><br/>
+    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
   </div>
 
   <div style={{marginBottom:"16px"}}>
@@ -266,28 +266,28 @@ td{border:1px solid black;padding:3px 4px}
 }
 
 return(
-<div style={{marginTop:"24px",padding:"20px",border:"2px solid #1565c0",borderRadius:"8px",background:"white",marginBottom:"24px"}}>
+<div style={{marginTop:"24px",padding:"20px",border:"2px solid #4caf50",borderRadius:"10px",background:"#141f14",color:"#e8f5e9",marginBottom:"24px"}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
     <h2 style={{color:"#1565c0",margin:0}}>🌱 Ieaudzēšanas pārskats</h2>
     <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>
   </div>
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"}}>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Virsmežniecība:</label><br/>
-    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Mežniecība:</label><br/>
-    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Vārds, uzvārds:</label><br/>
-    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Personas kods:</label><br/>
-    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Adrese:</label><br/>
-    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Tālrunis:</label><br/>
-    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Administratīvā teritorija:</label><br/>
-    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Pārskata gads:</label><br/>
-    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Virsmežniecība:</label><br/>
+    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Mežniecība:</label><br/>
+    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Vārds, uzvārds:</label><br/>
+    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Personas kods:</label><br/>
+    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Adrese:</label><br/>
+    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Tālrunis:</label><br/>
+    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Administratīvā teritorija:</label><br/>
+    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Pārskata gads:</label><br/>
+    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
   </div>
 
   <div style={{marginBottom:"16px"}}>
@@ -405,30 +405,30 @@ td{border:1px solid black;padding:3px 4px}
 }
 
 return(
-<div style={{marginTop:"24px",padding:"20px",border:"2px solid #225522",borderRadius:"8px",background:"white",marginBottom:"24px"}}>
+<div style={{marginTop:"24px",padding:"20px",border:"2px solid #4caf50",borderRadius:"10px",background:"#141f14",color:"#e8f5e9",marginBottom:"24px"}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
     <h2 style={{color:"#225522",margin:0}}>📋 Atjaunošanas pārskats</h2>
     <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>
   </div>
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px",marginBottom:"16px"}}>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Virsmežniecība:</label><br/>
-    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Mežniecība:</label><br/>
-    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Vārds, uzvārds:</label><br/>
-    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Personas kods:</label><br/>
-    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Adrese:</label><br/>
-    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Tālrunis:</label><br/>
-    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Administratīvā teritorija:</label><br/>
-    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
-    <div><label style={{fontSize:"11px",fontWeight:"bold"}}>Pārskata gads:</label><br/>
-    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"3px"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Virsmežniecība:</label><br/>
+    <input value={virsmezn} onChange={e=>setVirsmezn(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Mežniecība:</label><br/>
+    <input value={mezn} onChange={e=>setMezn(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Vārds, uzvārds:</label><br/>
+    <input value={vards} onChange={e=>{setVards(e.target.value);saglabatLoc("parskats_vards",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Personas kods:</label><br/>
+    <input value={personas} onChange={e=>{setPersonas(e.target.value);saglabatLoc("parskats_personas",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Adrese:</label><br/>
+    <input value={adrese} onChange={e=>{setAdrese(e.target.value);saglabatLoc("parskats_adrese",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Tālrunis:</label><br/>
+    <input value={talrunis} onChange={e=>{setTalrunis(e.target.value);saglabatLoc("parskats_talrunis",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Administratīvā teritorija:</label><br/>
+    <input value={adminTerit} onChange={e=>{setAdminTerit(e.target.value);saglabatLoc("parskats_adminTerit",e.target.value)}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
+    <div><label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Pārskata gads:</label><br/>
+    <input type="number" value={gads} onChange={e=>setGads(Number(e.target.value))} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9",boxSizing:"border-box"}}/></div>
   </div>
-  <div style={{background:"#f0f8f0",padding:"12px",borderRadius:"6px",marginBottom:"16px",fontSize:"12px"}}>
+  <div style={{background:"#0f2b0f",padding:"12px",borderRadius:"6px",marginBottom:"16px",fontSize:"12px",border:"1px solid #2d5a2d"}}>
     <b>Nogabali pārskatā:</b> {izcirtumi.filter(ic=>ic.formula&&ic.h>0&&ic.koki>0).length} no {izcirtumi.length}
     {izcirtumi.filter(ic=>!ic.formula||!ic.h||!ic.koki).length>0 && (
       <span style={{color:"#c62828",marginLeft:"12px"}}>⚠️ {izcirtumi.filter(ic=>!ic.formula||!ic.h||!ic.koki).length} nogabali bez datiem — netiks iekļauti</span>
