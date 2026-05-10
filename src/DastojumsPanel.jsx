@@ -149,14 +149,14 @@ ${ekoRez.map(r=>`<tr>
   }
 
   return(
-  <div style={{padding:"20px",fontFamily:"Arial",maxWidth:"1100px"}}>
+  <div style={{padding:"20px",fontFamily:"Arial",maxWidth:"1100px",background:"#0f1a0f",color:"#e8f5e9",borderRadius:"10px"}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
-      <h2 style={{color:"#225522",margin:0}}>🌲 Dastojuma aprēķins</h2>
+      <h2 style={{color:"#4caf50",margin:0}}>🌲 Dastojuma aprēķins</h2>
       {onClose && <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>}
     </div>
 
     {stavi.map((stavs,si)=>(
-    <div key={si} style={{border:"2px solid #225522",borderRadius:"8px",padding:"16px",marginBottom:"16px",background:"white"}}>
+    <div key={si} style={{border:"2px solid #2d5a2d",borderRadius:"8px",padding:"16px",marginBottom:"16px",background:"#141f14"}}>
       <div style={{display:"flex",gap:"16px",alignItems:"center",marginBottom:"12px",flexWrap:"wrap"}}>
         <b style={{color:"#225522"}}>{stavs.suga}</b>
         <div>
@@ -190,7 +190,7 @@ ${ekoRez.map(r=>`<tr>
               const h = stavs.hVid>0 ? calcH(row.d, stavs.hVid, stavs.suga) : 0
               const kopa = row.resni+row.videj+row.tiev+row.malka
               return(
-              <tr key={di} style={{background:di%2===0?"white":"#f9f9f9"}}>
+              <tr key={di} style={{background:di%2===0?"#0f1a0f":"#141f14",color:"#e8f5e9"}}>
                 <td style={{fontWeight:"bold",textAlign:"center"}}>{row.d}</td>
                 <td style={{textAlign:"center",color:"#666"}}>{h>0?h.toFixed(1):"—"}</td>
                 {["resni","videj","tiev","malka"].map(k=>(
@@ -210,7 +210,7 @@ ${ekoRez.map(r=>`<tr>
     </div>
     ))}
 
-    <div style={{border:"2px solid #6a4c2a",borderRadius:"8px",padding:"16px",marginBottom:"16px",background:"white"}}>
+    <div style={{border:"2px solid #6a4c2a",borderRadius:"8px",padding:"16px",marginBottom:"16px",background:"#1a1208"}}>
       <b style={{color:"#6a4c2a"}}>🌳 Ekoloģiskie koki</b>
       <div style={{overflowX:"auto",marginTop:"10px"}}>
         <table border="1" cellPadding="4" style={{fontSize:"11px",minWidth:"500px"}}>
@@ -223,7 +223,7 @@ ${ekoRez.map(r=>`<tr>
               const h = row.d>0 ? calcH(row.d,hVid,row.suga) : 0
               const vol = row.d>0&&row.skaits>0 ? row.skaits*Math.PI*Math.pow(row.d/200,2)*h*0.47 : 0
               return(
-              <tr key={i} style={{background:i%2===0?"white":"#fdf6f0"}}>
+             <tr key={i} style={{background:i%2===0?"#0f1a0f":"#141f14",color:"#e8f5e9"}}>
                 <td style={{fontWeight:"bold",textAlign:"center"}}>{row.suga}</td>
                 <td><input type="number" min="0" value={row.skaits||""} onChange={e=>updateEko(i,"skaits",e.target.value)} style={{width:"55px",border:"none",textAlign:"center",background:"transparent"}}/></td>
                 <td><input type="number" min="0" value={row.d||""} onChange={e=>updateEko(i,"d",e.target.value)} style={{width:"55px",border:"none",textAlign:"center",background:"transparent"}}/></td>
@@ -237,7 +237,7 @@ ${ekoRez.map(r=>`<tr>
       </div>
     </div>
 
-    <div style={{background:"#f0f6ec",border:"1px solid #225522",borderRadius:"6px",padding:"12px",marginBottom:"16px"}}>
+<div style={{background:"#0f2b0f",border:"1px solid #2d5a2d",borderRadius:"6px",padding:"12px",marginBottom:"16px"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
         <b style={{color:"#225522"}}>💶 Sortimentu cenas (€/m³)</b>
         <button onClick={()=>setShowCenas(!showCenas)} style={{padding:"3px 10px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>
@@ -247,7 +247,7 @@ ${ekoRez.map(r=>`<tr>
       <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",fontSize:"12px"}}>
         {Object.keys(cenas).map(k=>(
           <div key={k}>
-            <label style={{fontSize:"10px",color:"#666"}}>{CENU_NOSAUKUMI[k]}:</label><br/>
+           <label style={{fontSize:"10px",color:"#81c784"}}>{CENU_NOSAUKUMI[k]}:</label><br/>
             {showCenas
               ? <input type="number" value={cenas[k]} onChange={e=>setCenas({...cenas,[k]:Number(e.target.value)})} style={{width:"70px",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/>
               : <b>{cenas[k]} €</b>

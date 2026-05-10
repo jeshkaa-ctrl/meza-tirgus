@@ -178,24 +178,24 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
     win.print()
   }
 
-  return (
-    <div style={{marginTop:"24px",padding:"20px",border:"2px solid #1565c0",borderRadius:"8px",background:"white"}}>
-      <h2 style={{color:"#1565c0",marginTop:0}}>📏 Caurmēra mērījumi</h2>
+ return (
+    <div style={{marginTop:"24px",padding:"20px",border:"2px solid #4caf50",borderRadius:"10px",background:"#141f14",color:"#e8f5e9"}}>
+      <h2 style={{color:"#4caf50",marginTop:0}}>📏 Caurmēra mērījumi</h2>
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"8px",marginBottom:"16px"}}>
         <div>
-          <label style={{fontSize:"11px",fontWeight:"bold"}}>Valdošā suga:</label><br/>
-          <select value={suga} onChange={e=>{setSuga(e.target.value);saglabat({suga:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}>
+          <label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Valdošā suga:</label><br/>
+          <select value={suga} onChange={e=>{setSuga(e.target.value);saglabat({suga:e.target.value})}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9"}}>
             <option>P</option><option>E</option><option>B</option>
           </select>
         </div>
         <div>
-          <label style={{fontSize:"11px",fontWeight:"bold"}}>Vecums (gadi):</label><br/>
-          <input type="number" value={vecums} onChange={e=>{setVecums(e.target.value);saglabat({vecums:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+          <label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Vecums (gadi):</label><br/>
+          <input type="number" value={vecums} onChange={e=>{setVecums(e.target.value);saglabat({vecums:e.target.value})}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9"}}/>
         </div>
         <div>
-          <label style={{fontSize:"11px",fontWeight:"bold"}}>Vidējais augstums (m):</label><br/>
-          <input type="number" value={h} onChange={e=>{setH(e.target.value);saglabat({h:e.target.value})}} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px"}}/>
+          <label style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Vidējais augstums (m):</label><br/>
+          <input type="number" value={h} onChange={e=>{setH(e.target.value);saglabat({h:e.target.value})}} style={{width:"100%",padding:"6px",border:"1px solid #2d5a2d",borderRadius:"4px",background:"#0f1a0f",color:"#e8f5e9"}}/>
         </div>
         <div style={{display:"flex",alignItems:"flex-end"}}>
           <button onClick={notirit} style={{padding:"4px 12px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>🗑 Dzēst mērījumus</button>
@@ -207,10 +207,10 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
           : <button onClick={()=>onReg?.()} style={{padding:"6px 16px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
         }
         <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{padding:"6px 14px",background:"#5d4037",color:"white",borderRadius:"4px",textDecoration:"none",fontSize:"13px"}}>🏛 VMD</a>
-        <div style={{display:"flex",gap:"6px",alignItems:"center",background:"#f0f4ff",padding:"6px 10px",borderRadius:"6px",border:"1px solid #1565c0"}}>
-          <span style={{fontSize:"11px",fontWeight:"bold",color:"#1565c0"}}>Manuāli:</span>
-          <input type="number" value={jaunsD} onChange={e=>setJaunsD(e.target.value)} placeholder="d (cm)" style={{width:"60px",padding:"4px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/>
-          <input type="number" value={jaunsN} onChange={e=>setJaunsN(e.target.value)} placeholder="skaits" style={{width:"55px",padding:"4px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/>
+       <div style={{display:"flex",gap:"6px",alignItems:"center",background:"#0f2b0f",padding:"6px 10px",borderRadius:"6px",border:"1px solid #2d5a2d"}}>
+          <span style={{fontSize:"11px",fontWeight:"bold",color:"#81c784"}}>Manuāli:</span>
+          <input type="number" value={jaunsD} onChange={e=>setJaunsD(e.target.value)} placeholder="d (cm)" style={{width:"60px",padding:"4px",border:"1px solid #2d5a2d",borderRadius:"3px",fontSize:"12px",background:"#0f1a0f",color:"#e8f5e9"}}/>
+          <input type="number" value={jaunsN} onChange={e=>setJaunsN(e.target.value)} placeholder="skaits" style={{width:"55px",padding:"4px",border:"1px solid #2d5a2d",borderRadius:"3px",fontSize:"12px",background:"#0f1a0f",color:"#e8f5e9"}}/>
           <button onClick={pievienotManuali} style={{padding:"4px 10px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>+ Pievienot</button>
         </div>
         <label style={{padding:"6px 16px",background:"#1565c0",color:"white",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>
@@ -302,12 +302,12 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
           </thead>
           <tbody>
             {merijumi.map((r,i) => (
-              <tr key={i} style={{background:i%2===0?"white":"#f0f4ff"}}>
+              <tr key={i} style={{background:i%2===0?"#0f1a0f":"#141f14",color:"#e8f5e9"}}>
                 <td>{i+1}.</td>
                 <td>{r.d}</td>
                 <td>
                   <input type="number" value={r.n||""} onChange={e=>updateN(i,e.target.value)}
-                    style={{width:"60px",border:"1px solid #ccc",borderRadius:"3px",padding:"2px"}}/>
+                    style={{width:"60px",border:"1px solid #2d5a2d",borderRadius:"3px",padding:"2px",background:"#0f2b0f",color:"#e8f5e9"}}/>
                 </td>
                 <td style={{textAlign:"right"}}>{r.d * r.n || 0}</td>
               </tr>
