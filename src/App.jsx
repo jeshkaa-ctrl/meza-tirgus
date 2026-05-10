@@ -2469,7 +2469,7 @@ ${r.pvnRezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">R
       <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
         {kartina(`📅 ${šisMenesis}. mēnesis (${menesaRekini.length} rēķini)`, menesaStats, "#1565c0")}
         {kartina(`📆 ${šisGads}. gads (${gadaRekini.length} rēķini)`, gadaStats, "#225522")}
-        {kartina(`🔍 Filtrēts (${filtreti.length} rēķini)`, filtretoStats, "#e65100")}
+       {kartina(`🔍 Filtrēts (${filtreti.length} rēķini)`, filtretoStats, "#4caf50")}
       </div>
 
       {/* FILTRI */}
@@ -2485,7 +2485,7 @@ ${r.pvnRezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">R
       {filtreti.length === 0
         ? <div style={{ padding: "40px", textAlign: "center", color: "#888", border: "2px dashed #ccc", borderRadius: "8px" }}>Nav saglabātu rēķinu</div>
         : <table border="1" cellPadding="6" style={{ fontSize: "12px", width: "100%", borderCollapse: "collapse" }}>
-          <thead style={{ background: "#e65100", color: "white" }}>
+          <thead style={{ background: "#225522", color: "white" }}>
             <tr><th>Nr.</th><th>Datums</th><th>Klients</th><th>Periods</th><th>Bez PVN €</th><th>PVN €</th><th>Kopā €</th><th>Darbības</th></tr>
           </thead>
           <tbody>
@@ -2494,7 +2494,7 @@ ${r.pvnRezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">R
               const pvn = r.pvnRezims === "pvn21" ? kopa - kopa / 1.21 : 0
               const bezPvn = kopa - pvn
               return (
-                <tr key={r.id} style={{ background: i % 2 === 0 ? "white" : "#fff8f5" }}>
+              <tr key={r.id} style={{ background: i % 2 === 0 ? "white" : "#f0f8f0", color: "#111" }}>
                   <td><b>{r.nr} - {r.gads}</b></td>
                   <td>{r.datums}</td>
                   <td>
@@ -2507,7 +2507,7 @@ ${r.pvnRezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">R
                   <td style={{ textAlign: "right", color: pvn > 0 ? "#c62828" : "#888" }}>{pvn.toFixed(2)}</td>
                   <td style={{ textAlign: "right", fontWeight: "bold" }}>{kopa.toFixed(2)}</td>
                   <td>
-                    <button onClick={() => drukат(r)} style={{ padding: "3px 10px", background: "#e65100", color: "white", border: "none", borderRadius: "3px", cursor: "pointer", marginRight: "4px" }}>🖨 Drukāt</button>
+                  <button onClick={() => drukат(r)} style={{ padding: "3px 10px", background: "#225522", color: "white", border: "none", borderRadius: "3px", cursor: "pointer", marginRight: "4px" }}>🖨 Drukāt</button>
                     <button onClick={() => dzest(r.id)} style={{ padding: "3px 10px", background: "#c62828", color: "white", border: "none", borderRadius: "3px", cursor: "pointer" }}>✕</button>
                   </td>
                 </tr>
@@ -2526,10 +2526,10 @@ ${r.pvnRezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">R
               <td style={{ textAlign: "right", fontWeight: "bold", color: "#c62828" }}>{filtretoStats.pvnSumma.toFixed(2)}</td>
               <td colSpan="2" />
             </tr>
-            <tr style={{ background: "#fff0e8" }}>
+            <tr style={{ background: "#e8f5e9" }}>
               <td colSpan="4" style={{ textAlign: "right", fontWeight: "bold" }}>Kopā apmaksai:</td>
               <td colSpan="2" />
-              <td style={{ textAlign: "right", fontWeight: "bold", color: "#e65100", fontSize: "13px" }}>{filtretoStats.kopa.toFixed(2)} €</td>
+              <td style={{ textAlign: "right", fontWeight: "bold", color: "#225522", fontSize: "13px" }}>{filtretoStats.kopa.toFixed(2)} €</td>
               <td />
             </tr>
           </tfoot>
