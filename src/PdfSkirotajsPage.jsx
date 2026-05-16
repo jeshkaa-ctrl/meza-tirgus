@@ -40,14 +40,18 @@ async function aiAnalizeLapu(base64, lapaNr) {
           { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64 } },
           {
             type: "text",
-            text: `Analizē šo Latvijas meža dokumenta lapu. Atgriezies TIKAI ar JSON bez komentāriem:
+     text: `Skaties uz šo dokumenta lapu kā cilvēks. Saproti kontekstu vizuāli.
+
+Atgriezies TIKAI ar JSON bez komentāriem:
 {
-  "veids": "novertejums" vai "skice" vai "cits",
-  "kadastrs": "11 ciparu numurs vai null",
-  "nogabals": "nogabala numurs kā teksts, piem '6' vai '10,16' vai null",
-  "kvartals": "kvartāla numurs vai null",
-  "saimnieciba": "īpašuma nosaukums vai null",
-  "apraksts": "īss apraksts latviski"
+  "veids": "novertejums" ja redzi cirsmas novērtējuma tabulu ar sugām un m3, "skice" ja redzi karti vai zīmējumu, "cits" visam pārējam,
+  "kadastrs": "11 ciparu kadastra numurs no dokumenta vai null",
+  "nogabals": "pirmais nogabala numurs no lauka 'Nogabals:' vai null",
+  "nogabali": masīvs ar VISIEM nogabalu numuriem no lauka 'Nogabals:' — ja tur '2;3' tad ["2","3"], ja '8' tad ["8"], NEKAD null,
+  "kvartals": "kvartāla numurs no lauka 'Kvartāls:' vai null",
+  "saimnieciba": "īpašuma vai saimniecības nosaukums vai null",
+  "platiba": "platība hektāros kā teksts, piem '2.10' vai null",
+  "apraksts": "viena teikuma apraksts latviski — kas šī lapa ir un kas tajā atrodas"
 }`
           }
         ]
@@ -58,7 +62,10 @@ async function aiAnalizeLapu(base64, lapaNr) {
   const txt = data.content?.[0]?.text || "{}"
   try {
     const parsed = JSON.parse(txt.replace(/```json|```/g, "").trim())
-    return { ...parsed, lapa: lapaNr }
+    if (!Array.isArray(parsed.nogabali)) {
+  parsed.nogabali = parsed.nogabals ? [String(parsed.nogabals)] : [String(lapaNr)]
+}
+return { ...parsed, lapa: lapaNr }
   } catch {
     return { veids: "cits", lapa: lapaNr, apraksts: "Neizdevās analizēt" }
   }
@@ -133,10 +140,11 @@ export default function PdfSkirotajsPage({ onBack, onOpenDastojums }) {
     if (veribaPec === "nogabals") {
       const grupasMap = {}
       analizes.forEach(a => {
-        const atslega = a.nogabals || `lapa_${a.lapa}`
+       const nogabaliSaraksts = a.nogabali?.length ? a.nogabali : a.nogabals ? [String(a.nogabals)] : [`lapa_${a.lapa}`]
+       const atslega = nogabaliSaraksts.join("_")
         if (!grupasMap[atslega]) {
           grupasMap[atslega] = {
-            nosaukums: a.nogabals ? `Nogabals ${a.nogabals}` : `Lapa ${a.lapa}`,
+           nosaukums: atslega.startsWith("lapa_") ? `Lapa ${a.lapa}` : `Nogabals ${nogabaliSaraksts.join(", ")}`,
             lapas: [],
             kadastrs: a.kadastrs,
             saimnieciba: a.saimnieciba,

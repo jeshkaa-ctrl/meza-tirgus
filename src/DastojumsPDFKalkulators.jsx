@@ -123,20 +123,28 @@ export default function DastojumsPDFKalkulators({ onBack, initialFile }) {
     if(initialFile) parseDastojums(initialFile)
   }, [initialFile])
 
-  const parseDastojums = async (file) => {
+ const parseDastojums = async (file) => {
     setLoading(true)
     setApreklinats(false)
     try {
       const reader = new FileReader()
       reader.onload = async function() {
-        const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise
-        let txt = ""
+        const pdfBytes = new Uint8Array(this.result)
+        const pdf = await pdfjsLib.getDocument(pdfBytes).promise
+        
+        // Konvertē visas lapas uz bildēm
+        const base64Images = []
         for(let p = 1; p <= pdf.numPages; p++) {
-          const pg = await pdf.getPage(p)
-          const tc = await pg.getTextContent()
-          tc.items.forEach(i => { txt += i.str + " " })
+          const page = await pdf.getPage(p)
+          const viewport = page.getViewport({ scale: 2.0 })
+          const canvas = document.createElement("canvas")
+          canvas.width = viewport.width
+          canvas.height = viewport.height
+          const ctx = canvas.getContext("2d")
+          await page.render({ canvasContext: ctx, viewport }).promise
+          base64Images.push(canvas.toDataURL("image/jpeg", 0.85).split(",")[1])
         }
-      const parsed = parseMezvertePDF(txt)
+      
         try {
           const API_KEY = import.meta.env.VITE_ANTHROPIC_KEY || ""
           const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -147,36 +155,43 @@ export default function DastojumsPDFKalkulators({ onBack, initialFile }) {
               "anthropic-version": "2023-06-01",
               "anthropic-dangerous-direct-browser-access": "true"
             },
-            body: JSON.stringify({
+       body: JSON.stringify({
               model:"claude-sonnet-4-5",
-              max_tokens:1000,
-              messages:[{role:"user",content:`Šis ir Mežvērtes cirsmas novērtējuma PDF teksts. Izvelc sortimentu apjomus m³. Atgriezies TIKAI ar JSON bez komentāriem:\n{"kopaKraja":0,"log":0,"small":0,"veneer":0,"tara":0,"pulp":0,"fire":0,"chips":0,"saimnieciba":"","kadastrs":"","nogabali":[{"nr":"","platiba":""}]}\n\nPDF teksts:\n${txt.slice(0,3000)}`}]
+              max_tokens:3000,
+              messages:[{role:"user",content:[
+                ...base64Images.map(b64=>({
+                  type:"image",
+                  source:{type:"base64",media_type:"image/jpeg",data:b64}
+                })),
+{type:"text",text:`Skaties uz šiem cirsmas novērtējuma dokumentiem kā cilvēks. Katrs dokuments var būt viena cirsma.\n\nNo KATRAS lapas nolasi vizuāli:\n- Saimniecības nosaukums (īpašuma vārds, piem. "Vecnainieši")\n- Kadastra numurs (11 cipari)\n- Nogabala numurs TIKAI no lauka "Nogabals:" kas atrodas dokumenta galvenē (piem. "8" vai "2;3" vai "11" vai "4;5") — NEVIS Kvartāls, NEVIS A.Nogabals, NEVIS koku skaits\n- Platība hektāros\n- No "Kopā:" rindas tabulas apakšā nolasi KATRU kolonnu atsevišķi\n\nKolonnu secība "Kopā:" rindā: Koku skaits | Stumbra krāja | Īp.kval | Resnā | Vidējā | Tievā | P.malka | Malka | Atlikumi | Paredzēts pārdošanai\n\nAprēķini:\n- kraja = "Paredzēts pārdošanai" skaitlis\n- log = "Resnā" skaitlis (4. kolonna pēc kārtas)\n- small = "Vidējā" skaitlis (5. kolonna) PLUS "Tievā" skaitlis (6. kolonna) — nolasi katru atsevišķi un tad summē, piem. 61.85 + 52.36 = 114.21\n- pulp = "P.malka" skaitlis (7. kolonna)\n- fire = "Malka" skaitlis (8. kolonna)\n- chips = "Atlikumi" skaitlis (9. kolonna)\n- veneer = 0, tara = 0\n\nAtgriezies TIKAI ar JSON bez komentāriem:\n{"saimnieciba":"","kadastrs":"","nogabali":[{"nr":"8","platiba":"1.90","kraja":0,"log":0,"small":0,"veneer":0,"tara":0,"pulp":0,"fire":0,"chips":0}]}`}
+              ]}]
             })
           })
           const data = await response.json()
           const aiTxt = data.content?.[0]?.text||""
           const clean = aiTxt.replace(/```json|```/g,"").trim()
           const aiData = JSON.parse(clean)
+          const nogs = aiData.nogabali||[]
           const final = {
-            kopaKraja: aiData.kopaKraja||parsed.kopaKraja||0,
-            log: aiData.log||parsed.log||0,
-            small: aiData.small||parsed.small||0,
-            veneer: aiData.veneer||parsed.veneer||0,
-            tara: aiData.tara||parsed.tara||0,
-            pulp: aiData.pulp||parsed.pulp||0,
-            fire: aiData.fire||parsed.fire||0,
-            chips: aiData.chips||parsed.chips||0,
-            saimnieciba: aiData.saimnieciba||parsed.saimnieciba||"",
-            kadastrs: aiData.kadastrs||parsed.kadastrs||"",
-            nogabali: aiData.nogabali?.length>0?aiData.nogabali:parsed.nogabali||[]
+            saimnieciba: aiData.saimnieciba||"",
+            kadastrs: aiData.kadastrs||"",
+            nogabali: nogs,
+            kopaKraja: nogs.reduce((s,n)=>s+(n.kraja||0),0),
+            log: nogs.reduce((s,n)=>s+(n.log||0),0),
+            small: nogs.reduce((s,n)=>s+(n.small||0),0),
+            veneer: nogs.reduce((s,n)=>s+(n.veneer||0),0),
+            tara: nogs.reduce((s,n)=>s+(n.tara||0),0),
+            pulp: nogs.reduce((s,n)=>s+(n.pulp||0),0),
+            fire: nogs.reduce((s,n)=>s+(n.fire||0),0),
+            chips: nogs.reduce((s,n)=>s+(n.chips||0),0),
           }
           setDati(final)
           if(final.saimnieciba) setSaimnieciba(final.saimnieciba)
           if(final.kadastrs) setKadastrs(final.kadastrs)
-        } catch(e) {
-          setDati(parsed)
-          if(parsed.saimnieciba) setSaimnieciba(parsed.saimnieciba)
-          if(parsed.kadastrs) setKadastrs(parsed.kadastrs)
+    } catch(e) {
+          console.error("AI kļūda:", e)
+          alert("AI neizdevās parsēt PDF. Lūdzu ievadi datus manuāli.")
+          setDati({kopaKraja:0,log:0,small:0,veneer:0,tara:0,pulp:0,fire:0,chips:0,saimnieciba:"",kadastrs:"",nogabali:[]})
         }
         setLoading(false)
       }
@@ -289,7 +304,7 @@ ${Object.keys(SORT_NAMES).filter(k=>(dati[k]||0)>0.01).map(k=>`<tr><td>${SORT_NA
                 {Object.keys(SORT_NAMES).map(k=>(
                   <tr key={k} style={{background:(dati[k]||0)>0.01?"white":"#f9f9f9"}}>
                     <td style={{fontWeight:(dati[k]||0)>0.01?"bold":"normal",color:(dati[k]||0)>0.01?"#225522":"#aaa"}}>{SORT_NAMES[k]}</td>
-                    <td><input type="number" step="0.01" value={(dati[k]||0).toFixed(2)} onChange={e=>updateDati(k,e.target.value)} style={{width:"90px",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/></td>
+                   <td><input type="number" step="any" value={(dati[k]||0).toFixed(2)} onFocus={e=>e.target.select()} onChange={e=>updateDati(k,e.target.value)} style={{width:"90px",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/></td>
                     <td><input value={prices[k]} onChange={e=>setPrices({...prices,[k]:e.target.value})} onBlur={e=>{const v=parseFloat(String(e.target.value).replace(',','.'))||0;setPrices({...prices,[k]:v})}} style={{width:"60px",padding:"3px",border:"1px solid #ccc",borderRadius:"3px",fontSize:"12px"}}/></td>
                     <td style={{textAlign:"right",fontWeight:"bold",color:(dati[k]||0)>0.01?"#225522":"#ccc"}}>{((dati[k]||0)*(parseFloat(String(prices[k]).replace(',','.'))||0)).toFixed(0)} €</td>
                   </tr>
