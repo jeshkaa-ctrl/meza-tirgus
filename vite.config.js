@@ -12,7 +12,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api\/anthropic/, ''),
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
-            proxyReq.setHeader('x-api-key', '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')
+            proxyReq.setHeader('x-api-key', import.meta.env.VITE_ANTHROPIC_KEY || '')
             proxyReq.setHeader('anthropic-version', '2023-06-01')
           })
         }

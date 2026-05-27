@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { NOVADI } from "./novadi"
 import { DARBIBAS_VEIDI } from "./RegModal"
-import { parseMezvertePDF } from "./DastojumsPDFKalkulators"
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString()
 
 // ── localStorage helpers ──────────────────────────────────────────────────────

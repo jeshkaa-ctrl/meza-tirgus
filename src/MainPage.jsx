@@ -39,7 +39,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       title: "VMD & Analīze",
       color: "#4db6ac",
       riki: [
-        { icon: "📄", title: "VMD PDF analīze", desc: "Meža inventarizācijas PDF → nogabalu analīze, vērtība", page: "vmd_pdf" },
+    { icon: "🌲", title: "Cirsmas novērtēšana (PDF)", desc: "VMD inventarizācijas PDF → nogabalu analīze, cirsmas vērtība — pieejams bezmaksas sadaļā", page: "standard" },
         { icon: "✂️", title: "PDF šķirotājs", desc: "Sadala daudzīpašumu PDF pa kadastriem atsevišķos dokumentos", page: "pdfSkirotajs" },
       ]
     },
