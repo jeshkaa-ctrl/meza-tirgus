@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react"
+import { useSubscription } from "./hooks/useSubscription"
 
 // Nolasa neizlasīto ziņu skaitu
 const getNelasitas = (userId) => {
@@ -9,10 +10,14 @@ const getNelasitas = (userId) => {
   } catch { return 0 }
 }
 
+const PLAN_LABELS = { free: null, pro: 'Pro', business: 'Komercija' }
+const PLAN_COLORS = { free: null, pro: '#4caf50', business: '#fbbf24' }
+
 export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) {
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuOpen,  setMenuOpen]  = useState(false)
   const [nelasitas, setNelasitas] = useState(0)
   const menuRef = useRef(null)
+  const { plan } = useSubscription()
 
   useEffect(() => {
     if (!user) return
@@ -158,6 +163,11 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
             <span style={{ fontSize: 12, fontWeight: 600, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {vards}
             </span>
+            {PLAN_LABELS[plan] && (
+              <span style={{ fontSize: 9, background: PLAN_COLORS[plan], color: '#0f1a0f', padding: '1px 5px', borderRadius: 4, fontWeight: 700, flexShrink: 0 }}>
+                {PLAN_LABELS[plan]}
+              </span>
+            )}
             <span style={{ fontSize: 10, color: "#4caf50" }}>{menuOpen ? "▲" : "▼"}</span>
           </button>
 
@@ -191,6 +201,7 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
                 { icon: "🏠", label: "Sākumlapa", action: () => { onNavigate?.("landing"); setMenuOpen(false) } },
                 { icon: "🧾", label: "Mani rēķini", action: () => { onNavigate?.("rekini"); setMenuOpen(false) } },
                 { icon: "📢", label: "Mani sludinājumi", action: () => { onNavigate?.("sludinajumi"); setMenuOpen(false) } },
+                { icon: "💳", label: plan === 'free' ? "Abonēties →" : "Abonements", badge: plan === 'free' ? null : PLAN_LABELS[plan], action: () => { onNavigate?.("subscription"); setMenuOpen(false) } },
                 { icon: "🔑", label: "Mainīt paroli", action: () => { onNavigate?.("parole"); setMenuOpen(false) } },
               ].map((item, i) => (
                 <button
