@@ -7,6 +7,17 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
+  /* Tumšā tēma — CSS mainīgie */
+  --color-background-primary:   #1a2e1a;
+  --color-background-secondary: #111f11;
+  --color-background-tertiary:  #0f1a0f;
+  --color-text-primary:         #e8f5e9;
+  --color-text-secondary:       #a8d8a8;
+  --color-text-tertiary:        #7ab87a;
+  --color-text-warning:         #fbbf24;
+  --color-border:               #2d4a2d;
+  --color-accent:               #4caf50;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -53,6 +64,28 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+/* Globālie input/select stili tumšajai tēmai */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+select,
+textarea {
+  background: var(--color-background-tertiary, #0f1a0f);
+  border: 1px solid var(--color-border, #2d4a2d);
+  color: var(--color-text-primary, #e8f5e9);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent, #4caf50);
+}
+input::placeholder { color: var(--color-text-tertiary, #7ab87a); opacity: 0.7; }
+select option { background: #111f11; color: #e8f5e9; }
 
 @media (prefers-color-scheme: light) {
   :root {

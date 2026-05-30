@@ -49,6 +49,14 @@ export default function MobilajiRiki({ onBack, onNavigate }) {
       page: "krautuves_meritajs",
       color: "#4caf50"
     },
+    {
+      icon: "🌲",
+      title: "Dastojuma uzmērīšana",
+      desc: "D + suga + kvalitāte → kubatūra, sortimenti, 2. stāvs. Laukā, pa kokiem.",
+      badge: "MOBILAIS",
+      page: "dastojums_meritajs",
+      color: "#4caf50"
+    },
   ]
 
   return (
@@ -93,7 +101,7 @@ export default function MobilajiRiki({ onBack, onNavigate }) {
         <div style={{ marginTop: "20px", padding: "14px", background: "#0f1a0f", border: "1px dashed #2d4a2d", borderRadius: "12px" }}>
           <div style={{ color: "#4a7a4a", fontSize: "12px", fontWeight: 700, marginBottom: "10px" }}>🔧 Drīzumā</div>
           {[
-            { icon: "🌲", title: "Dastošanas app", desc: "Dastojums → kubi → sortimenti" },
+            { icon: "📊", title: "Cirsmu vērtēšana (laukā)", desc: "Pilna novērtēšana ar PDF pārskatu" },
           ].map((r, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: i === 0 ? "0.5px solid #1a3a1a" : "none", opacity: 0.5 }}>
               <div style={{ fontSize: "28px", minWidth: "36px", textAlign: "center" }}>{r.icon}</div>

@@ -22,6 +22,7 @@ import KubiKalkulators from "./KubiKalkulators"
 import LogistikaKalkulators from "./LogistikaKalkulators"
 import MobilajiRiki from "./MobilajiRiki"
 import KrautuvesMeritajsPage from "./KrautuvesMeritajsPage"
+import DastojumsMeritajsPage from "./DastojumsMeritajsPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1669,7 +1670,8 @@ if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
 if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
 if(page==="kubi") return <KubiKalkulators onBack={()=>setPage("main")}/>
-if(page==="krautuves_meritajs") return <KrautuvesMeritajsPage onBack={()=>setPage("mobilie")}/>
+if(page==="krautuves_meritajs")  return <KrautuvesMeritajsPage  onBack={()=>setPage("mobilie")}/>
+if(page==="dastojums_meritajs") return <DastojumsMeritajsPage onBack={()=>setPage("mobilie")}/>
 if(page==="mobilie") return <MobilajiRiki onBack={()=>setPage("main")} onNavigate={(p)=>setPage(p)}/>
 if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
 if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")}/>
