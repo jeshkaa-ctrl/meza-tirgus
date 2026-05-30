@@ -3,6 +3,7 @@ import * as pdfjsLib from "pdfjs-dist"
 import { getBonitate } from "./bonityEngine"
 import { calcSortimentsByQuality } from "./qualityEngine"
 import { formFactor, GminTable, GkritTable } from "./tables"
+import { SORT_KEYS, SORT_NAMES, DEFAULT_PRICES } from "./sortimentConfig"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -11,7 +12,37 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 
 const SUGAS = ["P","E","Lg","B","Ba","Bl","A","Oz","Os","G","M"]
 const KVALITATES = ["A1","A","B","C","D","Papīrmalka","Malka"]
-const AUGSNES_TIPI = ["Sl","Mr","Vr","Dm","Db","Nd","Vrs","Ds","Ks","Lk","Pv","Kp","As","Ap","Ln","Gr"]
+// Visi Latvijā atzītie meža augšanas tipi (MĀT)
+const AUGSNES_TIPI = [
+  // Sausieņu meži
+  "Sl",   // Sils
+  "Mr",   // Mētrājs
+  "Vr",   // Vērīs
+  "Gr",   // Gārša
+  "Lk",   // Lākstugs
+  "Ln",   // Lāns
+  // Pārejas tipi
+  "Vrs",  // Slapjais vērīs
+  "Ds",   // Slapjā gārša
+  "Dm",   // Damaksnis
+  "Dms",  // Slapjais damaksnis
+  // Slapjieņu meži
+  "Nd",   // Niedrājs
+  "Db",   // Dumbrājs
+  "As",   // Alkšņu silava
+  "Ap",   // Alkšņu paliene
+  // Kūdrāju meži
+  "Pv",   // Pāveris
+  "Kp",   // Kūdreņa priede
+  "Ks",   // Kūdrāja silava
+]
+
+const AUGANAS_TIPI_NOSAUKUMI = {
+  Sl:"Sils", Mr:"Mētrājs", Vr:"Vērīs", Gr:"Gārša", Lk:"Lākstugs", Ln:"Lāns",
+  Vrs:"Slapjais vērīs", Ds:"Slapjā gārša", Dm:"Damaksnis", Dms:"Slapjais damaksnis",
+  Nd:"Niedrājs", Db:"Dumbrājs", As:"Alkšņu silava", Ap:"Alkšņu paliene",
+  Pv:"Pāveris", Kp:"Kūdreņa priede", Ks:"Kūdrāja silava",
+}
 const PIEVESANA = ["Visu gadu","Sausa vasara","Vasara/Ziemā","Tikai ziemā"]
 const KVALITATE_COLORS = {
   A1:"#1b5e20", A:"#388e3c", B:"#81c784", C:"#fff176", D:"#ffb74d", Malka:"#e57373"
@@ -60,10 +91,10 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
   const [kadastrs, setKadastrs] = useState(savedState?.kadastrs ?? kadastrsIn)
   const [saimnieciba, setSaimnieciba] = useState(savedState?.saimnieciba ?? saimniecibaIn)
   const [cirsmas, setCirsmas] = useState(savedState?.cirsmas ?? [defaultCirsma()])
-const [prices, setPrices] = useState({
-    log:93, small:65, veneer:130, tara:48, stara:65, gulsnis:80, pulp:50, fire:38, chips:12
-  })
+  const [prices,     setPrices]     = useState({...DEFAULT_PRICES})
   const [showPrices, setShowPrices] = useState(false)
+  // Pielāgoti papildu sortimenti: [{id, nosaukums, cena}]
+  const [papilduSort, setPapilduSort] = useState([])
 
   const saglabat = (jaunasCircsmas, jaunaisKadastrs, jaunaSaimnieciba) => {
     onSaveState?.({
@@ -73,10 +104,8 @@ const [prices, setPrices] = useState({
     })
   }
 
-  const sortimentNames = {
-    log:"Zāģbaļķi", small:"Sīkbaļķi", veneer:"Finieris",
-    tara:"Tara", stara:"Skujkoku tara", gulsnis:"Gūlsnis", pulp:"Papīrmalka", fire:"Malka", chips:"Šķelda"
-  }
+  // Izmanto kopīgos nosaukumus no sortimentConfig (tara = "Lapkoku tara")
+  const sortimentNames = { ...SORT_NAMES }
   const updateCirsma = (ci, field, value) => {
     const n = [...cirsmas]; n[ci] = {...n[ci], [field]: value}
     setCirsmas(n); saglabat(n)
@@ -347,16 +376,52 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
 
       {showPrices && (
         <div style={{marginBottom:"16px",padding:"16px",background:"#141f14",border:"1px solid #2d5a2d",borderRadius:"10px"}}>
-          <b style={{fontSize:"12px",color:"#4caf50"}}>Cenas €/m³:</b>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginTop:"8px"}}>
-            {Object.keys(prices).map(k=>(
+          <b style={{fontSize:"13px",color:"#4caf50"}}>💰 Sortimentu cenas (€/m³):</b>
+          {/* Standarta sortimenti */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"8px",marginTop:"10px"}}>
+            {SORT_KEYS.map(k=>(
               <div key={k}>
-                <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold"}}>{sortimentNames[k]}:</label><br/>
-                <input type="number" value={prices[k]} onChange={e=>setPrices({...prices,[k]:Number(e.target.value)})} style={{width:"100%",padding:"6px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"4px",color:"#e8f5e9"}}/>
+                <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold"}}>{SORT_NAMES[k]}:</label><br/>
+                <input type="number" value={prices[k]||0}
+                  onChange={e=>setPrices({...prices,[k]:Number(e.target.value)})}
+                  style={{width:"100%",padding:"6px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"4px",color:"#e8f5e9",boxSizing:"border-box"}}/>
               </div>
             ))}
           </div>
-          <button onClick={()=>setShowPrices(false)} style={{marginTop:"8px",padding:"4px 12px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>Aizvērt</button>
+          {/* Pielāgoti papildu sortimenti */}
+          {papilduSort.length > 0 && (
+            <div style={{marginTop:"12px",borderTop:"1px solid #2d5a2d",paddingTop:"10px"}}>
+              <b style={{fontSize:"11px",color:"#a8d8a8"}}>Papildu sortimenti:</b>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"8px",marginTop:"6px"}}>
+                {papilduSort.map(ps=>(
+                  <div key={ps.id} style={{display:"flex",gap:"4px",alignItems:"flex-end"}}>
+                    <div style={{flex:1}}>
+                      <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold"}}>Nosaukums:</label><br/>
+                      <input value={ps.nosaukums}
+                        onChange={e=>setPapilduSort(papilduSort.map(x=>x.id===ps.id?{...x,nosaukums:e.target.value}:x))}
+                        style={{width:"100%",padding:"5px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"4px",color:"#e8f5e9",fontSize:"11px",boxSizing:"border-box"}}/>
+                    </div>
+                    <div style={{width:"65px"}}>
+                      <label style={{fontSize:"11px",color:"#81c784",fontWeight:"bold"}}>€/m³:</label><br/>
+                      <input type="number" value={ps.cena}
+                        onChange={e=>setPapilduSort(papilduSort.map(x=>x.id===ps.id?{...x,cena:Number(e.target.value)}:x))}
+                        style={{width:"100%",padding:"5px",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:"4px",color:"#e8f5e9",fontSize:"11px",boxSizing:"border-box"}}/>
+                    </div>
+                    <button onClick={()=>setPapilduSort(papilduSort.filter(x=>x.id!==ps.id))}
+                      style={{padding:"5px 8px",background:"#c62828",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"12px",marginBottom:"1px"}}>×</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <div style={{display:"flex",gap:"8px",marginTop:"10px"}}>
+            <button onClick={()=>setPapilduSort([...papilduSort,{id:Date.now(),nosaukums:"Jauns sortiments",cena:0}])}
+              style={{padding:"5px 14px",background:"#1565c0",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>+ Jauns sortiments</button>
+            <button onClick={()=>setPrices({...DEFAULT_PRICES})}
+              style={{padding:"5px 14px",background:"#444",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>↺ Atjaunot noklusējumu</button>
+            <button onClick={()=>setShowPrices(false)}
+              style={{padding:"5px 14px",background:"#225522",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"11px"}}>✓ Aizvērt</button>
+          </div>
         </div>
       )}
 
@@ -448,8 +513,8 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
                     </div>
                     <div>
                       <label style={{fontSize:"11px",fontWeight:"bold"}}>Augsnes tips:</label><br/>
-                      <select value={nog.augsneTips} onChange={e=>updateNogabals(ci,ni,"augsneTips",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}}>
-                        {AUGSNES_TIPI.map(t=><option key={t}>{t}</option>)}
+                      <select value={nog.augsneTips} onChange={e=>updateNogabals(ci,ni,"augsneTips",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #2d5a2d",borderRadius:"4px",fontSize:"12px",background:"#0f2b0f",color:"#e8f5e9"}}>
+                        {AUGSNES_TIPI.map(t=><option key={t} value={t}>{t} — {AUGANAS_TIPI_NOSAUKUMI[t]||t}</option>)}
                       </select>
                     </div>
                   </div>

@@ -180,10 +180,16 @@ export function calcDastojums(stavs, cenas) {
  const atlikas = atlikasFaktors[suga] || 0.15
   const likvida = kopaKraja * (1 - atlikas)
   const atlikasVol = kopaKraja * atlikas
+
+  // Piemēro atlikas faktoru sortimentu apjomiem — kalkulatoros sortimenti
+  // attiecas uz likvīdo krāju, nevis pilno stumbra tilpumu
+  const scaleFactor = 1 - atlikas
+  Object.keys(sortTotals).forEach(k => { sortTotals[k] *= scaleFactor })
+
   const lietkoksne = sortTotals.log + sortTotals.small + sortTotals.veneer + sortTotals.tara + sortTotals.pulp
   const malkaVol = sortTotals.fire + sortTotals.chips
-  
-  const vertiba = Object.entries(sortTotals).reduce((sum, [k, v]) => 
+
+  const vertiba = Object.entries(sortTotals).reduce((sum, [k, v]) =>
     sum + v * (cenas?.[k] || 0), 0)
 
   return {

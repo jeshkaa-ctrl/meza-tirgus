@@ -41,6 +41,14 @@ export default function MobilajiRiki({ onBack, onNavigate }) {
       page: "dastojums_pdf",
       color: "#4caf50"
     },
+    {
+      icon: "📸",
+      title: "Krautuves mērītājs",
+      desc: "3 bildes + garums → AI aprēķina kubatūru. Strādā ar krautuvi un mašīnu.",
+      badge: "AI",
+      page: "krautuves_meritajs",
+      color: "#4caf50"
+    },
   ]
 
   return (
@@ -85,7 +93,6 @@ export default function MobilajiRiki({ onBack, onNavigate }) {
         <div style={{ marginTop: "20px", padding: "14px", background: "#0f1a0f", border: "1px dashed #2d4a2d", borderRadius: "12px" }}>
           <div style={{ color: "#4a7a4a", fontSize: "12px", fontWeight: 700, marginBottom: "10px" }}>🔧 Drīzumā</div>
           {[
-            { icon: "📸", title: "Krautuves kalkulators", desc: "3 bildes + garums → aptuvenie m³" },
             { icon: "🌲", title: "Dastošanas app", desc: "Dastojums → kubi → sortimenti" },
           ].map((r, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", borderBottom: i === 0 ? "0.5px solid #1a3a1a" : "none", opacity: 0.5 }}>
