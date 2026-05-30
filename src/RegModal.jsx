@@ -86,6 +86,7 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
  const [parole, setParole] = useState("")
   const [parole2, setParole2] = useState("")
   const [kludas, setKludas] = useState("")
+  const [lade,   setLade]   = useState(false)
 
   const paroleSpeks = () => {
     if (parole.length === 0) return null
@@ -105,7 +106,8 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
     setPapilduNovadi(papilduNovadi.filter(n => n !== novads))
   }
 
-  const iesniegt = () => {
+  const iesniegt = async () => {
+    setKludas("")
     if (rezims === "jauns") {
       if (!vards.trim()) return setKludas("Lūdzu ievadi vārdu!")
       if (tips === "uznemums" && !uznemums.trim()) return setKludas("Ievadi uzņēmuma nosaukumu!")
@@ -114,11 +116,25 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
       if (parole.length < 8) return setKludas("Parolei jābūt vismaz 8 simboli!")
       if (!/\d/.test(parole)) return setKludas("Parolei jābūt vismaz viens cipars!")
       if (parole !== parole2) return setKludas("Paroles nesakrīt!")
-      onRegistreties({ vards, uznemums, darbiba, talrunis, bazesNovads, papilduNovadi, epasts, parole, tips })
+      setLade(true)
+      try {
+        await onRegistreties({ vards, uznemums, darbiba, talrunis, bazesNovads, papilduNovadi, epasts, parole, tips })
+      } catch(e) {
+        setKludas(e.message)
+      } finally {
+        setLade(false)
+      }
     } else {
       if (!epasts.includes("@")) return setKludas("Nepareizs e-pasts!")
       if (!parole) return setKludas("Ievadi paroli!")
-      onPieteikties({ epasts, parole })
+      setLade(true)
+      try {
+        await onPieteikties({ epasts, parole })
+      } catch(e) {
+        setKludas(e.message)
+      } finally {
+        setLade(false)
+      }
     }
   }
 
@@ -207,8 +223,8 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
           {parole2.length>0 && parole===parole2 && speks==="labi" && <span style={{fontSize:"10px",color:"#388e3c"}}>✓ Paroles sakrīt</span>}
         </div>
 
-        <button onClick={iesniegt} style={{width:"100%",padding:"10px",background:"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:"8px"}}>
-          {rezims==="jauns" ? "Abonēt →" : "Autorizēties →"}
+        <button onClick={iesniegt} disabled={lade} style={{width:"100%",padding:"10px",background:lade?"#557a55":"#225522",color:"white",border:"none",borderRadius:"6px",cursor:lade?"not-allowed":"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:"8px"}}>
+          {lade ? "⏳ Lūdzu uzgaidiet..." : rezims==="jauns" ? "Abonēt →" : "Autorizēties →"}
         </button>
         <button onClick={()=>{setRezims(rezims==="jauns"?"esoss":"jauns");setKludas("")}} style={{width:"100%",padding:"8px",background:"none",border:"1px solid #ccc",borderRadius:"6px",cursor:"pointer",color:"#555",fontSize:"12px",marginBottom:"6px"}}>
           {rezims==="jauns" ? "Jau esmu abonents? Autorizēties" : "Nav konta? Abonēt"}

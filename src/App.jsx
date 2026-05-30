@@ -1584,7 +1584,7 @@ return(
 
 function App(){
 const [page,setPage]=useState("landing")
-const { user, registreties, pieteikties, iziet } = useAuth()
+const { user, loading: authLoading, registreties, pieteikties, iziet } = useAuth()
 const [showReg, setShowReg] = useState(false)
 const [regAtpakal, setRegAtpakal] = useState(null)
 const [showChat, setShowChat] = useState(false)
@@ -1629,13 +1629,15 @@ const [papilduNogabali,setPapilduNogabali]=useState([])
 const jkRef=React.useRef(null)
 const atjRef=React.useRef(null)
 const ieaudRef=React.useRef(null)
+if(authLoading) return <div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}><div style={{width:40,height:40,border:"3px solid #2d4a2d",borderTop:"3px solid #4caf50",borderRadius:"50%",animation:"spin 1s linear infinite"}}/><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style><div style={{color:"#4a7a4a",fontSize:14}}>Ielādē...</div></div>
+
 if(page==="sludinajumi") return <>
   <SludinajumiPage user={user} onBack={()=>setPage("main")}/>
-  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="landing") return <>
   <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")}/>
-  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="standard") return <StandardPage onBack={()=>setPage("main")} onPilna={(data)=>{
   if(data){
@@ -1650,17 +1652,17 @@ if(page==="standard") return <StandardPage onBack={()=>setPage("main")} onPilna=
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState} onOpenDastojums={(file)=>{setDastojumsPdfFile(file); setPage("dastojumsPDF")}}/>
 if(page==="cirsma") return <>
   <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>atvertReg("cirsma")}/>
-  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
 if(page==="skice") return <>
   <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState} user={user} onReg={()=>atvertReg("skice")}/>
-  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedState={caurmersState} onSaveState={setCaurmersState}/>
 if(page==="rekini") return <>
   <RekinuKratuve onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rekini")}/>
-  {showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(showChat) return <ChatPage user={user} onBack={()=>setShowChat(false)}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
@@ -1874,7 +1876,7 @@ win.print()
 return(
 <div style={{fontFamily:"'Inter',Arial,sans-serif",background:"#080f08",minHeight:"100vh",color:"#e8f0e8"}}>
 {user && <GlobalHeader user={user} onIziet={iziet} onOpenChat={()=>setShowChat(true)} onNavigate={(p)=>setPage(p)}/>}
-{showReg && <RegModal onRegistreties={(d)=>{registreties(d);setShowReg(false)}} onPieteikties={(d)=>{pieteikties(d,(kl)=>alert(kl));setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
+{showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false)}} onAizvērt={()=>setShowReg(false)}/>}
 
 {showCustomModal && (
 <div style={{position:"fixed",top:0,left:0,width:"100%",height:"100%",background:"rgba(0,0,0,0.5)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center"}}>
