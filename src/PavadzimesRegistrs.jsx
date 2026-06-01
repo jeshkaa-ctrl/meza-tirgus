@@ -18,8 +18,6 @@ const COLS = [
   { key: "km",            label: "km",                auto: false },
 ];
 
-const API_KEY = import.meta.env.VITE_ANTHROPIC_KEY || "";
-
 const SORTIMENT_CONTEXT = `
 SORTIMENTI UN KOKU SUGAS (obligāti jānosaka abi):
 
@@ -40,14 +38,9 @@ PIEMĒRI:
 `;
 
 async function ocrPavadzime(base64, mediaType) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/anthropic/v1/messages", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
       max_tokens: 1000,
@@ -104,7 +97,7 @@ const getPiegadesVietas = () => { try { const j=JSON.parse(localStorage.getItem(
 const savePiegadesVieta = (v) => { try { const j=JSON.parse(localStorage.getItem("pvz_piegades")||"[]"); if(!j.includes(v)&&!PIEGADES_BAZE.includes(v)){localStorage.setItem("pvz_piegades",JSON.stringify([...j,v]))} } catch {} }
 const getKlienti = () => { try { return JSON.parse(localStorage.getItem("pvz_klienti")||"[]") } catch { return [] } }
 const saveKlients = (v) => { try { const j=JSON.parse(localStorage.getItem("pvz_klienti")||"[]"); if(!j.includes(v)){localStorage.setItem("pvz_klienti",JSON.stringify([...j,v]))} } catch {} }
-export default function PavadzimesRegistrs({ onBack }) {
+export default function PavadzimesRegistrs({ onBack, user }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
@@ -129,7 +122,7 @@ const [jaunaPiegade, setJaunaPiegade] = useState("")
   const loadFromSupabase = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.from("pavadzimes").select("*").order("id", { ascending: false });
+      const { data, error } = await supabase.from("pavadzimes").select("*").eq("user_id", user?.id).order("id", { ascending: false });
       if (error) throw error;
       setRecords(data || []);
     } catch (err) { setError("Kļūda ielādējot: " + err.message); }
@@ -175,7 +168,7 @@ const [jaunaPiegade, setJaunaPiegade] = useState("")
 if(verifyData.piegade) savePiegadesVieta(verifyData.piegade)
 setSaving(true); setError(null);
     try {
-      const row = {...verifyData}; delete row.id;
+      const row = {...verifyData, user_id: user?.id}; delete row.id;
       const { data, error } = await supabase.from("pavadzimes").insert([row]).select().single();
       if (error) throw error;
       setRecords(prev => [data, ...prev]);

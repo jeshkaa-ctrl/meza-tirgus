@@ -65,5 +65,43 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- 5. SVARĪGI: Supabase Dashboard → Authentication → Settings
+-- 5. Pavadzīmju reģistrs
+create table if not exists public.pavadzimes (
+  id             uuid primary key default gen_random_uuid(),
+  user_id        uuid references auth.users(id) on delete cascade not null,
+  datums         text default '',
+  pvz_nr         text default '',
+  no_kurienes    text default '',
+  cirt_apl_nr    text default '',
+  sortiments     text default '',
+  suga           text default '',
+  piegade        text default '',
+  kubi           numeric,
+  veids          text default '',
+  klients        text default '',
+  kubi_uzmeriti  numeric,
+  soferis        text default '',
+  auto           text default '',
+  km             numeric,
+  created_at     timestamptz default now()
+);
+
+alter table public.pavadzimes enable row level security;
+create policy "own_pavadzimes" on public.pavadzimes for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- 6. Klienta iestatījumi (šoferi, piegādes vietas, uzņēmuma nosaukums)
+create table if not exists public.klienta_iestatijumi (
+  user_id              uuid references auth.users(id) on delete cascade primary key,
+  uznemums_nosaukums   text default '',
+  soferi               jsonb default '[]',
+  piegades_vietas      jsonb default '[]',
+  updated_at           timestamptz default now()
+);
+
+alter table public.klienta_iestatijumi enable row level security;
+create policy "own_iestatijumi" on public.klienta_iestatijumi for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+-- Admins var lasīt/rakstīt visus iestatījumus (nomainīt uz īsto admin user ID)
+-- create policy "admin_iestatijumi" on public.klienta_iestatijumi for all using (auth.uid() = 'ADMIN_UUID_ŠEIT');
+
+-- 7. SVARĪGI: Supabase Dashboard → Authentication → Settings
 --    Izslēdz "Enable email confirmations" lai lietotāji var pieteikties uzreiz pēc reģistrācijas

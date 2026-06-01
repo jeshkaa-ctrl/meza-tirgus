@@ -1,6 +1,9 @@
 import JautaParMezuWidget from './components/JautaParMezuWidget'
 
+const ADMIN_EMAIL = 'jeshkaa@inbox.lv'
+
 export default function MainPage({ onNavigate, user, onReg, onIziet }) {
+  const isAdmin = user?.epasts === ADMIN_EMAIL
 
   const sadajas = [
     {
@@ -31,7 +34,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         { icon: "🧾", title: "Rēķinu krātuve", desc: "Rēķinu izveide, drukāšana, mēneša un gada pārskats", page: "rekini" },
         { icon: "🚛", title: "Loģistikas kalkulators", desc: "Transporta izmaksas, piegādes maršruti, degvielas kalkulācija", page: "logistika" },
         { icon: "💳", title: "Abonements", desc: "Pro un Komercija plāni — paplašinātas iespējas", page: "subscription" },
-        { icon: "🌲", title: "RP Andras portāls", desc: "Vadības panelis — algas, rēķini, Excel", page: "rpandras" },
+        ...(isAdmin ? [{ icon: "🌲", title: "RP Andras portāls", desc: "Vadības panelis — algas, rēķini, Excel", page: "rpandras" }] : []),
       ]
     },
     {
