@@ -435,7 +435,80 @@ function sagataavotKopsavilkumu(koki) {
   };
 }
 
-// ─── 9. EKSPORTA PALĪGFUNKCIJAS ───────────────────────────────────────────────
+// ─── 9. JAUNA GALVENĀ FUNKCIJA — pēc VMD standarta ───────────────────────────
+/**
+ * Aprēķina kubatūru un sadala pa kvalitātēm, izmantojot lietotāja ievadītos augstums.
+ * calcSortimenti() NETIEK izmantots — šis rīks ir tikai uzmērīšana, ne sortimentu sadalījums.
+ *
+ * @param {Array}  koki    — [{suga, d_cm, kvalitate, skaits, bon, nogabals, ...}]
+ * @param {Object} sugaH   — { P: 22.5, E: 18.0, B: 16.5, ... } — lietotāja ievadītie vidējie augstumi
+ * @returns {Object} { paSugam, kopa }
+ */
+export function sadaliKvalitates(koki, sugaH) {
+  // Iezīmē 2. stāvu (loģika nemainās)
+  const kokiAr2 = apzimetOtroStavu(
+    koki.flatMap(k => Array(k.skaits ?? 1).fill(k).map(x => ({ ...x })))
+  );
+
+  const paSugam = {};
+
+  for (const k of kokiAr2) {
+    // Lietotāja ievadītais augstums aizstāj regresiju; 2. stāvam — 60% no vidējā
+    const hVid = sugaH[k.suga] ?? calcH(k.d_cm, k.suga, k.bon ?? 3);
+    const h    = k.otrsStavs ? Math.max(hVid * 0.60, 4) : hVid;
+
+    const brutV  = calcV(k.d_cm, h, k.suga);
+    const { v: atliV } = calcAtliekas(k.d_cm, k.suga, brutV);
+    const likvidV = brutV - atliV;
+
+    if (!paSugam[k.suga]) {
+      paSugam[k.suga] = {
+        skaits: 0, brutV: 0, atliV: 0, likvidV: 0,
+        resnaV: 0, vidaV: 0, tievaV: 0, malkaV: 0,
+        otrsStavsSkaits: 0,
+      };
+    }
+    const ps = paSugam[k.suga];
+    ps.skaits += 1;
+    ps.brutV  += brutV;
+    ps.atliV  += atliV;
+    ps.likvidV += likvidV;
+    if (k.otrsStavs) ps.otrsStavsSkaits += 1;
+
+    if      (k.kvalitate === 'resns')  ps.resnaV  += likvidV;
+    else if (k.kvalitate === 'vidējs') ps.vidaV   += likvidV;
+    else if (k.kvalitate === 'tievs')  ps.tievaV  += likvidV;
+    else if (k.kvalitate === 'malka')  ps.malkaV  += likvidV;
+  }
+
+  // Noapaļo un aprēķina atvasinātās vērtības
+  const kopa = {
+    skaits: 0, brutV: 0, atliV: 0, likvidV: 0,
+    resnaV: 0, vidaV: 0, tievaV: 0, malkaV: 0,
+    lietkoksneV: 0, pardosanaiV: 0,
+  };
+
+  for (const sg in paSugam) {
+    const ps = paSugam[sg];
+    for (const f of ['brutV','atliV','likvidV','resnaV','vidaV','tievaV','malkaV']) {
+      ps[f] = round2(ps[f]);
+      kopa[f] += ps[f];
+    }
+    ps.lietkoksneV = round2(ps.resnaV + ps.vidaV + ps.tievaV);
+    ps.pardosanaiV = round2(ps.lietkoksneV + ps.malkaV);
+    ps.videjaKoks  = ps.skaits > 0 ? round2(ps.brutV / ps.skaits) : 0;
+    kopa.skaits += ps.skaits;
+  }
+
+  for (const f of ['brutV','atliV','likvidV','resnaV','vidaV','tievaV','malkaV']) kopa[f] = round2(kopa[f]);
+  kopa.lietkoksneV = round2(kopa.resnaV + kopa.vidaV + kopa.tievaV);
+  kopa.pardosanaiV = round2(kopa.lietkoksneV + kopa.malkaV);
+  kopa.videjaKoks  = kopa.skaits > 0 ? round2(kopa.brutV / kopa.skaits) : 0;
+
+  return { paSugam, kopa };
+}
+
+// ─── 10. EKSPORTA PALĪGFUNKCIJAS ──────────────────────────────────────────────
 
 /** Formatē kopsavilkumu teksta veidā (priekš PDF/print) */
 export function formatKopsavilkums(ks, cirsmaInfo = {}) {
