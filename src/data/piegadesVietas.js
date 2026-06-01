@@ -17,18 +17,27 @@ export const PIEGADES_VIETAS = [
   { id: "jubergs",         nosaukums: "Jubergs",           lat: 56.5307, lng: 25.8504, pienem: ["balki_P","balki_E","tara"] },
   { id: "v55",             nosaukums: "V55",               lat: 56.6163, lng: 26.7249, pienem: ["balki_P","balki_E","tara"] },
 
+  // LATVIJA — PAPĪRMALKA / SĪKBAĻĶI
+  { id: "stora_enso_sm",   nosaukums: "Stora Enso (sīkb.)",lat: 57.3403, lng: 25.8461, pienem: ["sikbalki","papirmalka"] },
+  { id: "billerud",        nosaukums: "Billerud Latgale",  lat: 56.5300, lng: 27.3500, pienem: ["sikbalki","papirmalka","balki_M"] },
+  { id: "rpc_paper",       nosaukums: "RPC (papīrmalka)",  lat: 56.6800, lng: 24.3600, pienem: ["papirmalka","sikbalki"] },
+
   // LATVIJA — FINIERIS
   { id: "lv_finieris",     nosaukums: "AS Latvijas Finieris", lat: 56.5432, lng: 27.3403, pienem: ["finieris"] },
 
-  // LATVIJA — GRANULAS/MALKA
-  { id: "graanul_invest",  nosaukums: "Graanul Invest",    lat: 57.3440, lng: 25.8563, pienem: ["malka","skelda"] },
-  { id: "graanul_pellets", nosaukums: "Graanul Pellets",   lat: 57.0884, lng: 24.6709, pienem: ["malka","skelda"] },
-  { id: "latgran",         nosaukums: "Latgran",           lat: 56.5069, lng: 25.9081, pienem: ["malka","skelda"] },
+  // LATVIJA — GRANULAS/MALKA/ŠĶELDA
+  { id: "graanul_invest",  nosaukums: "Graanul Invest",    lat: 57.3440, lng: 25.8563, pienem: ["malka","skelda","zagbalki","balki_M"] },
+  { id: "graanul_pellets", nosaukums: "Graanul Pellets",   lat: 57.0884, lng: 24.6709, pienem: ["malka","skelda","zagbalki"] },
+  { id: "latgran",         nosaukums: "Latgran",           lat: 56.5069, lng: 25.9081, pienem: ["malka","skelda","zagbalki","balki_M"] },
+  { id: "livo_mezs",       nosaukums: "Livo Mežs",         lat: 57.1200, lng: 24.8600, pienem: ["malka","skelda","zagbalki"] },
 
   // LATVIJA — TARA/DAŽĀDI
-  { id: "ibiza",           nosaukums: "Ibiza",             lat: 56.9644, lng: 24.1825, pienem: ["tara","balki_P","balki_E"] },
+  { id: "ibiza",           nosaukums: "Ibiza",             lat: 56.9644, lng: 24.1825, pienem: ["tara","balki_P","balki_E","zagbalki"] },
   { id: "akz",             nosaukums: "AKZ",               lat: 56.9662, lng: 24.0815, pienem: ["tara","balki_P","balki_E"] },
-  { id: "kankuli",         nosaukums: "Kankuli Timber",    lat: 56.2615, lng: 26.8158, pienem: ["tara"] },
+  { id: "kankuli",         nosaukums: "Kankuli Timber",    lat: 56.2615, lng: 26.8158, pienem: ["tara","zagbalki"] },
+
+  // MELNALKSNIS — īpaši pircēji
+  { id: "eko_b",           nosaukums: "Eko Biokurināmais", lat: 56.9500, lng: 24.5000, pienem: ["balki_M","sikbalki","malka","skelda"] },
 
   // IGAUNIJA
   { id: "barrus_ee",       nosaukums: "Barrus (EE)",       lat: 57.8175, lng: 27.0677, pienem: ["balki_P","balki_E","finieris"] },

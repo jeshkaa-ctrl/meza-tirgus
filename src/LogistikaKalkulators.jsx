@@ -48,7 +48,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
     if (sortimenti) return sortimenti
     return {
       balki_P: 0, balki_E: 0, balki_M: 0, sikbalki: 0,
-      finieris: 0, zagbalki: 0, tara: 0, papirmalka: 0, malka: 0
+      finieris: 0, zagbalki: 0, tara: 0, papirmalka: 0, malka: 0, skelda: 0
     }
   })
 
@@ -271,7 +271,11 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
           </div>
         </div>
 
-        <button style={s.btn} onClick={() => setSolis(2)}
+        <button style={{
+          ...s.btn,
+          opacity: (!krautuveLat || !krautuveLng) ? 0.4 : 1,
+          cursor: (!krautuveLat || !krautuveLng) ? "not-allowed" : "pointer",
+        }} onClick={() => setSolis(2)}
           disabled={!krautuveLat || !krautuveLng}>
           Tālāk → Sortimenti ›
         </button>
