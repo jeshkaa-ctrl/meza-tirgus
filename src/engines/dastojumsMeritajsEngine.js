@@ -130,34 +130,61 @@ const MALKA_PROC = {
   P:0.021, E:0.053, B:0.020, A:0.206, Ba:0.740, Bl:0.250, Oz:0.030, Os:0.040,
 };
 
-// ─── 6. SADALĪJUMS PA STUMBRA ZONĀM ─────────────────────────────────────────
+// ─── 6. SADALĪJUMS PA STUMBRA ZONĀM — Kozak volumetriskā integrācija ─────────
+//
+// Koka stumbra tilpums nav lineāri sadalīts pa augstumu — apakšā ir vairāk.
+// Kozak taper modelis: d(h) = D × (1 - h/H)^forma
+//
+// Volumetriskā frakcija no h1 līdz h2:
+//   V_zona/V_kopā = (1-h1/H)^(2f+1) - (1-h2/H)^(2f+1)
+//
+// Iegūts integrējot:
+//   V = ∫ (π/4)×d(h)² dh = (π/4)×D²×H × ∫(1-h/H)^(2f) dh
+//
+// Pārbaude: Priede D=28cm H=28m
+//   h18 = 13.8m → resnā frakcija = 0.9754 - 0.2095 = 76.6% ✓ (briefings: ≈76%)
+//
+function zonesFrakcija(h1, h2, H, forma) {
+  const exp = 2 * forma + 1;
+  const f1  = Math.pow(Math.max(0, 1 - h1 / H), exp);
+  const f2  = Math.pow(Math.max(0, 1 - h2 / H), exp);
+  return Math.max(0, f1 - f2);
+}
+
 /**
- * Sadala likvidV pa VMD stumbra zonām, izmantojot Kozak profilu.
- * Vienkāršotā versija: V_zona = likvidV * L_zona / H  (±5% precizitāte)
+ * Sadala likvidV pa VMD stumbra zonām ar Kozak volumetrisko integrāciju.
+ * Zonu summa = likvidV (normalizēta).
  *
- * @param {number} D_cm
- * @param {number} H_m   — lietotāja izmērītais augstums
- * @param {string} suga
- * @param {number} likvidV — likvīdā kubatūra (brutV - atliV)
- * @returns {{ resnaV, vidaV, tievaV, pmalkaV }} — pa zonām
+ * Validācija (Briefings):
+ *   P D=28 H=28: resnā ≈76%  ✓
+ *   P D=28 H=28: atlikumi ≈12.5% (no ATLIEKAS_PROC) ✓
  */
 function sadaliStumbu(D_cm, H_m, suga, likvidV) {
   const { h18, h14, h8, h4 } = stumbaProfileis(D_cm, H_m, suga);
+  const f    = STUMBRA_FORMA[suga] ?? 0.65;
   const CELMS = 0.3;
 
-  // Zonas garumi
-  const L_resna  = Math.max(0, h18 - CELMS);  // D≥18: no celma augšas līdz h18
-  const L_videja = Math.max(0, h14 - h18);     // D 14-18
-  const L_tieva  = Math.max(0, h8  - h14);     // D 8-14
-  const L_pmalka = Math.max(0, h4  - h8);      // D 4-8 (galotne — papīrmalka)
-  // D<4cm un celms (0.3m) ietilpst atlikumos
+  // Volumetriskās frakcijas pa zonām (Kozak modelis)
+  const fResna  = zonesFrakcija(CELMS, h18, H_m, f);  // D ≥ 18cm
+  const fVideja = zonesFrakcija(h18,   h14, H_m, f);  // D 14-18cm
+  const fTieva  = zonesFrakcija(h14,   h8,  H_m, f);  // D 8-14cm
+  const fPmalka = zonesFrakcija(h8,    h4,  H_m, f);  // D 4-8cm (P.malka)
+  // Galotne D<4cm + celms (0-0.3m) ietilpst atlikumos — nav zonās
 
-  // Proporcionāls sadalījums (vienkāršotais Kozak)
+  // Summa izmantojamo zonu frakcijām (≈97-99% no koka)
+  const fKopa = fResna + fVideja + fTieva + fPmalka;
+
+  if (fKopa <= 0) {
+    // Ļoti mazs koks (D<4cm) — viss iet atlikumos
+    return { resnaV:0, vidaV:0, tievaV:0, pmalkaV:0 };
+  }
+
+  // Normalizē zonas tā lai to summa = likvidV (precīza grāmatvedība)
   return {
-    resnaV:  round4(likvidV * L_resna  / H_m),
-    vidaV:   round4(likvidV * L_videja / H_m),
-    tievaV:  round4(likvidV * L_tieva  / H_m),
-    pmalkaV: round4(likvidV * L_pmalka / H_m),
+    resnaV:  round4(likvidV * fResna  / fKopa),
+    vidaV:   round4(likvidV * fVideja / fKopa),
+    tievaV:  round4(likvidV * fTieva  / fKopa),
+    pmalkaV: round4(likvidV * fPmalka / fKopa),
   };
 }
 
