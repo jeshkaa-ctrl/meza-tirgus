@@ -1,3 +1,5 @@
+import JautaParMezuWidget from './components/JautaParMezuWidget'
+
 export default function MainPage({ onNavigate, user, onReg, onIziet }) {
 
   const sadajas = [
@@ -5,7 +7,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       title: "Cirsmu darbi",
       color: "#4caf50",
       riki: [
-    { icon: "🗺", title: "Cirsmas skice", desc: "KML/SHP → skice ar koordinātām, PDF VMD iesniegumam. Iekļauj: 📏 Caurmēra mērījumi · 🌲 Dastojuma mērījumi · ⬇ SHP · 🧾 Rēķins", page: "skice" },
+        { icon: "🗺", title: "Cirsmas skice", desc: "KML/SHP → skice ar koordinātām, PDF VMD iesniegumam. Iekļauj: 📏 Caurmēra mērījumi · 🌲 Dastojuma mērījumi · ⬇ SHP · 🧾 Rēķins", page: "skice" },
         { icon: "🌲", title: "Cirsmas novērtēšana", desc: "PDF no VMD → nogabalu analīze, cirsmas vērtība, ieteikumi", page: "cirsma" },
         { icon: "📊", title: "Dastojuma kalkulators", desc: "Mežvērtes PDF → sortimentu apjomi, krautuves vērtība", page: "dastojums_pdf" },
       ]
@@ -41,7 +43,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       riki: [
         { icon: "🌲", title: "Cirsmas novērtēšana (PDF)", desc: "VMD inventarizācijas PDF → nogabalu analīze, cirsmas vērtība — pieejams bezmaksas sadaļā", page: "standard" },
         { icon: "✂️", title: "PDF šķirotājs", desc: "Sadala daudzīpašumu PDF pa kadastriem atsevišķos dokumentos", page: "pdfSkirotajs" },
-        { icon: "💬", title: "Jautā par mežu", desc: "AI konsultants — meža likumdošana, koku ciršana, aizsargjoslas, mikroliegumi. Atbild ar VMD/DAP kontaktiem.", page: "jautaparmezu", badge: "AI" },
+        { icon: "⚖️", title: "Meža likumi — pilnais čats", desc: "Daudzfāzu saruna, kategorijas, VMD/DAP kontakti", page: "jautaparmezu", badge: "AI" },
       ]
     },
   ]
@@ -51,13 +53,14 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
 
       {/* HEADER */}
       <div style={{ background: "#1b3a1b", borderBottom: "2px solid #4caf50", padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => onNavigate('landing')}>
           <span style={{ fontSize: "24px" }}>🌲</span>
           <span style={{ color: "#4caf50", fontSize: "18px", fontWeight: 800 }}>Meža tirgus</span>
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{ padding: "6px 12px", background: "#2e7d32", color: "white", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: "bold" }}>🗺 LVM GEO</a>
           <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{ padding: "6px 12px", background: "#5d4037", color: "white", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: "bold" }}>🏛 VMD</a>
+          <button onClick={() => onNavigate('jautaparmezu')} style={{ padding: "6px 12px", background: "transparent", color: "#a8d8a8", border: "1px solid #2d5a2d", borderRadius: "6px", fontSize: "12px", cursor: "pointer" }}>⚖️ Meža likumi</button>
           {user
             ? <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
                 <span style={{ color: "#81c784", fontSize: "13px", padding: "6px 10px", background: "rgba(255,255,255,0.05)", borderRadius: "6px", border: "1px solid #2d5a2d" }}>👤 {user.vards}</span>
@@ -68,8 +71,14 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         </div>
       </div>
 
-      {/* SADAĻAS */}
       <div style={{ padding: "16px 20px", maxWidth: "1100px", margin: "0 auto" }}>
+
+        {/* MEŽA LIKUMI WIDGET */}
+        <div style={{ marginBottom: "20px" }}>
+          <JautaParMezuWidget onPilnsSkats={() => onNavigate('jautaparmezu')} />
+        </div>
+
+        {/* SADAĻAS */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
           {sadajas.map((s, si) => (
             <div key={si} style={{ background: "#111f11", border: `1px solid ${s.color}33`, borderRadius: "12px", padding: "14px", borderTop: `3px solid ${s.color}` }}>
@@ -99,7 +108,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
           ))}
         </div>
 
-        {/* APAKŠA — vieta reklāmām / padomiem */}
+        {/* APAKŠA */}
         <div style={{ marginTop: "24px", padding: "16px", background: "#0f1a0f", border: "1px dashed #2d4a2d", borderRadius: "12px", textAlign: "center" }}>
           <div style={{ color: "#4a7a4a", fontSize: "12px", marginBottom: "8px" }}>💡 Padomi & jaunumi</div>
           <div style={{ color: "#2d4a2d", fontSize: "11px" }}>Šeit parādīsies padomi, jaunumi un reklāmas</div>

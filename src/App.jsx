@@ -25,6 +25,8 @@ import KrautuvesMeritajsPage from "./KrautuvesMeritajsPage"
 import DastojumsMeritajsPage from "./DastojumsMeritajsPage"
 import SubscriptionPage from "./SubscriptionPage"
 import JautaParMezuPage from "./JautaParMezuPage"
+import JautaParMezuWidget from "./components/JautaParMezuWidget"
+import MainPage from "./MainPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1420,7 +1422,7 @@ Drukāt / Saglabāt PDF
 )
 }
 // ========== GALVENA APP ==========
-function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi}){
 return(
 <div style={{fontFamily:"Arial",minHeight:"100vh",background:"#080f08",maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -1453,6 +1455,9 @@ return(
     <button onClick={onSludinajumi} style={{padding:"13px 28px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer"}}>
       📢 Sludinājumi
     </button>
+    <button onClick={onLikumi} style={{padding:"13px 28px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer"}}>
+      ⚖️ Meža likumi
+    </button>
     <div style={{position:"relative",display:"inline-block"}}
       onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
       onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
@@ -1470,8 +1475,13 @@ return(
   </div>
 </div>
 
+  {/* JAUTĀ PAR MEŽU WIDGET */}
+  <div style={{maxWidth:"900px",margin:"0 auto",padding:"32px 24px 0",width:"100%",boxSizing:"border-box"}}>
+    <JautaParMezuWidget onPilnsSkats={onLikumi} />
+  </div>
+
   {/* KAS IR MEŽA TIRGUS */}
-  <div style={{maxWidth:"900px",margin:"0 auto",padding:"48px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box",background:"#080f08"}}>
+  <div style={{maxWidth:"900px",margin:"0 auto",padding:"24px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box",background:"#080f08"}}>
 <div style={{background:"linear-gradient(135deg, #1a2e1a, #0f1f0f)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"40px",marginBottom:"24px"}}>
   <h2 style={{color:"#4caf50",fontSize:"24px",textAlign:"center",marginBottom:"24px",fontWeight:800,letterSpacing:"-0.02em"}}>Kas ir Meža tirgus?</h2>
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"24px",marginBottom:"24px"}}>
@@ -1639,7 +1649,7 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="standard") return <StandardPage onBack={()=>setPage("main")} onPilna={(data)=>{
@@ -1682,6 +1692,10 @@ if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")}/
 if(page==="rpandras") return <RpAndrasPortals onBack={()=>setPage("main")}/>
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
+if(page==="main") return <>
+  <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 
 const landPrices={
 Ap:4500,Vr:4500,Nd:2500,Db:2500,Vrs:3000,Dm:3000,Kp:3000

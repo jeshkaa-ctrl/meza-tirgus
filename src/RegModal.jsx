@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { NOVADI } from "./novadi"
 
 export const DARBIBAS_VEIDI = [
@@ -54,6 +54,7 @@ function NovadsAutocomplete({ onPievienot }) {
       <input
         value={ievade}
         onChange={e => handleChange(e.target.value)}
+        onBlur={() => setTimeout(() => setPiedavajumi([]), 150)}
         placeholder="Raksti novada nosaukumu..."
         style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}
       />
@@ -83,18 +84,10 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
   const [bazesNovads, setBazesNovads] = useState("")
   const [papilduNovadi, setPapilduNovadi] = useState([])
   const [epasts, setEpasts] = useState("")
- const [parole, setParole] = useState("")
-  const [parole2, setParole2] = useState("")
+  const paroleRef = useRef(null)
+  const parole2Ref = useRef(null)
   const [kludas, setKludas] = useState("")
   const [lade,   setLade]   = useState(false)
-
-  const paroleSpeks = () => {
-    if (parole.length === 0) return null
-    if (parole.length < 8) return "vaja"
-    if (!/\d/.test(parole)) return "vaja"
-    return "labi"
-  }
-  const speks = paroleSpeks()
 
   const pievienotNovadu = (novads) => {
     if (!papilduNovadi.includes(novads) && novads !== bazesNovads) {
@@ -108,17 +101,19 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
 
   const iesniegt = async () => {
     setKludas("")
+    const p1 = paroleRef.current?.value || ""
+    const p2 = parole2Ref.current?.value || ""
     if (rezims === "jauns") {
       if (!vards.trim()) return setKludas("Lūdzu ievadi vārdu!")
       if (tips === "uznemums" && !uznemums.trim()) return setKludas("Ievadi uzņēmuma nosaukumu!")
       if (tips === "uznemums" && !bazesNovads) return setKludas("Izvēlies bāzes novadu!")
       if (!epasts.includes("@")) return setKludas("Nepareizs e-pasts!")
-      if (parole.length < 8) return setKludas("Parolei jābūt vismaz 8 simboli!")
-      if (!/\d/.test(parole)) return setKludas("Parolei jābūt vismaz viens cipars!")
-      if (parole !== parole2) return setKludas("Paroles nesakrīt!")
+      if (p1.length < 8) return setKludas("Parolei jābūt vismaz 8 simboli!")
+      if (!/\d/.test(p1)) return setKludas("Parolei jābūt vismaz viens cipars!")
+      if (p1 !== p2) return setKludas("Paroles nesakrīt!")
       setLade(true)
       try {
-        await onRegistreties({ vards, uznemums, darbiba, talrunis, bazesNovads, papilduNovadi, epasts, parole, tips })
+        await onRegistreties({ vards, uznemums, darbiba, talrunis, bazesNovads, papilduNovadi, epasts, parole: p1, tips })
       } catch(e) {
         setKludas(e.message)
       } finally {
@@ -126,10 +121,10 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
       }
     } else {
       if (!epasts.includes("@")) return setKludas("Nepareizs e-pasts!")
-      if (!parole) return setKludas("Ievadi paroli!")
+      if (!p1) return setKludas("Ievadi paroli!")
       setLade(true)
       try {
-        await onPieteikties({ epasts, parole })
+        await onPieteikties({ epasts, parole: p1 })
       } catch(e) {
         setKludas(e.message)
       } finally {
@@ -210,17 +205,14 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
         <div style={{marginBottom:"10px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>Parole:</label>
           <span style={{fontSize:"10px",color:"#888",marginLeft:"8px"}}>min. 8 simboli, vismaz 1 cipars</span><br/>
-          <input type="password" value={parole} onChange={e=>setParole(e.target.value)}
-            style={{width:"100%",padding:"6px",border:`1px solid ${speks==="labi"?"#388e3c":speks==="vaja"?"#c62828":"#ccc"}`,borderRadius:"4px",fontSize:"13px",boxSizing:"border-box",background:speks==="labi"?"#f0fff0":speks==="vaja"?"#fff0f0":"white"}}/>
-          {speks==="vaja" && <span style={{fontSize:"10px",color:"#c62828"}}>⛔ Par īsu vai nav cipara</span>}
-          {speks==="labi" && <span style={{fontSize:"10px",color:"#388e3c"}}>✓ Parole ir derīga</span>}
+          <input ref={paroleRef} type="password" defaultValue=""
+            autoComplete={rezims==="jauns"?"new-password":"current-password"}
+            style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
         <div style={{marginBottom:"16px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>Atkārtot paroli:</label><br/>
-          <input type="password" value={parole2} onChange={e=>setParole2(e.target.value)}
-            style={{width:"100%",padding:"6px",border:`1px solid ${parole2.length>0?(parole===parole2?"#388e3c":"#c62828"):"#ccc"}`,borderRadius:"4px",fontSize:"13px",boxSizing:"border-box",background:parole2.length>0?(parole===parole2?"#f0fff0":"#fff0f0"):"white"}}/>
-          {parole2.length>0 && parole!==parole2 && <span style={{fontSize:"10px",color:"#c62828"}}>⛔ Paroles nesakrīt</span>}
-          {parole2.length>0 && parole===parole2 && speks==="labi" && <span style={{fontSize:"10px",color:"#388e3c"}}>✓ Paroles sakrīt</span>}
+          <input ref={parole2Ref} type="password" defaultValue="" autoComplete="new-password"
+            style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
 
         <button onClick={iesniegt} disabled={lade} style={{width:"100%",padding:"10px",background:lade?"#557a55":"#225522",color:"white",border:"none",borderRadius:"6px",cursor:lade?"not-allowed":"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:"8px"}}>
