@@ -326,7 +326,7 @@ ${soferuStats.map(s => {
   )
 }
 
-export default function RpAndrasPortals({ onBack }) {
+export default function RpAndrasPortals({ onBack, noHeader }) {
   const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -409,22 +409,33 @@ const [filtrKlients, setFiltrKlients] = useState("")
   return (
     <div style={{minHeight:"100vh",background:"#0a0f0a",color:"#e8f5e9",fontFamily:"Arial,sans-serif"}}>
 
-      {/* HEADER */}
+      {/* HEADER — slēpts ja noHeader */}
+      {!noHeader && (
       <div style={{background:"#1b3a1b",borderBottom:"2px solid #4caf50",padding:"14px 24px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:16}}>
-          <button onClick={onBack} style={{background:"transparent",border:"none",color:"#4caf50",fontSize:16,cursor:"pointer"}}>← Atpakaļ</button>
+          <button onClick={onBack} style={{background:"transparent",border:"none",color:"#4caf50",fontSize:22,cursor:"pointer",minWidth:36,minHeight:44}}>←</button>
           <div>
-            <div style={{fontSize:18,fontWeight:700,color:"#4caf50"}}>🌲 RP Andras</div>
+            <div style={{fontSize:16,fontWeight:700,color:"#4caf50"}}>📊 RP Andras — Vadība</div>
             <div style={{fontSize:11,color:"#4a7a4a"}}>Pavadzīmju vadības panelis</div>
           </div>
         </div>
-        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
           <button onClick={loadData} style={{background:"transparent",border:"1px solid #2d5a2d",borderRadius:6,padding:"6px 12px",color:"#81c784",fontSize:12,cursor:"pointer"}}>↻ Atjaunot</button>
           <button onClick={()=>exportExcel(filtreti, filtrFilename)} style={{background:"#0f2b0f",border:"1px solid #4caf50",borderRadius:6,padding:"6px 14px",color:"#4caf50",fontSize:12,cursor:"pointer",fontWeight:700}}>⬇ Excel</button>
           <button onClick={()=>setShowAlgas(true)} style={{background:"#3a2800",border:"1px solid #ffb74d",borderRadius:6,padding:"6px 14px",color:"#ffb74d",fontSize:12,cursor:"pointer",fontWeight:700}}>💰 Algas</button>
           <button onClick={()=>setShowRekins(true)} style={{background:"#225522",border:"1px solid #4caf50",borderRadius:6,padding:"6px 14px",color:"#4caf50",fontSize:12,cursor:"pointer",fontWeight:700}}>🧾 Rēķins</button>
         </div>
       </div>
+      )}
+      {/* Action bar kad noHeader */}
+      {noHeader && (
+        <div style={{padding:"10px 20px",display:"flex",gap:8,flexWrap:"wrap",borderBottom:"1px solid #2d4a2d"}}>
+          <button onClick={loadData} style={{background:"transparent",border:"1px solid #2d5a2d",borderRadius:6,padding:"6px 12px",color:"#81c784",fontSize:12,cursor:"pointer"}}>↻ Atjaunot</button>
+          <button onClick={()=>exportExcel(filtreti, filtrFilename)} style={{background:"#0f2b0f",border:"1px solid #4caf50",borderRadius:6,padding:"6px 14px",color:"#4caf50",fontSize:12,cursor:"pointer",fontWeight:700}}>⬇ Excel</button>
+          <button onClick={()=>setShowAlgas(true)} style={{background:"#3a2800",border:"1px solid #ffb74d",borderRadius:6,padding:"6px 14px",color:"#ffb74d",fontSize:12,cursor:"pointer",fontWeight:700}}>💰 Algas</button>
+          <button onClick={()=>setShowRekins(true)} style={{background:"#225522",border:"1px solid #4caf50",borderRadius:6,padding:"6px 14px",color:"#4caf50",fontSize:12,cursor:"pointer",fontWeight:700}}>🧾 Rēķins</button>
+        </div>
+      )}
 
       <div style={{padding:"20px 24px"}}>
 

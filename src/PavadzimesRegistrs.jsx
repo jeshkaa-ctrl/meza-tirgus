@@ -97,7 +97,7 @@ const getPiegadesVietas = () => { try { const j=JSON.parse(localStorage.getItem(
 const savePiegadesVieta = (v) => { try { const j=JSON.parse(localStorage.getItem("pvz_piegades")||"[]"); if(!j.includes(v)&&!PIEGADES_BAZE.includes(v)){localStorage.setItem("pvz_piegades",JSON.stringify([...j,v]))} } catch {} }
 const getKlienti = () => { try { return JSON.parse(localStorage.getItem("pvz_klienti")||"[]") } catch { return [] } }
 const saveKlients = (v) => { try { const j=JSON.parse(localStorage.getItem("pvz_klienti")||"[]"); if(!j.includes(v)){localStorage.setItem("pvz_klienti",JSON.stringify([...j,v]))} } catch {} }
-export default function PavadzimesRegistrs({ onBack, user }) {
+export default function PavadzimesRegistrs({ onBack, user, noHeader }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
@@ -199,22 +199,30 @@ setSaving(true); setError(null);
   return (
     <div style={{height:"100vh",display:"flex",flexDirection:"column",background:"#0a0f0a",color:"#e8f5e9",fontFamily:"Arial,sans-serif"}}>
 
-      {/* HEADER */}
-      <div style={{background:"#1b3a1b",borderBottom:"1px solid #2d5a2d",padding:"12px 20px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      {/* HEADER — slēpts ja noHeader */}
+      {!noHeader && (
+      <div style={{background:"#1b3a1b",borderBottom:"1px solid #2d5a2d",padding:"0 20px",height:52,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
-          {btn("← Atpakaļ", onBack, {background:"transparent",border:"none",color:"#4caf50",fontSize:16})}
-          <span style={{fontSize:16,fontWeight:700,color:"#4caf50"}}>🌲 Meža tirgus</span>
+          {onBack && btn("←", onBack, {background:"transparent",border:"none",color:"#4caf50",fontSize:22,minWidth:36,minHeight:44})}
+          <span style={{fontSize:15,fontWeight:700,color:"#4caf50"}}>🪵 Pavadzīmju reģistrs</span>
         </div>
-        <div style={{textAlign:"center"}}>
-          <div style={{fontSize:14,color:"#81c784"}}>Pavadzīmju reģistrs</div>
-          <div style={{fontSize:12,color:"#4a7a4a"}}>{loading?"Ielādē...":`${records.length} pvz. | ${totalKubi.toFixed(3)} m³`}</div>
-          <div style={{fontSize:10,color:"#2d5a2d"}}>☁ Supabase</div>
-        </div>
+        <div style={{fontSize:12,color:"#4a7a4a"}}>{loading?"Ielādē...":`${records.length} pvz. | ${totalKubi.toFixed(3)} m³`}</div>
         <div style={{display:"flex",gap:8}}>
           {btn("↻", loadFromSupabase, {background:"transparent",border:"1px solid #2d5a2d",borderRadius:8,padding:"6px 12px",color:"#81c784",fontSize:12})}
           {btn("⬇ CSV", ()=>exportCSV(records), {background:"#2d5a2d",border:"1px solid #4caf50",borderRadius:8,padding:"6px 14px",color:"#4caf50",fontSize:12})}
         </div>
       </div>
+      )}
+      {/* Action bar kad noHeader */}
+      {noHeader && (
+        <div style={{padding:"8px 20px",display:"flex",gap:8,justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid #2d5a2d"}}>
+          <div style={{fontSize:12,color:"#4a7a4a"}}>{loading?"Ielādē...":`${records.length} pvz. | ${totalKubi.toFixed(3)} m³`}</div>
+          <div style={{display:"flex",gap:8}}>
+            {btn("↻", loadFromSupabase, {background:"transparent",border:"1px solid #2d5a2d",borderRadius:8,padding:"6px 12px",color:"#81c784",fontSize:12})}
+            {btn("⬇ CSV", ()=>exportCSV(records), {background:"#2d5a2d",border:"1px solid #4caf50",borderRadius:8,padding:"6px 14px",color:"#4caf50",fontSize:12})}
+          </div>
+        </div>
+      )}
 
       {/* TABS */}
       <div style={{display:"flex",borderBottom:"1px solid #2d5a2d"}}>

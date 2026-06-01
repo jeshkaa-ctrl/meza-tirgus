@@ -18,6 +18,7 @@ import GlobalHeader from "./GlobalHeader"
 import ChatPage from "./ChatPage"
 import PavadzimesRegistrs from "./PavadzimesRegistrs"
 import RpAndrasPortals from "./RpAndrasPortals"
+import DastojumuRegistrsPage from "./DastojumuRegistrsPage"
 import KubiKalkulators from "./KubiKalkulators"
 import LogistikaKalkulators from "./LogistikaKalkulators"
 import MobilajiRiki from "./MobilajiRiki"
@@ -1689,8 +1690,8 @@ if(page==="subscription")      return <SubscriptionPage onBack={()=>setPage("mai
 if(page==="jautaparmezu")     return <JautaParMezuPage onBack={()=>setPage("main")}/>
 if(page==="mobilie") return <MobilajiRiki onBack={()=>setPage("main")} onNavigate={(p)=>setPage(p)}/>
 if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
-if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")} user={user}/>
-if(page==="rpandras") return <RpAndrasPortals onBack={()=>setPage("main")}/>
+if(page==="pavadzimes") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("pavadzimes")}/>
+if(page==="rpandras") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rpandras")}/>
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
 if(page==="main") return <>

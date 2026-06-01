@@ -24,7 +24,7 @@ const SADAJAS = (isAdmin) => [
       { icon: "🌲", title: "Cirsmas vērtēšana",       desc: "G mērījumi, Bitterlich, sortimenti reāllaikā",                       page: "cirsma_mobile",    badge: "MOBILAIS" },
       { icon: "🪵", title: "Dastojuma mērītājs",      desc: "Dastojuma rindu ievade, apjomi, pavadzīmes",                         page: "dastojums_meritajs", badge: "MOBILAIS" },
       { icon: "📦", title: "Krautuves mērītājs",      desc: "AI foto analīze → krājumu uzskaite un vērtēšana",                    page: "krautuves_meritajs", badge: "MOBILAIS" },
-      { icon: "📋", title: "Pavadzīmju reģistrs",     desc: "Foto → OCR → automātiska reģistrācija Supabase",                     page: "pavadzimes" },
+      { icon: "🪵", title: "Dastojumu reģistrs",       desc: "Pavadzīmju uzskaite — foto → AI → datubāze. Personalizēts katram klientam.", page: "pavadzimes" },
     ]
   },
   {
@@ -35,7 +35,6 @@ const SADAJAS = (isAdmin) => [
       { icon: "🧾", title: "Rēķinu krātuve",          desc: "Rēķinu izveide, drukāšana, mēneša un gada pārskats",                 page: "rekini" },
       { icon: "🚛", title: "Loģistikas kalkulators",  desc: "Transporta izmaksas, piegādes maršruti",                             page: "logistika" },
       { icon: "💳", title: "Abonements",              desc: "Pro un Komercija plāni — paplašinātas iespējas",                     page: "subscription" },
-      ...(isAdmin ? [{ icon: "🌲", title: "RP Andras portāls", desc: "Vadības panelis — algas, rēķini, Excel",                   page: "rpandras" }] : []),
     ]
   },
   {
