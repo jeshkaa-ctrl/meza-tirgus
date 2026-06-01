@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { C as DS, F, spinnerCSS } from "./ds"
 
 const SORT_MAP = {
   "3.7": "Baļķis", "4.9": "Baļķis", "6.1": "Baļķis",
@@ -143,9 +144,9 @@ ${entries.map((e, i) => `<tr><td>${i + 1}</td><td>${e.sort || "—"}</td><td>${e
     <div style={{ ...s, background: "#1a2e1a", minHeight: "100vh", maxWidth: "480px", margin: "0 auto" }}>
 
       {/* HEADER */}
-      <div style={{ background: "#0f1f0f", borderBottom: "2px solid #4caf50", padding: "7px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
-        <button onClick={onBack} style={{ background: "transparent", border: "none", color: "#4caf50", fontSize: "20px", cursor: "pointer", padding: "0 4px" }}>←</button>
-        <span style={{ color: "#ffffff", fontSize: "14px", fontWeight: "700", flex: 1 }}>Kubikmetru kalkulators</span>
+      <div style={{ background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`, backdropFilter: "blur(8px)", padding: "0 12px", height: 52, display: "flex", alignItems: "center", gap: "8px", position: "sticky", top: 0, zIndex: 10 }}>
+        <button onClick={onBack} style={{ background: "transparent", border: "none", color: DS.green, fontSize: "22px", cursor: "pointer", minWidth: 36, minHeight: 44 }}>←</button>
+        <span style={{ color: DS.textSec, fontSize: F.base, fontWeight: F.weightBold, flex: 1 }}>📐 Kubikmetru kalkulators</span>
         <button onClick={() => setShowOv(v => !v)} style={{ padding: "5px 10px", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "700", border: "2px solid #4caf50", color: showOv ? "#000" : "#4caf50", background: showOv ? "#4caf50" : "transparent" }}>Pārskats</button>
         <span style={{ color: "#81c784", fontSize: "10px", whiteSpace: "nowrap" }}>{savedTime}</span>
       </div>

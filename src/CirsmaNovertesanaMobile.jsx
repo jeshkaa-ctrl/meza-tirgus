@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { calcSortimentsByQuality } from "./qualityEngine"
+import { C as DS, F, spinnerCSS } from "./ds"
 
 // ── Tulkojumi ────────────────────────────────────────────────────────────────
 const T = {
@@ -157,9 +158,9 @@ const loadLS = () => { try { const d = localStorage.getItem(SK); return d ? JSON
 // Stili
 const c = {
   app: {fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",background:"#0f1a0f",minHeight:"100vh",color:"#e8f0e8",maxWidth:480,margin:"0 auto",paddingBottom:80},
-  hdr: {background:"linear-gradient(135deg,#1a2e1a,#0f1a0f)",borderBottom:"1px solid #2d4a2d",padding:"10px 14px",position:"sticky",top:0,zIndex:100,display:"flex",alignItems:"center",gap:8},
-  bkBtn: {background:"none",border:"1px solid #3d6b3d",color:"#7ab87a",borderRadius:8,padding:"6px 10px",fontSize:12,cursor:"pointer"},
-  ttl: {fontSize:14,fontWeight:700,color:"#a8d8a8",margin:0,flex:1,textAlign:"center"},
+  hdr: {background:DS.glass,borderBottom:`1px solid ${DS.greenBdr}`,backdropFilter:"blur(8px)",padding:"0 14px",height:52,position:"sticky",top:0,zIndex:100,display:"flex",alignItems:"center",gap:8},
+  bkBtn: {background:"none",border:`1px solid ${DS.greenBdr}`,color:DS.textMut,borderRadius:8,padding:"6px 12px",fontSize:F.sm,cursor:"pointer",minHeight:36},
+  ttl: {fontSize:F.sm,fontWeight:F.weightBold,color:DS.textSec,margin:0,flex:1,textAlign:"center"},
   lRow: {display:"flex",gap:3},
   lBtn: (a) => ({padding:"4px 7px",borderRadius:6,border:a?"2px solid #4caf50":"1px solid #3d6b3d",background:a?"#1b5e20":"#0f1a0f",color:a?"#c8e6c8":"#7ab87a",fontSize:11,cursor:"pointer",fontWeight:a?700:400}),
   sec: {margin:"12px 16px",background:"#1a2e1a",borderRadius:12,border:"1px solid #2d4a2d",overflow:"hidden"},

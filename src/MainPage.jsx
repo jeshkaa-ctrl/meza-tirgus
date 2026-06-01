@@ -1,113 +1,175 @@
 import JautaParMezuWidget from './components/JautaParMezuWidget'
+import { C, F, R, S, spinnerCSS } from './ds'
 
 const ADMIN_EMAIL = 'jeshkaa@inbox.lv'
 
+const SADAJAS = (isAdmin) => [
+  {
+    title: "Cirsmu darbi",
+    color: C.green,
+    ikona: "🪓",
+    riki: [
+      { icon: "🗺", title: "Cirsmas skice",           desc: "KML/SHP → skice, koordinātas, PDF VMD iesniegumam",                   page: "skice" },
+      { icon: "🌲", title: "Cirsmas novērtēšana",     desc: "PDF no VMD → nogabalu analīze, cirsmas vērtība",                      page: "cirsma" },
+      { icon: "📊", title: "Dastojuma kalkulators",   desc: "Mežvērtes PDF → sortimentu apjomi, krautuves vērtība",                page: "dastojums_pdf" },
+    ]
+  },
+  {
+    title: "Mobilie rīki",
+    color: '#42a5f5',
+    ikona: "📱",
+    riki: [
+      { icon: "📐", title: "Kubikmetru kalkulators",  desc: "Tievgalis + garums → m³, sortimenti, PDF",                           page: "kubi",             badge: "MOBILAIS" },
+      { icon: "📏", title: "Caurmēra mērījumi",       desc: "Ātra caurmēru ievade laukā, tūlītējs rezultāts",                     page: "caurmers_mobile",  badge: "MOBILAIS" },
+      { icon: "🌲", title: "Cirsmas vērtēšana",       desc: "G mērījumi, Bitterlich, sortimenti reāllaikā",                       page: "cirsma_mobile",    badge: "MOBILAIS" },
+      { icon: "🪵", title: "Dastojuma mērītājs",      desc: "Dastojuma rindu ievade, apjomi, pavadzīmes",                         page: "dastojums_meritajs", badge: "MOBILAIS" },
+      { icon: "📦", title: "Krautuves mērītājs",      desc: "AI foto analīze → krājumu uzskaite un vērtēšana",                    page: "krautuves_meritajs", badge: "MOBILAIS" },
+      { icon: "📋", title: "Pavadzīmju reģistrs",     desc: "Foto → OCR → automātiska reģistrācija Supabase",                     page: "pavadzimes" },
+    ]
+  },
+  {
+    title: "Bizness",
+    color: '#ffb74d',
+    ikona: "💼",
+    riki: [
+      { icon: "🧾", title: "Rēķinu krātuve",          desc: "Rēķinu izveide, drukāšana, mēneša un gada pārskats",                 page: "rekini" },
+      { icon: "🚛", title: "Loģistikas kalkulators",  desc: "Transporta izmaksas, piegādes maršruti",                             page: "logistika" },
+      { icon: "💳", title: "Abonements",              desc: "Pro un Komercija plāni — paplašinātas iespējas",                     page: "subscription" },
+      ...(isAdmin ? [{ icon: "🌲", title: "RP Andras portāls", desc: "Vadības panelis — algas, rēķini, Excel",                   page: "rpandras" }] : []),
+    ]
+  },
+  {
+    title: "Sludinājumi",
+    color: '#ce93d8',
+    ikona: "📢",
+    riki: [
+      { icon: "📢", title: "Sludinājumi",             desc: "Meža īpašumu un cirsmu sludinājumi",                                 page: "sludinajumi" },
+    ]
+  },
+  {
+    title: "VMD & Analīze",
+    color: '#4db6ac',
+    ikona: "📄",
+    riki: [
+      { icon: "🌲", title: "Cirsmas novērtēšana PDF", desc: "VMD inventarizācijas PDF → nogabalu analīze, vērtība",               page: "standard" },
+      { icon: "✂️", title: "PDF šķirotājs",           desc: "Sadala daudzīpašumu PDF pa kadastriem",                              page: "pdfSkirotajs" },
+      { icon: "⚖️", title: "Meža likumi — AI čats",   desc: "Daudzfāzu saruna, VMD/DAP kontakti, kategorijas",                   page: "jautaparmezu", badge: "AI" },
+    ]
+  },
+]
+
 export default function MainPage({ onNavigate, user, onReg, onIziet }) {
   const isAdmin = user?.epasts === ADMIN_EMAIL
-
-  const sadajas = [
-    {
-      title: "Cirsmu darbi",
-      color: "#4caf50",
-      riki: [
-        { icon: "🗺", title: "Cirsmas skice", desc: "KML/SHP → skice ar koordinātām, PDF VMD iesniegumam. Iekļauj: 📏 Caurmēra mērījumi · 🌲 Dastojuma mērījumi · ⬇ SHP · 🧾 Rēķins", page: "skice" },
-        { icon: "🌲", title: "Cirsmas novērtēšana", desc: "PDF no VMD → nogabalu analīze, cirsmas vērtība, ieteikumi", page: "cirsma" },
-        { icon: "📊", title: "Dastojuma kalkulators", desc: "Mežvērtes PDF → sortimentu apjomi, krautuves vērtība", page: "dastojums_pdf" },
-      ]
-    },
-    {
-      title: "Mobilie rīki",
-      color: "#42a5f5",
-      riki: [
-        { icon: "📐", title: "Kubikmetru kalkulators", desc: "Nogriežņu tievgalis + garums → m³, sortimenti, PDF", page: "kubi", badge: "MOBILAIS" },
-        { icon: "📏", title: "Caurmēra mērījumi", desc: "Ātra caurmēru ievade laukā, tūlītējs rezultāts", page: "caurmers_mobile", badge: "MOBILAIS" },
-        { icon: "🌲", title: "Cirsmas vērtēšana", desc: "G mērījumi, Bitterlich, sortimentu aprēķini reāllaikā", page: "cirsma_mobile", badge: "MOBILAIS" },
-        { icon: "📋", title: "Pavadzīmju reģistrs", desc: "Foto → OCR → automātiska reģistrācija", page: "pavadzimes" },
-        { icon: "🪵", title: "Dastojuma mērītājs", desc: "Dastojuma rindu ievade, apjomi, pavadzīmes izveide", page: "dastojums_meritajs", badge: "MOBILAIS" },
-        { icon: "📦", title: "Krautuves mērītājs", desc: "Krautuves krājumu uzskaite un vērtēšana", page: "krautuves_meritajs", badge: "MOBILAIS" },
-      ]
-    },
-    {
-      title: "Bizness",
-      color: "#ffb74d",
-      riki: [
-        { icon: "🧾", title: "Rēķinu krātuve", desc: "Rēķinu izveide, drukāšana, mēneša un gada pārskats", page: "rekini" },
-        { icon: "🚛", title: "Loģistikas kalkulators", desc: "Transporta izmaksas, piegādes maršruti, degvielas kalkulācija", page: "logistika" },
-        { icon: "💳", title: "Abonements", desc: "Pro un Komercija plāni — paplašinātas iespējas", page: "subscription" },
-        ...(isAdmin ? [{ icon: "🌲", title: "RP Andras portāls", desc: "Vadības panelis — algas, rēķini, Excel", page: "rpandras" }] : []),
-      ]
-    },
-    {
-      title: "Sludinājumi & Izsoles",
-      color: "#ce93d8",
-      riki: [
-        { icon: "📢", title: "Sludinājumi", desc: "Meža īpašumu un cirsmu sludinājumi", page: "sludinajumi" },
-      ]
-    },
-    {
-      title: "VMD & Analīze",
-      color: "#4db6ac",
-      riki: [
-        { icon: "🌲", title: "Cirsmas novērtēšana (PDF)", desc: "VMD inventarizācijas PDF → nogabalu analīze, cirsmas vērtība — pieejams bezmaksas sadaļā", page: "standard" },
-        { icon: "✂️", title: "PDF šķirotājs", desc: "Sadala daudzīpašumu PDF pa kadastriem atsevišķos dokumentos", page: "pdfSkirotajs" },
-        { icon: "⚖️", title: "Meža likumi — pilnais čats", desc: "Daudzfāzu saruna, kategorijas, VMD/DAP kontakti", page: "jautaparmezu", badge: "AI" },
-      ]
-    },
-  ]
+  const sadajas = SADAJAS(isAdmin)
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080f08", color: "#e8f5e9", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: F.family }}>
+      <style>{spinnerCSS}{`
+        .mp-card:hover { border-color: ${C.greenBdrLt} !important; }
+        .mp-tile:hover { background: #22381a !important; transform: translateY(-1px); }
+        .mp-tile { transition: all 0.15s; }
+        .mp-logo:hover { opacity: 0.85; }
+        @media (max-width: 600px) {
+          .mp-grid { grid-template-columns: 1fr !important; }
+          .mp-header-btns { display: none !important; }
+          .mp-header-btns-mobile { display: flex !important; }
+        }
+      `}</style>
 
       {/* HEADER */}
-      <div style={{ background: "#1b3a1b", borderBottom: "2px solid #4caf50", padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => onNavigate('landing')}>
-          <span style={{ fontSize: "24px" }}>🌲</span>
-          <span style={{ color: "#4caf50", fontSize: "18px", fontWeight: 800 }}>Meža tirgus</span>
-        </div>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{ padding: "6px 12px", background: "#2e7d32", color: "white", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: "bold" }}>🗺 LVM GEO</a>
-          <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{ padding: "6px 12px", background: "#5d4037", color: "white", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: "bold" }}>🏛 VMD</a>
-          <button onClick={() => onNavigate('jautaparmezu')} style={{ padding: "6px 12px", background: "transparent", color: "#a8d8a8", border: "1px solid #2d5a2d", borderRadius: "6px", fontSize: "12px", cursor: "pointer" }}>⚖️ Meža likumi</button>
-          {user
-            ? <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                <span style={{ color: "#81c784", fontSize: "13px", padding: "6px 10px", background: "rgba(255,255,255,0.05)", borderRadius: "6px", border: "1px solid #2d5a2d" }}>👤 {user.vards}</span>
-                <button onClick={onIziet} style={{ padding: "6px 12px", background: "transparent", color: "#81c784", border: "1px solid #2d5a2d", borderRadius: "6px", fontSize: "12px", cursor: "pointer" }}>Iziet</button>
-              </div>
-            : <button onClick={onReg} style={{ padding: "6px 14px", background: "#225522", color: "white", border: "1px solid #4caf50", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "bold" }}>Reģistrēties</button>
-          }
-        </div>
-      </div>
+      <header style={{
+        background: C.glass, borderBottom: `1px solid ${C.greenBdr}`,
+        backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 100,
+      }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="mp-logo" onClick={() => onNavigate('landing')} style={{ display: 'flex', alignItems: 'center', gap: S.sm, cursor: 'pointer' }}>
+            <div style={{
+              width: 32, height: 32, background: `linear-gradient(135deg, ${C.greenMd}, ${C.greenDk})`,
+              borderRadius: R.md, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17,
+            }}>🌲</div>
+            <span style={{ fontSize: F.lg, fontWeight: F.weightBlack, color: C.green, letterSpacing: '-0.01em' }}>Meža tirgus</span>
+          </div>
 
-      <div style={{ padding: "16px 20px", maxWidth: "1100px", margin: "0 auto" }}>
+          <div className="mp-header-btns" style={{ display: 'flex', gap: S.sm, alignItems: 'center' }}>
+            <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{
+              padding: '7px 14px', background: C.greenMd, color: 'white', borderRadius: R.md,
+              textDecoration: 'none', fontSize: F.sm, fontWeight: F.weightBold,
+            }}>🗺 LVM GEO</a>
+            <a href="https://www.vmd.gov.lv" target="_blank" rel="noreferrer" style={{
+              padding: '7px 14px', background: '#5d4037', color: 'white', borderRadius: R.md,
+              textDecoration: 'none', fontSize: F.sm, fontWeight: F.weightBold,
+            }}>🏛 VMD</a>
+            <button onClick={() => onNavigate('jautaparmezu')} style={{
+              padding: '7px 14px', background: 'transparent', color: C.textSec,
+              border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
+            }}>⚖️ Meža likumi</button>
+            {user
+              ? <div style={{ display: 'flex', gap: S.sm, alignItems: 'center' }}>
+                  <span style={{
+                    color: C.textSec, fontSize: F.sm, padding: '7px 12px',
+                    background: `${C.green}11`, borderRadius: R.md, border: `1px solid ${C.greenBdr}`,
+                  }}>👤 {user.vards || user.epasts}</span>
+                  <button onClick={onIziet} style={{
+                    padding: '7px 14px', background: 'transparent', color: C.textMut,
+                    border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
+                  }}>Iziet</button>
+                </div>
+              : <button onClick={onReg} style={{
+                  padding: '7px 16px', background: C.greenDk, color: 'white',
+                  border: `1px solid ${C.green}`, borderRadius: R.md, fontSize: F.sm,
+                  cursor: 'pointer', fontWeight: F.weightBold,
+                }}>Reģistrēties</button>
+            }
+          </div>
+        </div>
+      </header>
+
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: `${S.xl} 20px 60px` }}>
 
         {/* MEŽA LIKUMI WIDGET */}
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginBottom: S.xl }}>
           <JautaParMezuWidget onPilnsSkats={() => onNavigate('jautaparmezu')} />
         </div>
 
         {/* SADAĻAS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
+        <div className="mp-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: S.lg }}>
           {sadajas.map((s, si) => (
-            <div key={si} style={{ background: "#111f11", border: `1px solid ${s.color}33`, borderRadius: "12px", padding: "14px", borderTop: `3px solid ${s.color}` }}>
-              <div style={{ color: s.color, fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px", paddingBottom: "6px", borderBottom: `1px solid ${s.color}22` }}>
-                {s.title}
+            <div key={si} className="mp-card" style={{
+              background: C.bgCard, border: `1px solid ${s.color}33`,
+              borderRadius: R.xl, padding: S.lg,
+              borderTop: `3px solid ${s.color}`, transition: 'border-color 0.2s',
+            }}>
+              <div style={{
+                color: s.color, fontSize: F.xs, fontWeight: F.weightBold,
+                textTransform: 'uppercase', letterSpacing: '0.1em',
+                marginBottom: S.md, paddingBottom: S.sm,
+                borderBottom: `1px solid ${s.color}22`,
+                display: 'flex', alignItems: 'center', gap: S.sm,
+              }}>
+                <span>{s.ikona}</span> {s.title}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: S.sm }}>
                 {s.riki.map((r, ri) => (
-                  <div key={ri} onClick={() => onNavigate(r.page)}
-                    style={{ background: "#1a2e1a", border: "1px solid #2d4a2d", borderRadius: "8px", padding: "10px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "10px" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#22381a"}
-                    onMouseLeave={e => e.currentTarget.style.background = "#1a2e1a"}
-                  >
-                    <span style={{ fontSize: "20px", minWidth: "26px", textAlign: "center" }}>{r.icon}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "2px" }}>
-                        <span style={{ color: "#ffffff", fontSize: "13px", fontWeight: 700 }}>{r.title}</span>
-                        {r.badge && <span style={{ background: "#2d4a2d", color: "#4caf50", fontSize: "9px", padding: "1px 5px", borderRadius: "3px", fontWeight: 700 }}>{r.badge}</span>}
+                  <div key={ri} className="mp-tile" onClick={() => onNavigate(r.page)} style={{
+                    background: C.bgInner, border: `1px solid ${C.greenBdr}`,
+                    borderRadius: R.md, padding: '10px 14px', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                  }}>
+                    <span style={{ fontSize: 22, minWidth: 28, textAlign: 'center' }}>{r.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: S.sm, marginBottom: 2, flexWrap: 'wrap' }}>
+                        <span style={{ color: C.text, fontSize: F.base, fontWeight: F.weightBold }}>{r.title}</span>
+                        {r.badge && (
+                          <span style={{
+                            background: `${s.color}22`, color: s.color,
+                            fontSize: '9px', padding: '1px 5px', borderRadius: R.sm, fontWeight: F.weightBold,
+                          }}>{r.badge}</span>
+                        )}
                       </div>
-                      <div style={{ color: "#7ab87a", fontSize: "11px", lineHeight: 1.3 }}>{r.desc}</div>
+                      <div style={{ color: C.textDim, fontSize: F.xs, lineHeight: 1.4 }}>{r.desc}</div>
                     </div>
-                    <span style={{ color: "#4a7a4a", fontSize: "14px" }}>→</span>
+                    <span style={{ color: C.textFade, fontSize: 14, flexShrink: 0 }}>→</span>
                   </div>
                 ))}
               </div>
@@ -116,11 +178,13 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         </div>
 
         {/* APAKŠA */}
-        <div style={{ marginTop: "24px", padding: "16px", background: "#0f1a0f", border: "1px dashed #2d4a2d", borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ color: "#4a7a4a", fontSize: "12px", marginBottom: "8px" }}>💡 Padomi & jaunumi</div>
-          <div style={{ color: "#2d4a2d", fontSize: "11px" }}>Šeit parādīsies padomi, jaunumi un reklāmas</div>
+        <div style={{
+          marginTop: S.xl, padding: S.lg, background: C.bgInner,
+          border: `1px dashed ${C.greenBdr}`, borderRadius: R.lg, textAlign: 'center',
+        }}>
+          <div style={{ color: C.textDim, fontSize: F.sm }}>💡 Padomi, jaunumi un platformas atjauninājumi parādīsies šeit</div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

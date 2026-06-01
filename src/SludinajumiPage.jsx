@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { NOVADI } from "./novadi"
 import { DARBIBAS_VEIDI } from "./RegModal"
+import { C as DS, F, R, S, spinnerCSS } from "./ds"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString()
 
@@ -988,18 +989,24 @@ export default function SludinajumiPage({ user, onBack }) {
   const selSt = { ...inp, fontSize: 12, width: "auto" }
 
   return (
-    <div style={{ minHeight: "100vh", background: T.bg, color: T.text, fontFamily: "Arial, sans-serif", padding: "24px 20px" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", background: T.bg, color: T.text, fontFamily: F.family }}>
+      <style>{spinnerCSS}</style>
 
-        {/* Virsraksts */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
-          <h2 style={{ color: T.accent, margin: 0, fontSize: 20 }}>🌲 Sludinājumi & Izsoles</h2>
-          {onBack && (
-            <button onClick={onBack} style={{ padding: "6px 14px", background: "#333", color: T.textSec, border: `1px solid ${T.border}`, borderRadius: 4, cursor: "pointer" }}>
-              ← Atpakaļ
-            </button>
-          )}
+      {/* Sticky header */}
+      <div style={{
+        background: DS.glass, borderBottom: `1px solid ${T.border}`,
+        backdropFilter: "blur(8px)", padding: "0 20px", height: 52,
+        display: "flex", alignItems: "center", gap: 12,
+        position: "sticky", top: 0, zIndex: 10,
+      }}>
+        {onBack && <button onClick={onBack} style={{ background: "transparent", border: "none", color: T.accent, fontSize: 22, cursor: "pointer", minWidth: 36, minHeight: 44 }}>←</button>}
+        <div style={{ flex: 1 }}>
+          <div style={{ color: T.accent, fontSize: F.md, fontWeight: F.weightBold }}>📢 Sludinājumi & Izsoles</div>
+          <div style={{ color: T.textDim, fontSize: F.xs }}>Meža īpašumi un cirsmu tirdzniecība</div>
         </div>
+      </div>
+
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "20px 20px 60px" }}>
 
         {/* Cilnes */}
         <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>

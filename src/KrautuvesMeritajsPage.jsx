@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { C as DS, F, R, spinnerCSS } from "./ds";
 
 // ─── Atskaites veidi ar kļūdas novērtējumu ────────────────────────────────────
 const ATSKAITES_VEIDI = [
@@ -288,11 +289,19 @@ Atbildi TIKAI JSON:
   // ── IEVADS ──────────────────────────────────────────────────────────────────
   if (faze === "ievads") return (
     <div style={{ ...darkBg, display: "flex", flexDirection: "column", padding: "1.5rem 1.25rem", paddingBottom: "3rem" }}>
-      {onBack && (
-        <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 22, cursor: "pointer", padding: "0 0 12px", textAlign: "left" }}>←</button>
-      )}
-      <h2 style={{ fontSize: 20, fontWeight: 500, margin: "0 0 4px", color: "#fff" }}>📸 Kubatūras mērītājs</h2>
-      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 1.5rem" }}>AI fotografē un aprēķina kubatūru</p>
+      {/* Header */}
+      <div style={{
+        background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`,
+        backdropFilter: "blur(8px)", margin: "-1.5rem -1.25rem 1.5rem",
+        padding: "0 16px", height: 52,
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        {onBack && <button onClick={onBack} style={{ background: "none", border: "none", color: DS.green, fontSize: 22, cursor: "pointer", minWidth: 36, minHeight: 44 }}>←</button>}
+        <div>
+          <div style={{ color: DS.green, fontSize: F.md, fontWeight: F.weightBold }}>📸 Krautuves mērītājs</div>
+          <div style={{ color: DS.textDim, fontSize: F.xs }}>AI fotografē un aprēķina kubatūru</div>
+        </div>
+      </div>
 
       {/* Režīms */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: "1.5rem" }}>

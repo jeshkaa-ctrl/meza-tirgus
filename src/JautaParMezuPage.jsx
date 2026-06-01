@@ -1,18 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { SISTEMA_PROMPTS, KATEGORIJAS } from './mezaLikumiKnowledge'
+import { C as DS, F, R, spinnerCSS } from './ds'
 
-// ─── Krāsas ───────────────────────────────────────────────────────────────────
 const C = {
-  bg: '#080f08', card: '#111f11', inner: '#1a2e1a', deep: '#0f1a0f',
-  border: '#2d4a2d', text: '#e8f5e9', textSec: '#a8d8a8', textMut: '#7ab87a',
-  textDim: '#557a55', accent: '#4caf50', accentDk: '#225522',
-  warn: '#fbbf24', info: '#42a5f5', error: '#e57373',
+  bg: DS.bg, card: DS.bgCard, inner: DS.bgInner, deep: DS.bgDeep,
+  border: DS.greenBdr, text: DS.text, textSec: DS.textSec, textMut: DS.textMut,
+  textDim: DS.textDim, accent: DS.green, accentDk: DS.greenDk,
+  warn: DS.warn, info: DS.info, error: DS.error,
 }
 
 const inp = {
   background: C.deep, border: `1px solid ${C.border}`, color: C.text,
-  borderRadius: 8, padding: '10px 14px', fontSize: 14,
+  borderRadius: R.md, padding: '10px 14px', fontSize: F.base,
   width: '100%', boxSizing: 'border-box', outline: 'none', resize: 'vertical',
+  fontFamily: F.family,
 }
 
 // ─── Kontaktu karte ───────────────────────────────────────────────────────────
@@ -176,14 +177,23 @@ export default function JautaParMezuPage({ onBack }) {
   const pirmaJautajums = ziņas.length === 0
 
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: 'Arial, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: F.family, display: 'flex', flexDirection: 'column' }}>
+      <style>{spinnerCSS}{`@keyframes pulse { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }`}</style>
 
       {/* Header */}
-      <div style={{ background: '#1b3a1b', borderBottom: `2px solid ${C.accent}`, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-        {onBack && <button onClick={onBack} style={{ background: 'none', border: 'none', color: C.accent, fontSize: 22, cursor: 'pointer', padding: '0 4px 0 0' }}>←</button>}
-        <div>
-          <div style={{ color: C.accent, fontSize: 16, fontWeight: 700 }}>🌲 Jautā par mežu</div>
-          <div style={{ color: C.textMut, fontSize: 11 }}>Latvijas meža likumdošana — AI konsultants</div>
+      <div style={{
+        background: DS.glass, borderBottom: `1px solid ${C.accent}44`,
+        backdropFilter: 'blur(8px)', padding: '0 20px', height: 52,
+        display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0,
+        position: 'sticky', top: 0, zIndex: 10,
+      }}>
+        {onBack && <button onClick={onBack} style={{
+          background: 'none', border: 'none', color: C.accent, fontSize: 22,
+          cursor: 'pointer', padding: '0 4px 0 0', lineHeight: 1, minWidth: 36, minHeight: 44,
+        }}>←</button>}
+        <div style={{ flex: 1 }}>
+          <div style={{ color: C.accent, fontSize: F.md, fontWeight: F.weightBold }}>⚖️ Jautā par mežu</div>
+          <div style={{ color: C.textDim, fontSize: F.xs }}>Latvijas meža likumdošana — AI konsultants</div>
         </div>
       </div>
 
@@ -251,7 +261,6 @@ export default function JautaParMezuPage({ onBack }) {
             </div>
           </div>
         )}
-        <style>{`@keyframes pulse { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }`}</style>
         <div ref={bottomRef} />
       </div>
 

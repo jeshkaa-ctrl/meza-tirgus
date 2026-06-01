@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react"
 import { PIEGADES_VIETAS, SORT_NOSAUKUMI } from "./data/piegadesVietas"
 import { getTransportsCena, aprekinattalumu } from "./data/transportaTarifi"
 import { getKrautuveKoordinates } from "./data/pagastiKoordinates"
+import { C as DS, F, spinnerCSS } from "./ds"
 
 // ─── STILI ───────────────────────────────────────────────────────────────────
 const s = {
-  app: { minHeight: "100vh", background: "#070d07", color: "#e0ede0", fontFamily: "'Courier New', monospace" },
-  hdr: { background: "#0d1f0d", borderBottom: "2px solid #2d5a2d", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 },
-  hdrTitle: { margin: 0, color: "#4caf50", fontSize: 17, fontWeight: 800 },
-  backBtn: { background: "transparent", border: "1px solid #2d5a2d", color: "#4caf50", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontSize: 13 },
+  app: { minHeight: "100vh", background: DS.bg, color: DS.text, fontFamily: F.family },
+  hdr: { background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`, backdropFilter: "blur(8px)", padding: "0 20px", height: 52, display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 10 },
+  hdrTitle: { margin: 0, color: DS.green, fontSize: F.md, fontWeight: F.weightBold },
+  backBtn: { background: "transparent", border: "none", color: DS.green, padding: "0 4px", borderRadius: 6, cursor: "pointer", fontSize: 22, minWidth: 36, minHeight: 44 },
   body: { padding: "20px", maxWidth: 1100, margin: "0 auto" },
   card: { background: "#0d1f0d", border: "1px solid #1e3a1e", borderRadius: 10, padding: 16, marginBottom: 14 },
   cardTitle: { color: "#4caf50", fontWeight: 700, fontSize: 13, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 },

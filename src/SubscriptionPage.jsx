@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSubscription } from './hooks/useSubscription'
+import { C as DS, F, R, S, btn, spinnerCSS } from './ds'
 
 const PLANS = [
   {
@@ -79,14 +80,20 @@ export default function SubscriptionPage({ onBack, onNavigate }) {
   const [ciklsGads, setCiklsGads] = useState(false)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080f08', color: '#e8f5e9', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family }}>
+      <style>{spinnerCSS}</style>
 
       {/* Header */}
-      <div style={{ background: '#1b3a1b', borderBottom: '2px solid #4caf50', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={onBack} style={{ background: 'transparent', border: 'none', color: '#4caf50', fontSize: 20, cursor: 'pointer' }}>←</button>
+      <div style={{
+        background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`,
+        backdropFilter: 'blur(8px)', padding: '0 20px', height: 52,
+        display: 'flex', alignItems: 'center', gap: 12,
+        position: 'sticky', top: 0, zIndex: 10,
+      }}>
+        <button onClick={onBack} style={{ background: 'transparent', border: 'none', color: DS.green, fontSize: 22, cursor: 'pointer', minWidth: 36, minHeight: 44 }}>←</button>
         <div>
-          <h1 style={{ margin: 0, color: '#4caf50', fontSize: 18, fontWeight: 700 }}>🌲 Meža tirgus — Plāni</h1>
-          <div style={{ color: '#81c784', fontSize: 11, marginTop: 2 }}>Izvēlies piemēroto abonementu</div>
+          <div style={{ color: DS.green, fontSize: F.md, fontWeight: F.weightBold }}>💳 Meža tirgus — Plāni</div>
+          <div style={{ color: DS.textDim, fontSize: F.xs }}>Izvēlies piemēroto abonementu</div>
         </div>
       </div>
 

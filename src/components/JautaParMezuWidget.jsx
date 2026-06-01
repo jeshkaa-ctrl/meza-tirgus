@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { SISTEMA_PROMPTS } from '../mezaLikumiKnowledge'
+import { C, F, R, S, spinnerCSS } from '../ds'
 
-const C = {
-  bg: '#0f1a0f', card: '#111f11', border: '#2d4a2d',
-  text: '#e8f5e9', textSec: '#a8d8a8', textMut: '#7ab87a', textDim: '#557a55',
-  accent: '#4caf50', accentDk: '#225522', inner: '#1a2e1a', deep: '#080f08',
-}
+const IETEIKUMI = [
+  'Kad drīkst cirst mežu bez apliecinājuma?',
+  'Cik metru aizsargjosla upei Gauja?',
+  'Kā rīkoties ja atradu putnu ligzdu cirsmā?',
+]
 
 export default function JautaParMezuWidget({ onPilnsSkats }) {
   const [jautajums, setJautajums] = useState('')
@@ -41,67 +42,75 @@ export default function JautaParMezuWidget({ onPilnsSkats }) {
     }
   }
 
-  const ieteikumi = [
-    'Kad drīkst cirst mežu bez apliecinājuma?',
-    'Cik metru aizsargjosla jāatstāj pie upes?',
-    'Kā rīkoties ja atradu putnu ligzdu cirsmā?',
-  ]
-
   return (
     <div style={{
-      background: C.card, border: '2px solid #4caf5044',
-      borderTop: '3px solid #4caf50', borderRadius: '12px', padding: '18px 20px',
+      background: C.bgCard, border: `2px solid ${C.green}33`,
+      borderTop: `3px solid ${C.green}`, borderRadius: R.xl, padding: S.lg,
+      fontFamily: F.family,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '20px' }}>⚖️</span>
-          <span style={{ color: C.accent, fontSize: '16px', fontWeight: 800 }}>Meža likumi — AI konsultants</span>
-          <span style={{ background: '#2d4a2d', color: C.accent, fontSize: '9px', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>AI</span>
+      <style>{spinnerCSS}{`
+        .jw-chip:hover { background: ${C.bgInner} !important; border-color: ${C.greenBdrLt} !important; }
+        .jw-pilns:hover { background: ${C.bgInner} !important; }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: S.md, flexWrap: 'wrap', gap: S.sm }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: S.sm }}>
+          <span style={{ fontSize: 20 }}>⚖️</span>
+          <span style={{ color: C.green, fontSize: F.md, fontWeight: F.weightBold }}>Meža likumi — AI konsultants</span>
+          <span style={{
+            background: `${C.green}22`, color: C.green, fontSize: '9px',
+            padding: '2px 6px', borderRadius: R.full, fontWeight: F.weightBold, border: `1px solid ${C.green}44`,
+          }}>AI</span>
         </div>
         {onPilnsSkats && (
-          <button onClick={onPilnsSkats} style={{
-            background: 'none', border: `1px solid ${C.border}`, color: C.textMut,
-            borderRadius: '6px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer',
+          <button className="jw-pilns" onClick={onPilnsSkats} style={{
+            background: 'transparent', border: `1px solid ${C.greenBdr}`,
+            color: C.textMut, borderRadius: R.md, padding: '5px 12px',
+            fontSize: F.xs, cursor: 'pointer', fontFamily: F.family,
           }}>
             Pilns čats →
           </button>
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+      {/* Input */}
+      <div style={{ display: 'flex', gap: S.sm, marginBottom: S.sm }}>
         <input
           value={jautajums}
           onChange={e => setJautajums(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') jautāt() }}
           placeholder="Uzdod jautājumu par meža likumiem..."
           style={{
-            flex: 1, background: C.bg, border: `1px solid ${C.border}`,
-            color: C.text, borderRadius: '8px', padding: '10px 14px',
-            fontSize: '14px', outline: 'none',
+            flex: 1, background: C.bg, border: `1px solid ${C.greenBdr}`,
+            color: C.text, borderRadius: R.md, padding: '10px 14px',
+            fontSize: F.base, outline: 'none', fontFamily: F.family, minHeight: 44,
           }}
         />
         <button
           onClick={() => jautāt()}
           disabled={!jautajums.trim() || lade}
           style={{
-            padding: '10px 18px', borderRadius: '8px', border: 'none', flexShrink: 0,
-            background: jautajums.trim() && !lade ? C.accentDk : C.inner,
-            color: jautajums.trim() && !lade ? '#fff' : C.textDim,
-            borderTop: `2px solid ${jautajums.trim() && !lade ? C.accent : C.border}`,
-            fontSize: '14px', fontWeight: 600,
-            cursor: jautajums.trim() && !lade ? 'pointer' : 'not-allowed',
+            padding: '10px 20px', borderRadius: R.md, border: 'none', flexShrink: 0,
+            background: (jautajums.trim() && !lade) ? C.greenDk : C.bgInner,
+            color: (jautajums.trim() && !lade) ? '#fff' : C.textFade,
+            borderTop: `2px solid ${(jautajums.trim() && !lade) ? C.green : C.greenBdr}`,
+            fontSize: F.base, fontWeight: F.weightBold, cursor: (jautajums.trim() && !lade) ? 'pointer' : 'not-allowed',
+            minHeight: 44, fontFamily: F.family, transition: 'all 0.15s',
           }}
         >
           {lade ? '⏳' : '→'}
         </button>
       </div>
 
+      {/* Ieteikumi */}
       {!atbilde && !lade && (
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {ieteikumi.map(q => (
-            <button key={q} onClick={() => jautāt(q)} style={{
-              background: C.bg, border: `1px solid ${C.border}`, color: C.textMut,
-              borderRadius: '20px', padding: '5px 12px', fontSize: '11px', cursor: 'pointer',
+        <div style={{ display: 'flex', gap: S.sm, flexWrap: 'wrap' }}>
+          {IETEIKUMI.map(q => (
+            <button key={q} className="jw-chip" onClick={() => jautāt(q)} style={{
+              background: C.bg, border: `1px solid ${C.greenBdr}`,
+              color: C.textMut, borderRadius: R.full, padding: '5px 14px',
+              fontSize: F.xs, cursor: 'pointer', fontFamily: F.family, transition: 'all 0.15s',
             }}>
               {q}
             </button>
@@ -109,42 +118,44 @@ export default function JautaParMezuWidget({ onPilnsSkats }) {
         </div>
       )}
 
+      {/* Loading */}
       {lade && (
-        <div style={{ display: 'flex', gap: 5, alignItems: 'center', padding: '8px 0' }}>
+        <div style={{ display: 'flex', gap: 5, alignItems: 'center', padding: `${S.sm} 0` }}>
           {[0, 1, 2].map(i => (
             <div key={i} style={{
-              width: 7, height: 7, borderRadius: '50%', background: C.accent,
-              animation: `jautaPulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+              width: 7, height: 7, borderRadius: '50%', background: C.green,
+              animation: `mt-pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
             }} />
           ))}
-          <style>{`@keyframes jautaPulse{0%,80%,100%{opacity:0.2}40%{opacity:1}}`}</style>
+          <span style={{ color: C.textDim, fontSize: F.xs, marginLeft: S.sm }}>Analizē jautājumu...</span>
         </div>
       )}
 
+      {/* Atbilde */}
       {atbilde && (
-        <div style={{ marginTop: '10px' }}>
-          <div style={{ fontSize: '11px', color: C.textDim, marginBottom: '6px' }}>
+        <div style={{ marginTop: S.sm }} className="mt-fade">
+          <div style={{ fontSize: F.xs, color: C.textDim, marginBottom: S.sm }}>
             Jautājums: <span style={{ color: C.textSec }}>{atbilde.jautajums}</span>
           </div>
           <div style={{
-            background: C.bg, border: `1px solid ${C.border}`, borderRadius: '8px',
-            padding: '12px 14px', fontSize: '13px', lineHeight: 1.7, color: C.text,
-            whiteSpace: 'pre-wrap', maxHeight: '220px', overflowY: 'auto',
+            background: C.bg, border: `1px solid ${C.greenBdr}`, borderRadius: R.md,
+            padding: S.md, fontSize: F.sm, lineHeight: F.lineHeight, color: C.text,
+            whiteSpace: 'pre-wrap', maxHeight: 240, overflowY: 'auto',
           }}>
             {atbilde.parsed?.atbilde || atbilde.teksts}
           </div>
           {atbilde.parsed?.avots && (
-            <div style={{ fontSize: '10px', color: C.textDim, marginTop: '5px' }}>
+            <div style={{ fontSize: F.xs, color: C.textDim, marginTop: S.sm }}>
               📋 {atbilde.parsed.avots}
             </div>
           )}
           {onPilnsSkats && (
-            <button onClick={onPilnsSkats} style={{
-              marginTop: '8px', background: 'none', border: `1px solid ${C.border}`,
-              color: C.accent, borderRadius: '6px', padding: '5px 12px',
-              fontSize: '11px', cursor: 'pointer',
+            <button className="jw-pilns" onClick={onPilnsSkats} style={{
+              marginTop: S.sm, background: 'transparent', border: `1px solid ${C.greenBdr}`,
+              color: C.green, borderRadius: R.md, padding: '7px 14px',
+              fontSize: F.xs, cursor: 'pointer', fontFamily: F.family,
             }}>
-              Turpināt sarunu pilnajā čatā →
+              Turpināt pilnajā čatā →
             </button>
           )}
         </div>

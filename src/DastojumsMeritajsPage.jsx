@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { sadaliKvalitates, SUGAS } from './engines/dastojumsMeritajsEngine';
 import { PAGASTI } from './pagastiKoordinates';
+import { C as DS, F, R, spinnerCSS } from './ds';
 
 // ─── Konstantes ───────────────────────────────────────────────────────────────
 const SUGAS_SARAKSTS = ['P','E','B','A','Ba','Bl','Oz','Os'];
@@ -71,11 +72,16 @@ const inp = {
 // ─── Palīgkomponentes ─────────────────────────────────────────────────────────
 function Header({ title, subtitle, onBack, extra }) {
   return (
-    <div style={{ background:'#1b3a1b', borderBottom:`2px solid ${C.accent}`, padding:'12px 16px', display:'flex', alignItems:'center', gap:10 }}>
-      {onBack && <button onClick={onBack} style={{ background:'none', border:'none', color:C.accent, fontSize:22, cursor:'pointer', padding:'0 4px 0 0', lineHeight:1 }}>←</button>}
+    <div style={{
+      background: DS.glass, borderBottom: `1px solid ${C.border}`,
+      backdropFilter: 'blur(8px)', padding: '0 16px', height: 52,
+      display: 'flex', alignItems: 'center', gap: 10,
+      position: 'sticky', top: 0, zIndex: 10, fontFamily: F.family,
+    }}>
+      {onBack && <button onClick={onBack} style={{ background:'none', border:'none', color:C.accent, fontSize:22, cursor:'pointer', padding:'0 4px 0 0', lineHeight:1, minWidth:36, minHeight:44 }}>←</button>}
       <div style={{ flex:1 }}>
-        <div style={{ color:C.accent, fontSize:16, fontWeight:700 }}>{title}</div>
-        {subtitle && <div style={{ color:C.textMut, fontSize:11, marginTop:1 }}>{subtitle}</div>}
+        <div style={{ color:C.accent, fontSize: F.md, fontWeight: F.weightBold }}>{title}</div>
+        {subtitle && <div style={{ color:C.textDim, fontSize: F.xs, marginTop:1 }}>{subtitle}</div>}
       </div>
       {extra}
     </div>

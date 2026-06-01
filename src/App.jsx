@@ -27,6 +27,7 @@ import SubscriptionPage from "./SubscriptionPage"
 import JautaParMezuPage from "./JautaParMezuPage"
 import JautaParMezuWidget from "./components/JautaParMezuWidget"
 import MainPage from "./MainPage"
+import { C as DS, F, spinnerCSS } from "./ds"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1424,7 +1425,7 @@ Drukāt / Saglabāt PDF
 // ========== GALVENA APP ==========
 function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi}){
 return(
-<div style={{fontFamily:"Arial",minHeight:"100vh",background:"#080f08",maxWidth:"100%",overflowX:"hidden"}}>
+<div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
   {/* HERO */}
  <div style={{background:"linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 60%, #0f2a0f 100%)",padding:"56px 40px 64px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative",overflow:"hidden"}}>
