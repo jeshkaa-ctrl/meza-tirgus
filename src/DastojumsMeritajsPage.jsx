@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { sadaliKvalitates, SUGAS } from './engines/dastojumsMeritajsEngine';
+import { PAGASTI } from './pagastiKoordinates';
 
 // ─── Konstantes ───────────────────────────────────────────────────────────────
 const SUGAS_SARAKSTS = ['P','E','B','A','Ba','Bl','Oz','Os'];
@@ -9,6 +10,50 @@ const KVALITATES = [
   { val: 'tievs',  label: 'Tievs (Q3)'  },
   { val: 'malka',  label: 'Malka'        },
 ];
+
+// ─── Kadastra → atrašanās vieta ──────────────────────────────────────────────
+// Novads pēc kadastra pirmajiem 2 cipariem (aptuveni)
+const KADASTRS_NOVADS = {
+  '01':'Rīgas novads','11':'Rīga','17':'Jūrmala',
+  '34':'Aizkraukles novads','36':'Alūksnes novads','38':'Balvu novads',
+  '40':'Bauskas novads','42':'Cēsu novads','44':'Daugavpils novads',
+  '46':'Dobeles novads','50':'Gulbenes novads','54':'Jelgavas novads',
+  '56':'Jēkabpils novads','49':'Krāslavas novads','62':'Kuldīgas novads',
+  '66':'Limbažu novads','64':'Liepājas novads','68':'Ludzas novads',
+  '70':'Madonas novads','74':'Ogres novads','76':'Preiļu novads',
+  '78':'Rēzeknes novads','84':'Saldus novads','94':'Smiltenes novads',
+  '90':'Talsu novads','92':'Tukuma novads','95':'Valkas novads',
+  '96':'Valmieras novads','98':'Ventspils novads','80':'Ādažu novads',
+};
+// Novads → Virsmežniecība
+const NOVADS_VMN = {
+  'Kurzemes':  ['Talsu novads','Kuldīgas novads','Liepājas novads','Saldus novads','Ventspils novads'],
+  'Zemgales':  ['Jelgavas novads','Bauskas novads','Dobeles novads','Jēkabpils novads','Aizkraukles novads'],
+  'Rīgas':     ['Rīgas novads','Rīga','Jūrmala','Ādažu novads','Ogres novads','Tukuma novads'],
+  'Vidzemes':  ['Valmieras novads','Cēsu novads','Limbažu novads','Madonas novads','Gulbenes novads','Alūksnes novads','Valkas novads','Smiltenes novads'],
+  'Latgales':  ['Daugavpils novads','Rēzeknes novads','Ludzas novads','Preiļu novads','Krāslavas novads','Balvu novads'],
+};
+
+function iegutVirsmeznieciba(novads) {
+  for (const [vmn, saraksts] of Object.entries(NOVADS_VMN)) {
+    if (saraksts.some(n => novads.includes(n.replace(' novads','')))) return vmn + ' VMŅ';
+  }
+  return '';
+}
+
+function autoAizpilditNoKadastrs(kadastra) {
+  const tirs = kadastra.replace(/\s/g, '');
+  if (tirs.length < 4) return {};
+  const p4 = tirs.slice(0, 4);
+  const p2 = tirs.slice(0, 2);
+  const pagastaInfo = PAGASTI[p4];
+  const novads = KADASTRS_NOVADS[p2] || '';
+  return {
+    pagasts: pagastaInfo?.nos || '',
+    novads,
+    virsmezn: iegutVirsmeznieciba(novads),
+  };
+}
 
 // ─── Krāsas ───────────────────────────────────────────────────────────────────
 const C = {
@@ -84,18 +129,35 @@ const btnPrimary = {
 };
 
 // ─── GALVENĀ KOMPONENTE ───────────────────────────────────────────────────────
-export default function DastojumsMeritajsPage({ onBack }) {
-  const [faze,     setFaze]     = useState('setup');
-  const [kadastrs, setKadastrs] = useState('');
-  const [platiba,  setPlatiba]  = useState('');
+export default function DastojumsMeritajsPage({ onBack, user }) {
+  const [faze, setFaze] = useState('setup');
   const bon = 3; // bonitāte nav vajadzīga — kalibrēts augstums kompensē
 
-  const [koki,     setKoki]     = useState([]);
-  const [d,        setD]        = useState('');
-  const [suga,     setSuga]     = useState('E');
-  const [kval,     setKval]     = useState('vidējs');
-  const [nogabals, setNogabals] = useState('');
-  const [skaits,   setSkaits]   = useState(1);
+  // Cirsmas info — visi lauki izdrukam
+  const [inf, setInf] = useState({
+    kadastrs: '', nogabals: '', aNogabals: '', kvartals: '',
+    saimnieciba: '', novads: '', pagasts: '', virsmezn: '', meznieciba: '',
+    ipasnieks: '', uzmērīja: '', platiba: '', pievesana: '',
+    izmantosana: 'Galvenā cirte - kailcirte',
+  });
+  const updInf = (k, v) => setInf(p => ({ ...p, [k]: v }));
+
+  const handleKadastrs = (v) => {
+    const auto = autoAizpilditNoKadastrs(v);
+    setInf(p => ({
+      ...p, kadastrs: v,
+      novads:   p.novads   || auto.novads,
+      pagasts:  p.pagasts  || auto.pagasts,
+      virsmezn: p.virsmezn || auto.virsmezn,
+    }));
+  };
+
+  const [koki,   setKoki]   = useState([]);
+  const [d,      setD]      = useState('');
+  const [suga,   setSuga]   = useState('E');
+  const [kval,   setKval]   = useState('vidējs');
+  const [ievNog, setIevNog] = useState('');
+  const [skaits, setSkaits] = useState(1);
 
   // Fāze 2b — augstumi
   const [sugaH, setSugaH] = useState({});
@@ -112,15 +174,13 @@ export default function DastojumsMeritajsPage({ onBack }) {
     return sadaliKvalitates(koki, sugaH);
   }, [koki, sugaH]);
 
-  const garumi = {}; // vairs neizmanto — zonas tiek noteiktas pēc D sliekšņiem
-
   function pievienotKoku() {
     const dNum = parseFloat(d);
     if (!dNum || dNum < 4 || dNum > 120) return;
     setKoki(prev => [...prev, {
       id: Date.now() + Math.random(),
       suga, d_cm: dNum, kvalitate: kval,
-      bon: parseInt(bon), nogabals: nogabals || '—',
+      bon, nogabals: ievNog || '—',
       skaits: parseInt(skaits) || 1,
     }]);
     setD(''); setSkaits(1);
@@ -134,19 +194,113 @@ export default function DastojumsMeritajsPage({ onBack }) {
   // ═══════════════════════════════════════════════════════════════════════════
   // FĀZE 1 — SETUP
   // ═══════════════════════════════════════════════════════════════════════════
-  if (faze === 'setup') return (
+  if (faze === 'setup') {
+    const row2 = { display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 };
+    return (
     <div style={{ minHeight:'100vh', background:C.bg, color:C.text, fontFamily:'Arial,sans-serif' }}>
-      <Header title="🌲 Dastojuma uzmērīšana" subtitle="Cirsmas pamatdati" onBack={onBack} />
-      <div style={{ maxWidth:540, margin:'0 auto', padding:'16px 16px 60px' }}>
+      <Header title="🌲 Dastojuma uzmērīšana" subtitle="Cirsmas dati pirms mērīšanas" onBack={onBack} />
+      <div style={{ maxWidth:560, margin:'0 auto', padding:'16px 16px 60px' }}>
 
+        {/* Nogabala identifikācija */}
         <Karte>
-          <div style={{ marginBottom:12 }}>
-            <label style={labelSt}>Kadastra nr. (nav obligāts)</label>
-            <input value={kadastrs} onChange={e => setKadastrs(e.target.value)} placeholder="piem. 42820040063" style={inp} />
+          <div style={{ fontSize:12, color:C.textDim, fontWeight:600, marginBottom:10, textTransform:'uppercase', letterSpacing:'0.05em' }}>Nogabala identifikācija</div>
+          <div style={{ marginBottom:10 }}>
+            <label style={labelSt}>Kadastra numurs</label>
+            <input value={inf.kadastrs} onChange={e => handleKadastrs(e.target.value)}
+              placeholder="piem. 70700130035" style={inp} maxLength={11} />
+            {inf.novads && <div style={{ fontSize:11, color:C.accent, marginTop:3 }}>✓ {inf.novads}{inf.pagasts ? ` · ${inf.pagasts}` : ''}</div>}
           </div>
-          <div>
-            <label style={labelSt}>Platība (ha)</label>
-            <input type="number" value={platiba} onChange={e => setPlatiba(e.target.value)} placeholder="piem. 3.5" style={inp} />
+          <div style={row2}>
+            <div>
+              <label style={labelSt}>Nogabals</label>
+              <input value={inf.nogabals} onChange={e => updInf('nogabals', e.target.value)}
+                placeholder="piem. 8" style={inp} />
+            </div>
+            <div>
+              <label style={labelSt}>A.Nogabals</label>
+              <input value={inf.aNogabals} onChange={e => updInf('aNogabals', e.target.value)}
+                placeholder="piem. 0" style={inp} />
+            </div>
+          </div>
+          <div style={{ marginTop:10 }}>
+            <label style={labelSt}>Kvartāls</label>
+            <input value={inf.kvartals} onChange={e => updInf('kvartals', e.target.value)}
+              placeholder="piem. 13" style={inp} />
+          </div>
+        </Karte>
+
+        {/* Atrašanās vieta */}
+        <Karte>
+          <div style={{ fontSize:12, color:C.textDim, fontWeight:600, marginBottom:10, textTransform:'uppercase', letterSpacing:'0.05em' }}>Atrašanās vieta</div>
+          <div style={row2}>
+            <div>
+              <label style={labelSt}>Novads {inf.novads && <span style={{ color:C.accent }}>●</span>}</label>
+              <input value={inf.novads} onChange={e => updInf('novads', e.target.value)}
+                placeholder="piem. Madonas novads" style={inf.novads ? {...inp, borderColor: C.accent} : inp} />
+            </div>
+            <div>
+              <label style={labelSt}>Pagasts {inf.pagasts && <span style={{ color:C.accent }}>●</span>}</label>
+              <input value={inf.pagasts} onChange={e => updInf('pagasts', e.target.value)}
+                placeholder="piem. Laudonas pag." style={inf.pagasts ? {...inp, borderColor: C.accent} : inp} />
+            </div>
+          </div>
+          <div style={{ ...row2, marginTop:10 }}>
+            <div>
+              <label style={labelSt}>Virsmežniecība {inf.virsmezn && <span style={{ color:C.accent }}>●</span>}</label>
+              <input value={inf.virsmezn} onChange={e => updInf('virsmezn', e.target.value)}
+                placeholder="piem. Vidzemes VMŅ" style={inf.virsmezn ? {...inp, borderColor: C.accent} : inp} />
+            </div>
+            <div>
+              <label style={labelSt}>Mežniecība</label>
+              <input value={inf.meznieciba} onChange={e => updInf('meznieciba', e.target.value)}
+                placeholder="piem. Madonas" style={inp} />
+            </div>
+          </div>
+        </Karte>
+
+        {/* Saimniecība un dati */}
+        <Karte>
+          <div style={{ fontSize:12, color:C.textDim, fontWeight:600, marginBottom:10, textTransform:'uppercase', letterSpacing:'0.05em' }}>Saimniecība un mērījumi</div>
+          <div style={{ marginBottom:10 }}>
+            <label style={labelSt}>Saimniecības nosaukums</label>
+            <input value={inf.saimnieciba} onChange={e => updInf('saimnieciba', e.target.value)}
+              placeholder="piem. Vecainiešu saimniecība" style={inp} />
+          </div>
+          <div style={row2}>
+            <div>
+              <label style={labelSt}>Platība (ha)</label>
+              <input type="number" value={inf.platiba} onChange={e => updInf('platiba', e.target.value)}
+                placeholder="piem. 1.90" style={inp} />
+            </div>
+            <div>
+              <label style={labelSt}>Pievešanas attālums (m)</label>
+              <input type="number" value={inf.pievesana} onChange={e => updInf('pievesana', e.target.value)}
+                placeholder="piem. 800" style={inp} />
+            </div>
+          </div>
+          <div style={{ marginTop:10 }}>
+            <label style={labelSt}>Meža izmantošanas veids</label>
+            <select value={inf.izmantosana} onChange={e => updInf('izmantosana', e.target.value)} style={inp}>
+              {['Galvenā cirte - kailcirte','Galvenā cirte - izlases cirte','Galvenā cirte - kailcirte pēc caurmēra','Kopšanas cirte','Sanitārā cirte'].map(v =>
+                <option key={v}>{v}</option>)}
+            </select>
+          </div>
+        </Karte>
+
+        {/* Personas */}
+        <Karte>
+          <div style={{ fontSize:12, color:C.textDim, fontWeight:600, marginBottom:10, textTransform:'uppercase', letterSpacing:'0.05em' }}>Personas</div>
+          <div style={row2}>
+            <div>
+              <label style={labelSt}>Īpašnieks</label>
+              <input value={inf.ipasnieks} onChange={e => updInf('ipasnieks', e.target.value)}
+                placeholder="vārds, uzvārds" style={inp} />
+            </div>
+            <div>
+              <label style={labelSt}>Uzmērīja</label>
+              <input value={inf.uzmērīja} onChange={e => updInf('uzmērīja', e.target.value)}
+                placeholder={user?.vards || 'vārds, uzvārds'} style={inp} />
+            </div>
           </div>
         </Karte>
 
@@ -155,7 +309,7 @@ export default function DastojumsMeritajsPage({ onBack }) {
         </button>
       </div>
     </div>
-  );
+  );}
 
   // ═══════════════════════════════════════════════════════════════════════════
   // FĀZE 2 — MĒRĪŠANA
@@ -213,7 +367,7 @@ export default function DastojumsMeritajsPage({ onBack }) {
 
           <div style={{ marginBottom:14 }}>
             <label style={labelSt}>Nogabals (pēc izvēles)</label>
-            <input value={nogabals} onChange={e => setNogabals(e.target.value)} placeholder="piem. 1a" style={inp} />
+            <input value={ievNog} onChange={e => setIevNog(e.target.value)} placeholder="piem. 1a" style={inp} />
           </div>
 
           <button onClick={pievienotKoku} disabled={!dLabi} style={{
@@ -385,8 +539,25 @@ td.r{text-align:right}
 .zem{margin-top:16px;font-size:11px}
 .paraksts{display:flex;gap:60px;margin-top:28px;font-size:11px}
 </style></head><body>
-<h2>🌲 MEŽA TIRGUS — Dastojuma uzmērīšanas pārskats</h2>
-<p>Kadastra nr.: <b>${kadastrs || '—'}</b> &nbsp;|&nbsp; Platība: <b>${platiba || '—'} ha</b> &nbsp;|&nbsp; Datums: <b>${datums}</b></p>
+<h1 style="text-align:center;font-size:16px;margin:0 0 12px">CIRSMAS NOVĒRTĒJUMS</h1>
+<table style="width:100%;border:none;font-size:10px;margin-bottom:12px"><tr>
+<td style="border:none;width:50%">
+<b>Saimniecība:</b> ${inf.saimnieciba || '—'}<br>
+<b>Novads:</b> ${inf.novads || '—'}<br>
+<b>Pagasts:</b> ${inf.pagasts || '—'}<br>
+<b>Virsmežniecība:</b> ${inf.virsmezn || '—'}<br>
+<b>Mežniecība:</b> ${inf.meznieciba || '—'}
+</td>
+<td style="border:none;width:50%">
+<b>Īpašnieks:</b> ${inf.ipasnieks || '—'}<br>
+<b>Kadastrs:</b> ${inf.kadastrs || '—'}<br>
+<b>Kvartāls:</b> ${inf.kvartals || '—'} &nbsp;<b>Nogabals:</b> ${inf.nogabals || '—'} &nbsp;<b>A.Nog.:</b> ${inf.aNogabals || '0'}<br>
+<b>Platība:</b> ${inf.platiba || '—'} ha &nbsp;<b>Pievešana:</b> ${inf.pievesana || '—'} m<br>
+<b>Koku skaits:</b> ${kopa.skaits} gab. nogabalā<br>
+<b>Meža izmantošanas veids:</b> ${inf.izmantosana || '—'}<br>
+<b>Uzmērīja:</b> ${inf.uzmērīja || '—'} &nbsp;<b>Datums:</b> ${datums}
+</td>
+</tr></table>
 <table>
   <thead><tr>
     <th style="text-align:left">Suga</th>
@@ -410,7 +581,7 @@ td.r{text-align:right}
   <p>Cirsmas vērtība, €: _______________________</p>
 </div>
 <div class="paraksts">
-  <div>Uzmērīja: _________________________</div>
+  <div>Uzmērīja: ${inf.uzmērīja || '_________________________'}</div>
   <div>Novērtēja: _________________________</div>
 </div>
 </body></html>`;
@@ -424,7 +595,7 @@ td.r{text-align:right}
       <div style={{ minHeight:'100vh', background:C.bg, color:C.text, fontFamily:'Arial,sans-serif' }}>
         <Header
           title="🌲 Dastojuma pārskats"
-          subtitle={kadastrs ? `${kadastrs}${platiba ? ` · ${platiba} ha` : ''}` : datums}
+          subtitle={inf.kadastrs ? `${inf.kadastrs}${inf.platiba ? ` · ${inf.platiba} ha` : ''}` : datums}
           onBack={() => setFaze('augstumi')}
         />
         <div style={{ maxWidth:'100%', padding:'16px 12px 80px', overflowX:'auto' }}>
