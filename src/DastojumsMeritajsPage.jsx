@@ -9,7 +9,6 @@ const KVALITATES = [
   { val: 'tievs',  label: 'Tievs (Q3)'  },
   { val: 'malka',  label: 'Malka'        },
 ];
-const DEFAULT_GARUMI = { P:5, E:5, B:4, A:4, Ba:2.5, Bl:4, Oz:5, Os:5 };
 
 // ─── Krāsas ───────────────────────────────────────────────────────────────────
 const C = {
@@ -90,7 +89,6 @@ export default function DastojumsMeritajsPage({ onBack }) {
   const [kadastrs, setKadastrs] = useState('');
   const [platiba,  setPlatiba]  = useState('');
   const [bon,      setBon]      = useState(3);
-  const [garumi,   setGarumi]   = useState({ ...DEFAULT_GARUMI });
 
   const [koki,     setKoki]     = useState([]);
   const [d,        setD]        = useState('');
@@ -113,6 +111,8 @@ export default function DastojumsMeritajsPage({ onBack }) {
     if (koki.length === 0 || Object.keys(sugaH).length === 0) return null;
     return sadaliKvalitates(koki, sugaH);
   }, [koki, sugaH]);
+
+  const garumi = {}; // vairs neizmanto — zonas tiek noteiktas pēc D sliekšņiem
 
   function pievienotKoku() {
     const dNum = parseFloat(d);
@@ -155,24 +155,6 @@ export default function DastojumsMeritajsPage({ onBack }) {
                 {[1,2,3,4,5].map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
-          </div>
-        </Karte>
-
-        <Karte>
-          <div style={{ fontSize:13, fontWeight:600, color:C.textSec, marginBottom:10 }}>
-            Sortimenta garumi (m) pa sugām
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
-            {SUGAS_SARAKSTS.map(s => (
-              <div key={s} style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span style={{ fontSize:14, fontWeight:700, color:C.accent, width:28, textAlign:'center' }}>{s}</span>
-                <input type="number" min="1" max="10" step="0.5"
-                  value={garumi[s] ?? 4}
-                  onChange={e => setGarumi(prev => ({ ...prev, [s]: parseFloat(e.target.value) }))}
-                  style={{ ...inp, flex:1, width:'auto', textAlign:'center', fontSize:15, fontWeight:600 }} />
-                <span style={{ fontSize:12, color:C.textDim, width:14 }}>m</span>
-              </div>
-            ))}
           </div>
         </Karte>
 
