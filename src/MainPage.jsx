@@ -20,6 +20,8 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         { icon: "📏", title: "Caurmēra mērījumi", desc: "Ātra caurmēru ievade laukā, tūlītējs rezultāts", page: "caurmers_mobile", badge: "MOBILAIS" },
         { icon: "🌲", title: "Cirsmas vērtēšana", desc: "G mērījumi, Bitterlich, sortimentu aprēķini reāllaikā", page: "cirsma_mobile", badge: "MOBILAIS" },
         { icon: "📋", title: "Pavadzīmju reģistrs", desc: "Foto → OCR → automātiska reģistrācija", page: "pavadzimes" },
+        { icon: "🪵", title: "Dastojuma mērītājs", desc: "Dastojuma rindu ievade, apjomi, pavadzīmes izveide", page: "dastojums_meritajs", badge: "MOBILAIS" },
+        { icon: "📦", title: "Krautuves mērītājs", desc: "Krautuves krājumu uzskaite un vērtēšana", page: "krautuves_meritajs", badge: "MOBILAIS" },
       ]
     },
     {
@@ -27,6 +29,8 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       color: "#ffb74d",
       riki: [
         { icon: "🧾", title: "Rēķinu krātuve", desc: "Rēķinu izveide, drukāšana, mēneša un gada pārskats", page: "rekini" },
+        { icon: "🚛", title: "Loģistikas kalkulators", desc: "Transporta izmaksas, piegādes maršruti, degvielas kalkulācija", page: "logistika" },
+        { icon: "💳", title: "Abonements", desc: "Pro un Komercija plāni — paplašinātas iespējas", page: "subscription" },
         { icon: "🌲", title: "RP Andras portāls", desc: "Vadības panelis — algas, rēķini, Excel", page: "rpandras" },
       ]
     },
