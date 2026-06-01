@@ -88,7 +88,7 @@ export default function DastojumsMeritajsPage({ onBack }) {
   const [faze,     setFaze]     = useState('setup');
   const [kadastrs, setKadastrs] = useState('');
   const [platiba,  setPlatiba]  = useState('');
-  const [bon,      setBon]      = useState(3);
+  const bon = 3; // bonitāte nav vajadzīga — kalibrēts augstums kompensē
 
   const [koki,     setKoki]     = useState([]);
   const [d,        setD]        = useState('');
@@ -144,17 +144,9 @@ export default function DastojumsMeritajsPage({ onBack }) {
             <label style={labelSt}>Kadastra nr. (nav obligāts)</label>
             <input value={kadastrs} onChange={e => setKadastrs(e.target.value)} placeholder="piem. 42820040063" style={inp} />
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-            <div>
-              <label style={labelSt}>Platība (ha)</label>
-              <input type="number" value={platiba} onChange={e => setPlatiba(e.target.value)} placeholder="piem. 3.5" style={inp} />
-            </div>
-            <div>
-              <label style={labelSt}>Bonitāte (1–5)</label>
-              <select value={bon} onChange={e => setBon(e.target.value)} style={inp}>
-                {[1,2,3,4,5].map(b => <option key={b} value={b}>{b}</option>)}
-              </select>
-            </div>
+          <div>
+            <label style={labelSt}>Platība (ha)</label>
+            <input type="number" value={platiba} onChange={e => setPlatiba(e.target.value)} placeholder="piem. 3.5" style={inp} />
           </div>
         </Karte>
 
