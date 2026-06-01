@@ -39,8 +39,9 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       title: "VMD & Analīze",
       color: "#4db6ac",
       riki: [
-    { icon: "🌲", title: "Cirsmas novērtēšana (PDF)", desc: "VMD inventarizācijas PDF → nogabalu analīze, cirsmas vērtība — pieejams bezmaksas sadaļā", page: "standard" },
+        { icon: "🌲", title: "Cirsmas novērtēšana (PDF)", desc: "VMD inventarizācijas PDF → nogabalu analīze, cirsmas vērtība — pieejams bezmaksas sadaļā", page: "standard" },
         { icon: "✂️", title: "PDF šķirotājs", desc: "Sadala daudzīpašumu PDF pa kadastriem atsevišķos dokumentos", page: "pdfSkirotajs" },
+        { icon: "💬", title: "Jautā par mežu", desc: "AI konsultants — meža likumdošana, koku ciršana, aizsargjoslas, mikroliegumi. Atbild ar VMD/DAP kontaktiem.", page: "jautaparmezu", badge: "AI" },
       ]
     },
   ]

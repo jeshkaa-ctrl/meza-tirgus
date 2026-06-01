@@ -24,6 +24,7 @@ import MobilajiRiki from "./MobilajiRiki"
 import KrautuvesMeritajsPage from "./KrautuvesMeritajsPage"
 import DastojumsMeritajsPage from "./DastojumsMeritajsPage"
 import SubscriptionPage from "./SubscriptionPage"
+import JautaParMezuPage from "./JautaParMezuPage"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -1674,6 +1675,7 @@ if(page==="kubi") return <KubiKalkulators onBack={()=>setPage("main")}/>
 if(page==="krautuves_meritajs")  return <KrautuvesMeritajsPage  onBack={()=>setPage("mobilie")}/>
 if(page==="dastojums_meritajs") return <DastojumsMeritajsPage onBack={()=>setPage("mobilie")}/>
 if(page==="subscription")      return <SubscriptionPage onBack={()=>setPage("main")} onNavigate={setPage}/>
+if(page==="jautaparmezu")     return <JautaParMezuPage onBack={()=>setPage("main")}/>
 if(page==="mobilie") return <MobilajiRiki onBack={()=>setPage("main")} onNavigate={(p)=>setPage(p)}/>
 if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
 if(page==="pavadzimes") return <PavadzimesRegistrs onBack={()=>setPage("main")}/>
