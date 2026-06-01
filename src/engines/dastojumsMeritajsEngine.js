@@ -204,12 +204,43 @@ export function sadaliKvalitates(koki, sugaH) {
     koki.flatMap(k => Array(k.skaits ?? 1).fill(k).map(x => ({ ...x })))
   );
 
+  // ── Kalibrācijas faktors pa sugām ──────────────────────────────────────────
+  // Lietotājs ievada VIDĒJO 1. stāva augstumu — tas kalpo kā kalibrācijas punkts.
+  // Katrs koks saņem INDIVIDUĀLU augstumu pēc sava D, kalibrētu pret lietotāja mērījumu.
+  //
+  // k = H_lietotājs / calcH(D_vid_1stavs, suga, bon)
+  // h_koka = calcH(D_koka, suga, bon) × k
+  //
+  // Piemērs: E H_vid=29m, D_vid_1stavs=15.3cm → k=1.306
+  //   D=18cm → 30.6m, D=16cm → 29.4m, D=12cm → 26.5m, D=8cm(2.stāvs) → 13.4m
+  const kalibr = {};
+  const sugas  = [...new Set(kokiAr2.map(k => k.suga))];
+
+  for (const sg of sugas) {
+    if (!sugaH[sg]) continue;
+    const stavs1 = kokiAr2.filter(k => k.suga === sg && !k.otrsStavs);
+    if (stavs1.length === 0) continue;
+    const dVid   = stavs1.reduce((s, k) => s + k.d_cm, 0) / stavs1.length;
+    const bonVid = Math.round(stavs1.reduce((s, k) => s + (k.bon ?? 3), 0) / stavs1.length);
+    const hRegr  = calcH(dVid, sg, bonVid);
+    kalibr[sg]   = hRegr > 0 ? sugaH[sg] / hRegr : 1;
+  }
+
   const paSugam = {};
 
   for (const k of kokiAr2) {
-    // a) Augstums: lietotāja ievadītais → precīzāks par regresiju
-    const hVid = sugaH[k.suga] ?? calcH(k.d_cm, k.suga, k.bon ?? 3);
-    const h    = k.otrsStavs ? Math.max(hVid * 0.60, 4) : hVid;
+    // a) Individuālais augstums — kalibrēts pret lietotāja mērījumu
+    const kFakt        = kalibr[k.suga] ?? 1;
+    const hIndividuals = calcH(k.d_cm, k.suga, k.bon ?? 3) * kFakt;
+    const hVidMax      = sugaH[k.suga] ?? hIndividuals; // 1. stāva vidējais kā griesti 2. stāvam
+
+    let h;
+    if (k.otrsStavs) {
+      // 2. stāvs: max 60% no 1. stāva vidējā augstuma, bet ne vairāk par pašu individuālo
+      h = Math.max(Math.min(hIndividuals, hVidMax * 0.60), 4);
+    } else {
+      h = Math.max(hIndividuals, 4);
+    }
 
     // b) Brutā kubatūra
     const brutV = calcV(k.d_cm, h, k.suga);
