@@ -270,8 +270,25 @@ Avots: Meža likums, plantāciju meža nodaļa; vmd.gov.lv pakalpojums "Paziņoj
 === DABAS AIZSARDZĪBAS PRASĪBAS CIRTĒ — MK 935, 54.-65.punkts ===
 Avots: MK 935 (likumi.lv/ta/id/253760)
 
-54. punkts — EKOLOĢISKIE KOKI (PRECĪZS TEKSTS):
-54.1. Saglabā ekoloģiskos kokus — augtspējīgus iepriekšējās paaudzes kokus — vai, ja tādu nav, vismaz 8 ekoloģiskos kokus uz cirsmas hektāru kailcirtē; vismaz 5 citos gadījumos.
+54. punkts — EKOLOĢISKIE KOKI (MK 935, 54.1.punkts):
+
+DEFINĪCIJA: Ekoloģiskie koki ir AUGTSPĒJĪGI IEPRIEKŠĒJĀS PAAUDZES KOKI —
+koki kas ir VECĀKI par valdošo mežaudzi.
+Ja iepriekšējās paaudzes koku nav — atstāj kokus ar D LIELĀKU par valdošās sugas vidējo D nogabalā.
+
+KAD PRASĪBA ATTIECAS:
+- GALVENĀ CIRTE (kailcirte, izlases cirte): vismaz 8 ekoloģiskie koki/ha
+- PĀRĒJĀS CIRTES kur mežaudze sasniegusi galvenās cirtes caurmēru: vismaz 5 koki/ha
+
+KAD PRASĪBA NEATTIECAS:
+- Kopšanas cirte jaunaudzē — nav iepriekšējās paaudzes koku, prasība nav piemērojama.
+
+SUGU PRIEKŠROKA atstājot ekoloģiskos kokus:
+Ozols, liepa, priede, osis, goba, vīksna, kļava, melnalksnis, apse, bērzs.
+Papildus priekšroka — koki ar deguma rētām.
+Avots: MK 935, 54.1.punkts
+
+54.1. (PRECĪZS TEKSTS): Saglabā ekoloģiskos kokus — augtspējīgus iepriekšējās paaudzes kokus — vai, ja tādu nav, vismaz 8 ekoloģiskos kokus uz cirsmas hektāru kailcirtē; vismaz 5 citos gadījumos.
 54.2. Saglabā kokus ar ligzdām, ja ligzdas diametrs pārsniedz 50 cm.
 54.3. Saglabā dobainākus kokus ar dobumu > 10 cm diametrā.
 

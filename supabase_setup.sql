@@ -103,5 +103,20 @@ create policy "own_iestatijumi" on public.klienta_iestatijumi for all using (aut
 -- Admins var lasīt/rakstīt visus iestatījumus (nomainīt uz īsto admin user ID)
 -- create policy "admin_iestatijumi" on public.klienta_iestatijumi for all using (auth.uid() = 'ADMIN_UUID_ŠEIT');
 
--- 7. SVARĪGI: Supabase Dashboard → Authentication → Settings
+-- 7. Vienreizējo maksājumu tabula
+create table if not exists public.one_time_payments (
+  id             uuid primary key default gen_random_uuid(),
+  user_id        uuid references auth.users(id) on delete cascade not null,
+  plan_id        text not null,
+  merchant_ref   text unique,
+  amount         numeric,
+  status         text default 'paid',
+  paid_at        timestamptz default now(),
+  created_at     timestamptz default now()
+);
+
+alter table public.one_time_payments enable row level security;
+create policy "own_payments" on public.one_time_payments for select using (auth.uid() = user_id);
+
+-- 8. SVARĪGI: Supabase Dashboard → Authentication → Settings
 --    Izslēdz "Enable email confirmations" lai lietotāji var pieteikties uzreiz pēc reģistrācijas

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSubscription } from './hooks/useSubscription'
+import { supabase } from './supabaseClient'
 import { C as DS, F, R, S, btn, spinnerCSS } from './ds'
 
 const PLANS = [
@@ -75,9 +76,27 @@ const VIENREIZIGI = [
   { nosaukums: 'Izcelts sludinājums',    cena: '15.00 €', apraksts: 'Augšgalā 14 dienas' },
 ]
 
-export default function SubscriptionPage({ onBack, onNavigate }) {
+export default function SubscriptionPage({ onBack, onNavigate, user }) {
   const { plan: tagadejais, loading } = useSubscription()
   const [ciklsGads, setCiklsGads] = useState(false)
+  const [maksajums, setMaksajums] = useState({ loading: false, klude: '' })
+
+  const saktMaksajumu = async (planId, billingCycle) => {
+    if (!user) {
+      setMaksajums({ loading: false, klude: 'Lūdzu ielogojies pirms maksāšanas' })
+      return
+    }
+    setMaksajums({ loading: true, klude: '' })
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { userId: user.id, planId, billingCycle },
+      })
+      if (error || !data?.paymentUrl) throw new Error(error?.message || 'Nav paymentUrl')
+      window.location.href = data.paymentUrl
+    } catch (e) {
+      setMaksajums({ loading: false, klude: `Kļūda: ${e.message}` })
+    }
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family }}>
@@ -185,26 +204,59 @@ export default function SubscriptionPage({ onBack, onNavigate }) {
                 </div>
 
                 <button
-                  disabled={aktīvs}
-                  onClick={() => {/* Drīzumā — Stripe */}}
+                  disabled={aktīvs || maksajums.loading || p.id === 'free'}
+                  onClick={() => saktMaksajumu(p.id, ciklsGads ? 'yearly' : 'monthly')}
                   style={{
-                    width: '100%', padding: '11px 0', borderRadius: 8, border: 'none',
-                    background: aktīvs ? '#1a2e1a' : p.id === 'free' ? '#2d4a2d' : p.id === 'pro' ? '#225522' : '#7a6000',
-                    color: aktīvs ? '#4a7a4a' : 'white',
-                    fontSize: 14, fontWeight: aktīvs ? 400 : 600,
-                    cursor: aktīvs ? 'default' : 'pointer',
+                    width: '100%', padding: '12px 0', borderRadius: 8, border: 'none',
+                    background: aktīvs
+                      ? '#1a2e1a'
+                      : p.id === 'free'
+                      ? '#1a2e1a'
+                      : maksajums.loading
+                      ? '#1a3a1a'
+                      : p.id === 'pro' ? '#225522' : '#7a6000',
+                    color: aktīvs || p.id === 'free' ? '#4a7a4a' : 'white',
+                    fontSize: 14, fontWeight: 600,
+                    cursor: aktīvs || p.id === 'free' ? 'default' : 'pointer',
+                    opacity: maksajums.loading ? 0.7 : 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   }}
                 >
                   {aktīvs
                     ? '✓ Aktīvs plāns'
                     : p.id === 'free'
                     ? 'Bezmaksas'
-                    : '⏳ Drīzumā — Stripe maksājums'}
+                    : maksajums.loading
+                    ? '⏳ Novirza uz banku...'
+                    : `🏦 Maksāt ar internetbanku — €${cena}${ciklsGads ? '/gadā' : '/mēn.'}`
+                  }
                 </button>
+
+                {/* Banku logotipi */}
+                {p.id !== 'free' && !aktīvs && (
+                  <div style={{ marginTop: 10, textAlign: 'center' }}>
+                    <div style={{ fontSize: 10, color: '#3a5a3a', marginBottom: 4 }}>Pieejamas bankas:</div>
+                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+                      {['Swedbank', 'SEB', 'Citadele', 'Luminor'].map(b => (
+                        <span key={b} style={{
+                          fontSize: 10, color: '#4a7a4a', background: '#0f2b0f',
+                          border: '1px solid #1e3a1e', borderRadius: 4, padding: '2px 6px',
+                        }}>{b}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
         </div>
+
+        {/* Kļūdas ziņojums */}
+        {maksajums.klude && (
+          <div style={{ background: DS.errorBg, border: `1px solid ${DS.error}44`, borderRadius: 8, padding: '10px 16px', marginBottom: 16, color: DS.error, fontSize: 13 }}>
+            ⚠ {maksajums.klude}
+          </div>
+        )}
 
         {/* Pay-as-you-go */}
         <div style={{ background: '#111f11', border: '1px solid #2d4a2d', borderRadius: 12, padding: '20px 24px' }}>

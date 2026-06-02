@@ -25,6 +25,7 @@ import MobilajiRiki from "./MobilajiRiki"
 import KrautuvesMeritajsPage from "./KrautuvesMeritajsPage"
 import DastojumsMeritajsPage from "./DastojumsMeritajsPage"
 import SubscriptionPage from "./SubscriptionPage"
+import MaksajumsPaldies from "./MaksajumsPaldies"
 import JautaParMezuPage from "./JautaParMezuPage"
 import JautaParMezuWidget from "./components/JautaParMezuWidget"
 import MainPage from "./MainPage"
@@ -1598,7 +1599,11 @@ return(
 }
 
 function App(){
-const [page,setPage]=useState("landing")
+// Montonio return URL pārbaude — ja ?payment=success, rāda paldies lapu
+const urlParams = new URLSearchParams(window.location.search)
+const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies' : 'landing'
+
+const [page,setPage]=useState(initialPage)
 const { user, loading: authLoading, registreties, pieteikties, iziet } = useAuth()
 const [showReg, setShowReg] = useState(false)
 const [regAtpakal, setRegAtpakal] = useState(null)
@@ -1686,7 +1691,8 @@ if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("
 if(page==="kubi") return <KubiKalkulators onBack={()=>setPage("main")}/>
 if(page==="krautuves_meritajs")  return <KrautuvesMeritajsPage  onBack={()=>setPage("main")}/>
 if(page==="dastojums_meritajs") return <DastojumsMeritajsPage onBack={()=>setPage("main")}/>
-if(page==="subscription")      return <SubscriptionPage onBack={()=>setPage("main")} onNavigate={setPage}/>
+if(page==="subscription")      return <SubscriptionPage onBack={()=>setPage("main")} onNavigate={setPage} user={user}/>
+if(page==="maksajums_paldies") return <MaksajumsPaldies onTurpina={()=>setPage("main")}/>
 if(page==="jautaparmezu")     return <JautaParMezuPage onBack={()=>setPage("main")}/>
 if(page==="mobilie") return <MobilajiRiki onBack={()=>setPage("main")} onNavigate={(p)=>setPage(p)}/>
 if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
