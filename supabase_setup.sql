@@ -186,7 +186,14 @@ alter table public.grupas_dalibnieki enable row level security;
 create policy "dalibnieki_lasit"       on public.grupas_dalibnieki for select using (true);
 create policy "dalibnieki_pievienoties" on public.grupas_dalibnieki for insert with check (auth.uid() = user_id);
 
--- 14. Seed dati — demo posti (aizstāj USER_ID ar reālu user uuid no auth.users)
+-- 14. FK no posts uz profiles (ļauj PostgREST joinot profilus)
+-- Izpildi tikai ja posts tabula tika tikko izveidota:
+-- alter table public.posts
+--   drop constraint if exists posts_user_id_fkey,
+--   add constraint posts_user_id_fkey
+--     foreign key (user_id) references public.profiles(id) on delete cascade;
+
+-- 15. Seed dati — demo posti (aizstāj USER_ID ar reālu user uuid no auth.users)
 -- insert into public.posts (user_id, teksts, tips) values
 --   ('USER_ID', 'Šodien Gaujas krastā pamanīju melnā stārķa ligzdu vecajā priežu mežā. Cirte plānota tuvākajā kvartālā — kas jādara? Vai pietiek paziņot VMD vai arī jāsazinās ar DAP?', 'post'),
 --   ('USER_ID', 'Kāds ir jūsu pieredze ar Bitterliha relaskopu? Tikko ieguvu un mēģinu izprast metodi. Cik parauglaukumus jāizdara uz 5 ha cirsmu?', 'post'),

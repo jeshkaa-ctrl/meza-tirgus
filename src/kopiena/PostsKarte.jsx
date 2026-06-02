@@ -52,12 +52,22 @@ export default function PostsKarte({ post, user, onDelete }) {
   const ieladeKomentarus = async () => {
     if (komLoad) return
     setKomLoad(true)
-    const { data } = await supabase
+    const { data: komData } = await supabase
       .from('komentari')
-      .select('*, profiles:user_id(vards, uznemums, loma, avatar_url)')
+      .select('*')
       .eq('post_id', post.id)
       .order('created_at', { ascending: true })
-    setKomentari(data || [])
+
+    if (komData && komData.length > 0) {
+      const uids = [...new Set(komData.map(k => k.user_id))]
+      const { data: profs } = await supabase
+        .from('profiles').select('id, vards, uznemums, loma, avatar_url').in('id', uids)
+      const pm = {}
+      ;(profs || []).forEach(p => { pm[p.id] = p })
+      setKomentari(komData.map(k => ({ ...k, profiles: pm[k.user_id] || null })))
+    } else {
+      setKomentari([])
+    }
     setKomLoad(false)
   }
 

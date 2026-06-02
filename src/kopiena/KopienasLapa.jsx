@@ -33,48 +33,82 @@ export default function KopienasLapa({ user, onNavigate, onReg }) {
     if (no === 0) setLoading(true)
     else setLadeVairāk(true)
 
-    let q = supabase
-      .from('posts')
-      .select(`
-        *,
-        profiles:user_id(vards, uznemums, loma, novads, avatar_url),
-        likes_skaits:post_reakcijas(count),
-        komentari_skaits:komentari(count)
-      `)
-      .order('created_at', { ascending: false })
-      .range(no, no + LAPU_IZMERS - 1)
+    try {
+      // 1. Ielādē postus
+      let q = supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(no, no + LAPU_IZMERS - 1)
 
-    if (tips === 'sludinajumi') q = q.eq('tips', 'sludinajums')
+      if (tips === 'sludinajumi') q = q.eq('tips', 'sludinajums')
+      const { data: postiData, error } = await q
+      if (error) throw error
 
-    const { data } = await q
+      const posti = postiData || []
+      if (posti.length === 0) {
+        if (no === 0) setPosti([])
+        setVairāk(false)
+        setLoading(false)
+        setLadeVairāk(false)
+        return
+      }
 
-    // Normalizē count objektus
-    const normalizēti = (data || []).map(p => ({
-      ...p,
-      likes_skaits:     p.likes_skaits?.[0]?.count || 0,
-      komentari_skaits: p.komentari_skaits?.[0]?.count || 0,
-    }))
+      const ids    = posti.map(p => p.id)
+      const userIds = [...new Set(posti.map(p => p.user_id))]
 
-    // Pārbauda user likes
-    if (user?.id && normalizēti.length > 0) {
-      const ids = normalizēti.map(p => p.id)
-      const { data: manasR } = await supabase
-        .from('post_reakcijas')
-        .select('post_id')
-        .eq('user_id', user.id)
-        .in('post_id', ids)
+      // 2. Paralēli: profili, likes skaits, komentāru skaits, mani likes
+      const [profilsRes, likesRes, komRes, maniRes] = await Promise.all([
+        supabase.from('profiles')
+          .select('id, vards, uznemums, loma, novads, avatar_url')
+          .in('id', userIds),
+        supabase.from('post_reakcijas')
+          .select('post_id')
+          .in('post_id', ids),
+        supabase.from('komentari')
+          .select('post_id')
+          .in('post_id', ids),
+        user?.id
+          ? supabase.from('post_reakcijas').select('post_id')
+              .eq('user_id', user.id).in('post_id', ids)
+          : Promise.resolve({ data: [] }),
+      ])
 
-      const maniSet = new Set((manasR || []).map(r => r.post_id))
-      normalizēti.forEach(p => { p.mans_like = maniSet.has(p.id) })
+      // 3. Apkopo datus
+      const profilMap = {}
+      ;(profilsRes.data || []).forEach(p => { profilMap[p.id] = p })
+
+      const likesMap = {}
+      ;(likesRes.data || []).forEach(r => {
+        likesMap[r.post_id] = (likesMap[r.post_id] || 0) + 1
+      })
+
+      const komMap = {}
+      ;(komRes.data || []).forEach(r => {
+        komMap[r.post_id] = (komMap[r.post_id] || 0) + 1
+      })
+
+      const maniSet = new Set((maniRes.data || []).map(r => r.post_id))
+
+      const normalizēti = posti.map(p => ({
+        ...p,
+        profiles:         profilMap[p.user_id] || null,
+        likes_skaits:     likesMap[p.id] || 0,
+        komentari_skaits: komMap[p.id] || 0,
+        mans_like:        maniSet.has(p.id),
+      }))
+
+      if (no === 0) setPosti(normalizēti)
+      else setPosti(prev => [...prev, ...normalizēti])
+
+      setVairāk(normalizēti.length === LAPU_IZMERS)
+      setOffset(no + normalizēti.length)
+    } catch (e) {
+      console.error('Kļūda ielādējot postus:', e)
+    } finally {
+      setLoading(false)
+      setLadeVairāk(false)
     }
-
-    if (no === 0) setPosti(normalizēti)
-    else setPosti(prev => [...prev, ...normalizēti])
-
-    setVairāk(normalizēti.length === LAPU_IZMERS)
-    setOffset(no + normalizēti.length)
-    setLoading(false)
-    setLadeVairāk(false)
   }, [cilne, user?.id])
 
   useEffect(() => {

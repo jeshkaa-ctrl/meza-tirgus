@@ -51,11 +51,12 @@ export default function JaunsPostsForma({ user, profils, onJaunsPost }) {
     const { data, error } = await supabase
       .from('posts')
       .insert({ user_id: user.id, teksts: teksts.trim(), bilde_url })
-      .select(`*, profiles:user_id(vards, uznemums, loma, novads, avatar_url)`)
+      .select('*')
       .single()
 
     if (!error && data) {
-      onJaunsPost?.({ ...data, likes_skaits: 0, komentari_skaits: 0, mans_like: false })
+      // Pievieno profilu lokāli — nav nepieciešams papildu query
+      onJaunsPost?.({ ...data, profiles: profils, likes_skaits: 0, komentari_skaits: 0, mans_like: false })
       setTeksts(''); setBilde(null); setAktiva(false)
     }
     setPosting(false)
