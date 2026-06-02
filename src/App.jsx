@@ -1426,7 +1426,7 @@ Drukāt / Saglabāt PDF
 )
 }
 // ========== GALVENA APP ==========
-function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus}){
 return(
 <div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -1506,51 +1506,100 @@ return(
   </p>
 </div>
 
-    {/* BEZMAKSAS / MAKSAS */}
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"24px",marginBottom:"40px"}}>
-      <div style={{background:"linear-gradient(160deg,#0f1f0f,#1a2e1a)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"28px"}}>
-        <div style={{color:"#4caf50",fontWeight:800,fontSize:"18px",marginBottom:"6px"}}>✓ Bezmaksas</div>
-        <div style={{color:"#4a7a4a",fontSize:"12px",marginBottom:"20px"}}>Sāc bez maksas uzreiz</div>
+    {/* PLĀNI — 3 kartiņas */}
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"16px",marginBottom:"24px"}}>
+
+      {/* BEZMAKSAS */}
+      <div style={{background:"linear-gradient(160deg,#0f1f0f,#1a2e1a)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"24px",display:"flex",flexDirection:"column"}}>
+        <div style={{color:"#4caf50",fontWeight:800,fontSize:"20px",marginBottom:"4px"}}>✓ Bezmaksas</div>
+        <div style={{color:"#4a7a4a",fontSize:"12px",marginBottom:"4px"}}>Sāc bez maksas uzreiz</div>
+        <div style={{color:"#4caf50",fontSize:"24px",fontWeight:800,marginBottom:"16px"}}>€0</div>
         {[
-          {icon:"📄",text:"PDF augšupielāde un nogabalu analīze"},
-          {icon:"🌲",text:"Ieteikumi par cirtes veidu"},
-          {icon:"💰",text:"Saimnieciskā un tirgus vērtība"},
-          {icon:"📏",text:"Ciršanas ieteikumi pēc vecuma un bonitātes"},
-          {icon:"🌱",text:"Atjaunošanas pārskats"},
-          {icon:"🪓",text:"Jaunaudžu kopšanas pārskats"},
-          {icon:"📢",text:"Sludinājumi un piedāvājumi"},
+          {icon:"🌿",text:"Tirgus plūsma — posti, bildes, sludinājumi"},
+          {icon:"⚖️",text:"Meža likuma un tirgus konsultants"},
+          {icon:"📐",text:"Kubatūras kalkulators"},
+          {icon:"📏",text:"Caurmēra mērīšana un bonitāte"},
+          {icon:"🗺",text:"Cirsmas skice (bez PDF)"},
+          {icon:"📢",text:"Sludinājumu un izsolu skatīšana"},
         ].map((t,i)=>(
-          <div key={i} style={{fontSize:"13px",color:"#a8d8a8",padding:"7px 0",borderBottom:"1px solid #1e3a1e",display:"flex",alignItems:"center",gap:"8px"}}>
-            <span style={{fontSize:"15px"}}>{t.icon}</span>{t.text}
+          <div key={i} style={{fontSize:"13px",color:"#a8d8a8",padding:"6px 0",borderBottom:"1px solid #1e3a1e",display:"flex",alignItems:"center",gap:"8px"}}>
+            <span style={{fontSize:"14px"}}>{t.icon}</span>{t.text}
           </div>
         ))}
-        <button onClick={onStandard} style={{marginTop:"20px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#4caf50,#2e7d32)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
-          Sākt pamata versiju →
+        <button onClick={onStandard} style={{marginTop:"auto",paddingTop:"16px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#2d5a2d,#1a3a1a)",color:"#4caf50",border:"1px solid #4caf50",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
+          Sākt bez maksas →
         </button>
       </div>
-      <div style={{background:"linear-gradient(160deg,#1a1000,#2a1f00)",border:"1px solid #4a3800",borderRadius:"16px",padding:"28px"}}>
-        <div style={{color:"#ffc107",fontWeight:800,fontSize:"18px",marginBottom:"6px"}}>★ Pilnā versija</div>
-        <div style={{color:"#7a6a00",fontSize:"12px",marginBottom:"20px"}}>Visi rīki profesionālim</div>
+
+      {/* PRO */}
+      <div style={{background:"linear-gradient(160deg,#0d1f0d,#1a3a1a)",border:"2px solid #4caf50",borderRadius:"16px",padding:"24px",position:"relative",display:"flex",flexDirection:"column",boxShadow:"0 0 24px rgba(76,175,80,0.15)"}}>
+        <div style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#4caf50",color:"white",fontSize:"11px",fontWeight:700,padding:"3px 14px",borderRadius:"10px",whiteSpace:"nowrap"}}>POPULĀRĀKAIS</div>
+        <div style={{color:"#4caf50",fontWeight:800,fontSize:"20px",marginBottom:"4px"}}>★ Pro</div>
+        <div style={{color:"#7ab87a",fontSize:"12px",marginBottom:"4px"}}>Meža speciālistiem</div>
+        <div style={{marginBottom:"16px"}}>
+          <span style={{color:"white",fontSize:"24px",fontWeight:800}}>€19</span>
+          <span style={{color:"#7ab87a",fontSize:"13px"}}>/mēn.</span>
+          <div style={{color:"#4caf50",fontSize:"11px",marginTop:"2px"}}>vai €159/gadā — ietaupa €69</div>
+        </div>
         {[
-          {icon:"🗺",text:"Cirsmas skice (KML/SHP) ar PDF"},
-          {icon:"📏",text:"Caurmēra mērījumi ar izdruku"},
-          {icon:"🌲",text:"Krautuves vērtība"},
-          {icon:"📊",text:"Sortimentu sadalījums un vērtība"},
-          {icon:"🪵",text:"Dastojumu aprēķini"},
-          {icon:"🧾",text:"Rēķinu izveide un drukāšana"},
-          {icon:"✂️",text:"PDF šķirotājs"},
-          {icon:"📱",text:"Mobilā cirsmu vērtēšana laukā"},
-          {icon:"💬",text:"Iekšējais čats ar kolēģiem"},
-          {icon:"🏷",text:"Izsoles ar PDF analīzi"},
+          {icon:"📄",text:"Neierobežoti PDF (skices, novērtējumi, atskaites)"},
+          {icon:"📱",text:"Mobilā cirsmu novērtēšana laukā"},
+          {icon:"🌲",text:"Dastojuma uzmērīšana (VMD standarts)"},
+          {icon:"📸",text:"Kubatūras mērītājs ar AI foto analīzi"},
+          {icon:"🚛",text:"Loģistikas kalkulators"},
+          {icon:"📂",text:"Cirsmu un dastojumu arhīvs"},
+          {icon:"📢",text:"Sludinājuma publicēšana"},
+          {icon:"🏷",text:"Izsoles dalība (pirkšana)"},
+          {icon:"🧾",text:"Rēķinu krātuve"},
         ].map((t,i)=>(
-          <div key={i} style={{fontSize:"13px",color:"#ffe082",padding:"7px 0",borderBottom:"1px solid #3a2e00",display:"flex",alignItems:"center",gap:"8px"}}>
-            <span style={{fontSize:"15px"}}>{t.icon}</span>{t.text}
+          <div key={i} style={{fontSize:"13px",color:"#a8d8a8",padding:"6px 0",borderBottom:"1px solid #1e3a1e",display:"flex",alignItems:"center",gap:"8px"}}>
+            <span style={{fontSize:"14px"}}>{t.icon}</span>{t.text}
           </div>
         ))}
-        <button onClick={onEnter} style={{marginTop:"20px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#ffc107,#e65100)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
-          Izmēģināt pilno versiju →
+        <button onClick={onEnter} style={{marginTop:"auto",paddingTop:"16px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#4caf50,#2e7d32)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
+          Izmēģināt Pro →
         </button>
       </div>
+
+      {/* KOMERCIJA */}
+      <div style={{background:"linear-gradient(160deg,#1a1000,#2a1f00)",border:"1px solid #fbbf24",borderRadius:"16px",padding:"24px",display:"flex",flexDirection:"column"}}>
+        <div style={{color:"#fbbf24",fontWeight:800,fontSize:"20px",marginBottom:"4px"}}>🏢 Komercija</div>
+        <div style={{color:"#7a6a00",fontSize:"12px",marginBottom:"4px"}}>Uzņēmumiem un tirgotājiem</div>
+        <div style={{marginBottom:"16px"}}>
+          <span style={{color:"white",fontSize:"24px",fontWeight:800}}>€59</span>
+          <span style={{color:"#a68a00",fontSize:"13px"}}>/mēn.</span>
+          <div style={{color:"#fbbf24",fontSize:"11px",marginTop:"2px"}}>vai €490/gadā</div>
+        </div>
+        {[
+          {icon:"✓",text:"Viss no Pro"},
+          {icon:"🏷",text:"Izsoles publicēšana un vadīšana"},
+          {icon:"🪵",text:"Pavadzīmju reģistrs ar OCR"},
+          {icon:"📤",text:"VMD PDF eksports"},
+          {icon:"👥",text:"Līdz 5 lietotāji uzņēmumā"},
+          {icon:"🏢",text:"Uzņēmuma profils platformā"},
+        ].map((t,i)=>(
+          <div key={i} style={{fontSize:"13px",color:"#ffe082",padding:"6px 0",borderBottom:"1px solid #3a2e00",display:"flex",alignItems:"center",gap:"8px"}}>
+            <span style={{fontSize:"14px"}}>{t.icon}</span>{t.text}
+          </div>
+        ))}
+        <a href="mailto:jeshkaa@inbox.lv" style={{marginTop:"auto",paddingTop:"16px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#fbbf24,#e65100)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px",textDecoration:"none",textAlign:"center",boxSizing:"border-box",display:"block"}}>
+          Sazināties →
+        </a>
+      </div>
+    </div>
+
+    {/* TIRGUS BANNERIS */}
+    <div style={{background:"linear-gradient(135deg,#1a3a1a,#0f2a0f)",border:"1px solid #4caf50",borderRadius:"16px",padding:"28px",marginBottom:"40px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"20px",flexWrap:"wrap"}}>
+      <div>
+        <div style={{color:"#4caf50",fontSize:"20px",fontWeight:800,marginBottom:"6px"}}>🌿 Meža tirgus kopiena</div>
+        <div style={{color:"#81c784",fontSize:"14px",lineHeight:1.6,maxWidth:"480px"}}>
+          Redzi ko dara meža kopiena — posti, pieredze, sludinājumi, jautājumi.
+          Bezmaksas visiem. Piesakies un pievieno savu balsi.
+        </div>
+      </div>
+      <button onClick={onTirgus} style={{background:"#4caf50",color:"white",border:"none",borderRadius:"10px",padding:"14px 28px",fontSize:"15px",fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
+        Atvērt Tirgu →
+      </button>
     </div>
 
    {/* KĀ TIEK APRĒĶINĀTS */}
@@ -1657,7 +1706,7 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="standard") return <StandardPage onBack={()=>setPage("main")} onPilna={(data)=>{
