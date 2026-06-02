@@ -37,12 +37,16 @@ PIEMĒRI:
 - "Papīrmalka" -> sortiments: "Papīrmalka", suga pēc konteksta
 `;
 
-async function ocrPavadzime(base64, mediaType) {
+// OCR — dinamisks ar klienta šoferiem un piegādes vietām
+async function ocrPavadzime(base64, mediaType, soferi = [], piegadesVietas = []) {
+  const soferiStr    = soferi.map(s => s.vards).join(", ") || "nav norādīts";
+  const piegadesStr  = piegadesVietas.join(", ") || "nav norādīts";
+
   const response = await fetch("/api/anthropic/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 1000,
       messages: [{
         role: "user",
@@ -52,9 +56,9 @@ async function ocrPavadzime(base64, mediaType) {
             type: "text",
             text: `Nolasi šo Latvijas meža pavadzīmi. Atgriezni TIKAI JSON bez jebkāda teksta apkārt.
 
-ŠOFERI - izvēlies tuvāko: Jānis Siņica, Oskars Pardencis, Mareks Jančuks, Ivo Janovičs, Juris Žeikars, Jānis Miglonis
+ŠOFERI - izvēlies tuvāko no saraksta: ${soferiStr}
 
-PIEGĀDES VIETAS - tas ir SAŅĒMĒJS (nevis Nosūtītājs!). Meklē "Saņēmējs" lauku pavadzīmē - izvēlies tuvāko: Baltic Block, Latvāņi, Gaiziņš, Moon Wood, Livo Mežs, Ibiza, Gaujas Koks, Jubergs, Privātbūde, Stora Enso Latvija, Latgran, Graanul Invest, Graanul Pellets, BSW Latvia, VMS Timber, Krauss, AS Latvijas Finieris, V55, AKZ, SIA Timbro, Bono Timber, PB Koksne, Helda, Paged, Holten, Vudlande, Barrus, Kankuļi Timber, Go Aģentūra, Pinbo Timber, Vaidens, Kraujas Z.
+PIEGĀDES VIETAS - tas ir SAŅĒMĒJS (nevis Nosūtītājs!). Meklē "Saņēmējs" lauku pavadzīmē - izvēlies tuvāko: ${piegadesStr}
 
 ${SORTIMENT_CONTEXT}
 
@@ -82,21 +86,7 @@ function exportCSV(records) {
   URL.revokeObjectURL(url);
 }
 
-const SOFERI = [
-  { vards: "Jānis Siņica",     auto: "SH58"   },
-  { vards: "Oskars Pardencis", auto: "ER58"   },
-  { vards: "Mareks Jančuks",   auto: "SH58"   },
-  { vards: "Ivo Janovičs",     auto: "ER58"   },
-  { vards: "Juris Žeikars",    auto: "LK1154" },
-  { vards: "Jānis Miglonis",   auto: "LK1154" },
-];
-
 const SUGAS = { P:"Priede", E:"Egle", B:"Bērzs", A:"Alksnis", Ba:"Baltalksnis", Bl:"Melnalksnis", Oz:"Ozols", Os:"Osis", M:"Melnā kārkls", G:"Apse" };
-const PIEGADES_BAZE = ["Baltic Block","Latvāņi","Gaiziņš","Moon Wood","Livo Mežs","Ibiza","Gaujas Koks","Jubergs","Privātbūde","Stora Enso Latvija","Latgran","Graanul Invest","Graanul Pellets","BSW Latvia","VMS Timber","Krauss","AS Latvijas Finieris","V55","AKZ","SIA Timbro","Bono Timber","PB Koksne","Helda","Paged","Holten","Vudlande","Barrus","Kankuļi Timber","Go Aģentūra","Pinbo Timber","Vaidens","Kraujas Z."]
-const getPiegadesVietas = () => { try { const j=JSON.parse(localStorage.getItem("pvz_piegades")||"[]"); return [...new Set([...PIEGADES_BAZE,...j])] } catch { return PIEGADES_BAZE } }
-const savePiegadesVieta = (v) => { try { const j=JSON.parse(localStorage.getItem("pvz_piegades")||"[]"); if(!j.includes(v)&&!PIEGADES_BAZE.includes(v)){localStorage.setItem("pvz_piegades",JSON.stringify([...j,v]))} } catch {} }
-const getKlienti = () => { try { return JSON.parse(localStorage.getItem("pvz_klienti")||"[]") } catch { return [] } }
-const saveKlients = (v) => { try { const j=JSON.parse(localStorage.getItem("pvz_klienti")||"[]"); if(!j.includes(v)){localStorage.setItem("pvz_klienti",JSON.stringify([...j,v]))} } catch {} }
 export default function PavadzimesRegistrs({ onBack, user, noHeader }) {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,8 +104,19 @@ export default function PavadzimesRegistrs({ onBack, user, noHeader }) {
   const [izveletaAuto, setIzveletaAuto] = useState("");
   const [izveletiVeids, setIzveletiVeids] = useState("");
   const [izveletiKlients, setIzveletiKlients] = useState("");
-const [jaunaPiegade, setJaunaPiegade] = useState("")
+  const [jaunaPiegade, setJaunaPiegade] = useState("");
+  const [iestatijumi, setIestatijumi] = useState(null); // null = ielādē, {} = nav, {...} = ir
   const fileRef = useRef();
+
+  // Ielādē klienta iestatījumus no Supabase
+  useEffect(() => {
+    if (!user?.id) { setIestatijumi({}); return; }
+    supabase.from("klienta_iestatijumi")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle()
+      .then(({ data }) => setIestatijumi(data || {}));
+  }, [user?.id]);
 
   useEffect(() => { loadFromSupabase(); }, []);
 
@@ -137,7 +138,12 @@ const [jaunaPiegade, setJaunaPiegade] = useState("")
       const dataUrl = e.target.result;
       setPreview(dataUrl); setScanning(true); setExtracted(null);
       try {
-        const result = await ocrPavadzime(dataUrl.split(",")[1], file.type || "image/jpeg");
+        const result = await ocrPavadzime(
+          dataUrl.split(",")[1],
+          file.type || "image/jpeg",
+          iestatijumi?.soferi || [],
+          iestatijumi?.piegades_vietas || []
+        );
         setExtracted(result);
       } catch (err) { setError("OCR kļūda: " + err.message); }
       finally { setScanning(false); }
@@ -164,8 +170,6 @@ const [jaunaPiegade, setJaunaPiegade] = useState("")
     const missing = ["datums","pvz_nr","kubi","soferis","km"].filter(k => !verifyData[k]);
     if (missing.length > 0) { setError("Aizpildi: " + missing.join(", ")); return; }
     if (isNaN(parseFloat(verifyData.km))) { setError("km jābūt skaitlim"); return; }
-    if(verifyData.klients) saveKlients(verifyData.klients)
-if(verifyData.piegade) savePiegadesVieta(verifyData.piegade)
 setSaving(true); setError(null);
     try {
       const row = {...verifyData, user_id: user?.id}; delete row.id;
@@ -192,6 +196,11 @@ setSaving(true); setError(null);
   };
 
   const totalKubi = records.reduce((s,r) => s + (parseFloat(r.kubi)||0), 0);
+  const soferi       = iestatijumi?.soferi        || [];
+  const piegadesVietas = iestatijumi?.piegades_vietas || [];
+  const klienti      = iestatijumi?.klienti       || [];
+  const iestatijumiGatavi = iestatijumi !== null && (soferi.length > 0 || piegadesVietas.length > 0);
+
   const btn = (label, onClick, style={}) => (
     <button onClick={onClick} style={{fontFamily:"inherit",cursor:"pointer",...style}}>{label}</button>
   );
@@ -242,7 +251,22 @@ setSaving(true); setError(null);
       {/* MAIN */}
       <div style={{flex:1,overflow:"auto",padding:"20px"}}>
 
-        {tab==="scan" && (
+        {/* Iestatījumi nav konfigurēti */}
+        {iestatijumi !== null && !iestatijumiGatavi && tab === "scan" && (
+          <div style={{maxWidth:500,margin:"40px auto",textAlign:"center",padding:"40px 24px",background:"#141f14",border:"2px dashed #2d5a2d",borderRadius:16}}>
+            <div style={{fontSize:48,marginBottom:16}}>⚙️</div>
+            <div style={{fontSize:16,fontWeight:700,color:"#4caf50",marginBottom:8}}>Reģistrs nav konfigurēts</div>
+            <div style={{fontSize:13,color:"#81c784",lineHeight:1.7,marginBottom:20}}>
+              Šis pavadzīmju reģistrs tiek personalizēts katram klientam.<br/>
+              Sazinieties ar mums lai iestatītu šoferus, piegādes vietas un uzņēmuma profilu.
+            </div>
+            <a href="mailto:jeshkaa@inbox.lv" style={{display:"inline-block",background:"#225522",border:"1px solid #4caf50",borderRadius:8,padding:"12px 24px",color:"#4caf50",fontSize:14,fontWeight:700,textDecoration:"none"}}>
+              ✉️ Sazināties — jeshkaa@inbox.lv
+            </a>
+          </div>
+        )}
+
+        {tab==="scan" && iestatijumiGatavi && (
           <div>
 
             {/* SOLIS 1 — Šoferis */}
@@ -252,7 +276,7 @@ setSaving(true); setError(null);
                   👤 Izvēlies šoferi
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:24}}>
-                  {SOFERI.map((s,i)=>(
+                  {soferi.map((s,i)=>(
                     <div key={i} onClick={()=>{setIzveletsSoferis(s);setIzveletaAuto(s.auto)}}
                       style={{background:izveletsSoferis?.vards===s.vards?"#1e3a1e":"#141f14",border:`2px solid ${izveletsSoferis?.vards===s.vards?"#4caf50":"#2d5a2d"}`,borderRadius:10,padding:"14px 18px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                       <span style={{color:"#e8f5e9",fontSize:15,fontWeight:600}}>{s.vards}</span>
@@ -284,11 +308,11 @@ setSaving(true); setError(null);
                     {izveletiVeids==="Pakalpojums" && (
                       <div style={{marginBottom:20}}>
                         <label style={{fontSize:12,color:"#81c784",display:"block",marginBottom:6}}>Klients:</label>
-                        {getKlienti().length>0 && (
+                        {klienti.length>0 && (
                           <select onChange={e=>{if(e.target.value)setIzveletiKlients(e.target.value)}}
                             style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:8,padding:"10px 14px",color:"#e8f5e9",fontSize:14,fontFamily:"inherit",boxSizing:"border-box",marginBottom:8}}>
                             <option value="">— izvēlies no saraksta —</option>
-                            {getKlienti().map((k,i)=><option key={i} value={k}>{k}</option>)}
+                            {klienti.map((k,i)=><option key={i} value={k}>{k}</option>)}
                           </select>
                         )}
                         <input value={izveletiKlients} onChange={e=>setIzveletiKlients(e.target.value)}
@@ -400,7 +424,7 @@ setSaving(true); setError(null);
                                 <select value={verifyData[col.key]??""} onChange={e=>setVerifyData(p=>({...p,[col.key]:e.target.value}))}
                                   style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}>
                                   <option value="">— izvēlies —</option>
-                                  {getPiegadesVietas().map((v,i)=><option key={i} value={v}>{v}</option>)}
+                                  {piegadesVietas.map((v,i)=><option key={i} value={v}>{v}</option>)}
                                 </select>
                                 <input value={jaunaPiegade} onChange={e=>setJaunaPiegade(e.target.value)} onBlur={e=>{if(e.target.value){setVerifyData(p=>({...p,piegade:e.target.value}));setJaunaPiegade("")}}}
                                   placeholder="Vai ievadi jaunu piegādes vietu..."
@@ -424,7 +448,7 @@ setSaving(true); setError(null);
             )}
 
           </div>
-        )}
+        )} {/* tab==="scan" && iestatijumiGatavi */}
 
         {tab==="registrs" && (
           <div>

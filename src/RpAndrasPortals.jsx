@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react"
 import { supabase } from './supabaseClient'
+import KlientuIestatijumiAdmin from './KlientuIestatijumiAdmin'
 
 const SOFERI = [
   { vards: "Jānis Siņica",     auto: "SH58"   },
@@ -343,6 +344,7 @@ const [filtrKlients, setFiltrKlients] = useState("")
   // Modāļi
   const [showRekins, setShowRekins] = useState(false)
   const [showAlgas, setShowAlgas] = useState(false)
+  const [rpCilne, setRpCilne] = useState('pavadzimes') // 'pavadzimes' | 'iestatijumi'
 
   useEffect(() => { loadData() }, [])
 
@@ -437,7 +439,25 @@ const [filtrKlients, setFiltrKlients] = useState("")
         </div>
       )}
 
-      <div style={{padding:"20px 24px"}}>
+      {/* Cilnes */}
+      <div style={{display:"flex",borderBottom:"1px solid #2d5a2d",padding:"0 24px"}}>
+        {[
+          { id: 'pavadzimes', label: '📋 Pavadzīmju pārskats' },
+          { id: 'iestatijumi', label: '⚙️ Klientu iestatīšana' },
+        ].map(c => (
+          <button key={c.id} onClick={() => setRpCilne(c.id)} style={{
+            background: 'transparent', border: 'none',
+            borderBottom: rpCilne === c.id ? '2px solid #4caf50' : '2px solid transparent',
+            color: rpCilne === c.id ? '#4caf50' : '#4a7a4a',
+            padding: '10px 16px', fontSize: 13, fontWeight: rpCilne === c.id ? 700 : 400,
+            cursor: 'pointer', fontFamily: 'inherit',
+          }}>{c.label}</button>
+        ))}
+      </div>
+
+      {rpCilne === 'iestatijumi' && <KlientuIestatijumiAdmin />}
+
+      {rpCilne === 'pavadzimes' && <div style={{padding:"20px 24px"}}>
 
         {/* KOPSAVILKUMS */}
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:20}}>
@@ -586,6 +606,7 @@ const [filtrKlients, setFiltrKlients] = useState("")
           )
         }
       </div>
+      } {/* rpCilne === 'pavadzimes' */}
 
       {/* MODĀĻI */}
       {showRekins && <RekinsModal records={filtreti} onClose={()=>setShowRekins(false)}/>}
