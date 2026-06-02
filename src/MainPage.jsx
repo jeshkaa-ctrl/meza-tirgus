@@ -81,6 +81,14 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 100,
       }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <button onClick={() => onNavigate('tirgus')} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5,
+            color: C.textMut, fontSize: F.sm, padding: '6px 8px',
+            borderRadius: R.md, opacity: 0.75, fontFamily: F.family,
+            minHeight: 44, flexShrink: 0,
+          }}>← Tirgus</button>
+
           <div className="mp-logo" onClick={() => onNavigate('landing')} style={{ display: 'flex', alignItems: 'center', gap: S.sm, cursor: 'pointer' }}>
             <div style={{
               width: 32, height: 32, background: `linear-gradient(135deg, ${C.greenMd}, ${C.greenDk})`,

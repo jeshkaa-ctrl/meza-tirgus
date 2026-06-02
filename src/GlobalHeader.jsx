@@ -67,6 +67,15 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
         fontFamily: F.family,
       }}>
 
+        {/* Atpakaļ uz Tirgu */}
+        <button onClick={() => onNavigate?.("tirgus")} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 5,
+          color: C.textMut, fontSize: F.sm, padding: '6px 8px',
+          borderRadius: R.md, opacity: 0.75, fontFamily: F.family,
+          minHeight: 44, flexShrink: 0,
+        }}>← Tirgus</button>
+
         {/* Logo */}
         <div onClick={() => onNavigate?.("main")} style={{
           display: 'flex', alignItems: 'center', gap: S.sm, cursor: 'pointer',
