@@ -29,6 +29,7 @@ import MaksajumsPaldies from "./MaksajumsPaldies"
 import JautaParMezuPage from "./JautaParMezuPage"
 import JautaParMezuWidget from "./components/JautaParMezuWidget"
 import MainPage from "./MainPage"
+import KopienasLapa from "./kopiena/KopienasLapa"
 import { C as DS, F, spinnerCSS } from "./ds"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -1601,7 +1602,9 @@ return(
 function App(){
 // Montonio return URL pārbaude — ja ?payment=success, rāda paldies lapu
 const urlParams = new URLSearchParams(window.location.search)
-const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies' : 'landing'
+const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies'
+  : window.location.pathname === '/kopiena' ? 'kopiena'
+  : 'landing'
 
 const [page,setPage]=useState(initialPage)
 const { user, loading: authLoading, registreties, pieteikties, iziet } = useAuth()
@@ -1693,6 +1696,7 @@ if(page==="krautuves_meritajs")  return <KrautuvesMeritajsPage  onBack={()=>setP
 if(page==="dastojums_meritajs") return <DastojumsMeritajsPage onBack={()=>setPage("main")}/>
 if(page==="subscription")      return <SubscriptionPage onBack={()=>setPage("main")} onNavigate={setPage} user={user}/>
 if(page==="maksajums_paldies") return <MaksajumsPaldies onTurpina={()=>setPage("main")}/>
+if(page==="kopiena") return <KopienasLapa user={user} onNavigate={setPage} onReg={()=>atvertReg("kopiena")}/>
 if(page==="jautaparmezu")     return <JautaParMezuPage onBack={()=>setPage("main")}/>
 if(page==="mobilie") return <MobilajiRiki onBack={()=>setPage("main")} onNavigate={(p)=>setPage(p)}/>
 if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
