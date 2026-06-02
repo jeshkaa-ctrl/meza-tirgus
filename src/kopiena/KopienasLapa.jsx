@@ -7,6 +7,59 @@ import GrupasSkats from './GrupasSkats'
 
 const LAPU_IZMERS = 15
 
+const DEMO_POSTI = [
+  {
+    id: 'demo-1',
+    user_id: 'demo',
+    teksts: 'Šorīt Ogrē beidzot sākas egļu izstrāde. Zeme vēl mīksta, bet ar platajiem riteņiem iet labi. Kādam ir pieredze ar šo sezonu Vidzemē?',
+    bilde_url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&q=80',
+    tips: 'post',
+    created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+    profiles: { vards: 'Jānis Kalniņš',   loma: 'mežsaimnieks',   novads: 'Ogres novads' },
+    likes_skaits: 24, komentari_skaits: 8,  mans_like: false,
+  },
+  {
+    id: 'demo-2',
+    user_id: 'demo',
+    teksts: '🔧 Piedāvājam John Deere 1470G harvesteru nomu sezonai. Pieredzējis operators iekļauts. Apkalpojam Vidzemi un Zemgali. Cena pēc vienošanās.',
+    bilde_url: 'https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=600&q=80',
+    tips: 'sludinajums',
+    created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    profiles: { vards: 'Meža tehnika SIA', loma: 'izstradatājs',   novads: 'Rīga' },
+    likes_skaits: 15, komentari_skaits: 5,  mans_like: false,
+  },
+  {
+    id: 'demo-3',
+    user_id: 'demo',
+    teksts: 'Vakardienas medības Pierīgā — lielisks rīts! Stirnu bars ap 40 galvām. Sezona atklāta veiksmīgi. Vai kādam ir interese par sadarbību kopīgajās medībās?',
+    bilde_url: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=80',
+    tips: 'post',
+    created_at: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
+    profiles: { vards: 'Latvijas Mednieks',loma: 'mednieks',       novads: 'Pierīga' },
+    likes_skaits: 41, komentari_skaits: 17, mans_like: false,
+  },
+  {
+    id: 'demo-4',
+    user_id: 'demo',
+    teksts: 'Atgādinājums — no 15. marta melnais stārķis ir aizsargājams! Ja cirsmā vai tuvumā ir ligzda — obligāts DAP saskaņojums pirms jebkādas ciršanas. Mikrolieguma zona 300m ap ligzdu. Neaizmirstiet pārbaudīt registri.gov.lv pirms darba uzsākšanas.',
+    bilde_url: null,
+    tips: 'post',
+    created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+    profiles: { vards: 'Ligita Bērziņa',   loma: 'konsultants',    novads: 'Vidzeme' },
+    likes_skaits: 67, komentari_skaits: 23, mans_like: false,
+  },
+  {
+    id: 'demo-5',
+    user_id: 'demo',
+    teksts: 'Pārdodu priežu stādiņus P+1 frakcija, 15–25 cm augstumā. Cena 0.12 €/gab, no 10 000 gab. Audzēti Vidzemē, akreditēts stādaudzētājs. Piegāde iespējama.',
+    bilde_url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&q=80',
+    tips: 'sludinajums',
+    created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+    profiles: { vards: 'Zaļā Sēkla SIA',   loma: 'meža_ipasnieks', novads: 'Cēsu novads' },
+    likes_skaits: 33, komentari_skaits: 11, mans_like: false,
+  },
+]
+
 const CILNES = [
   { id: 'visi',       ikona: '🌿', label: 'Visi' },
   { id: 'grupas',     ikona: '👥', label: 'Grupas' },
@@ -239,15 +292,20 @@ export default function KopienasLapa({ user, onNavigate, onReg }) {
                 <div style={{ color: K.textFade, fontSize: KF.base }}>Ielādē...</div>
               </div>
             ) : posti.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 20px', background: K.bgCard, borderRadius: KR.lg, border: `1px solid ${K.border}` }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🌲</div>
-                <div style={{ fontSize: KF.lg, fontWeight: KF.semi, color: K.text, marginBottom: 6 }}>
-                  {cilne === 'sludinajumi' ? 'Nav sludinājumu' : 'Plūsma tukša'}
+              <>
+                <div style={{
+                  padding: '8px 12px', marginBottom: 10, fontSize: KF.xs,
+                  color: K.textFade, background: K.bgCard,
+                  border: `1px dashed ${K.border}`, borderRadius: KR.md,
+                  textAlign: 'center',
+                }}>
+                  📋 Demo saturs — publicē pirmo īsto ierakstu!
                 </div>
-                <div style={{ fontSize: KF.sm, color: K.textSec }}>
-                  {user ? 'Esi pirmais — publicē kaut ko!' : 'Pieslēdzies lai publicētu'}
-                </div>
-              </div>
+                {DEMO_POSTI
+                  .filter(p => cilne === 'sludinajumi' ? p.tips === 'sludinajums' : true)
+                  .map(p => <PostsKarte key={p.id} post={p} user={user} />)
+                }
+              </>
             ) : (
               <>
                 {posti.map(p => (
