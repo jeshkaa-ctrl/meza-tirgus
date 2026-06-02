@@ -89,6 +89,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
             <span style={{ fontSize: F.lg, fontWeight: F.weightBlack, color: C.green, letterSpacing: '-0.01em' }}>Meža tirgus</span>
           </div>
 
+          {/* Desktop nav */}
           <div className="mp-header-btns" style={{ display: 'flex', gap: S.sm, alignItems: 'center' }}>
             <a href="https://www.lvmgeo.lv/kartes" target="_blank" rel="noreferrer" style={{
               padding: '7px 14px', background: C.greenMd, color: 'white', borderRadius: R.md,
@@ -122,6 +123,22 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
                   border: `1px solid ${C.green}`, borderRadius: R.md, fontSize: F.sm,
                   cursor: 'pointer', fontWeight: F.weightBold,
                 }}>Reģistrēties</button>
+            }
+          </div>
+
+          {/* Mobilais — tikai login/logout poga */}
+          <div className="mp-header-btns-mobile" style={{ display: 'none', gap: S.sm, alignItems: 'center' }}>
+            {user
+              ? <button onClick={onIziet} style={{
+                  padding: '8px 14px', background: 'transparent', color: C.textMut,
+                  border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm,
+                  cursor: 'pointer', minHeight: 44,
+                }}>Iziet</button>
+              : <button onClick={onReg} style={{
+                  padding: '8px 16px', background: C.greenDk, color: 'white',
+                  border: `1px solid ${C.green}`, borderRadius: R.md, fontSize: F.sm,
+                  cursor: 'pointer', fontWeight: F.weightBold, minHeight: 44,
+                }}>Pieslēgties</button>
             }
           </div>
         </div>

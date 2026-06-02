@@ -159,7 +159,7 @@ const loadLS = () => { try { const d = localStorage.getItem(SK); return d ? JSON
 const c = {
   app: {fontFamily:"-apple-system,BlinkMacSystemFont,sans-serif",background:"#0f1a0f",minHeight:"100vh",color:"#e8f0e8",maxWidth:480,margin:"0 auto",paddingBottom:80},
   hdr: {background:DS.glass,borderBottom:`1px solid ${DS.greenBdr}`,backdropFilter:"blur(8px)",padding:"0 14px",height:52,position:"sticky",top:0,zIndex:100,display:"flex",alignItems:"center",gap:8},
-  bkBtn: {background:"none",border:`1px solid ${DS.greenBdr}`,color:DS.textMut,borderRadius:8,padding:"6px 12px",fontSize:F.sm,cursor:"pointer",minHeight:36},
+  bkBtn: {background:"none",border:`1px solid ${DS.greenBdr}`,color:DS.textMut,borderRadius:8,padding:"10px 14px",fontSize:F.sm,cursor:"pointer",minHeight:44},
   ttl: {fontSize:F.sm,fontWeight:F.weightBold,color:DS.textSec,margin:0,flex:1,textAlign:"center"},
   lRow: {display:"flex",gap:3},
   lBtn: (a) => ({padding:"4px 7px",borderRadius:6,border:a?"2px solid #4caf50":"1px solid #3d6b3d",background:a?"#1b5e20":"#0f1a0f",color:a?"#c8e6c8":"#7ab87a",fontSize:11,cursor:"pointer",fontWeight:a?700:400}),

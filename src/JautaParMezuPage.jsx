@@ -214,7 +214,8 @@ export default function JautaParMezuPage({ onBack }) {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 24 }}>
               {KATEGORIJAS.map(k => (
                 <button key={k.id} onClick={() => setKategorija(k.id === kategorija ? '' : k.id)} style={{
-                  padding: '8px 14px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
+                  padding: '10px 16px', borderRadius: 20, fontSize: 13, cursor: 'pointer',
+                  minHeight: 44,
                   border: `1px solid ${kategorija === k.id ? C.accent : C.border}`,
                   background: kategorija === k.id ? C.accentDk : C.inner,
                   color: kategorija === k.id ? '#fff' : C.textSec,
