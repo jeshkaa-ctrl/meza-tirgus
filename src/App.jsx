@@ -1603,8 +1603,6 @@ function App(){
 // Montonio return URL pārbaude — ja ?payment=success, rāda paldies lapu
 const urlParams = new URLSearchParams(window.location.search)
 const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies' : 'landing'
-  
-  : 'landing'
 
 const [page,setPage]=useState(initialPage)
 const { user, loading: authLoading, registreties, pieteikties, iziet } = useAuth()
