@@ -186,7 +186,14 @@ alter table public.grupas_dalibnieki enable row level security;
 create policy "dalibnieki_lasit"       on public.grupas_dalibnieki for select using (true);
 create policy "dalibnieki_pievienoties" on public.grupas_dalibnieki for insert with check (auth.uid() = user_id);
 
--- 14. FK no posts uz profiles (ļauj PostgREST joinot profilus)
+-- 14. Admin politika — Artijs redz VISAS pavadzīmes (izpildi Supabase SQL Editor)
+create policy "admin_visas_pavadzimes" on public.pavadzimes
+  for select using (
+    auth.uid() = user_id OR
+    auth.jwt() ->> 'email' = 'jeshkaa@inbox.lv'
+  );
+
+-- 14b. FK no posts uz profiles (ļauj PostgREST joinot profilus)
 -- Izpildi tikai ja posts tabula tika tikko izveidota:
 -- alter table public.posts
 --   drop constraint if exists posts_user_id_fkey,

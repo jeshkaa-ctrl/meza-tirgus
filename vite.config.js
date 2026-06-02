@@ -26,6 +26,18 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
+    build: {
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'pdf-worker': ['pdfjs-dist'],
+            'supabase':   ['@supabase/supabase-js'],
+            'react-core': ['react', 'react-dom'],
+          }
+        }
+      }
+    },
     plugins: [
       react(),
       VitePWA({

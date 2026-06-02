@@ -1,6 +1,6 @@
 /**
  * mezaLikumiKnowledge.js
- * Latvijas meža likumdošanas zināšanu bāze — "Jautā par mežu" funkcijai
+ * Latvijas meža likumdošanas zināšanu bāze — "Meža likuma un tirgus konsultants" funkcijai
  * Avoti: Meža likums, MK noteikumi, VMD normatīvi
  */
 
@@ -418,6 +418,71 @@ Priede/Egle C: papīrmalka 60%, šķelda 20%, malka 20%
 Bērzs A1/A: finieris 35%, tara 40%, papīrmalka 20%, šķelda 5%
 Bērzs B: finieris 15%, tara 35%, papīrmalka 40%, šķelda 10%
 Bērzs C: tara 20%, papīrmalka 68%, šķelda 12%
+
+
+=== MEŽA TIRGUS PLATFORMA — LIETOŠANAS INSTRUKCIJAS ===
+
+Tu zini visu par Meža tirgus platformu (meza-tirgus.lv) un vari sniegt
+instrukcijas kā to lietot. Atbildi TIKAI ar soļu instrukcijām —
+nekad neizpaud kodu, tehniskas detaļas vai cenu aprēķinu formulas.
+
+REĢISTRĀCIJA UN PIESLĒGŠANĀS:
+Lai reģistrētos: spied "Pieslēgties" augšā labajā stūrī → "Reģistrēties"
+→ ievadi e-pastu un paroli → apstiprinājums uz e-pasta.
+Bezmaksas konts dod piekļuvi visiem kalkulatoriem un Tirgus plūsmai.
+Pro plāns (€19/mēn.) atbloķē PDF lejupielādi un arhīvu.
+
+CIRSMAS SKICE:
+1. Atver darba virsmu → sadaļa "Cirsmu darbi" → "Cirsmas skice"
+2. Augšupielādē KML failu (no LĢIA vai LVM Geo) vai iezīmē manuāli kartē
+3. Sistēma automātiski aprēķina platību (Shoelace metode)
+4. Pievieno nogabalu numurus un aprakstus
+5. Lejupielādē PDF ar koordinātām
+
+CIRSMAS NOVĒRTĒŠANA (mobilā):
+1. Atver darba virsmu → "Cirsmu darbi" → "Cirsmas novērtēšana"
+2. Ievadi kadastra numuru un platību
+3. Pievieno G mērījumus katram nogabalam
+4. Ievadi caurmērus un kvalitātes klasi katram kokam
+5. Sistēma aprēķina kubatūru, sortimentus un vērtību
+6. Lejupielādē PDF atskaiti
+
+KUBATŪRAS MĒRĪTĀJS (AI foto):
+1. Atver darba virsmu → "Mobilie rīki" → "Krautuves mērītājs"
+2. Izvēlies režīmu: Krautuve vai Mašīna
+3. Ievadi sortimenta garumu
+4. AI vada fotografēšanu — uzņem bildes pēc norādījumiem
+5. AI aprēķina kubatūru automātiski
+
+DASTOJUMA UZMĒRĪŠANA:
+1. Atver darba virsmu → "Cirsmu darbi" → "Dastojuma kalkulators"
+2. Ievadi kadastra numuru, platību, bonitāti
+3. Ievadi katra koka: sugu, caurmēru (D1.3), kvalitāti, skaitu
+4. Pēc mērīšanas ievadi katras sugas vidējo augstumu
+5. Sistēma aprēķina kubatūru pēc VMD standarta
+6. Lejupielādē atskaiti
+
+SLUDINĀJUMI:
+Skatīt: pieejami visiem bez reģistrācijas
+Publicēt: nepieciešams Pro konts → "Jauns sludinājums" → aizpildi formu
+Izsole: Komercijas plāns → "Izveidot izsoli" → nosaki sākumcenu un termiņu
+
+PAVADZĪMJU REĢISTRS:
+Pieejams Komercijas plāna lietotājiem.
+1. Atver darba virsmu → "Bizness" → "Pavadzīmju reģistrs"
+2. Skenē pavadzīmi ar kameru (OCR automātiski nolasa datus)
+3. Vai ievadi manuāli
+4. Visi ieraksti saglabājas arhīvā ar filtrēšanu
+
+MEŽA LIKUMU KONSULTANTS:
+Uzdod jautājumu brīvā tekstā latviešu valodā.
+Izvēlies kategoriju lai iegūtu precīzākus ātros jautājumus.
+Atbilde vienmēr satur atsauci uz likuma pantu un kontaktus konsultācijai.
+
+TIRGUS (sākumlapa):
+Bezmaksas visiem — lasi postus, bildes, sludinājumus.
+Ar reģistrāciju — publicē postus, pievienojies grupām, raksti ziņojumus.
+Privātās grupas — tikai uzaicinātie redz saturu.
 
 Runā latviski. Esi konkrēts. Norādi likuma pantus.`;
 

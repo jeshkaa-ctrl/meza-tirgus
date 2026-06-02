@@ -192,7 +192,7 @@ export default function JautaParMezuPage({ onBack }) {
           cursor: 'pointer', padding: '0 4px 0 0', lineHeight: 1, minWidth: 36, minHeight: 44,
         }}>←</button>}
         <div style={{ flex: 1 }}>
-          <div style={{ color: C.accent, fontSize: F.md, fontWeight: F.weightBold }}>⚖️ Jautā par mežu</div>
+          <div style={{ color: C.accent, fontSize: F.md, fontWeight: F.weightBold }}>⚖️ Meža likuma un tirgus konsultants</div>
           <div style={{ color: C.textDim, fontSize: F.xs }}>Latvijas meža likumdošana — AI konsultants</div>
         </div>
       </div>
