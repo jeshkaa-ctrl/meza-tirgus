@@ -66,7 +66,7 @@ const CILNES = [
   { id: 'sludinajumi',ikona: '📢', label: 'Sludinājumi' },
 ]
 
-export default function KopienasLapa({ user, onNavigate, onReg }) {
+export default function TirgusLapa({ user, onNavigate, onReg }) {
   const [cilne,    setCilne]    = useState('visi')
   const [posti,    setPosti]    = useState([])
   const [profils,  setProfils]  = useState(null)
@@ -197,7 +197,7 @@ export default function KopienasLapa({ user, onNavigate, onReg }) {
             }}>🌲</div>
             <div>
               <span style={{ fontSize: KF.md, fontWeight: KF.bold, color: K.text }}>Meža tirgus</span>
-              <span style={{ fontSize: KF.xs, color: K.primaryMd, marginLeft: 6, fontWeight: KF.semi }}>kopiena</span>
+              <span style={{ fontSize: KF.xs, color: K.primaryMd, marginLeft: 6, fontWeight: KF.semi }}>tirgus</span>
             </div>
           </div>
 
@@ -269,7 +269,7 @@ export default function KopienasLapa({ user, onNavigate, onReg }) {
           }}>
             <div style={{ fontSize: 28 }}>🌿</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: KF.base, fontWeight: KF.semi, color: K.text }}>Pievienojies kopienai</div>
+              <div style={{ fontSize: KF.base, fontWeight: KF.semi, color: K.text }}>Pievienojies tirgusi</div>
               <div style={{ fontSize: KF.sm, color: K.textSec }}>Raksti, dalies pieredzē, uzdod jautājumus</div>
             </div>
             <button onClick={onReg} style={{

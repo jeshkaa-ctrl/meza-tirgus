@@ -98,10 +98,10 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
               padding: '7px 14px', background: '#5d4037', color: 'white', borderRadius: R.md,
               textDecoration: 'none', fontSize: F.sm, fontWeight: F.weightBold,
             }}>🏛 VMD</a>
-            <button onClick={() => onNavigate('kopiena')} style={{
+            <button onClick={() => onNavigate('tirgus')} style={{
               padding: '7px 14px', background: '#EDF5E8', color: '#3B6D11',
               border: '1px solid #A8D89A', borderRadius: R.md, fontSize: F.sm, cursor: 'pointer', fontWeight: 600,
-            }}>🌿 Kopiena</button>
+            }}>🌿 Tirgus</button>
             <button onClick={() => onNavigate('jautaparmezu')} style={{
               padding: '7px 14px', background: 'transparent', color: C.textSec,
               border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',

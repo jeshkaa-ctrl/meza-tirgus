@@ -1,4 +1,4 @@
-// Kopienas Dizaina Sistēma — gaišā tēma
+// Tirgus Dizaina Sistēma — gaišā tēma
 export const K = {
   // Foni
   bg:        '#F5F8F3',
