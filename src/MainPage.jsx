@@ -107,13 +107,18 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         backdropFilter: 'blur(8px)', position: 'sticky', top: 0, zIndex: 100,
       }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button onClick={() => onNavigate('tirgus')} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 5,
-            color: C.textMut, fontSize: F.sm, padding: '6px 8px',
-            borderRadius: R.md, opacity: 0.75, fontFamily: F.family,
-            minHeight: 44, flexShrink: 0,
-          }}>← Tirgus</button>
+          <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+            <button onClick={() => onNavigate('landing')} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: C.textSec, fontSize: F.sm, padding: '6px 8px',
+              borderRadius: R.md, fontFamily: F.family, minHeight: 44,
+            }}>← Sākums</button>
+            <button onClick={() => onNavigate('tirgus')} style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: C.textMut, fontSize: F.sm, padding: '6px 8px',
+              borderRadius: R.md, opacity: 0.75, fontFamily: F.family, minHeight: 44,
+            }}>Tirgus</button>
+          </div>
 
           <div className="mp-logo" onClick={() => onNavigate('landing')} style={{ display: 'flex', alignItems: 'center', gap: S.sm, cursor: 'pointer' }}>
             <div style={{
@@ -196,6 +201,34 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         {/* MEŽA LIKUMI WIDGET */}
         <div style={{ marginBottom: S.xl }}>
           <JautaParMezuWidget onPilnsSkats={() => onNavigate('jautaparmezu')} />
+        </div>
+
+        {/* BEZMAKSAS RĪKS */}
+        <div onClick={() => onNavigate('standard')} className="mp-tile" style={{
+          background: `linear-gradient(135deg, #0d2a0d, #1a3a1a)`,
+          border: `2px solid ${C.green}`,
+          borderRadius: R.xl, padding: '18px 20px', marginBottom: S.lg,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16,
+        }}>
+          <div style={{
+            width: 48, height: 48, background: `linear-gradient(135deg, ${C.greenMd}, ${C.greenDk})`,
+            borderRadius: R.lg, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 24, flexShrink: 0,
+          }}>📄</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <span style={{ color: C.text, fontSize: F.md, fontWeight: F.weightBold }}>VMD PDF analīze</span>
+              <span style={{
+                background: C.green, color: C.bg,
+                fontSize: '9px', fontWeight: F.weightBold,
+                padding: '2px 7px', borderRadius: R.sm, letterSpacing: '0.05em',
+              }}>BEZMAKSAS</span>
+            </div>
+            <div style={{ color: C.textMut, fontSize: F.sm }}>
+              Augšupielādē VMD inventarizācijas PDF → nogabalu analīze, vērtība, sortimenti
+            </div>
+          </div>
+          <span style={{ color: C.green, fontSize: 20, flexShrink: 0 }}>→</span>
         </div>
 
         {/* SADAĻAS */}
