@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#080f08"/>
+  <rect width="1200" height="630" fill="url(#grad)"/>
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1a0a"/>
+      <stop offset="100%" stop-color="#1a3a1a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Koki -->
+  <polygon points="160,420 220,260 280,420" fill="#2e7d32"/>
+  <polygon points="130,420 220,230 310,420" fill="#1b5e20" opacity="0.6"/>
+  <rect x="205" y="420" width="30" height="50" rx="3" fill="#1b5e20"/>
+
+  <polygon points="280,430 330,300 380,430" fill="#2e7d32"/>
+  <polygon points="255,430 330,270 405,430" fill="#1b5e20" opacity="0.5"/>
+  <rect x="318" y="430" width="24" height="40" rx="3" fill="#1b5e20"/>
+
+  <polygon points="860,420 920,260 980,420" fill="#2e7d32"/>
+  <polygon points="830,420 920,230 1010,420" fill="#1b5e20" opacity="0.6"/>
+  <rect x="905" y="420" width="30" height="50" rx="3" fill="#1b5e20"/>
+
+  <polygon points="980,430 1030,300 1080,430" fill="#2e7d32"/>
+  <rect x="1018" y="430" width="24" height="40" rx="3" fill="#1b5e20"/>
+
+  <!-- Logo ikona -->
+  <rect x="520" y="180" width="64" height="64" rx="12" fill="#1b5e20"/>
+  <polygon points="552,198 572,228 532,228" fill="#4caf50"/>
+  <polygon points="552,192 576,228 528,228" fill="#2e7d32" opacity="0.7"/>
+  <rect x="548" y="228" width="8" height="10" rx="1" fill="#2e7d32"/>
+
+  <!-- Teksts -->
+  <text x="600" y="270" font-family="Arial, sans-serif" font-size="52" font-weight="800" fill="white" text-anchor="middle" letter-spacing="-1">Meža tirgus</text>
+  <text x="600" y="320" font-family="Arial, sans-serif" font-size="22" fill="#7ab87a" text-anchor="middle">Meža cilvēku platforma Latvijā</text>
+
+  <!-- Tagi -->
+  <rect x="340" y="360" width="160" height="40" rx="20" fill="#1a3a1a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="420" y="385" font-family="Arial, sans-serif" font-size="15" fill="#4caf50" text-anchor="middle">🌲 Cirsmu analīze</text>
+
+  <rect x="520" y="360" width="160" height="40" rx="20" fill="#1a3a1a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="600" y="385" font-family="Arial, sans-serif" font-size="15" fill="#4caf50" text-anchor="middle">📊 Dastojums</text>
+
+  <rect x="700" y="360" width="160" height="40" rx="20" fill="#1a3a1a" stroke="#2e7d32" stroke-width="1"/>
+  <text x="780" y="385" font-family="Arial, sans-serif" font-size="15" fill="#4caf50" text-anchor="middle">⚖️ AI konsultants</text>
+
+  <!-- URL -->
+  <text x="600" y="500" font-family="Arial, sans-serif" font-size="18" fill="#4a6a4a" text-anchor="middle">meza-tirgus.lv</text>
+</svg>

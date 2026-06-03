@@ -1,14 +1,9 @@
-import React, { useState, useRef } from "react"
+import React, { useState } from "react"
 import { useAuth } from "./useAuth"
 import RegModal from "./RegModal"
 import * as pdfjsLib from "pdfjs-dist"
 // Eager — vajadzīgi uzreiz vai lieto named exports
-import { forestEngine } from "./forestEngine"
-import { getBonitate } from "./bonityEngine"
-import { minDiameter, formFactor } from "./tables"
-import { calcSortimentsByQuality } from "./qualityEngine"
 import StandardPage, { JaunaudžuParskats, AtjaunosanaParskats, IeaudzesanaParskats } from "./StandardPage"
-import DastojumsPanel from "./DastojumsPanel"
 import GlobalHeader from "./GlobalHeader"
 import MainPage from "./MainPage"
 import LandingPage from "./LandingPage"
@@ -21,8 +16,6 @@ const CaurmeraMobile         = React.lazy(() => import("./CaurmeraMobile"))
 const CirsmaNovertesanaMobile= React.lazy(() => import("./CirsmaNovertesanaMobile"))
 const DastojumsPDFKalkulators= React.lazy(() => import("./DastojumsPDFKalkulators"))
 const ChatPage               = React.lazy(() => import("./ChatPage"))
-const PavadzimesRegistrs     = React.lazy(() => import("./PavadzimesRegistrs"))
-const RpAndrasPortals        = React.lazy(() => import("./RpAndrasPortals"))
 const DastojumuRegistrsPage  = React.lazy(() => import("./DastojumuRegistrsPage"))
 const KubiKalkulators        = React.lazy(() => import("./KubiKalkulators"))
 const LogistikaKalkulators   = React.lazy(() => import("./LogistikaKalkulators"))
@@ -39,11 +32,9 @@ const CirsmaskicePage        = React.lazy(() => import("./CirsmaskicePage"))
 const CaurmeraPage           = React.lazy(() => import("./CaurmeraPage"))
 const AtjaunosanaPage        = React.lazy(() => import("./AtjaunosanaPage"))
 const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
+const ParoleLapa             = React.lazy(() => import("./ParoleLapa"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
-import CaurmeraPanel from "./CaurmeraPanel"
-import RekinsPanel from "./RekinsPanel"
-import JautaParMezuWidget from "./components/JautaParMezuWidget"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -57,7 +48,7 @@ const urlParams = new URLSearchParams(window.location.search)
 const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies' : 'landing'
 
 const [page,setPageRaw]=useState(initialPage)
-const { user, loading: authLoading, registreties, pieteikties, iziet } = useAuth()
+const { user, loading: authLoading, registreties, pieteikties, iziet, mainitParoli } = useAuth()
 
 // Lapas izsekošana — ieraksta Supabase app_events tabulā (klusē ja tabulas nav)
 const sesijasId = React.useRef(
@@ -154,6 +145,7 @@ if(page==="rpandras") return <DastojumuRegistrsPage onBack={()=>setPage("main")}
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
 if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
+if(page==="parole") return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
 if(page==="admin" && user?.epasts === "jeshkaa@inbox.lv") return <AdminDashboard onBack={()=>setPage("main")}/>
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
