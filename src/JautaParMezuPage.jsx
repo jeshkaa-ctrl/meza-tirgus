@@ -165,11 +165,12 @@ export default function JautaParMezuPage({ onBack }) {
 
       setZiņas(prev => [...prev, { role: 'ai', teksts, parsed }])
     } catch (e) {
-      setZiņas(prev => [...prev, {
-        role: 'ai',
-        teksts: 'Savienojuma kļūda. Pārbaudi internetu un mēģini vēlreiz.',
-        parsed: null,
-      }])
+      const zinoteksts = !navigator.onLine
+        ? 'Nav interneta savienojuma. Pārbaudi savienojumu un mēģini vēlreiz.'
+        : e?.message?.includes('ACM')
+        ? 'Sesijas kļūda — atsvaidzini lapu un mēģini vēlreiz.'
+        : 'AI serviss īslaicīgi nepieejams. Mēģini pēc brīža.'
+      setZiņas(prev => [...prev, { role: 'ai', teksts: zinoteksts, parsed: null }])
     } finally {
       setLade(false)
     }

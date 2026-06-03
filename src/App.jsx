@@ -2,44 +2,48 @@ import React, { useState, useRef } from "react"
 import { useAuth } from "./useAuth"
 import RegModal from "./RegModal"
 import * as pdfjsLib from "pdfjs-dist"
-import CirsmaNovertesanaPage from "./CirsmaNovertesanaPage"
-import PdfSkirotajsPage from "./PdfSkirotajsPage"
+// Eager — vajadzīgi uzreiz vai lieto named exports
 import { forestEngine } from "./forestEngine"
 import { getBonitate } from "./bonityEngine"
 import { minDiameter, formFactor } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
 import StandardPage, { JaunaudžuParskats, AtjaunosanaParskats, IeaudzesanaParskats } from "./StandardPage"
 import DastojumsPanel from "./DastojumsPanel"
-import SludinajumiPage from "./SludinajumiPage"
-import CaurmeraMobile from "./CaurmeraMobile"
-import CirsmaNovertesanaMobile from "./CirsmaNovertesanaMobile"
-import DastojumsPDFKalkulators from "./DastojumsPDFKalkulators"
 import GlobalHeader from "./GlobalHeader"
-import ChatPage from "./ChatPage"
-import PavadzimesRegistrs from "./PavadzimesRegistrs"
-import RpAndrasPortals from "./RpAndrasPortals"
-import DastojumuRegistrsPage from "./DastojumuRegistrsPage"
-import KubiKalkulators from "./KubiKalkulators"
-import LogistikaKalkulators from "./LogistikaKalkulators"
-import MobilajiRiki from "./MobilajiRiki"
-import KrautuvesMeritajsPage from "./KrautuvesMeritajsPage"
-import DastojumsMeritajsPage from "./DastojumsMeritajsPage"
-import SubscriptionPage from "./SubscriptionPage"
-import MaksajumsPaldies from "./MaksajumsPaldies"
-import JautaParMezuPage from "./JautaParMezuPage"
-import JautaParMezuWidget from "./components/JautaParMezuWidget"
 import MainPage from "./MainPage"
-import TirgusLapa from "./kopiena/TirgusLapa"
-import AdminDashboard from "./AdminDashboard"
+import LandingPage from "./LandingPage"
+
+// Lazy — ielādē tikai tad kad lietotājs atvērs šo lapu
+const CirsmaNovertesanaPage  = React.lazy(() => import("./CirsmaNovertesanaPage"))
+const PdfSkirotajsPage       = React.lazy(() => import("./PdfSkirotajsPage"))
+const SludinajumiPage        = React.lazy(() => import("./SludinajumiPage"))
+const CaurmeraMobile         = React.lazy(() => import("./CaurmeraMobile"))
+const CirsmaNovertesanaMobile= React.lazy(() => import("./CirsmaNovertesanaMobile"))
+const DastojumsPDFKalkulators= React.lazy(() => import("./DastojumsPDFKalkulators"))
+const ChatPage               = React.lazy(() => import("./ChatPage"))
+const PavadzimesRegistrs     = React.lazy(() => import("./PavadzimesRegistrs"))
+const RpAndrasPortals        = React.lazy(() => import("./RpAndrasPortals"))
+const DastojumuRegistrsPage  = React.lazy(() => import("./DastojumuRegistrsPage"))
+const KubiKalkulators        = React.lazy(() => import("./KubiKalkulators"))
+const LogistikaKalkulators   = React.lazy(() => import("./LogistikaKalkulators"))
+const MobilajiRiki           = React.lazy(() => import("./MobilajiRiki"))
+const KrautuvesMeritajsPage  = React.lazy(() => import("./KrautuvesMeritajsPage"))
+const DastojumsMeritajsPage  = React.lazy(() => import("./DastojumsMeritajsPage"))
+const SubscriptionPage       = React.lazy(() => import("./SubscriptionPage"))
+const MaksajumsPaldies       = React.lazy(() => import("./MaksajumsPaldies"))
+const JautaParMezuPage       = React.lazy(() => import("./JautaParMezuPage"))
+const TirgusLapa             = React.lazy(() => import("./kopiena/TirgusLapa"))
+const AdminDashboard         = React.lazy(() => import("./AdminDashboard"))
+const PrivatumsPage          = React.lazy(() => import("./PrivatumsPage"))
+const CirsmaskicePage        = React.lazy(() => import("./CirsmaskicePage"))
+const CaurmeraPage           = React.lazy(() => import("./CaurmeraPage"))
+const AtjaunosanaPage        = React.lazy(() => import("./AtjaunosanaPage"))
+const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 import CaurmeraPanel from "./CaurmeraPanel"
 import RekinsPanel from "./RekinsPanel"
-import CirsmaskicePage from "./CirsmaskicePage"
-import CaurmeraPage from "./CaurmeraPage"
-import AtjaunosanaPage from "./AtjaunosanaPage"
-import LandingPage from "./LandingPage"
-import RekinuKratuve from "./RekinuKratuve"
+import JautaParMezuWidget from "./components/JautaParMezuWidget"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -124,7 +128,7 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
 if(page==="standard") return <StandardPage onBack={()=>setPage("main")} onPilna={(data)=>{
@@ -168,7 +172,8 @@ if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("m
 if(page==="pavadzimes") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("pavadzimes")}/>
 if(page==="rpandras") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rpandras")}/>
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
-if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
+if(page==="dastojums") { setPage("dastojums_pdf"); return null }
+if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
 if(page==="admin" && user?.epasts === "jeshkaa@inbox.lv") return <AdminDashboard onBack={()=>setPage("main")}/>
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>

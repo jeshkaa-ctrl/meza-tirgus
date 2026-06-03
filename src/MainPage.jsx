@@ -205,6 +205,37 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
 
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: `${S.xl} 20px 60px` }}>
 
+        {/* Onboarding — tikai jauniem lietotājiem (pirmo reizi) */}
+        {!user && !localStorage.getItem('mt_onb') && (
+          <div style={{
+            background: `linear-gradient(135deg, ${C.greenDk}, #0d2a0d)`,
+            border: `1px solid ${C.green}`, borderRadius: R.xl,
+            padding: '16px 20px', marginBottom: S.lg,
+            display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap',
+          }}>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ color: C.text, fontWeight: 700, fontSize: F.md, marginBottom: 4 }}>
+                👋 Sveicināti Meža tirgū!
+              </div>
+              <div style={{ color: C.textMut, fontSize: F.sm }}>
+                Sāc ar bezmaksas VMD PDF analīzi — augšupielādē inventarizācijas PDF un saņem cirsmas vērtējumu uzreiz.
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              <button onClick={() => onNavigate('standard')} style={{
+                padding: '9px 20px', background: C.green, color: C.bg,
+                border: 'none', borderRadius: R.md, fontSize: F.sm,
+                fontWeight: 700, cursor: 'pointer', fontFamily: F.family,
+              }}>Izmēģini →</button>
+              <button onClick={() => localStorage.setItem('mt_onb', '1')} style={{
+                padding: '9px 12px', background: 'none', color: C.textDim,
+                border: `1px solid ${C.greenBdr}`, borderRadius: R.md,
+                fontSize: F.sm, cursor: 'pointer', fontFamily: F.family,
+              }}>×</button>
+            </div>
+          </div>
+        )}
+
         {/* MEŽA LIKUMI WIDGET */}
         <div style={{ marginBottom: S.xl }}>
           <JautaParMezuWidget onPilnsSkats={() => onNavigate('jautaparmezu')} />

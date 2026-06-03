@@ -277,7 +277,15 @@ Atbildi TIKAI JSON:
       const parsed = JSON.parse(raw);
       setRezultats({ ...parsed, garums: garumsNum, atskaite: atskaiteNum, atskVeids, rezims });
       setFaze("rezultats");
-    } catch (e) { setKluda("Aprēķins neizdevās: " + e.message); setFaze("kamera"); }
+    } catch (e) {
+      const msg = !navigator.onLine
+        ? "Nav interneta. Pārbaudi savienojumu."
+        : e?.message?.includes('ACM')
+        ? "Sesijas kļūda — atsvaidzini lapu."
+        : "AI analīze neizdevās. Pārbaudi bildes kvalitāti un mēģini vēlreiz."
+      setKluda(msg)
+      setFaze("kamera")
+    }
   }
 
   function reset() {
