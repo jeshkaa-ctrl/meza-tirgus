@@ -90,9 +90,17 @@ export function useAuth() {
     setUser(null)
   }
 
-  // Paroles maiņa
+  // Paroles maiņa (pieslēgtam lietotājam)
   const mainitParoli = async (jaunāParole) => {
     const { error } = await supabase.auth.updateUser({ password: jaunāParole })
+    if (error) throw new Error(tulkotKludu(error.message))
+  }
+
+  // Paroles atjaunošana — nosūta reset saiti uz e-pastu
+  const nosutitParolesReset = async (epasts) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(epasts, {
+      redirectTo: `${window.location.origin}/?reset=1`,
+    })
     if (error) throw new Error(tulkotKludu(error.message))
   }
 
@@ -104,7 +112,7 @@ export function useAuth() {
     setUser(prev => ({ ...prev, ...dati }))
   }
 
-  return { user, loading, registreties, pieteikties, iziet, mainitParoli, atjaunotProfilu }
+  return { user, loading, registreties, pieteikties, iziet, mainitParoli, nosutitParolesReset, atjaunotProfilu }
 }
 
 // Supabase kļūdu tulkošana latviski

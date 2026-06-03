@@ -56,6 +56,7 @@ const SADAJAS = (isAdmin) => [
       { icon: "🌲", title: "Cirsmas novērtēšana PDF", desc: "VMD inventarizācijas PDF → nogabalu analīze, vērtība",               page: "standard" },
       { icon: "✂️", title: "PDF šķirotājs",           desc: "Sadala daudzīpašumu PDF pa kadastriem",                              page: "pdfSkirotajs" },
       { icon: "⚖️", title: "Meža likumi — AI čats",   desc: "Daudzfāzu saruna, VMD/DAP kontakti, kategorijas",                   page: "jautaparmezu", badge: "AI" },
+      { icon: "💰", title: "Koksnes cenu kalkulators", desc: "Priede, egle, bērzs — sortimentu cenas un apjoma vērtības aprēķins", page: "cenas" },
     ]
   },
 ]

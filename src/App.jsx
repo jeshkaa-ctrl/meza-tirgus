@@ -33,6 +33,7 @@ const CaurmeraPage           = React.lazy(() => import("./CaurmeraPage"))
 const AtjaunosanaPage        = React.lazy(() => import("./AtjaunosanaPage"))
 const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
 const ParoleLapa             = React.lazy(() => import("./ParoleLapa"))
+const CenuKalkulators        = React.lazy(() => import("./CenuKalkulators"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -45,10 +46,14 @@ import.meta.url
 function App(){
 // Montonio return URL pārbaude — ja ?payment=success, rāda paldies lapu
 const urlParams = new URLSearchParams(window.location.search)
-const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies' : 'landing'
+const initialPage = urlParams.get('payment') === 'success'
+  ? 'maksajums_paldies'
+  : urlParams.get('reset') === '1'
+  ? 'parole'
+  : 'landing'
 
 const [page,setPageRaw]=useState(initialPage)
-const { user, loading: authLoading, registreties, pieteikties, iziet, mainitParoli } = useAuth()
+const { user, loading: authLoading, registreties, pieteikties, iziet, mainitParoli, nosutitParolesReset } = useAuth()
 
 // Lapas izsekošana — ieraksta Supabase app_events tabulā (klusē ja tabulas nav)
 const sesijasId = React.useRef(
@@ -90,11 +95,11 @@ if(authLoading) return <div style={{minHeight:"100vh",background:"#080f08",displ
 
 if(page==="sludinajumi") return <>
   <SludinajumiPage user={user} onBack={()=>setPage("main")}/>
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="landing") return <>
   <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")}/>
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="standard") return <>
   <StandardPage
@@ -110,22 +115,22 @@ if(page==="standard") return <>
       setPage("cirsma")
     }}
   />
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState} onOpenDastojums={(file)=>{setDastojumsPdfFile(file); setPage("dastojumsPDF")}}/>
 if(page==="cirsma") return <>
   <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>atvertReg("cirsma")}/>
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="atjaunosana") return <AtjaunosanaPage onBack={()=>setPage("main")} izcirtumi={izcirtumi} kadastrs={kadastrs} saimnieciba={saimnieciba}/>
 if(page==="skice") return <>
   <CirsmaskicePage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={skiceState} onSaveState={setSkiceState} user={user} onReg={()=>atvertReg("skice")}/>
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="caurmers") return <CaurmeraPage onBack={()=>setPage("main")} savedState={caurmersState} onSaveState={setCaurmersState}/>
 if(page==="rekini") return <>
   <RekinuKratuve onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rekini")}/>
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(showChat) return <ChatPage user={user} onBack={()=>setShowChat(false)}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
@@ -145,11 +150,12 @@ if(page==="rpandras") return <DastojumuRegistrsPage onBack={()=>setPage("main")}
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
 if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
-if(page==="parole") return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
+if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
+if(page==="cenas")   return <CenuKalkulators onBack={()=>setPage("main")}/>
 if(page==="admin" && user?.epasts === "jeshkaa@inbox.lv") return <AdminDashboard onBack={()=>setPage("main")}/>
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
-  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 
 

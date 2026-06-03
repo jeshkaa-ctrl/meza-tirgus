@@ -28,6 +28,7 @@ export default function PostsKarte({ post, user, onDelete }) {
   const [likes,     setLikes]     = useState(post.likes_skaits || 0)
   const [manLike,   setManLike]   = useState(post.mans_like || false)
   const [showKom,   setShowKom]   = useState(false)
+  const [showFull,  setShowFull]  = useState(false)
   const [komentari, setKomentari] = useState([])
   const [komLoad,   setKomLoad]   = useState(false)
   const [jaunsKom,  setJaunsKom]  = useState('')
@@ -92,6 +93,7 @@ export default function PostsKarte({ post, user, onDelete }) {
   const lomaStyle = loma ? getLomaStyle(loma) : null
 
   return (
+    <>
     <div style={{
       background: K.bgCard, border: `1px solid ${K.border}`,
       borderRadius: KR.lg, marginBottom: 10,
@@ -127,8 +129,11 @@ export default function PostsKarte({ post, user, onDelete }) {
       </div>
 
       {/* Teksts */}
-      <div style={{ padding: '0 16px 12px', fontSize: KF.base, color: K.text, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-        {post.teksts}
+      <div onClick={() => setShowFull(true)} style={{ padding: '0 16px 12px', fontSize: KF.base, color: K.text, lineHeight: 1.6, whiteSpace: 'pre-wrap', cursor: 'pointer' }}>
+        {post.teksts?.length > 280 ? post.teksts.slice(0, 280) + '…' : post.teksts}
+        {post.teksts?.length > 280 && (
+          <span style={{ color: K.primary, fontSize: KF.sm, marginLeft: 6 }}>lasīt vairāk</span>
+        )}
       </div>
 
       {/* Bilde */}
@@ -164,6 +169,21 @@ export default function PostsKarte({ post, user, onDelete }) {
         }}>
           💬 {post.komentari_skaits > 0 && post.komentari_skaits}
         </button>
+        <button onClick={() => {
+          const teksts = post.teksts?.slice(0, 120) + (post.teksts?.length > 120 ? '...' : '')
+          const url    = encodeURIComponent(`https://www.meza-tirgus.lv/`)
+          const txt    = encodeURIComponent(`🌲 Meža tirgus: ${teksts}\n${decodeURIComponent(url)}`)
+          if (navigator.share) {
+            navigator.share({ title: 'Meža tirgus', text: teksts, url: 'https://www.meza-tirgus.lv/' })
+          } else {
+            window.open(`https://wa.me/?text=${txt}`, '_blank')
+          }
+        }} style={{
+          display: 'flex', alignItems: 'center', gap: 5,
+          background: 'none', border: `1px solid ${K.border}`,
+          borderRadius: KR.full, padding: '5px 12px',
+          color: K.textMut, fontSize: KF.sm, cursor: 'pointer',
+        }}>📤</button>
       </div>
 
       {/* Komentāri */}
@@ -220,5 +240,45 @@ export default function PostsKarte({ post, user, onDelete }) {
         </div>
       )}
     </div>
+
+    {/* Pilna skata modālis */}
+    {showFull && (
+      <div onClick={() => setShowFull(false)} style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+        zIndex: 2000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        padding: '0 0 env(safe-area-inset-bottom)',
+      }}>
+        <div onClick={e => e.stopPropagation()} style={{
+          background: K.bgCard, borderRadius: `${KR.xl} ${KR.xl} 0 0`,
+          width: '100%', maxWidth: 580, maxHeight: '85vh', overflowY: 'auto',
+          padding: '20px 20px 32px', fontFamily: KF.family,
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.2)',
+        }}>
+          <div style={{ width: 36, height: 4, background: K.borderMd, borderRadius: 2, margin: '0 auto 16px' }} />
+          <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+            <AvatarsBloks profils={profils} />
+            <div>
+              <div style={{ fontWeight: KF.bold, color: K.text, fontSize: KF.base }}>{vards}</div>
+              <div style={{ fontSize: KF.xs, color: K.textFade }}>{laiks}</div>
+            </div>
+            <button onClick={() => setShowFull(false)} style={{
+              marginLeft: 'auto', background: 'none', border: 'none',
+              color: K.textMut, fontSize: 22, cursor: 'pointer', lineHeight: 1,
+            }}>×</button>
+          </div>
+          <div style={{ fontSize: KF.base, color: K.text, lineHeight: 1.7, whiteSpace: 'pre-wrap', marginBottom: 16 }}>
+            {post.teksts}
+          </div>
+          {post.bilde_url && (
+            <img src={post.bilde_url} alt="" style={{ width: '100%', borderRadius: KR.md, marginBottom: 16 }} />
+          )}
+          <div style={{ display: 'flex', gap: 8, paddingTop: 12, borderTop: `1px solid ${K.border}` }}>
+            <span style={{ fontSize: KF.sm, color: K.textMut }}>👍 {likes}</span>
+            <span style={{ fontSize: KF.sm, color: K.textMut }}>💬 {post.komentari_skaits || 0}</span>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

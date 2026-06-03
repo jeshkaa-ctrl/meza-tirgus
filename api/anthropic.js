@@ -13,6 +13,8 @@ export default async function handler(req, res) {
   const url = new URL(req.url, `https://${req.headers.host}`)
   const anthropicPath = url.pathname.replace(/^\/api\/anthropic/, '') || '/v1/messages'
 
+  const isStream = req.body?.stream === true
+
   const upstream = await fetch(`https://api.anthropic.com${anthropicPath}`, {
     method: req.method,
     headers: {
@@ -22,6 +24,22 @@ export default async function handler(req, res) {
     },
     body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
   })
+
+  if (isStream && upstream.body) {
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Connection', 'keep-alive')
+    res.status(upstream.status)
+    const reader = upstream.body.getReader()
+    const write  = async () => {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) { res.end(); return }
+        res.write(Buffer.from(value))
+      }
+    }
+    return write()
+  }
 
   const data = await upstream.json()
   res.status(upstream.status).json(data)

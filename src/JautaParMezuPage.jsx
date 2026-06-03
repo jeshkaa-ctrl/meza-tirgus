@@ -125,10 +125,11 @@ function Zina({ msg }) {
 
 // ─── GALVENĀ LAPA ─────────────────────────────────────────────────────────────
 export default function JautaParMezuPage({ onBack }) {
-  const [ziņas,     setZiņas]     = useState([])
-  const [jautajums, setJautajums] = useState('')
-  const [kategorija,setKategorija]= useState('')
-  const [lade,      setLade]      = useState(false)
+  const [ziņas,          setZiņas]          = useState([])
+  const [jautajums,      setJautajums]      = useState('')
+  const [kategorija,     setKategorija]     = useState('')
+  const [lade,           setLade]           = useState(false)
+  const [streamTeksts,   setStreamTeksts]   = useState('')
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -141,6 +142,7 @@ export default function JautaParMezuPage({ onBack }) {
     setJautajums('')
     setZiņas(prev => [...prev, { role: 'user', teksts: j }])
     setLade(true)
+    setStreamTeksts('')
     try {
       const resp = await fetch('/api/anthropic/v1/messages', {
         method: 'POST',
@@ -148,23 +150,44 @@ export default function JautaParMezuPage({ onBack }) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 1200,
+          stream: true,
           system: SISTEMA_PROMPTS + (kategorija ? `\n\nLietotāja jautājuma kategorija: ${kategorija}` : ''),
           messages: [{ role: 'user', content: j }],
         }),
       })
-      const data = await resp.json()
-      const teksts = data.content?.[0]?.text || 'Kļūda — lūdzu mēģini vēlreiz.'
 
-      let parsed = null
-      try {
-        const clean = teksts.replace(/```json|```/g, '').trim()
-        parsed = JSON.parse(clean)
-      } catch {
-        parsed = null
+      const reader  = resp.body.getReader()
+      const decoder = new TextDecoder()
+      let fullText  = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data: ')) continue
+          const raw = line.slice(6).trim()
+          if (raw === '[DONE]') continue
+          try {
+            const ev = JSON.parse(raw)
+            if (ev.type === 'content_block_delta' && ev.delta?.type === 'text_delta') {
+              fullText += ev.delta.text
+              setStreamTeksts(fullText)
+            }
+          } catch { /* ne-SSE rinda, ignorē */ }
+        }
       }
 
-      setZiņas(prev => [...prev, { role: 'ai', teksts, parsed }])
+      setStreamTeksts('')
+      let parsed = null
+      try {
+        const clean = fullText.replace(/```json|```/g, '').trim()
+        parsed = JSON.parse(clean)
+      } catch { parsed = null }
+
+      setZiņas(prev => [...prev, { role: 'ai', teksts: fullText || 'Kļūda — mēģini vēlreiz.', parsed }])
     } catch (e) {
+      setStreamTeksts('')
       const zinoteksts = !navigator.onLine
         ? 'Nav interneta savienojuma. Pārbaudi savienojumu un mēģini vēlreiz.'
         : e?.message?.includes('ACM')
@@ -250,8 +273,25 @@ export default function JautaParMezuPage({ onBack }) {
         {/* Ziņas */}
         {ziņas.map((msg, i) => <Zina key={i} msg={msg} />)}
 
-        {/* Loading */}
-        {lade && (
+        {/* Streaming teksts */}
+        {streamTeksts && (
+          <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 16 }}>
+            <div style={{ maxWidth: '85%' }}>
+              <div style={{ fontSize: 20, marginBottom: 6 }}>🌲</div>
+              <div style={{
+                background: C.card, border: `1px solid ${C.border}`,
+                borderRadius: '4px 12px 12px 12px', padding: '12px 14px',
+                fontSize: 14, lineHeight: 1.7, color: C.text, whiteSpace: 'pre-wrap',
+              }}>
+                {streamTeksts}
+                <span style={{ opacity: 0.6, animation: 'pulse 1s infinite' }}>▍</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Loading (pirms pirmā chunk) */}
+        {lade && !streamTeksts && (
           <div style={{ display: 'flex', gap: 6, padding: '8px 0', alignItems: 'center' }}>
             <div style={{ fontSize: 20 }}>🌲</div>
             <div style={{ display: 'flex', gap: 4 }}>

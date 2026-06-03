@@ -74,8 +74,10 @@ function NovadsAutocomplete({ onPievienot }) {
   )
 }
 
-export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) {
-  const [rezims, setRezims] = useState("jauns")
+export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, nosutitParolesReset }) {
+  const [rezims,       setRezims]       = useState("jauns")
+  const [resetEpasts,  setResetEpasts]  = useState("")
+  const [resetVeiksme, setResetVeiksme] = useState(false)
   const [tips, setTips] = useState("privatpersona")
   const [vards, setVards] = useState("")
   const [uznemums, setUznemums] = useState("")
@@ -196,30 +198,74 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt }) 
           </>
         )}
 
-        {kludas && <div style={{background:"#ffebee",color:"#c62828",padding:"8px",borderRadius:"4px",marginBottom:"10px",fontSize:"12px"}}>{kludas}</div>}
+        {/* RESET PAROLES FORMA */}
+        {rezims === "reset" && (
+          <div style={{marginBottom:12}}>
+            {resetVeiksme ? (
+              <div style={{background:"#e8f5e9",border:"1px solid #4caf50",borderRadius:"6px",padding:"14px",textAlign:"center"}}>
+                <div style={{fontSize:24,marginBottom:8}}>✅</div>
+                <div style={{fontWeight:"bold",color:"#225522",marginBottom:4}}>E-pasts nosūtīts!</div>
+                <div style={{fontSize:"12px",color:"#555"}}>Pārbaudi {resetEpasts} iesūtni un klikšķini uz atjaunošanas saites.</div>
+              </div>
+            ) : (
+              <>
+                <p style={{fontSize:"12px",color:"#555",marginBottom:12}}>
+                  Ievadi savu reģistrācijas e-pastu. Nosūtīsim saiti paroles atjaunošanai.
+                </p>
+                <div style={{marginBottom:10}}>
+                  <label style={{fontSize:"11px",fontWeight:"bold"}}>E-pasts:</label><br/>
+                  <input type="email" value={resetEpasts} onChange={e=>setResetEpasts(e.target.value)}
+                    placeholder="tavs@epasts.lv"
+                    style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
+                </div>
+                {kludas && <div style={{background:"#ffebee",color:"#c62828",padding:"8px",borderRadius:"4px",marginBottom:"10px",fontSize:"12px"}}>{kludas}</div>}
+                <button onClick={async()=>{
+                  setKludas("")
+                  if (!resetEpasts.includes("@")) return setKludas("Ievadi pareizu e-pastu!")
+                  setLade(true)
+                  try {
+                    await nosutitParolesReset?.(resetEpasts)
+                    setResetVeiksme(true)
+                  } catch(e) { setKludas(e.message) }
+                  finally { setLade(false) }
+                }} disabled={lade} style={{width:"100%",padding:"10px",background:lade?"#888":"#225522",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:8}}>
+                  {lade ? "⏳ Sūta..." : "Nosūtīt atjaunošanas saiti →"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
 
-        <div style={{marginBottom:"10px"}}>
+        {kludas && rezims !== "reset" && <div style={{background:"#ffebee",color:"#c62828",padding:"8px",borderRadius:"4px",marginBottom:"10px",fontSize:"12px"}}>{kludas}</div>}
+
+        <div style={{display: rezims === "reset" ? "none" : "block", marginBottom:"10px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>E-pasts:</label><br/>
           <input type="email" value={epasts} onChange={e=>setEpasts(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
-        <div style={{marginBottom:"10px"}}>
+
+        <div style={{display: rezims === "reset" ? "none" : "block", marginBottom:"10px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>Parole:</label>
           <span style={{fontSize:"10px",color:"#888",marginLeft:"8px"}}>min. 8 simboli, vismaz 1 cipars</span><br/>
           <input ref={paroleRef} type="password" defaultValue=""
             autoComplete={rezims==="jauns"?"new-password":"current-password"}
             style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
-        <div style={{marginBottom:"16px"}}>
+        <div style={{display: rezims === "reset" ? "none" : "block", marginBottom:"16px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>Atkārtot paroli:</label><br/>
           <input ref={parole2Ref} type="password" defaultValue="" autoComplete="new-password"
             style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
 
-        <button onClick={iesniegt} disabled={lade} style={{width:"100%",padding:"10px",background:lade?"#557a55":"#225522",color:"white",border:"none",borderRadius:"6px",cursor:lade?"not-allowed":"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:"8px"}}>
+        {rezims !== "reset" && <button onClick={iesniegt} disabled={lade} style={{width:"100%",padding:"10px",background:lade?"#557a55":"#225522",color:"white",border:"none",borderRadius:"6px",cursor:lade?"not-allowed":"pointer",fontWeight:"bold",fontSize:"14px",marginBottom:"8px"}}>
           {lade ? "⏳ Lūdzu uzgaidiet..." : rezims==="jauns" ? "Abonēt →" : "Autorizēties →"}
-        </button>
+        </button>}
+        {rezims === "esoss" && (
+          <button onClick={() => { setRezims("reset"); setKludas("") }} style={{width:"100%",padding:"6px",background:"none",border:"none",cursor:"pointer",color:"#888",fontSize:"11px",textDecoration:"underline",marginBottom:2}}>
+            Aizmirsu paroli
+          </button>
+        )}
         <button onClick={()=>{setRezims(rezims==="jauns"?"esoss":"jauns");setKludas("")}} style={{width:"100%",padding:"8px",background:"none",border:"1px solid #ccc",borderRadius:"6px",cursor:"pointer",color:"#555",fontSize:"12px",marginBottom:"6px"}}>
-          {rezims==="jauns" ? "Jau esmu abonents? Autorizēties" : "Nav konta? Abonēt"}
+          {rezims==="jauns" ? "Jau esmu abonents? Autorizēties" : rezims==="esoss" ? "Nav konta? Abonēt" : "Atpakaļ uz pieteikšanos"}
         </button>
         <button onClick={onAizvērt} style={{width:"100%",padding:"8px",background:"none",border:"none",cursor:"pointer",color:"#aaa",fontSize:"12px"}}>
           Vēlāk
