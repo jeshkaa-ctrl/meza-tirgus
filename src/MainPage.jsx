@@ -146,6 +146,13 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
               padding: '7px 14px', background: 'transparent', color: C.textSec,
               border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
             }}>⚖️ Meža likumi</button>
+            <button
+              title="Angļu valodas tulkojums tiek gatavots"
+              style={{
+                padding: '7px 10px', background: 'transparent', color: C.textDim,
+                border: `1px solid ${C.greenBdr}33`, borderRadius: R.md, fontSize: '11px',
+                cursor: 'not-allowed', opacity: 0.5,
+              }}>🇱🇻 LV</button>
             {!pwaInstallets && (
               <button onClick={handleInstalletClick} style={{
                 padding: '7px 14px', background: 'transparent', color: C.textMut,

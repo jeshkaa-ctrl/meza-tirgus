@@ -441,7 +441,7 @@ return(
 )
 }
 
-function StandardPage({onBack, onPilna}){
+function StandardPage({onBack, onPilna, user, onReg}){
 const [rows, setRows] = useState([])
 const [izcirtumi, setIzcirtumi] = useState([])
 const [jaunaudzes, setJaunaudzes] = useState([])
@@ -559,7 +559,7 @@ return(
     <div style={{maxWidth:"1000px",margin:"0 auto"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"24px",flexWrap:"wrap",gap:"8px"}}>
         <button onClick={onBack} style={{padding:"8px 16px",background:"rgba(255,255,255,0.15)",color:"white",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"4px",cursor:"pointer"}}>← Sākumlapa</button>
-       <button onClick={()=>onPilna({rows,izcirtumi,jaunaudzes,kadastrs,saimnieciba})} style={{padding:"8px 20px",background:"#4caf50",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>Turpināt pilnajā versijā →</button>
+       <button onClick={()=>user ? onPilna({rows,izcirtumi,jaunaudzes,kadastrs,saimnieciba}) : onReg?.()} style={{padding:"8px 20px",background:"#4caf50",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontWeight:"bold"}}>{user ? "Saglabāt analīzi →" : "Reģistrējies — saglabā analīzi →"}</button>
       </div>
       <h1 style={{margin:"0 0 8px",fontSize:"28px"}}>Pamata versija</h1>
       <p style={{color:"#aaa",margin:"0 0 28px",fontSize:"14px"}}>Augšupielādē meža inventarizācijas PDF un saņem īpašuma analīzi</p>
@@ -758,10 +758,30 @@ return(
 
   {rows.length>0 && (
   <div style={{background:"#1a3a1a",borderRadius:"10px",padding:"20px",textAlign:"center",marginBottom:"24px"}}>
-  <p style={{color:"#aaa",fontSize:"13px",marginBottom:"12px"}}>Lai iegūtu detalizētu sortimentu sadalījumu, cirsmas skici, caurmēra mērījumus un rēķinu izveidi — kā arī iespēju labot augšupielādēto datu vērtības un formulas —</p>
-    <button onClick={()=>onPilna({rows,izcirtumi,jaunaudzes,kadastrs,saimnieciba})} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"15px",fontWeight:"bold",cursor:"pointer"}}>
-      Turpināt pilnajā versijā →
-    </button>
+    {user ? (
+      <>
+        <p style={{color:"#aaa",fontSize:"13px",marginBottom:"12px"}}>
+          Analīze pabeigta. Vari turpināt ar cirsmas skici, caurmēra mērījumiem un rēķinu izveidi —
+        </p>
+        <div style={{display:"flex",gap:"12px",justifyContent:"center",flexWrap:"wrap"}}>
+          <button onClick={()=>onPilna({rows,izcirtumi,jaunaudzes,kadastrs,saimnieciba})} style={{padding:"12px 28px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"14px",fontWeight:"bold",cursor:"pointer"}}>
+            Saglabāt un turpināt →
+          </button>
+        </div>
+      </>
+    ) : (
+      <>
+        <p style={{color:"#aaa",fontSize:"13px",marginBottom:"8px"}}>
+          Lai saglabātu analīzes rezultātus, iegūtu cirsmas skici, caurmēra mērījumus un rēķinu izveidi —
+        </p>
+        <p style={{color:"#81c784",fontSize:"12px",marginBottom:"14px",fontStyle:"italic"}}>
+          Reģistrācija ir bezmaksas. Šī analīze paliks pieejama pēc pieteikšanās.
+        </p>
+        <button onClick={()=>onReg?.()} style={{padding:"12px 32px",background:"#4caf50",color:"white",border:"none",borderRadius:"6px",fontSize:"15px",fontWeight:"bold",cursor:"pointer"}}>
+          Reģistrēties un turpināt →
+        </button>
+      </>
+    )}
   </div>
   )}
 </div>

@@ -105,14 +105,22 @@ if(page==="landing") return <>
   <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
 </>
-if(page==="standard") return <StandardPage onBack={()=>setPage("main")} onPilna={(data)=>{
-  if(data){
-    setIzcirtumi(data.izcirtumi||[])
-    setKadastrs(data.kadastrs||"")
-    setSaimnieciba(data.saimnieciba||"")
-  }
-  setTimeout(()=>setPage("main"),50)
-}}/>
+if(page==="standard") return <>
+  <StandardPage
+    onBack={()=>setPage("main")}
+    user={user}
+    onReg={()=>atvertReg("standard")}
+    onPilna={(data)=>{
+      if(data){
+        setIzcirtumi(data.izcirtumi||[])
+        setKadastrs(data.kadastrs||"")
+        setSaimnieciba(data.saimnieciba||"")
+      }
+      setPage("cirsma")
+    }}
+  />
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}
+</>
 if(page==="pdfSkirotajs") return <PdfSkirotajsPage onBack={()=>setPage("main")} savedState={skirotajsState} onSaveState={setSkirotajsState} onOpenDastojums={(file)=>{setDastojumsPdfFile(file); setPage("dastojumsPDF")}}/>
 if(page==="cirsma") return <>
   <CirsmaNovertesanaPage onBack={()=>setPage("main")} kadastrsIn={kadastrs} saimniecibaIn={saimnieciba} savedState={cirsmaState} onSaveState={setCirsmaState} user={user} onReg={()=>atvertReg("cirsma")}/>
