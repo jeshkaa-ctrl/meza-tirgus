@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { SISTEMA_PROMPTS, KATEGORIJAS } from './mezaLikumiKnowledge'
 import { C as DS, F, R, spinnerCSS } from './ds'
+import { acmHeaders } from './utils/acm'
 
 const C = {
   bg: DS.bg, card: DS.bgCard, inner: DS.bgInner, deep: DS.bgDeep,
@@ -143,7 +144,7 @@ export default function JautaParMezuPage({ onBack }) {
     try {
       const resp = await fetch('/api/anthropic/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: acmHeaders(),
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 1200,

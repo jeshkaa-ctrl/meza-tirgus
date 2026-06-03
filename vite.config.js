@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { acmValidetToken } from './src/utils/acm.js'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -14,13 +15,24 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/anthropic/, ''),
           configure: (proxy) => {
-            proxy.on('proxyReq', (proxyReq) => {
-              const key = (env.ANTHROPIC_KEY || '').trim()
-              proxyReq.setHeader('x-api-key', key)
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              const token  = req.headers['x-acm-token'] || ''
+              const sesija = req.headers['x-sesija-id'] || ''
+
+              if (!acmValidetToken(token, sesija)) {
+                console.warn('[ACM] 🐗 Bloķēts pieprasījums —', req.socket?.remoteAddress)
+                res.writeHead(403, { 'Content-Type': 'application/json' })
+                res.end(JSON.stringify({ error: 'ACM_BLOCKED' }))
+                return
+              }
+
+              proxyReq.setHeader('x-api-key', (env.ANTHROPIC_KEY || '').trim())
               proxyReq.setHeader('anthropic-version', '2023-06-01')
               proxyReq.removeHeader('origin')
               proxyReq.removeHeader('referer')
               proxyReq.removeHeader('accept-encoding')
+              proxyReq.removeHeader('x-acm-token')
+              proxyReq.removeHeader('x-sesija-id')
             })
           },
         }

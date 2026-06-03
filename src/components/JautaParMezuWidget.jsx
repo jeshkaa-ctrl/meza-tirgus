@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { SISTEMA_PROMPTS } from '../mezaLikumiKnowledge'
 import { C, F, R, S, spinnerCSS } from '../ds'
+import { acmHeaders } from '../utils/acm'
 
 const IETEIKUMI = [
   'Kad drīkst cirst mežu bez apliecinājuma?',
@@ -22,7 +23,7 @@ export default function JautaParMezuWidget({ onPilnsSkats }) {
     try {
       const resp = await fetch('/api/anthropic/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: acmHeaders(),
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 900,

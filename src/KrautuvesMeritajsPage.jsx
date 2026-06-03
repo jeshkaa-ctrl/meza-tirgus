@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { C as DS, F, R, spinnerCSS } from "./ds";
+import { acmHeaders } from "./utils/acm";
 
 // ─── Atskaites veidi ar kļūdas novērtējumu ────────────────────────────────────
 const ATSKAITES_VEIDI = [
@@ -211,7 +212,7 @@ export default function KrautuvesMeritajsPage({ onBack }) {
         : `vai redzama visa krautuves priekšpuse`;
       const resp = await fetch("/api/anthropic/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: acmHeaders(),
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 120,
@@ -265,7 +266,7 @@ Atbildi TIKAI JSON:
 
       const resp = await fetch("/api/anthropic/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: acmHeaders(),
         body: JSON.stringify({
           model: "claude-sonnet-4-6", max_tokens: 400,
           messages: [{ role: "user", content: [...imageBlocks, { type: "text", text: prompt }] }],
