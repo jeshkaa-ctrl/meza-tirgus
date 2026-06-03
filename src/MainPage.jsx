@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react'
 import JautaParMezuWidget from './components/JautaParMezuWidget'
+import PwaInstalModal from './PwaInstalModal'
 import { C, F, R, S, spinnerCSS } from './ds'
 
 const ADMIN_EMAIL = 'jeshkaa@inbox.lv'
@@ -11,6 +13,7 @@ const SADAJAS = (isAdmin) => [
     riki: [
       { icon: "🗺", title: "Cirsmas skice",           desc: "KML/SHP → skice, koordinātas, PDF VMD iesniegumam",                   page: "skice" },
       { icon: "🌲", title: "Cirsmas novērtēšana",     desc: "PDF no VMD → nogabalu analīze, cirsmas vērtība",                      page: "cirsma" },
+      { icon: "📄", title: "VMD PDF analīze",         desc: "Nogabalu aktuālās informācijas analīze no VMD PDF",                   page: "standard" },
       { icon: "📊", title: "Dastojuma kalkulators",   desc: "Mežvērtes PDF → sortimentu apjomi, krautuves vērtība",                page: "dastojums_pdf" },
     ]
   },
@@ -60,6 +63,29 @@ const SADAJAS = (isAdmin) => [
 export default function MainPage({ onNavigate, user, onReg, onIziet }) {
   const isAdmin = user?.epasts === ADMIN_EMAIL
   const sadajas = SADAJAS(isAdmin)
+
+  const [deferredPrompt,  setDeferredPrompt]  = useState(null)
+  const [pwaModalOpen,    setPwaModalOpen]    = useState(false)
+  const [pwaInstallets,   setPwaInstallets]   = useState(false)
+
+  useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+      setPwaInstallets(true)
+      return
+    }
+    const handler = (e) => { e.preventDefault(); setDeferredPrompt(e) }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  function handleInstalletClick() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      deferredPrompt.userChoice.then(() => setDeferredPrompt(null))
+    } else {
+      setPwaModalOpen(true)
+    }
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: F.family }}>
@@ -115,6 +141,12 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
               padding: '7px 14px', background: 'transparent', color: C.textSec,
               border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
             }}>⚖️ Meža likumi</button>
+            {!pwaInstallets && (
+              <button onClick={handleInstalletClick} style={{
+                padding: '7px 14px', background: 'transparent', color: C.textMut,
+                border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
+              }}>📲 Instalēt app</button>
+            )}
             {user
               ? <div style={{ display: 'flex', gap: S.sm, alignItems: 'center' }}>
                   <span style={{
@@ -134,8 +166,15 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
             }
           </div>
 
-          {/* Mobilais — tikai login/logout poga */}
+          {/* Mobilais — instalēt + login/logout */}
           <div className="mp-header-btns-mobile" style={{ display: 'none', gap: S.sm, alignItems: 'center' }}>
+            {!pwaInstallets && (
+              <button onClick={handleInstalletClick} style={{
+                padding: '8px 12px', background: C.greenDk, color: C.textSec,
+                border: `1px solid ${C.green}`, borderRadius: R.md, fontSize: F.sm,
+                cursor: 'pointer', fontWeight: 600, minHeight: 44,
+              }}>📲 Instalēt</button>
+            )}
             {user
               ? <button onClick={onIziet} style={{
                   padding: '8px 14px', background: 'transparent', color: C.textMut,
@@ -213,6 +252,8 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
           <div style={{ color: C.textDim, fontSize: F.sm }}>💡 Padomi, jaunumi un platformas atjauninājumi parādīsies šeit</div>
         </div>
       </main>
+
+      {pwaModalOpen && <PwaInstalModal onAizveret={() => setPwaModalOpen(false)} />}
     </div>
   )
 }

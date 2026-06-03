@@ -77,7 +77,7 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
         }}>← Tirgus</button>
 
         {/* Logo */}
-        <div onClick={() => onNavigate?.("main")} style={{
+        <div onClick={() => onNavigate?.("landing")} style={{
           display: 'flex', alignItems: 'center', gap: S.sm, cursor: 'pointer',
         }}>
           <div style={{
