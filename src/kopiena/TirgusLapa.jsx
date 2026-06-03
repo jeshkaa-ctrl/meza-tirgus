@@ -281,7 +281,7 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
         )}
 
         {/* Grupas skats */}
-        {cilne === 'grupas' && <GrupasSkats user={user} />}
+        {cilne === 'grupas' && <GrupasSkats user={user} onReg={onReg} />}
 
         {/* Posti */}
         {cilne !== 'grupas' && (

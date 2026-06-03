@@ -53,7 +53,7 @@ function GrupasKarte({ grupa, user, onPievienoties }) {
   )
 }
 
-export default function GrupasSkats({ user }) {
+export default function GrupasSkats({ user, onReg }) {
   const [grupas, setGrupas]     = useState([])
   const [loading, setLoading]   = useState(true)
   const [showForma, setShowForma] = useState(false)
@@ -88,6 +88,26 @@ export default function GrupasSkats({ user }) {
 
   return (
     <div>
+      {/* Nav pieslēdzies */}
+      {!user && (
+        <div style={{
+          background: K.bgCard, border: `1px solid ${K.border}`,
+          borderRadius: KR.lg, padding: '14px 16px', marginBottom: 16,
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <div style={{ fontSize: 28 }}>👥</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: KF.base, fontWeight: KF.semi, color: K.text }}>Pieslēdzies lai izveidotu grupu</div>
+            <div style={{ fontSize: KF.sm, color: K.textSec }}>Apvieno meža cilvēkus pēc reģiona vai intereses</div>
+          </div>
+          <button onClick={onReg} style={{
+            background: K.primary, color: 'white', border: 'none',
+            borderRadius: KR.full, padding: '7px 18px',
+            fontSize: KF.sm, fontWeight: KF.semi, cursor: 'pointer',
+          }}>Pieslēgties</button>
+        </div>
+      )}
+
       {/* Jauna grupa forma */}
       {user && (
         <div style={{ marginBottom: 16 }}>
