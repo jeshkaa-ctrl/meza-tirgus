@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useSubscription } from "./hooks/useSubscription"
+import { supabase } from "./supabaseClient"
 import { C, F, R, S, spinnerCSS } from "./ds"
 
 const getNelasitas = (userId) => {
@@ -21,10 +22,17 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
 
   useEffect(() => {
     if (!user) return
-    const update = () => setNelasitas(getNelasitas(user.id || user.epasts))
+    const update = () => {
+      if (document.visibilityState === 'visible')
+        setNelasitas(getNelasitas(user.id || user.epasts))
+    }
     update()
-    const interval = setInterval(update, 3000)
-    return () => clearInterval(interval)
+    document.addEventListener('visibilitychange', update)
+    const interval = setInterval(update, 30000)
+    return () => {
+      document.removeEventListener('visibilitychange', update)
+      clearInterval(interval)
+    }
   }, [user])
 
   useEffect(() => {
@@ -183,6 +191,25 @@ export default function GlobalHeader({ user, onIziet, onOpenChat, onNavigate }) 
                 }}>
                   <span style={{ fontSize: 16, width: 20, textAlign: 'center' }}>🚪</span>
                   <span>Iziet</span>
+                </button>
+
+                {/* Dzēst kontu */}
+                <button onClick={async () => {
+                  if (!window.confirm('Dzēst kontu? Visi dati tiks neatgriezeniski dzēsti.')) return
+                  setMenuOpen(false)
+                  await supabase.from('profiles').delete().eq('id', user.id)
+                  await supabase.auth.admin?.deleteUser?.(user.id).catch(() => {})
+                  await supabase.auth.signOut()
+                  onIziet?.()
+                }} style={{
+                  width: '100%', background: 'transparent', border: 'none',
+                  borderTop: `1px solid ${C.greenBdr}22`, padding: '9px 16px',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  cursor: 'pointer', color: C.textDim, fontSize: '11px', textAlign: 'left',
+                  fontFamily: F.family,
+                }}>
+                  <span style={{ fontSize: 14, width: 20, textAlign: 'center' }}>🗑</span>
+                  <span>Dzēst kontu</span>
                 </button>
               </div>
             )}
