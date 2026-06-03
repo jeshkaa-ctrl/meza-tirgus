@@ -30,6 +30,8 @@ import JautaParMezuPage from "./JautaParMezuPage"
 import JautaParMezuWidget from "./components/JautaParMezuWidget"
 import MainPage from "./MainPage"
 import TirgusLapa from "./kopiena/TirgusLapa"
+import AdminDashboard from "./AdminDashboard"
+import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -1653,8 +1655,25 @@ function App(){
 const urlParams = new URLSearchParams(window.location.search)
 const initialPage = urlParams.get('payment') === 'success' ? 'maksajums_paldies' : 'landing'
 
-const [page,setPage]=useState(initialPage)
+const [page,setPageRaw]=useState(initialPage)
 const { user, loading: authLoading, registreties, pieteikties, iziet } = useAuth()
+
+// Lapas izsekošana — ieraksta Supabase app_events tabulā (klusē ja tabulas nav)
+const sesijasId = React.useRef(
+  sessionStorage.getItem('mt_sesija') || (() => {
+    const id = Math.random().toString(36).slice(2) + Date.now().toString(36)
+    sessionStorage.setItem('mt_sesija', id)
+    return id
+  })()
+)
+const setPage = React.useCallback((lapa) => {
+  setPageRaw(lapa)
+  supabase.from('app_events').insert({
+    lapa,
+    sesija_id: sesijasId.current,
+    user_id: null,
+  }).then(() => {}).catch(() => {})
+}, [])
 const [showReg, setShowReg] = useState(false)
 const [regAtpakal, setRegAtpakal] = useState(null)
 const [showChat, setShowChat] = useState(false)
@@ -1751,6 +1770,7 @@ if(page==="pavadzimes") return <DastojumuRegistrsPage onBack={()=>setPage("main"
 if(page==="rpandras") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rpandras")}/>
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
 if(page==="dastojums") return <div style={{padding:"40px",fontFamily:"Arial"}}><button onClick={()=>setPage("main")} style={{marginBottom:"16px",padding:"6px 14px",background:"#555",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>Atpakaļ</button><h1>Dastojuma aprēķini</h1><p style={{color:"#888"}}>Drīzumā...</p></div>
+if(page==="admin" && user?.epasts === "jeshkaa@inbox.lv") return <AdminDashboard onBack={()=>setPage("main")}/>
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)}/>}

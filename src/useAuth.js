@@ -6,10 +6,20 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Pārbauda esošo sesiju
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) ielādētProfilu(session.user)
-      else setLoading(false)
+    // Pārbauda esošo sesiju; ja nav — mēģina admin auto-login
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        ielādētProfilu(session.user)
+      } else if (import.meta.env.VITE_ADMIN_EMAIL && import.meta.env.VITE_ADMIN_PASS) {
+        const { data } = await supabase.auth.signInWithPassword({
+          email:    import.meta.env.VITE_ADMIN_EMAIL,
+          password: import.meta.env.VITE_ADMIN_PASS,
+        })
+        if (data?.session?.user) ielādētProfilu(data.session.user)
+        else setLoading(false)
+      } else {
+        setLoading(false)
+      }
     })
 
     // Klausās izmaiņas (pieteikšanās, izrakstīšanās)

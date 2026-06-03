@@ -152,6 +152,13 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
                 border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
               }}>📲 Instalēt app</button>
             )}
+            {user?.epasts === 'jeshkaa@inbox.lv' && (
+              <button onClick={() => onNavigate('admin')} style={{
+                padding: '7px 14px', background: `${C.green}22`, color: C.green,
+                border: `1px solid ${C.green}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
+                fontWeight: 700,
+              }}>🔐 Admin</button>
+            )}
             {user
               ? <div style={{ display: 'flex', gap: S.sm, alignItems: 'center' }}>
                   <span style={{
