@@ -1666,12 +1666,14 @@ const sesijasId = React.useRef(
     return id
   })()
 )
+const userRef = React.useRef(null)
+React.useEffect(() => { userRef.current = user }, [user])
 const setPage = React.useCallback((lapa) => {
   setPageRaw(lapa)
   supabase.from('app_events').insert({
     lapa,
     sesija_id: sesijasId.current,
-    user_id: null,
+    user_id: userRef.current?.id || null,
   }).then(() => {}).catch(() => {})
 }, [])
 const [showReg, setShowReg] = useState(false)
