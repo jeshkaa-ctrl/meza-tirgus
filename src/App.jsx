@@ -34,6 +34,7 @@ const AtjaunosanaPage        = React.lazy(() => import("./AtjaunosanaPage"))
 const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
 const ParoleLapa             = React.lazy(() => import("./ParoleLapa"))
 const CenuKalkulators        = React.lazy(() => import("./CenuKalkulators"))
+const PircejuCenas           = React.lazy(() => import("./PircejuCenas"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -151,7 +152,8 @@ if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
 if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
-if(page==="cenas")   return <CenuKalkulators onBack={()=>setPage("main")}/>
+if(page==="cenas")        return <CenuKalkulators onBack={()=>setPage("main")}/>
+if(page==="pirceja_cenas") return <PircejuCenas onBack={()=>setPage("main")} user={user}/>
 if(page==="admin" && user?.epasts === "jeshkaa@inbox.lv") return <AdminDashboard onBack={()=>setPage("main")}/>
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>

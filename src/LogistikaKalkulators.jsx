@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react"
 import { PIEGADES_VIETAS, SORT_NOSAUKUMI } from "./data/piegadesVietas"
 import { getTransportsCena, aprekinattalumu } from "./data/transportaTarifi"
 import { getKrautuveKoordinates } from "./data/pagastiKoordinates"
+import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
+
+const CENU_KOLS = {
+  balki_P: 'cena_balki_p', balki_E: 'cena_balki_e', balki_M: 'cena_balki_m',
+  sikbalki: 'cena_sikbalki', finieris: 'cena_finieris', zagbalki: 'cena_zagbalki',
+  tara: 'cena_tara', papirmalka: 'cena_papirmalka', malka: 'cena_malka', skelda: 'cena_skelda',
+}
 
 // ─── STILI ───────────────────────────────────────────────────────────────────
 const s = {
@@ -56,7 +63,11 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
   const [izstrade, setIzstrade] = useState(18)
   const [kravasIetilpiba, setKravasIetilpiba] = useState(35)
 
-  // Piegādes vietu cenas (lietotājs ievada)
+  // Dinamiskās pircēju vietas no Supabase
+  const [dinamiskasVietas, setDinamiskasVietas] = useState([])
+  const [visasVietas,      setVisasVietas]      = useState(PIEGADES_VIETAS)
+
+  // Piegādes vietu cenas — sākotnēji tukšas, aizpilda no Supabase
   const [cenas, setCenas] = useState(() => {
     const c = {}
     PIEGADES_VIETAS.forEach(v => {
@@ -65,6 +76,48 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
     })
     return c
   })
+
+  // Ielādē pircēju cenas no Supabase
+  useEffect(() => {
+    supabase
+      .from('pirceja_vietas')
+      .select('*')
+      .eq('aktiva', true)
+      .then(({ data }) => {
+        if (!data?.length) return
+        setDinamiskasVietas(data)
+
+        // Pārveido Supabase datus par PIEGADES_VIETAS formātu
+        const jaunasVietas = data.map(v => ({
+          id:       `sb_${v.id}`,
+          nosaukums: v.nosaukums,
+          lat:      v.lat,
+          lng:      v.lng,
+          novads:   v.novads,
+          talrunis: v.talrunis,
+          epasts:   v.epasts,
+          apraksts: v.apraksts,
+          pienem:   v.pienem || [],
+          noSupabase: true,
+        }))
+
+        setVisasVietas([...PIEGADES_VIETAS, ...jaunasVietas])
+
+        // Pre-aizpilda cenas no Supabase
+        setCenas(prev => {
+          const c = { ...prev }
+          data.forEach(v => {
+            const vid = `sb_${v.id}`;
+            c[vid] = {}
+            ;(v.pienem || []).forEach(s => {
+              const kol = CENU_KOLS[s]
+              c[vid][s] = kol && v[kol] ? String(v[kol]) : ""
+            })
+          })
+          return c
+        })
+      })
+  }, [])
 
   // Rezultāti
   const [rezultati, setRezultati] = useState(null)
@@ -111,7 +164,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
 
       const opcijas = []
 
-      PIEGADES_VIETAS.forEach(vieta => {
+      visasVietas.forEach(vieta => {
         if (!vieta.pienem.includes(sort)) return
 
         const km = aprekinattalumu(lat, lng, vieta.lat, vieta.lng)
@@ -193,7 +246,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
   const aktivieSortimenti = Object.entries(apjomi).filter(([, m]) => m > 0).map(([s]) => s)
 
   // ── Piegādes vietas kas pieņem aktīvo sortimentu ──────────────────────────
-  const vietasPienemSort = PIEGADES_VIETAS.filter(v => v.pienem.includes(aktivaisSortiments))
+  const vietasPienemSort = visasVietas.filter(v => v.pienem.includes(aktivaisSortiments))
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
 
