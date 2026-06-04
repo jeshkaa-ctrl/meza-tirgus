@@ -1,0 +1,15 @@
+{
+  "name": "Krautuves mērītājs",
+  "short_name": "Krautuve",
+  "description": "AI foto analīze — koksnes krautuves kubikmetri sekundēs",
+  "start_url": "/krautuve.html",
+  "scope": "/krautuve.html",
+  "display": "standalone",
+  "background_color": "#080f08",
+  "theme_color": "#225522",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "pwa-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "pwa-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

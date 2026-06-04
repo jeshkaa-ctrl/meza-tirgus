@@ -41,6 +41,12 @@ export default defineConfig(({ mode }) => {
     build: {
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
+        input: {
+          main:     'index.html',
+          cirsma:   'cirsma.html',
+          krautuve: 'krautuve.html',
+          caurmers: 'caurmers.html',
+        },
         output: {
           manualChunks: {
             'pdf-worker': ['pdfjs-dist'],

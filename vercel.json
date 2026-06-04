@@ -1,6 +1,9 @@
 {
   "rewrites": [
     { "source": "/api/anthropic/(.*)", "destination": "/api/anthropic" },
+    { "source": "/cirsma",             "destination": "/cirsma.html"   },
+    { "source": "/krautuve",           "destination": "/krautuve.html" },
+    { "source": "/caurmers",           "destination": "/caurmers.html" },
     { "source": "/(.*)",               "destination": "/index.html"    }
   ]
 }

@@ -23,10 +23,10 @@ const SADAJAS = (isAdmin) => [
     ikona: "📱",
     riki: [
       { icon: "📐", title: "Kubikmetru kalkulators",  desc: "Tievgalis + garums → m³, sortimenti, PDF",                           page: "kubi",             badge: "MOBILAIS" },
-      { icon: "📏", title: "Caurmēra mērījumi",       desc: "Ātra caurmēru ievade laukā, tūlītējs rezultāts",                     page: "caurmers_mobile",  badge: "MOBILAIS" },
-      { icon: "🌲", title: "Cirsmas vērtēšana",       desc: "G mērījumi, Bitterlich, sortimenti reāllaikā",                       page: "cirsma_mobile",    badge: "MOBILAIS" },
+      { icon: "📏", title: "Caurmēra mērījumi",       desc: "Ātra caurmēru ievade laukā, tūlītējs rezultāts",                     page: "caurmers_mobile",    badge: "MOBILAIS", miniApp: "/caurmers.html" },
+      { icon: "🌲", title: "Cirsmas vērtēšana",       desc: "G mērījumi, Bitterlich, sortimenti reāllaikā",                       page: "cirsma_mobile",      badge: "MOBILAIS", miniApp: "/cirsma.html" },
       { icon: "🪵", title: "Dastojuma mērītājs",      desc: "Dastojuma rindu ievade, apjomi, pavadzīmes",                         page: "dastojums_meritajs", badge: "MOBILAIS" },
-      { icon: "📦", title: "Krautuves mērītājs",      desc: "AI foto analīze → krājumu uzskaite un vērtēšana",                    page: "krautuves_meritajs", badge: "MOBILAIS" },
+      { icon: "📦", title: "Krautuves mērītājs",      desc: "AI foto analīze → krājumu uzskaite un vērtēšana",                    page: "krautuves_meritajs", badge: "MOBILAIS", miniApp: "/krautuve.html" },
     ]
   },
   {
@@ -298,25 +298,46 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: S.sm }}>
                 {s.riki.map((r, ri) => (
-                  <div key={ri} className="mp-tile" onClick={() => onNavigate(r.page)} style={{
+                  <div key={ri} style={{
                     background: C.bgInner, border: `1px solid ${C.greenBdr}`,
-                    borderRadius: R.md, padding: '10px 14px', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 12,
+                    borderRadius: R.md, overflow: 'hidden',
                   }}>
-                    <span style={{ fontSize: 22, minWidth: 28, textAlign: 'center' }}>{r.icon}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: S.sm, marginBottom: 2, flexWrap: 'wrap' }}>
-                        <span style={{ color: C.text, fontSize: F.base, fontWeight: F.weightBold }}>{r.title}</span>
-                        {r.badge && (
-                          <span style={{
-                            background: `${s.color}22`, color: s.color,
-                            fontSize: '9px', padding: '1px 5px', borderRadius: R.sm, fontWeight: F.weightBold,
-                          }}>{r.badge}</span>
-                        )}
+                    <div className="mp-tile" onClick={() => onNavigate(r.page)} style={{
+                      padding: '10px 14px', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 12,
+                    }}>
+                      <span style={{ fontSize: 22, minWidth: 28, textAlign: 'center' }}>{r.icon}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: S.sm, marginBottom: 2, flexWrap: 'wrap' }}>
+                          <span style={{ color: C.text, fontSize: F.base, fontWeight: F.weightBold }}>{r.title}</span>
+                          {r.badge && (
+                            <span style={{
+                              background: `${s.color}22`, color: s.color,
+                              fontSize: '9px', padding: '1px 5px', borderRadius: R.sm, fontWeight: F.weightBold,
+                            }}>{r.badge}</span>
+                          )}
+                        </div>
+                        <div style={{ color: C.textDim, fontSize: F.xs, lineHeight: 1.4 }}>{r.desc}</div>
                       </div>
-                      <div style={{ color: C.textDim, fontSize: F.xs, lineHeight: 1.4 }}>{r.desc}</div>
+                      <span style={{ color: C.textFade, fontSize: 14, flexShrink: 0 }}>→</span>
                     </div>
-                    <span style={{ color: C.textFade, fontSize: 14, flexShrink: 0 }}>→</span>
+                    {r.miniApp && (
+                      <div style={{
+                        borderTop: `1px solid ${C.greenBdr}33`,
+                        padding: '6px 14px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      }}>
+                        <span style={{ fontSize: F.xs, color: C.textDim }}>Pieejams kā atsevišķa aplikācija</span>
+                        <a href={r.miniApp} target="_blank" rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            fontSize: F.xs, color: C.green, fontWeight: 700,
+                            textDecoration: 'none', padding: '3px 10px',
+                            border: `1px solid ${C.green}44`, borderRadius: R.sm,
+                            background: `${C.green}11`,
+                          }}>📲 Saglabāt telefonā</a>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
