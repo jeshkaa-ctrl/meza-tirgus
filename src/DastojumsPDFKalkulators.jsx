@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react"
 import * as pdfjsLib from "pdfjs-dist"
+import { acmHeaders } from "./utils/acm"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -180,7 +181,6 @@ async function parsePDFarAI(file) {
     base64Images.push(canvas.toDataURL("image/jpeg", 0.85).split(",")[1])
   }
 
-  const API_KEY = import.meta.env.VITE_ANTHROPIC_KEY || ""
   const prompt = `Tu esi meža cirsmas dastojuma novērtētājs. Skaties uz šiem PDF lapām un nolasi datus.
 
 SVARĪGI PRINCIPI:
@@ -234,16 +234,11 @@ Atgriezies TIKAI ar JSON bez komentāriem:
   ]
 }`
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/anthropic/v1/messages", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
-    },
+    headers: acmHeaders(),
     body: JSON.stringify({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 4000,
       messages: [{
         role: "user",
