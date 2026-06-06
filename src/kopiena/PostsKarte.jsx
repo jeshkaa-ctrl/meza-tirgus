@@ -11,7 +11,6 @@ function AvatarsBloks({ profils, izmers = 40 }) {
   const vards = parādītVardu(profils)
   const i = iniciāļi(vards)
   const lomaKrasa = profils?.loma ? getLomaStyle(profils.loma) : { bg: K.primaryLt, color: K.primary }
-
   if (profils?.avatar_url) {
     return (
       <img src={profils.avatar_url} alt={vards}
@@ -29,15 +28,18 @@ function AvatarsBloks({ profils, izmers = 40 }) {
   )
 }
 
+const KOM_LIMITS = 3
+
 export default function PostsKarte({ post, user, onDelete }) {
-  const [likes,     setLikes]     = useState(post.likes_skaits || 0)
-  const [manLike,   setManLike]   = useState(post.mans_like || false)
-  const [showKom,   setShowKom]   = useState(false)
-  const [showFull,  setShowFull]  = useState(false)
-  const [komentari, setKomentari] = useState([])
-  const [komLoad,   setKomLoad]   = useState(false)
-  const [jaunsKom,  setJaunsKom]  = useState('')
-  const [sendKom,   setSendKom]   = useState(false)
+  const [likes,       setLikes]       = useState(post.likes_skaits || 0)
+  const [manLike,     setManLike]     = useState(post.mans_like || false)
+  const [showKom,     setShowKom]     = useState(false)
+  const [showFull,    setShowFull]    = useState(false)
+  const [komentari,   setKomentari]   = useState([])
+  const [komLoad,     setKomLoad]     = useState(false)
+  const [komIeladeti, setKomIeladeti] = useState(false)
+  const [jaunsKom,    setJaunsKom]    = useState('')
+  const [sendKom,     setSendKom]     = useState(false)
 
   const profils = post.profiles || {}
   const vards   = parādītVardu(profils)
@@ -56,15 +58,14 @@ export default function PostsKarte({ post, user, onDelete }) {
   }
 
   const ieladeKomentarus = async () => {
-    if (komLoad) return
+    if (komLoad || komIeladeti) return
     setKomLoad(true)
     const { data: komData } = await supabase
       .from('komentari')
       .select('*')
       .eq('post_id', post.id)
       .order('created_at', { ascending: true })
-
-    if (komData && komData.length > 0) {
+    if (komData?.length > 0) {
       const uids = [...new Set(komData.map(k => k.user_id))]
       const { data: profs } = await supabase
         .from('profiles').select('id, vards, uznemums, loma, avatar_url, epasts').in('id', uids)
@@ -75,27 +76,83 @@ export default function PostsKarte({ post, user, onDelete }) {
       setKomentari([])
     }
     setKomLoad(false)
+    setKomIeladeti(true)
   }
 
   const toggleKomentari = () => {
-    if (!showKom && komentari.length === 0) ieladeKomentarus()
+    if (!komIeladeti) ieladeKomentarus()
     setShowKom(v => !v)
+  }
+
+  const atvertPilno = () => {
+    if (!komIeladeti) ieladeKomentarus()
+    setShowFull(true)
   }
 
   const pievienotKomentaru = async () => {
     if (!jaunsKom.trim() || !user) return
     setSendKom(true)
+    const teksts = jaunsKom.trim()
     const { data } = await supabase
       .from('komentari')
-      .insert({ post_id: post.id, user_id: user.id, teksts: jaunsKom.trim() })
-      .select('*, profiles:user_id(vards, uznemums, loma, avatar_url, epasts)')
+      .insert({ post_id: post.id, user_id: user.id, teksts })
+      .select()
       .single()
-    if (data) { setKomentari(p => [...p, data]); setJaunsKom('') }
+    if (data) {
+      setKomentari(prev => [...prev, {
+        ...data,
+        profiles: {
+          vards: user.vards, uznemums: user.uznemums,
+          loma: user.loma, avatar_url: user.avatar_url, epasts: user.epasts,
+        }
+      }])
+      setKomIeladeti(true)
+      setJaunsKom('')
+      // Paziņojums posta autoram (ne sev, ne demo postiem)
+      if (post.user_id && post.user_id !== user.id && post.user_id !== 'demo') {
+        supabase.from('notifications').insert({
+          user_id: post.user_id, tips: 'komentars',
+          post_id: post.id, no_user_id: user.id,
+        })
+      }
+    }
     setSendKom(false)
   }
 
-  const loma = profils.loma
-  const lomaStyle = loma ? getLomaStyle(loma) : null
+  const loma             = profils.loma
+  const lomaStyle        = loma ? getLomaStyle(loma) : null
+  const raditosKomentari = komentari.slice(0, KOM_LIMITS)
+  const irVairākKom      = komentari.length > KOM_LIMITS
+
+  // Komentāra ievades josla (izmanto abās vietās ar to pašu state)
+  const komentaraIevade = user && (
+    <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+      <AvatarsBloks profils={{ vards: user.vards || user.epasts }} izmers={28} />
+      <div style={{ flex: 1, display: 'flex', gap: 6 }}>
+        <input
+          value={jaunsKom}
+          onChange={e => setJaunsKom(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && pievienotKomentaru()}
+          placeholder="Raksti komentāru..."
+          style={{
+            flex: 1, background: K.bgInput, border: `1px solid ${K.border}`,
+            borderRadius: KR.full, padding: '7px 14px',
+            fontSize: KF.sm, color: K.text, outline: 'none',
+            fontFamily: KF.family,
+          }}
+        />
+        <button onClick={pievienotKomentaru} disabled={!jaunsKom.trim() || sendKom}
+          style={{
+            background: jaunsKom.trim() ? K.primary : K.border,
+            color: 'white', border: 'none', borderRadius: KR.full,
+            padding: '7px 16px', fontSize: KF.sm, fontWeight: KF.semi,
+            cursor: jaunsKom.trim() ? 'pointer' : 'default', minHeight: 36,
+          }}>
+          {sendKom ? '...' : '→'}
+        </button>
+      </div>
+    </div>
+  )
 
   return (
     <>
@@ -133,8 +190,8 @@ export default function PostsKarte({ post, user, onDelete }) {
         )}
       </div>
 
-      {/* Teksts */}
-      <div onClick={() => setShowFull(true)} style={{ padding: '0 16px 12px', fontSize: KF.base, color: K.text, lineHeight: 1.6, whiteSpace: 'pre-wrap', cursor: 'pointer' }}>
+      {/* Teksts — klikšķis atver pilno skatu */}
+      <div onClick={atvertPilno} style={{ padding: '0 16px 12px', fontSize: KF.base, color: K.text, lineHeight: 1.6, whiteSpace: 'pre-wrap', cursor: 'pointer' }}>
         {post.teksts?.length > 280 ? post.teksts.slice(0, 280) + '…' : post.teksts}
         {post.teksts?.length > 280 && (
           <span style={{ color: K.primary, fontSize: KF.sm, marginLeft: 6 }}>lasīt vairāk</span>
@@ -149,11 +206,8 @@ export default function PostsKarte({ post, user, onDelete }) {
         }} />
       )}
 
-      {/* Apakša — darbības */}
-      <div style={{
-        padding: '8px 16px', display: 'flex', gap: 4,
-        borderTop: `1px solid ${K.border}`,
-      }}>
+      {/* Darbību josla */}
+      <div style={{ padding: '8px 16px', display: 'flex', gap: 4, borderTop: `1px solid ${K.border}` }}>
         <button onClick={toggleLike} style={{
           display: 'flex', alignItems: 'center', gap: 5,
           background: manLike ? K.primaryLt : 'none',
@@ -163,7 +217,7 @@ export default function PostsKarte({ post, user, onDelete }) {
           fontSize: KF.sm, fontWeight: manLike ? KF.semi : KF.med,
           cursor: user ? 'pointer' : 'default',
         }}>
-          {manLike ? '👍' : '👍'} {likes > 0 && likes}
+          👍 {likes > 0 && likes}
         </button>
         <button onClick={toggleKomentari} style={{
           display: 'flex', alignItems: 'center', gap: 5,
@@ -176,7 +230,7 @@ export default function PostsKarte({ post, user, onDelete }) {
         </button>
         <button onClick={() => {
           const teksts = post.teksts?.slice(0, 120) + (post.teksts?.length > 120 ? '...' : '')
-          const url    = encodeURIComponent(`https://www.meza-tirgus.lv/`)
+          const url    = encodeURIComponent('https://www.meza-tirgus.lv/')
           const txt    = encodeURIComponent(`🌲 Meža tirgus: ${teksts}\n${decodeURIComponent(url)}`)
           if (navigator.share) {
             navigator.share({ title: 'Meža tirgus', text: teksts, url: 'https://www.meza-tirgus.lv/' })
@@ -191,12 +245,12 @@ export default function PostsKarte({ post, user, onDelete }) {
         }}>📤</button>
       </div>
 
-      {/* Komentāri */}
+      {/* Inline komentāri — max 3 */}
       {showKom && (
         <div style={{ borderTop: `1px solid ${K.border}`, padding: '12px 16px' }}>
-          {komLoad && <div style={{ color: K.textFade, fontSize: KF.sm }}>Ielādē...</div>}
+          {komLoad && <div style={{ color: K.textFade, fontSize: KF.sm, marginBottom: 8 }}>Ielādē...</div>}
 
-          {komentari.map(k => (
+          {raditosKomentari.map(k => (
             <div key={k.id} style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
               <AvatarsBloks profils={k.profiles} izmers={28} />
               <div style={{ flex: 1 }}>
@@ -214,39 +268,22 @@ export default function PostsKarte({ post, user, onDelete }) {
             </div>
           ))}
 
-          {user && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-              <AvatarsBloks profils={{ vards: user.vards || user.epasts }} izmers={28} />
-              <div style={{ flex: 1, display: 'flex', gap: 6 }}>
-                <input
-                  value={jaunsKom}
-                  onChange={e => setJaunsKom(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && pievienotKomentaru()}
-                  placeholder="Raksti komentāru..."
-                  style={{
-                    flex: 1, background: K.bgInput, border: `1px solid ${K.border}`,
-                    borderRadius: KR.full, padding: '7px 14px',
-                    fontSize: KF.sm, color: K.text, outline: 'none',
-                    fontFamily: KF.family,
-                  }}
-                />
-                <button onClick={pievienotKomentaru} disabled={!jaunsKom.trim() || sendKom}
-                  style={{
-                    background: jaunsKom.trim() ? K.primary : K.border,
-                    color: 'white', border: 'none', borderRadius: KR.full,
-                    padding: '7px 16px', fontSize: KF.sm, fontWeight: KF.semi,
-                    cursor: jaunsKom.trim() ? 'pointer' : 'default',
-                  }}>
-                  {sendKom ? '...' : '→'}
-                </button>
-              </div>
-            </div>
+          {irVairākKom && (
+            <button onClick={atvertPilno} style={{
+              background: 'none', border: 'none', color: K.primary,
+              fontSize: KF.sm, cursor: 'pointer', padding: '4px 0 8px',
+              fontFamily: KF.family, display: 'block',
+            }}>
+              💬 Skatīt visus {komentari.length} komentārus →
+            </button>
           )}
+
+          {komentaraIevade}
         </div>
       )}
     </div>
 
-    {/* Pilna skata modālis */}
+    {/* Pilnā skata modālis — posts + VISI komentāri + ievade */}
     {showFull && (
       <div onClick={() => setShowFull(false)} style={{
         position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
@@ -255,11 +292,14 @@ export default function PostsKarte({ post, user, onDelete }) {
       }}>
         <div onClick={e => e.stopPropagation()} style={{
           background: K.bgCard, borderRadius: `${KR.xl} ${KR.xl} 0 0`,
-          width: '100%', maxWidth: 580, maxHeight: '85vh', overflowY: 'auto',
+          width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto',
           padding: '20px 20px 32px', fontFamily: KF.family,
           boxShadow: '0 -4px 24px rgba(0,0,0,0.2)',
         }}>
+          {/* Vilkšanas indikatora svītra */}
           <div style={{ width: 36, height: 4, background: K.borderMd, borderRadius: 2, margin: '0 auto 16px' }} />
+
+          {/* Galvene */}
           <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
             <AvatarsBloks profils={profils} />
             <div>
@@ -271,16 +311,51 @@ export default function PostsKarte({ post, user, onDelete }) {
               color: K.textMut, fontSize: 22, cursor: 'pointer', lineHeight: 1,
             }}>×</button>
           </div>
+
+          {/* Pilns teksts */}
           <div style={{ fontSize: KF.base, color: K.text, lineHeight: 1.7, whiteSpace: 'pre-wrap', marginBottom: 16 }}>
             {post.teksts}
           </div>
+
+          {/* Bilde */}
           {post.bilde_url && (
             <img src={post.bilde_url} alt="" style={{ width: '100%', borderRadius: KR.md, marginBottom: 16 }} />
           )}
-          <div style={{ display: 'flex', gap: 8, paddingTop: 12, borderTop: `1px solid ${K.border}` }}>
+
+          {/* Statistika */}
+          <div style={{ display: 'flex', gap: 8, paddingBottom: 12, marginBottom: 16, borderBottom: `1px solid ${K.border}` }}>
             <span style={{ fontSize: KF.sm, color: K.textMut }}>👍 {likes}</span>
-            <span style={{ fontSize: KF.sm, color: K.textMut }}>💬 {post.komentari_skaits || 0}</span>
+            <span style={{ fontSize: KF.sm, color: K.textMut }}>💬 {komentari.length}</span>
           </div>
+
+          {/* Visi komentāri */}
+          {komLoad ? (
+            <div style={{ color: K.textFade, fontSize: KF.sm, marginBottom: 12 }}>Ielādē komentārus...</div>
+          ) : komentari.length === 0 ? (
+            <div style={{ color: K.textFade, fontSize: KF.sm, textAlign: 'center', padding: '12px 0 16px' }}>
+              Vēl nav komentāru. Esi pirmais!
+            </div>
+          ) : (
+            komentari.map(k => (
+              <div key={k.id} style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <AvatarsBloks profils={k.profiles} izmers={28} />
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    background: K.bgInput, borderRadius: KR.md,
+                    padding: '8px 12px', border: `1px solid ${K.border}`,
+                  }}>
+                    <div style={{ fontSize: KF.xs, fontWeight: KF.bold, color: K.textSec, marginBottom: 2 }}>
+                      {parādītVardu(k.profiles)}
+                    </div>
+                    <div style={{ fontSize: KF.sm, color: K.text, lineHeight: 1.5 }}>{k.teksts}</div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+
+          {/* Komentāra ievade */}
+          {komentaraIevade}
         </div>
       </div>
     )}

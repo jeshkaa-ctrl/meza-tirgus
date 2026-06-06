@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
-import { K, KF, KR } from './kds'
+import { K, KF, KR, laicinsAtspalsts } from './kds'
 import PostsKarte from './PostsKarte'
 import JaunsPostsForma from './JaunsPostsForma'
 import GrupasSkats from './GrupasSkats'
@@ -75,12 +75,41 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
   const [ladeLairāk, setLadeVairāk] = useState(false)
   const [offset,   setOffset]   = useState(0)
 
+  const [pazinoSkaits, setPazinoSkaits] = useState(0)
+  const [showPazino,   setShowPazino]   = useState(false)
+  const [pazinojumi,   setPazinojumi]   = useState([])
+
   // Ielādē lietotāja profilu
   useEffect(() => {
     if (!user?.id) { setProfils(null); return }
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
       .then(({ data }) => setProfils(data))
   }, [user?.id])
+
+  // Ielādē nelasītos paziņojumus
+  useEffect(() => {
+    if (!user?.id) { setPazinoSkaits(0); setPazinojumi([]); return }
+    supabase
+      .from('notifications')
+      .select('id, tips, post_id, created_at')
+      .eq('user_id', user.id)
+      .eq('lasits', false)
+      .order('created_at', { ascending: false })
+      .limit(10)
+      .then(({ data }) => {
+        setPazinojumi(data || [])
+        setPazinoSkaits(data?.length || 0)
+      })
+  }, [user?.id])
+
+  const atzimetLasitus = async () => {
+    if (!user?.id || pazinojumi.length === 0) return
+    await supabase.from('notifications')
+      .update({ lasits: true })
+      .eq('user_id', user.id)
+      .eq('lasits', false)
+    setPazinoSkaits(0)
+  }
 
   const ieladePostus = useCallback(async (no = 0, tips = cilne) => {
     if (no === 0) setLoading(true)
@@ -211,6 +240,70 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
             }}>
               🛠 Darba virsma
             </button>
+
+            {/* Paziņojumu zvaniņš */}
+            {user && (
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => { setShowPazino(v => !v); if (!showPazino) atzimetLasitus() }}
+                  style={{
+                    position: 'relative', width: 32, height: 32, borderRadius: '50%',
+                    background: K.bgInput, border: `1px solid ${K.border}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', fontSize: 15,
+                  }}
+                >
+                  🔔
+                  {pazinoSkaits > 0 && (
+                    <span style={{
+                      position: 'absolute', top: -3, right: -3,
+                      background: '#ef4444', color: 'white', borderRadius: '50%',
+                      width: 16, height: 16, fontSize: '9px', fontWeight: 700,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      lineHeight: 1,
+                    }}>
+                      {pazinoSkaits > 9 ? '9+' : pazinoSkaits}
+                    </span>
+                  )}
+                </button>
+
+                {showPazino && (
+                  <>
+                    <div onClick={() => setShowPazino(false)}
+                      style={{ position: 'fixed', inset: 0, zIndex: 199 }} />
+                    <div style={{
+                      position: 'absolute', right: 0, top: 'calc(100% + 6px)',
+                      background: K.bgCard, border: `1px solid ${K.border}`,
+                      borderRadius: KR.lg, width: 280, maxHeight: 320, overflowY: 'auto',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.15)', zIndex: 200,
+                    }}>
+                      <div style={{
+                        padding: '10px 14px', borderBottom: `1px solid ${K.border}`,
+                        fontSize: KF.sm, fontWeight: KF.bold, color: K.text,
+                      }}>
+                        🔔 Paziņojumi
+                      </div>
+                      {pazinojumi.length === 0 ? (
+                        <div style={{ padding: '20px 16px', textAlign: 'center', color: K.textFade, fontSize: KF.sm }}>
+                          Nav jaunu paziņojumu
+                        </div>
+                      ) : pazinojumi.map(p => (
+                        <div key={p.id} onClick={() => setShowPazino(false)} style={{
+                          padding: '10px 14px', borderBottom: `1px solid ${K.border}`,
+                          fontSize: KF.sm, color: K.text, cursor: 'pointer',
+                        }}>
+                          <div>💬 Kāds komentēja tavu ierakstu</div>
+                          <div style={{ fontSize: KF.xs, color: K.textFade, marginTop: 2 }}>
+                            {laicinsAtspalsts(p.created_at)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
             {user
               ? <div style={{
                   width: 32, height: 32, borderRadius: '50%',
