@@ -170,38 +170,77 @@ async function wfsDiagnostika(geoPath, typeNames) {
   }
 }
 
+// ─── color lauka parsēšana → bonitāte + biezība ──────────────────────────────
+// Formāts: "10 1-2" → SUGA_KOD BON-BIEZIB
+// bv10=0 vienmēr — bonitāte TIKAI no color lauka
+function parseColor(color) {
+  const s = String(color || '').trim()
+  const m = s.match(/\d+\s+(\d+)-(\d+)/)
+  if (m) {
+    return {
+      bonNum:  parseInt(m[1]) || 3,
+      bieziba: Math.max(0.1, Math.min(1.0, parseFloat(m[2]) / 10)),
+    }
+  }
+  return { bonNum: 3, bieziba: 1.0 }
+}
+
 // ─── Nogabala apstrāde (pēc WFS feature) ─────────────────────────────────────
 function apstradatNogabalu(feat, i) {
-  const p   = feat.properties || {}
-  const sugaNum = p.s10  || 1   // numerisks kods 1-12, default 1=Priede
-  const bonNum  = p.bv10 || 3   // numerisks kods 1-6, default 3=II
-  const inf = SUGAS_KARTE[sugaNum] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
+  const p = feat.properties || {}
+
+  // Vecuma korekcija: gtf = faktiskais taksācijas gads
+  const taksGads     = parseInt(p.gtf) || 2011
+  const gadskorekcija = new Date().getFullYear() - taksGads
+
+  // Bonitāte un biezība no color lauka (bv10 vienmēr 0!)
+  const { bonNum, bieziba } = parseColor(p.color)
   const bon = BONITATES[bonNum] || 'II'
 
   const platiba = parseFloat(p.nog_plat) || 0
-  const vec     = parseInt(p.a10)        || 0
-  const h       = parseFloat(p.h10)     || 0
-  const g       = parseFloat(p.g10)     || 0
-  const d       = parseFloat(p.d10)     || 0
 
-  // Efektīvās vērtības: ja WFS atgriež 0 — aprēķina no numeriskajiem kodiem
-  const hEff = h || calcH(bonNum, vec)
-  const gEff = g || calcG(sugaNum, vec)
-  const dEff = d || calcD(hEff)
+  // Visi sugu slāņi (s10–s14) — summē kopējo G un kubatūru
+  const SUFIKSI = [10, 11, 12, 13, 14]
+  const slani = SUFIKSI.map(sfx => {
+    const sKods = parseInt(p[`s${sfx}`]) || 0
+    if (!sKods) return null
+    const aWfs = parseInt(p[`a${sfx}`]) || 0
+    const vec  = aWfs + gadskorekcija
+    const h    = parseFloat(p[`h${sfx}`]) || 0
+    const g    = parseFloat(p[`g${sfx}`]) || 0
+    const d    = parseFloat(p[`d${sfx}`]) || 0
+    const hEff = h || calcH(bonNum, vec)
+    const gEff = g || calcG(sKods, vec)
+    const dEff = d || calcD(hEff)
+    const kub  = aprekinātKubaturu(gEff, hEff, platiba)
+    const inf  = SUGAS_KARTE[sKods] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
+    return { sKods, inf, vec, aWfs, hEff, gEff, dEff, kub }
+  }).filter(Boolean)
 
-  // Kubatūra: G × H × 0.45 × platiba
-  const kubatura = aprekinātKubaturu(gEff, hEff, platiba)
+  // Galvenā suga (pirmais slānis)
+  const main = slani[0] || { sKods:1, inf:SUGAS_KARTE[1], vec:60, aWfs:0, hEff:0, gEff:0, dEff:0, kub:0 }
+  const inf  = main.inf
 
-  // Cirtes lēmums (aizsardzība tiks pielietota pēc DAP ielādes)
-  const { lēmums: lemumsBezAizsardzibas } = noteiktCirti(vec, gEff, 'briva', sugaNum)
+  // Kopējie rādītāji
+  const gKopa      = slani.reduce((s, l) => s + l.gEff, 0)
+  const kubaturaKopa = slani.reduce((s, l) => s + l.kub, 0)
 
-  // forestEngine sortimentiem (tikai ja ir koki)
-  let sortVert = 0, sortimenti = {}, lemums = lemumsBezAizsardzibas
-  if (kubatura > 0 && vec > 20) {
+  // Audzes formula tekstā (piemēram "8P 2E")
+  const audzeFormula = slani.map(l =>
+    `${Math.round(l.gEff / Math.max(gKopa, 1) * 10)}${l.inf.kods}`
+  ).join(' ')
+
+  // Cirtes lēmums pēc galvenās sugas (ar biezību kā brīdinājumu)
+  const { lēmums: lemumsBezAiz } = noteiktCirti(main.vec, gKopa, 'briva', main.sKods)
+  const biezibasBrid = bieziba < 0.4 ? ` ⚠️ biezība ${bieziba}` : ''
+
+  // forestEngine sortimentiem (galvenā suga)
+  let sortVert = 0, sortimenti = {}, lemums = lemumsBezAiz + biezibasBrid
+  if (kubaturaKopa > 0 && main.vec > 20) {
     try {
       const rez = forestEngine({
-        formula: `10${inf.kods}`, vec, bon,
-        h: hEff, g: gEff, d: dEff,
+        formula: `10${inf.kods}`, vec: main.vec, bon,
+        h: main.hEff, g: gKopa, d: main.dEff,
         platiba, krm3ha: 0, harvestType: '', plantacija: false,
       })
       sortimenti = rez.sortiments || {}
@@ -210,10 +249,9 @@ function apstradatNogabalu(feat, i) {
     } catch { /* ignorē */ }
   }
 
-  // Indikatīvā tirgus vērtība (€35/m³ vidēji)
-  const indVertiba = kubatura * 35
+  const indVertiba = kubaturaKopa * 35
 
-  // Nogabala numurs: ar apakšnogabalu → "1.1", bez → "1-0"
+  // Nogabala numurs
   const nr_text = p.kvart != null
     ? (p.anog && p.anog !== '0' && p.anog !== 0)
       ? `${p.nog}.${p.anog}`
@@ -222,12 +260,19 @@ function apstradatNogabalu(feat, i) {
 
   return {
     id: feat.id || `n${i}`, nr: i + 1, nr_text,
-    sugaKods:  p.s10    || 0,
-    suga:      inf.kods,
-    sugaNos:   inf.nos,
-    sugaKrasa: inf.krasa,
-    vecums: vec, bon, platiba,
-    h: hEff, g: gEff, d: dEff, kubatura,
+    sugaKods:    main.sKods,
+    suga:        inf.kods,
+    sugaNos:     inf.nos,
+    sugaKrasa:   inf.krasa,
+    audzeFormula,
+    vecums:      main.vec,
+    vecumsWfs:   main.aWfs,
+    taksGads,
+    bon, bieziba,
+    platiba,
+    h: main.hEff, g: gKopa, d: main.dEff,
+    kubatura: kubaturaKopa,
+    slani,    // visi sugu slāņi
     sortVert, sortimenti, lemums, indVertiba,
     mzVeids: p.mz_veids ?? null,
     geojson: feat, rawProps: p,
@@ -324,18 +369,24 @@ export default function IpasumAnalīze({ onBack }) {
               if (!n) return
 
               const lemumKrasa = getLemumKrasa(n.lemums)
+              const taksInfo = n.taksGads ? ` (taks. ${n.taksGads})` : ''
+              const sugasRindas = (n.slani || []).map(l =>
+                `<tr><td style="color:#888;font-size:10px">${l.inf.nos}</td>` +
+                `<td style="text-align:right;font-size:10px">${l.vec} g · H${l.hEff}m · G${l.gEff} · ${l.kub}m³</td></tr>`
+              ).join('')
               layer.bindPopup(
-                `<div style="font-family:Arial;font-size:12px;min-width:190px">` +
-                `<b style="font-size:13px">${n.nr_text} — ${n.sugaNos}</b><br>` +
+                `<div style="font-family:Arial;font-size:12px;min-width:210px">` +
+                `<b style="font-size:13px">${n.nr_text} — ${n.audzeFormula || n.sugaNos}</b><br>` +
                 `<table style="margin-top:6px;border-collapse:collapse;width:100%">` +
-                `<tr><td style="color:#666;padding:2px 0">Vecums</td><td style="text-align:right;font-weight:600">${n.vecums} g.</td></tr>` +
-                `<tr><td style="color:#666">Bonitāte</td><td style="text-align:right;font-weight:600">${n.bon}</td></tr>` +
+                `<tr><td style="color:#666;padding:2px 0">Vecums</td><td style="text-align:right;font-weight:600">${n.vecums} g.${taksInfo}</td></tr>` +
+                `<tr><td style="color:#666">Bonitāte / Biezība</td><td style="text-align:right;font-weight:600">${n.bon} / ${n.bieziba}</td></tr>` +
                 `<tr><td style="color:#666">Platība</td><td style="text-align:right;font-weight:600">${n.platiba.toFixed(2)} ha</td></tr>` +
-                `<tr><td style="color:#666">H / G</td><td style="text-align:right;font-weight:600">${n.h} m / ${n.g} m²/ha</td></tr>` +
+                `<tr><td style="color:#666">G kopa / H</td><td style="text-align:right;font-weight:600">${n.g} m²/ha / ${n.h} m</td></tr>` +
+                sugasRindas +
                 `<tr><td style="color:#666">Kubatūra</td><td style="text-align:right;font-weight:600">${n.kubatura} m³</td></tr>` +
                 `<tr><td style="color:#666">Ind. vērtība</td><td style="text-align:right;color:#4caf50;font-weight:700">~${n.indVertiba.toLocaleString()} €</td></tr>` +
-                `<tr><td style="color:#666">Lēmums</td><td style="text-align:right;font-weight:700;color:${lemumKrasa}">${n.lemums}</td></tr>` +
-                (n.mzVeids != null ? `<tr><td style="color:#666">MZ veids</td><td style="text-align:right;font-size:11px">${n.mzVeids}</td></tr>` : '') +
+                `<tr><td style="color:#666">Lēmums</td><td style="text-align:right;font-weight:700;color:${lemumKrasa};font-size:11px">${n.lemums}</td></tr>` +
+                (n.mzVeids != null ? `<tr><td style="color:#666">MZ veids</td><td style="text-align:right;font-size:10px">${n.mzVeids}</td></tr>` : '') +
                 `</table></div>`
               )
 
@@ -701,6 +752,9 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
           </div>
           <div style={{ color:C.dim, fontSize:F.xs }}>
             {editData.length} nogabali · {kopPlatiba.toFixed(2)} ha · {kopKubatura.toFixed(0)} m³
+            {editData[0]?.taksGads && (
+              <span style={{ color:'#f9a825', marginLeft:6 }}>· taks. {editData[0].taksGads}</span>
+            )}
           </div>
         </div>
         <button onClick={eksportPDF} style={{ background:DS.greenDk, color:'white',
