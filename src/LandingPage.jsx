@@ -80,7 +80,7 @@ return(
   <div style={{maxWidth:"900px",margin:"0 auto",padding:"24px 24px 0",textAlign:"center",width:"100%",boxSizing:"border-box",background:"#080f08"}}>
 <div style={{background:"linear-gradient(135deg, #1a2e1a, #0f1f0f)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"40px",marginBottom:"24px"}}>
   <h2 style={{color:"#4caf50",fontSize:"24px",textAlign:"center",marginBottom:"24px",fontWeight:800,letterSpacing:"-0.02em"}}>Kas ir Meža tirgus?</h2>
-  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"24px",marginBottom:"24px"}}>
+  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))",gap:"1rem",marginBottom:"24px"}}>
     {[
       {icon:"🌲",title:"Meža rīki",text:"Cirsmu vērtēšana, dastojumi, caurmēra mērījumi — viss vienā vietā."},
       {icon:"🤝",title:"Savienojam",text:"Īpašnieki, mežsaimnieki, harvesteru operatori — vienā platformā."},
