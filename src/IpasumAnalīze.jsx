@@ -649,13 +649,24 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
           <div style={{ fontSize:11, color:C.dim, padding:'0 8px 10px' }}>
             Noklikšķini uz lauka lai rediģētu — kubatūra un vērtība atjaunojas automātiski.
           </div>
-          <table style={{ width:'100%', borderCollapse:'collapse', minWidth:680, fontSize:12 }}>
+          <table style={{ width:'100%', borderCollapse:'collapse', minWidth:860, fontSize:12 }}>
             <thead>
               <tr style={{ background:'#1b4a1b' }}>
-                {['Nog.','Suga','Vec.','Bon.','ha','H m','G m²/ha','Kubatūra','Lēmums','Ind. €'].map((h,i)=>(
+                {[
+                  { h:'Nog.',     mw:55  },
+                  { h:'Suga',     mw:90  },
+                  { h:'Vec.',     mw:50  },
+                  { h:'Bon.',     mw:50  },
+                  { h:'ha',       mw:55  },
+                  { h:'H m',      mw:45  },
+                  { h:'G m²/ha',  mw:65  },
+                  { h:'Kubatūra', mw:70  },
+                  { h:'Lēmums',   mw:120 },
+                  { h:'Ind. €',   mw:75  },
+                ].map(({ h, mw }, i) => (
                   <th key={i} style={{ padding:'6px 8px', textAlign:i<2?'left':'right',
                     color:C.sec, fontWeight:700, fontSize:10, whiteSpace:'nowrap',
-                    border:`1px solid ${C.border}` }}>{h}</th>
+                    border:`1px solid ${C.border}`, minWidth: mw }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -667,7 +678,7 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
                   {/* Vec. rediģējams */}
                   <td style={{ padding:'2px 4px', border:`1px solid ${C.border}` }}>
                     <input type="number" value={n.vecums} onChange={e=>updateRinda(i,'vecums',e.target.value)}
-                      style={{ background:'transparent', border:'none', color:C.text, width:44, textAlign:'right', fontSize:12, fontFamily:F.family }} />
+                      style={{ background:'transparent', border:'none', color:C.text, width:48, textAlign:'right', fontSize:12, fontFamily:F.family }} />
                   </td>
                   {/* Bon. rediģējams */}
                   <td style={{ padding:'2px 4px', border:`1px solid ${C.border}` }}>
@@ -679,7 +690,7 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
                   {/* Platiba rediģējama */}
                   <td style={{ padding:'2px 4px', border:`1px solid ${C.border}` }}>
                     <input type="number" step="0.01" value={n.platiba.toFixed(2)} onChange={e=>updateRinda(i,'platiba',e.target.value)}
-                      style={{ background:'transparent', border:'none', color:C.text, width:54, textAlign:'right', fontSize:12, fontFamily:F.family }} />
+                      style={{ background:'transparent', border:'none', color:C.text, width:60, textAlign:'right', fontSize:12, fontFamily:F.family }} />
                   </td>
                   <td style={{ padding:'4px 8px', border:`1px solid ${C.border}`, textAlign:'right', color:C.sec }}>{n.h||'—'}</td>
                   <td style={{ padding:'4px 8px', border:`1px solid ${C.border}`, textAlign:'right', color:C.sec }}>{n.g||'—'}</td>
