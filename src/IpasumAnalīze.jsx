@@ -710,7 +710,7 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
         </button>
       </div>
 
-      {/* Aizsardzības josla */}
+      {/* Egļu aizsardzības josla (ja atrasta) */}
       {aizsardzibaStatus.cirte !== 'briva' && (
         <div style={{
           margin:'10px 16px 0', padding:'8px 14px', borderRadius:8, fontSize:13, fontWeight:600,
@@ -722,6 +722,29 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
           {dapTer.length > 0 && <span style={{ fontSize:11, marginLeft:8, opacity:0.7 }}>({dapTer.length} teritorija)</span>}
         </div>
       )}
+
+      {/* DAP brīdinājums — mikroliegumi/dabas liegumi nav publiski WFS */}
+      <div style={{
+        margin:'8px 16px 0', padding:'8px 14px', borderRadius:8,
+        background:'#1a1408', border:'1px solid #f9a82544',
+        display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap',
+      }}>
+        <div style={{ fontSize:12, color:'#ffcc80' }}>
+          ⚠️ Pārbaudiet mikroliegrumus, dabas liegrumus un aizsargjoslas:
+        </div>
+        <a
+          href={`https://www.dap.gov.lv/lv/aizsargajamas-teritorijas/mikroliegumi?search=${kadInput}`}
+          target="_blank" rel="noreferrer"
+          style={{
+            fontSize:12, fontWeight:700, color:'#f9a825',
+            textDecoration:'none', padding:'4px 12px',
+            border:'1px solid #f9a82566', borderRadius:6,
+            background:'#f9a82511', flexShrink:0,
+          }}
+        >
+          dap.gov.lv →
+        </a>
+      </div>
 
       {/* Kopsavilkuma kartiņas */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:8, padding:'10px 16px 0' }}>
