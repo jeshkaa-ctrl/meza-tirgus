@@ -28,6 +28,11 @@ const SORT_CENAS = { log: 93, small: 65, veneer: 130, tara: 48, pulp: 50, fire: 
 const H_MAX = { Ia: 38, I: 33, II: 28, III: 23, IV: 18, V: 14, Va: 10 }
 const T50   = { Ia: 40, I: 45, II: 50, III: 60, IV: 70, V: 80, Va: 90 }
 
+// LVM WFS sugas kodi (s10 lauks ir cipars)
+const SPECIES_NUM = { 1:'P', 2:'E', 3:'B', 4:'A', 5:'G', 6:'Bl', 7:'Ba', 8:'Oz', 9:'Os', 10:'M', 11:'Bl', 12:'Ba' }
+// LVM bonitātes kodi (bv10 lauks)
+const BON_NUM = { '-1':'Ia', 0:'Ia', 1:'I', 2:'II', 3:'III', 4:'IV', 5:'V', 6:'Va' }
+
 // ─── Palīgfunkcijas ───────────────────────────────────────────────────────────
 
 function calcH(bon, vec) {
@@ -69,8 +74,7 @@ function geojsonToWKT(geom) {
 }
 
 // Izveido WFS URL caur lokālo proxy
-// /api/lvmgeo/publicwfs/wfs?... → dev: Vite proxy; prod: Vercel function
-// CQL_FILTER: GeoServer akceptē daļēji enkodētu — tikai speciālās rakstzīmes
+// srsName=EPSG:4326 → GeoServer atgriež WGS-84 koordinātes (Leaflet vajadzīgas)
 function buildWFS(geoPath, typeNames, cqlFilter, count = 100) {
   const cqlEnc = cqlFilter
     ? '&CQL_FILTER=' + cqlFilter.replace(/ /g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/,/g, '%2C')
@@ -79,6 +83,7 @@ function buildWFS(geoPath, typeNames, cqlFilter, count = 100) {
     `?service=WFS&version=2.0.0&request=GetFeature` +
     `&typeNames=${encodeURIComponent(typeNames)}` +
     `&outputFormat=application/json` +
+    `&srsName=EPSG:4326` +
     `&count=${count}` +
     cqlEnc
 }
@@ -125,22 +130,32 @@ function aprekināt(suga, vecums, bon, platiba, h, g, d) {
 }
 
 function normalizēNogabals(feat, i) {
-  const p    = feat.properties || {}
-  const suga = normSuga(p.SPECIES || p.SUG  || p.SUGA  || p.SUGA1 || p.species || 'P')
-  const vec  = parseInt(p.VECUMS  || p.AGE  || p.VEC   || p.age   || 0) || 60
-  const bon  = normBon(p.BONITETE || p.BON  || p.BONIT || p.bonite|| 'II')
-  // platiba: SHAPE_Area ir m², pārvērš uz ha
-  const shapeArea = parseFloat(p.SHAPE_Area || p.SHAPE_AREA || 0)
-  const platiba   = parseFloat(p.AREA_HA || p.PLATIBA || p.PLATIB || p.HA || 0) ||
-                    (shapeArea > 100 ? shapeArea / 10000 : shapeArea) || 1.0
-  const h   = parseFloat(p.H || p.HEIGHT || 0) || calcH(bon, vec)
-  const g   = parseFloat(p.G || p.BASAL  || 0) || calcG(suga, vec)
-  const d   = parseFloat(p.D || p.DBH    || 0) || calcD(h)
+  const p = feat.properties || {}
+
+  // LVM VMD lauks s10 = galvenā suga (ciparu kods: 1=P, 2=E, 3=B ...)
+  const sugaKods = p.s10 || p.s11 || 0
+  const suga = SPECIES_NUM[sugaKods] || 'P'
+
+  // Vecums, augstums, caurmērs, šķērslaukums — galvenais stāvs (10)
+  const vec  = parseInt(p.a10 || p.a11 || 0) || 60
+  const bonKods = p.bv10 ?? p.bv11 ?? 2
+  const bon  = BON_NUM[String(bonKods)] || 'II'
+  const platiba = parseFloat(p.nog_plat || 0) || 1.0
+  const h    = parseFloat(p.h10 || p.h11 || 0) || calcH(bon, vec)
+  const g    = parseFloat(p.g10 || p.g11 || 0) || calcG(suga, vec)
+  const d    = parseFloat(p.d10 || p.d11 || 0) || calcD(h)
+
+  // Nogabala apzīmējums: kvartāls.nogabals[.apakšnogabals]
+  const nr_text = p.kvart != null
+    ? `${p.kvart}.${p.nog}${p.anog ? '.'+p.anog : ''}`
+    : String(i + 1)
 
   const { kraja, vertiba, sortVert, sortimenti, lemums } = aprekināt(suga, vec, bon, platiba, h, g, d)
 
-  return { id: feat.id || `n${i}`, nr: i+1, suga, vecums: vec, bon, platiba, h, g, d,
-           kraja, vertiba, sortVert, sortimenti, lemums, geojson: feat, rawProps: p }
+  return { id: feat.id || `n${i}`, nr: i + 1, nr_text,
+           suga, vecums: vec, bon, platiba, h, g, d,
+           kraja, vertiba, sortVert, sortimenti, lemums,
+           geojson: feat, rawProps: p }
 }
 
 // ─── Galvenā komponente ───────────────────────────────────────────────────────
@@ -211,7 +226,7 @@ export default function IpasumAnalīze({ onBack }) {
           {
             style: feat => ({
               color: '#fff', weight: 1,
-              fillColor: SUGAS_KRASAS[normSuga(feat?.properties?.SUG || feat?.properties?.SUGA || feat?.properties?.SPECIES)] || '#4caf50',
+              fillColor: SUGAS_KRASAS[SPECIES_NUM[feat?.properties?.s10]] || '#4caf50',
               fillOpacity: 0.5,
             }),
             onEachFeature: (feat, layer) => {
@@ -271,55 +286,47 @@ export default function IpasumAnalīze({ onBack }) {
     setLadeText('Saņem kadastra robežas...')
 
     try {
-      // 1. Kadastra robežas
+      // 1. Kadastra robeža — slānis: kkparcel, lauks: code
       let kadData
       try {
         kadData = await lvmWFS(
-          buildWFS('/publicwfs/wfs', 'publicwfs:Kadastra_karte', `KADASTRA_APZIMEJUMS='${kad}'`)
+          buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`)
         )
       } catch (e) {
         if (e.message.startsWith('WFS_400') || e.message.startsWith('WFS_500')) {
-          setLadeText('Diagnostika — pārbauda lauku nosaukumus...')
-          const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:Kadastra_karte')
-          setFaze('ievads')
-          setKluda(`LVM GEO kļūda (${e.message.slice(4, 7)}). ${info}`)
-          return
+          setLadeText('Diagnostika...')
+          const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:kkparcel')
+          setFaze('ievads'); setKluda(`LVM GEO kļūda. ${info}`); return
         }
         throw e
       }
       const kadFeat = kadData?.features?.[0]
       if (!kadFeat) {
-        setLadeText('Diagnostika — pārbauda lauku nosaukumus...')
-        const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:Kadastra_karte')
         setFaze('ievads')
-        setKluda(`Kadastra numurs '${kad}' nav atrasts. ${info}`)
+        setKluda(`Kadastra numurs '${kad}' nav atrasts LVM GEO reģistrā. Pārbaudi numuru.`)
         return
       }
       setKadGeom(kadFeat)
       setKadProps(kadFeat.properties)
 
-      // 2. WKT no kadastra ģeometrijas VMD un DAP vaicājumiem
-      const wkt = geojsonToWKT(kadFeat.geometry)
-      if (!wkt) throw new Error('Nevar noteikt kadastra ģeometriju')
-
       setLadeText('Iegūst VMD nogabalu datus...')
 
-      // 3. VMD nogabali
+      // 2. VMD nogabali — tieši pēc kadastrs='...' (lauks: kadastrs)
       const vmdData = await lvmWFS(
-        buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `INTERSECTS(the_geom,${wkt})`)
+        buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500)
       )
       const nogFeatures = vmdData?.features || []
 
-      setLadeText('Iegūst DAP aizsargājamās teritorijas...')
+      setLadeText('Iegūst aizsardzības zonas...')
 
-      // 4. DAP teritorijas (nav obligāti — kļūda tiek ignorēta)
+      // 3. Egļu aizsardzības nogabali (vienīgais publiski pieejamais aizsardzības slānis)
       let dapFeatures = []
       try {
-        const dapData = await lvmWFS(
-          buildWFS('/publicwfs/ows', 'publicwfs:dap_teritorijas', `INTERSECTS(the_geom,${wkt})`)
+        const sprData = await lvmWFS(
+          buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', `kadastrs='${kad}'`, 50)
         )
-        dapFeatures = dapData?.features || []
-      } catch { /* DAP nav obligāti */ }
+        dapFeatures = sprData?.features || []
+      } catch { /* nav obligāti */ }
 
       setLadeText('Aprēķina meža vērtību...')
 
