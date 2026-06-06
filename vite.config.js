@@ -10,6 +10,11 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       proxy: {
+        '/api/lvmgeo': {
+          target: 'https://lvmgeoserver.lvm.lv',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/lvmgeo/, '/geoserver'),
+        },
         '/api/anthropic': {
           target: 'https://api.anthropic.com',
           changeOrigin: true,

@@ -68,8 +68,18 @@ function geojsonToWKT(geom) {
   return null
 }
 
-async function lvmWFS(url) {
-  const r = await fetch(`/api/lvmgeo?url=${encodeURIComponent(url)}`)
+// Izveido WFS URL caur lokālo proxy
+// /api/lvmgeo/publicwfs/wfs?... → dev: Vite proxy; prod: Vercel function
+function buildWFS(geoPath, typeNames, cqlFilter) {
+  const q = `service=WFS&version=2.0.0&request=GetFeature` +
+    `&typeNames=${encodeURIComponent(typeNames)}` +
+    `&outputFormat=application%2Fjson` +
+    (cqlFilter ? `&CQL_FILTER=${encodeURIComponent(cqlFilter)}` : '')
+  return `/api/lvmgeo${geoPath}?${q}`
+}
+
+async function lvmWFS(proxyUrl) {
+  const r = await fetch(proxyUrl)
   if (!r.ok) throw new Error(`LVM GEO atbildes kods: ${r.status}`)
   const data = await r.json()
   if (data.error) throw new Error(data.error)
@@ -241,8 +251,9 @@ export default function IpasumAnalīze({ onBack }) {
 
     try {
       // 1. Kadastra robežas
-      const kadURL = `https://lvmgeoserver.lvm.lv/geoserver/publicwfs/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=publicwfs:Kadastra_karte&CQL_FILTER=KADASTRA_APZIMEJUMS='${kad}'&outputFormat=application/json`
-      const kadData = await lvmWFS(kadURL)
+      const kadData = await lvmWFS(
+        buildWFS('/publicwfs/wfs', 'publicwfs:Kadastra_karte', `KADASTRA_APZIMEJUMS='${kad}'`)
+      )
       const kadFeat = kadData?.features?.[0]
       if (!kadFeat) {
         setFaze('ievads')
@@ -259,17 +270,19 @@ export default function IpasumAnalīze({ onBack }) {
       setLadeText('Iegūst VMD nogabalu datus...')
 
       // 3. VMD nogabali
-      const vmdURL = `https://lvmgeoserver.lvm.lv/geoserver/publicwfs/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=publicwfs:vmdpubliccompartments&CQL_FILTER=INTERSECTS(the_geom,${wkt})&outputFormat=application/json`
-      const vmdData = await lvmWFS(vmdURL)
+      const vmdData = await lvmWFS(
+        buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `INTERSECTS(the_geom,${wkt})`)
+      )
       const nogFeatures = vmdData?.features || []
 
       setLadeText('Iegūst DAP aizsargājamās teritorijas...')
 
-      // 4. DAP teritorijas
+      // 4. DAP teritorijas (nav obligāti — kļūda tiek ignorēta)
       let dapFeatures = []
       try {
-        const dapURL = `https://lvmgeoserver.lvm.lv/geoserver/publicwfs/ows?service=WFS&version=2.0.0&request=GetFeature&typeNames=publicwfs:dap_teritorijas&CQL_FILTER=INTERSECTS(the_geom,${wkt})&outputFormat=application/json`
-        const dapData = await lvmWFS(dapURL)
+        const dapData = await lvmWFS(
+          buildWFS('/publicwfs/ows', 'publicwfs:dap_teritorijas', `INTERSECTS(the_geom,${wkt})`)
+        )
         dapFeatures = dapData?.features || []
       } catch { /* DAP nav obligāti */ }
 

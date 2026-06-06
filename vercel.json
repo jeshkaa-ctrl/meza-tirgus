@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/api/anthropic/(.*)", "destination": "/api/anthropic" },
     { "source": "/api/lvmgeo",        "destination": "/api/lvmgeo"    },
+    { "source": "/api/lvmgeo/(.*)",   "destination": "/api/lvmgeo"    },
     { "source": "/cirsma",             "destination": "/cirsma.html"   },
     { "source": "/krautuve",           "destination": "/krautuve.html" },
     { "source": "/caurmers",           "destination": "/caurmers.html" },
