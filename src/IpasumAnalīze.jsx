@@ -269,14 +269,17 @@ export default function IpasumAnalīze({ onBack }) {
 
       setLadeText('Iegūst aizsardzības zonas...')
 
-      // 3. Egļu aizsardzības nogabali
+      // 3. Egļu aizsardzības nogabali (nav obligāti — var nebūt kadastrs lauks)
       let dapFeatures = []
       try {
         const sprData = await lvmWFS(
           buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', `kadastrs='${kad}'`, 50)
         )
         dapFeatures = sprData?.features || []
-      } catch { /* nav obligāti */ }
+      } catch {
+        // Slānis neatbalsta kadastrs filtru — ignorē klusām
+        dapFeatures = []
+      }
 
       setLadeText('Aprēķina meža vērtību...')
 

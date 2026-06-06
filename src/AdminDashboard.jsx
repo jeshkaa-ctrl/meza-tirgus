@@ -236,7 +236,8 @@ export default function AdminDashboard({ onBack }) {
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   sesija_id text,
   user_id uuid,
-  lapa text NOT NULL,
+  tips text NOT NULL,
+  dati jsonb,
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE app_events ENABLE ROW LEVEL SECURITY;
