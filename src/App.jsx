@@ -69,12 +69,15 @@ const userRef = React.useRef(null)
 React.useEffect(() => { userRef.current = user }, [user])
 const setPage = React.useCallback((lapa) => {
   setPageRaw(lapa)
-  supabase.from('app_events').insert({
-    tips: 'navigacija',
-    dati: { lapa },
-    sesija_id: sesijasId.current,
-    user_id: userRef.current?.id || null,
-  }).then(() => {}).catch(() => {})
+  if (userRef.current?.id) {
+    try {
+      supabase.from('app_events').insert({
+        user_id: userRef.current.id,
+        tips: 'navigacija',
+        dati: { lapa },
+      }).then(() => {}).catch(() => {})
+    } catch { /* ignorē */ }
+  }
 }, [])
 const [showReg, setShowReg] = useState(false)
 const [regAtpakal, setRegAtpakal] = useState(null)
