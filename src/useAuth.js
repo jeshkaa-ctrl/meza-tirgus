@@ -64,6 +64,7 @@ export function useAuth() {
     if (data.user) {
       await supabase.from("profiles").upsert({
         id:            data.user.id,
+        epasts:        data.user.email    || "",
         vards:         dati.vards         || "",
         uznemums:      dati.uznemums      || "",
         darbiba:       dati.darbiba       || "",

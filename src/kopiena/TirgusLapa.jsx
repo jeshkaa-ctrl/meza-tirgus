@@ -113,7 +113,7 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
       // 2. Paralēli: profili, likes skaits, komentāru skaits, mani likes
       const [profilsRes, likesRes, komRes, maniRes] = await Promise.all([
         supabase.from('profiles')
-          .select('id, vards, uznemums, loma, novads, avatar_url')
+          .select('id, vards, uznemums, loma, novads, avatar_url, epasts')
           .in('id', userIds),
         supabase.from('post_reakcijas')
           .select('post_id')

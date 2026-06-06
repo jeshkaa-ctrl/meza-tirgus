@@ -2,8 +2,13 @@ import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { K, KF, KR, getLomaStyle, laicinsAtspalsts, iniciāļi, LOMAS_NOSAUKUMI } from './kds'
 
+function emailPirmsAt(epasts) { return epasts ? epasts.split('@')[0] : null }
+function parādītVardu(p) {
+  return p?.vards || p?.uznemums || emailPirmsAt(p?.epasts) || 'Lietotājs'
+}
+
 function AvatarsBloks({ profils, izmers = 40 }) {
-  const vards = profils?.vards || profils?.uznemums || '?'
+  const vards = parādītVardu(profils)
   const i = iniciāļi(vards)
   const lomaKrasa = profils?.loma ? getLomaStyle(profils.loma) : { bg: K.primaryLt, color: K.primary }
 
@@ -35,7 +40,7 @@ export default function PostsKarte({ post, user, onDelete }) {
   const [sendKom,   setSendKom]   = useState(false)
 
   const profils = post.profiles || {}
-  const vards   = profils.vards || profils.uznemums || 'Anonīms'
+  const vards   = parādītVardu(profils)
   const laiks   = laicinsAtspalsts(post.created_at)
   const irMans  = user?.id === post.user_id
 
@@ -62,7 +67,7 @@ export default function PostsKarte({ post, user, onDelete }) {
     if (komData && komData.length > 0) {
       const uids = [...new Set(komData.map(k => k.user_id))]
       const { data: profs } = await supabase
-        .from('profiles').select('id, vards, uznemums, loma, avatar_url').in('id', uids)
+        .from('profiles').select('id, vards, uznemums, loma, avatar_url, epasts').in('id', uids)
       const pm = {}
       ;(profs || []).forEach(p => { pm[p.id] = p })
       setKomentari(komData.map(k => ({ ...k, profiles: pm[k.user_id] || null })))
@@ -83,7 +88,7 @@ export default function PostsKarte({ post, user, onDelete }) {
     const { data } = await supabase
       .from('komentari')
       .insert({ post_id: post.id, user_id: user.id, teksts: jaunsKom.trim() })
-      .select('*, profiles:user_id(vards, uznemums, loma, avatar_url)')
+      .select('*, profiles:user_id(vards, uznemums, loma, avatar_url, epasts)')
       .single()
     if (data) { setKomentari(p => [...p, data]); setJaunsKom('') }
     setSendKom(false)
@@ -201,7 +206,7 @@ export default function PostsKarte({ post, user, onDelete }) {
                   maxWidth: '100%', border: `1px solid ${K.border}`,
                 }}>
                   <div style={{ fontSize: KF.xs, fontWeight: KF.bold, color: K.textSec, marginBottom: 2 }}>
-                    {k.profiles?.vards || k.profiles?.uznemums || 'Anonīms'}
+                    {parādītVardu(k.profiles)}
                   </div>
                   <div style={{ fontSize: KF.sm, color: K.text, lineHeight: 1.5 }}>{k.teksts}</div>
                 </div>
