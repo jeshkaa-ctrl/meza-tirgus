@@ -23,7 +23,7 @@ return(
 <div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
   {/* HERO */}
- <div style={{background:"linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 60%, #0f2a0f 100%)",padding:"56px 40px 64px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative",overflow:"hidden"}}>
+ <div style={{background:"linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 60%, #0f2a0f 100%)",padding:"40px 20px 48px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative",overflow:"hidden"}}>
   {/* Dekoratīvs fona elements */}
   <div style={{position:"absolute",top:"-60px",right:"-60px",width:"300px",height:"300px",background:"radial-gradient(circle, rgba(76,175,80,0.08) 0%, transparent 70%)",pointerEvents:"none"}}/>
   <div style={{position:"absolute",bottom:"-40px",left:"-40px",width:"200px",height:"200px",background:"radial-gradient(circle, rgba(76,175,80,0.05) 0%, transparent 70%)",pointerEvents:"none"}}/>
@@ -38,26 +38,26 @@ return(
   </p>
 
   <div style={{display:"flex",gap:"12px",justifyContent:"center",flexWrap:"wrap"}}>
-    <button onClick={onStandard} style={{padding:"13px 32px",background:"linear-gradient(135deg, #4caf50, #2e7d32)",color:"white",border:"none",borderRadius:"8px",fontSize:"15px",fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(76,175,80,0.3)"}}>
+    <button onClick={onStandard} style={{padding:"13px 32px",background:"linear-gradient(135deg, #4caf50, #2e7d32)",color:"white",border:"none",borderRadius:"8px",fontSize:"15px",fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(76,175,80,0.3)",minHeight:44}}>
       Sākt bezmaksas →
     </button>
     {user
       ? <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
           <span style={{color:"#7ab87a",fontSize:"14px",padding:"8px 14px",background:"rgba(255,255,255,0.05)",borderRadius:"8px",border:"1px solid #2d5a2d"}}>👤 {user.vards}</span>
-          <button onClick={onIziet} style={{padding:"11px 20px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer"}}>Iziet</button>
+          <button onClick={onIziet} style={{padding:"11px 20px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>Iziet</button>
         </div>
-      : <button onClick={onReg} style={{padding:"13px 32px",background:"transparent",color:"white",border:"2px solid rgba(255,255,255,0.3)",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600}}>Reģistrēties</button>
+      : <button onClick={onReg} style={{padding:"13px 32px",background:"transparent",color:"white",border:"2px solid rgba(255,255,255,0.3)",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600,minHeight:44}}>Reģistrēties</button>
     }
-    <button onClick={onSludinajumi} style={{padding:"13px 28px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer"}}>
+    <button onClick={onSludinajumi} style={{padding:"13px 28px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer",minHeight:44}}>
       📢 Sludinājumi
     </button>
-    <button onClick={onLikumi} style={{padding:"13px 28px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer"}}>
+    <button onClick={onLikumi} style={{padding:"13px 28px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer",minHeight:44}}>
       ⚖️ Meža likumi
     </button>
     <div style={{position:"relative",display:"inline-block"}}
       onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
       onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
-      <button onClick={onEnter} style={{padding:"13px 28px",background:"transparent",color:"#4caf50",border:"2px solid #4caf50",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600}}>
+      <button onClick={onEnter} style={{padding:"13px 28px",background:"transparent",color:"#4caf50",border:"2px solid #4caf50",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600,minHeight:44}}>
         Pilnā versija ▾
       </button>
       <div className="pilna-menu" style={{display:"none",position:"absolute",top:"100%",left:0,background:"#1a2e1a",border:"1px solid #2d5a2d",borderRadius:"8px",padding:"8px 0",minWidth:"220px",zIndex:100,marginTop:"6px",boxShadow:"0 8px 24px rgba(0,0,0,0.4)"}}>

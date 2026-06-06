@@ -205,8 +205,9 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <button onClick={() => onNavigate?.('main')} style={{
               background: K.primaryLt, border: `1px solid ${K.primaryMd}`,
-              borderRadius: KR.full, padding: '5px 14px',
+              borderRadius: KR.full, padding: '8px 14px',
               fontSize: KF.xs, fontWeight: KF.semi, color: K.primary, cursor: 'pointer',
+              minHeight: 36,
             }}>
               🛠 Darba virsma
             </button>
@@ -222,8 +223,9 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
                 </div>
               : <button onClick={onReg} style={{
                   background: K.primary, color: 'white', border: 'none',
-                  borderRadius: KR.full, padding: '6px 16px',
+                  borderRadius: KR.full, padding: '8px 16px',
                   fontSize: KF.sm, fontWeight: KF.semi, cursor: 'pointer',
+                  minHeight: 36,
                 }}>Pieslēgties</button>
             }
           </div>
@@ -274,8 +276,9 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
             </div>
             <button onClick={onReg} style={{
               background: K.primary, color: 'white', border: 'none',
-              borderRadius: KR.full, padding: '7px 18px',
+              borderRadius: KR.full, padding: '10px 18px',
               fontSize: KF.sm, fontWeight: KF.semi, cursor: 'pointer',
+              minHeight: 44,
             }}>Pieslēgties</button>
           </div>
         )}
@@ -318,7 +321,7 @@ export default function TirgusLapa({ user, onNavigate, onReg }) {
                     background: K.bgCard, border: `1px solid ${K.border}`,
                     borderRadius: KR.md, color: K.textSec,
                     fontSize: KF.sm, cursor: ladeLairāk ? 'default' : 'pointer',
-                    fontFamily: KF.family,
+                    fontFamily: KF.family, minHeight: 44,
                   }}>
                     {ladeLairāk ? 'Ielādē...' : 'Ielādēt vairāk'}
                   </button>

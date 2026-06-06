@@ -366,7 +366,7 @@ Atbildi TIKAI JSON:
           <label style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6 }}>Sortimenta garums (m)</label>
           <input type="number" inputMode="decimal" min="0.5" max="30" step="0.5"
             placeholder="piem. 4.0" value={garums} onChange={e => setGarums(e.target.value)}
-            style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, color: "#fff", fontSize: 20, fontWeight: 500, padding: "12px 14px", outline: "none" }} />
+            style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10, color: "#fff", fontSize: 16, fontWeight: 500, padding: "12px 14px", outline: "none" }} />
           <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", margin: "4px 0 0" }}>Baļķi: 3/4/5/6m · Malka: 1/2/4m</p>
         </div>
         {atskVeids !== "bez_atskaites" && (
@@ -376,7 +376,7 @@ Atbildi TIKAI JSON:
             </label>
             <input type="number" inputMode="decimal" min="0.5" max="10" step="0.5"
               value={atskaite} onChange={e => setAtskaite(e.target.value)}
-              style={{ width: "100%", boxSizing: "border-box", background: `${atskVeidsObj.krasa}11`, border: `1px solid ${atskVeidsObj.krasa}44`, borderRadius: 10, color: atskVeidsObj.krasa, fontSize: 20, fontWeight: 500, padding: "12px 14px", outline: "none" }} />
+              style={{ width: "100%", boxSizing: "border-box", background: `${atskVeidsObj.krasa}11`, border: `1px solid ${atskVeidsObj.krasa}44`, borderRadius: 10, color: atskVeidsObj.krasa, fontSize: 16, fontWeight: 500, padding: "12px 14px", outline: "none" }} />
             <p style={{ fontSize: 10, color: `${atskVeidsObj.krasa}88`, margin: "4px 0 0" }}>
               {atskVeids === "lata_cm" ? "Atzīmētā baļķa vai latas garums" : "Noliec šo baļķi pie krautuves"}
             </p>
@@ -543,7 +543,7 @@ Atbildi TIKAI JSON:
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: "1.25rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: "1.25rem" }}>
           {[
             { label: "Augstums", val: rezultats.augstums_m?.toFixed(2), unit: "m" },
             { label: "Platums",  val: rezultats.platums_m?.toFixed(2),  unit: "m" },
@@ -553,9 +553,9 @@ Atbildi TIKAI JSON:
             { label: "Neto",     val: rezultats.neto_m3?.toFixed(2), unit: "m³" },
           ].map(({ label, val, unit, sub }) => (
             <div key={label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "10px 8px", textAlign: "center" }}>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginBottom: 3 }}>{label}</div>
-              <div style={{ fontSize: 18, fontWeight: 500, color: "#fff" }}>{val}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{sub || unit}</div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", marginBottom: 3 }}>{label}</div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: "#fff" }}>{val}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)" }}>{sub || unit}</div>
             </div>
           ))}
         </div>
@@ -563,7 +563,7 @@ Atbildi TIKAI JSON:
         {/* Korekcija */}
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "1rem", marginBottom: "1.25rem" }}>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 10 }}>Manuāla korekcija:</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
             {[{ key: "augstums_m", label: "Augst. m", step: 0.1 }, { key: "platums_m", label: "Plat. m", step: 0.1 }, { key: "tuksumsProc", label: "Tukšums %", step: 1 }].map(({ key, label, step }) => (
               <div key={key}>
                 <label style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", display: "block", marginBottom: 3 }}>{label}</label>
@@ -573,7 +573,7 @@ Atbildi TIKAI JSON:
                   r.pilnTilpums_m3 = r.augstums_m * r.platums_m * garumsNum;
                   r.neto_m3 = r.pilnTilpums_m3 * (1 - r.tuksumsProc / 100);
                   setRezultats(r);
-                }} style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 15, padding: "8px 10px", outline: "none" }} />
+                }} style={{ width: "100%", boxSizing: "border-box", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 16, padding: "8px 6px", outline: "none" }} />
               </div>
             ))}
           </div>

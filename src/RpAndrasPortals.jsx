@@ -460,7 +460,7 @@ const [filtrKlients, setFiltrKlients] = useState("")
       {rpCilne === 'pavadzimes' && <div style={{padding:"20px 24px"}}>
 
         {/* KOPSAVILKUMS */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:20}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))",gap:12,marginBottom:20}}>
           {[
             { label:"Pavadzīmes", value: filtreti.length, unit:"", color:"#4caf50" },
             { label:"Nosūtīts", value: stats.kopaKubi.toFixed(3), unit:"m³", color:"#81c784" },
@@ -496,11 +496,11 @@ const [filtrKlients, setFiltrKlients] = useState("")
             <span style={{fontSize:13,fontWeight:700,color:"#4caf50"}}>🔍 Filtri</span>
             <button onClick={notīrītFiltrus} style={{background:"transparent",border:"1px solid #2d5a2d",borderRadius:4,padding:"4px 10px",color:"#4a7a4a",fontSize:11,cursor:"pointer"}}>Notīrīt</button>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr) repeat(2,1fr) 1fr",gap:10}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))",gap:10}}>
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>Šoferis:</label>
               <select value={filtrSoferis} onChange={e=>setFiltrSoferis(e.target.value)}
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11}}>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,minHeight:44}}>
                 <option value="">Visi</option>
                 {SOFERI.map(s=><option key={s.vards} value={s.vards}>{s.vards}</option>)}
               </select>
@@ -508,22 +508,22 @@ const [filtrKlients, setFiltrKlients] = useState("")
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>Sortiments:</label>
               <input value={filtrSortiments} onChange={e=>setFiltrSortiments(e.target.value)} placeholder="Meklēt..."
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11,boxSizing:"border-box"}}/>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,boxSizing:"border-box",minHeight:44}}/>
             </div>
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>Piegādes vieta:</label>
               <input value={filtrPiegade} onChange={e=>setFiltrPiegade(e.target.value)} placeholder="Meklēt..."
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11,boxSizing:"border-box"}}/>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,boxSizing:"border-box",minHeight:44}}/>
             </div>
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>Klients:</label>
               <input value={filtrKlients||""} onChange={e=>setFiltrKlients(e.target.value)} placeholder="Meklēt..."
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11,boxSizing:"border-box"}}/>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,boxSizing:"border-box",minHeight:44}}/>
             </div>
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>Veids:</label>
               <select value={filtrVeids} onChange={e=>setFiltrVeids(e.target.value)}
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11}}>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,minHeight:44}}>
                 <option value="">Visi</option>
                 <option value="Sava krautuve">Sava krautuve</option>
                 <option value="Pakalpojums">Pakalpojums</option>
@@ -532,12 +532,12 @@ const [filtrKlients, setFiltrKlients] = useState("")
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>No datuma:</label>
               <input type="date" value={filtrNo} onChange={e=>setFiltrNo(e.target.value)}
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11,boxSizing:"border-box"}}/>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,boxSizing:"border-box",minHeight:44}}/>
             </div>
             <div>
               <label style={{fontSize:10,color:"#4a7a4a",display:"block",marginBottom:3}}>Līdz datumam:</label>
               <input type="date" value={filtrLidz} onChange={e=>setFiltrLidz(e.target.value)}
-                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"6px",color:"#e8f5e9",fontSize:11,boxSizing:"border-box"}}/>
+                style={{width:"100%",background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:5,padding:"8px 6px",color:"#e8f5e9",fontSize:16,boxSizing:"border-box",minHeight:44}}/>
             </div>
           </div>
         </div>

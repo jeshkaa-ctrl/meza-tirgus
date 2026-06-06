@@ -65,8 +65,8 @@ const C = {
 }
 const inp = {
   background:C.deep, border:`1px solid ${C.border}`, color:C.text,
-  borderRadius:6, padding:'8px 10px', fontSize:14,
-  width:'100%', boxSizing:'border-box', outline:'none',
+  borderRadius:6, padding:'10px 10px', fontSize:16,
+  width:'100%', boxSizing:'border-box', outline:'none', minHeight:44,
 }
 
 // ─── Palīgkomponentes ─────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ function SugaToggle({ value, onChange }) {
           padding:'9px 16px', borderRadius:8, fontSize:15, fontWeight:value===s?700:400,
           border:value===s?`2px solid ${C.accent}`:`1px solid ${C.border}`,
           background:value===s?C.accentDk:C.inner, color:value===s?'#fff':C.textSec,
-          cursor:'pointer', minWidth:44,
+          cursor:'pointer', minWidth:44, minHeight:44,
         }}>{s}</button>
       ))}
     </div>
@@ -120,7 +120,7 @@ function KvalToggle({ value, onChange }) {
           padding:'9px 14px', borderRadius:8, fontSize:13, fontWeight:value===k.val?700:400,
           border:value===k.val?`2px solid ${kr[k.val]}`:`1px solid ${C.border}`,
           background:value===k.val?`${kr[k.val]}22`:C.inner, color:value===k.val?kr[k.val]:C.textSec,
-          cursor:'pointer',
+          cursor:'pointer', minHeight:44,
         }}>{k.label}</button>
       ))}
     </div>
@@ -131,7 +131,7 @@ const labelSt = { fontSize:12, color:'#557a55', display:'block', marginBottom:5,
 const btnPrimary = {
   width:'100%', padding:'14px 0', borderRadius:10, border:'none',
   background:C.accentDk, color:'#fff', fontSize:16, fontWeight:600,
-  cursor:'pointer', borderTop:`2px solid ${C.accent}`,
+  cursor:'pointer', borderTop:`2px solid ${C.accent}`, minHeight:44,
 };
 
 // ─── GALVENĀ KOMPONENTE ───────────────────────────────────────────────────────
@@ -201,7 +201,7 @@ export default function DastojumsMeritajsPage({ onBack, user }) {
   // FĀZE 1 — SETUP
   // ═══════════════════════════════════════════════════════════════════════════
   if (faze === 'setup') {
-    const row2 = { display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 };
+    const row2 = { display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:10 };
     return (
     <div style={{ minHeight:'100vh', background:C.bg, color:C.text, fontFamily:'Arial,sans-serif' }}>
       <Header title="🌲 Dastojuma uzmērīšana" subtitle="Cirsmas dati pirms mērīšanas" onBack={onBack} />
@@ -341,7 +341,7 @@ export default function DastojumsMeritajsPage({ onBack, user }) {
             <SugaToggle value={suga} onChange={setSuga} />
           </div>
 
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:14 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(120px, 1fr))', gap:10, marginBottom:14 }}>
             <div>
               <label style={labelSt}>D 1.3 (cm)</label>
               <input

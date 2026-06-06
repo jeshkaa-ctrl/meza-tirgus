@@ -12,7 +12,7 @@ const C = {
 
 const inp = {
   background: C.deep, border: `1px solid ${C.border}`, color: C.text,
-  borderRadius: R.md, padding: '10px 14px', fontSize: F.base,
+  borderRadius: R.md, padding: '10px 14px', fontSize: 16,
   width: '100%', boxSizing: 'border-box', outline: 'none', resize: 'vertical',
   fontFamily: F.family,
 }
@@ -261,7 +261,7 @@ export default function JautaParMezuPage({ onBack }) {
               ].map(q => (
                 <button key={q} onClick={() => { setJautajums(q) }} style={{
                   padding: '10px 14px', borderRadius: 8, fontSize: 13, cursor: 'pointer', textAlign: 'left',
-                  border: `1px solid ${C.border}`, background: C.inner, color: C.textSec,
+                  border: `1px solid ${C.border}`, background: C.inner, color: C.textSec, minHeight: 44,
                 }}>
                   {q}
                 </button>
@@ -342,6 +342,7 @@ export default function JautaParMezuPage({ onBack }) {
             color: jautajums.trim() && !lade ? '#fff' : C.textDim,
             fontSize: 14, fontWeight: 600, cursor: jautajums.trim() && !lade ? 'pointer' : 'not-allowed',
             flexShrink: 0, borderTop: `2px solid ${jautajums.trim() && !lade ? C.accent : C.border}`,
+            minHeight: 44,
           }}>
             {lade ? '⏳' : '→'}
           </button>

@@ -279,7 +279,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
         </div>
 
         {/* SADAĻAS */}
-        <div className="mp-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: S.lg }}>
+        <div className="mp-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: S.lg }}>
           {sadajas.map((s, si) => (
             <div key={si} className="mp-card" style={{
               background: C.bgCard, border: `1px solid ${s.color}33`,

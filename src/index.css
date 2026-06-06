@@ -83,8 +83,8 @@ textarea {
   border: 1px solid var(--color-border, #2d4a2d);
   color: var(--color-text-primary, #e8f5e9);
   border-radius: 6px;
-  padding: 7px 10px;
-  font-size: 14px;
+  padding: 10px 10px;
+  font-size: 16px;
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s;

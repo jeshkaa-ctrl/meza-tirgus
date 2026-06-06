@@ -380,12 +380,12 @@ setSaving(true); setError(null);
                       </div>
                     )}
 
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))",gap:12,marginBottom:20}}>
                       {COLS.filter(c=>c.auto).map(col=>(
                         <div key={col.key} style={{display:"flex",flexDirection:"column",gap:4}}>
                           <label style={{fontSize:11,color:"#81c784"}}>{col.label} ●</label>
                           <input type="text" value={extracted[col.key]??""} onChange={e=>setExtracted({...extracted,[col.key]:e.target.value})}
-                            style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"6px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}/>
+                            style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:16,fontFamily:"inherit",boxSizing:"border-box",minHeight:44}}/>
                         </div>
                       ))}
                     </div>
@@ -399,7 +399,7 @@ setSaving(true); setError(null);
                 {verifyMode && verifyData && (
                   <div style={{background:"#141f14",border:"2px solid #4caf50",borderRadius:12,padding:24,maxWidth:900,margin:"0 auto"}}>
                     <div style={{fontSize:16,fontWeight:700,color:"#4caf50",marginBottom:20,textAlign:"center"}}>✓ Pārbaudi visus laukus</div>
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:20}}>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))",gap:16,marginBottom:20}}>
                       {COLS.map(col=>(
                         <div key={col.key} style={{display:"flex",flexDirection:"column",gap:4}}>
                           <label style={{fontSize:11,color:col.auto?"#81c784":"#ffb74d",fontWeight:700}}>
@@ -408,31 +408,31 @@ setSaving(true); setError(null);
                           </label>
                           {col.key==="veids"
                             ? <select value={verifyData[col.key]??""} onChange={e=>setVerifyData(p=>({...p,[col.key]:e.target.value}))}
-                                style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}>
+                                style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:16,fontFamily:"inherit",minHeight:44}}>
                                 <option value="">— izvēlies —</option>
                                 <option value="Sava krautuve">🌲 Sava krautuve</option>
                                 <option value="Pakalpojums">🤝 Pakalpojums</option>
                               </select>
                             : col.key==="suga"
                             ? <select value={verifyData[col.key]??""} onChange={e=>setVerifyData(p=>({...p,[col.key]:e.target.value}))}
-                                style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}>
+                                style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:16,fontFamily:"inherit",minHeight:44}}>
                                 <option value="">— izvēlies —</option>
                                 {Object.entries(SUGAS).map(([k,v])=><option key={k} value={k}>{k} — {v}</option>)}
                               </select>
                             : col.key==="piegade"
                             ? <div style={{display:"flex",flexDirection:"column",gap:4}}>
                                 <select value={verifyData[col.key]??""} onChange={e=>setVerifyData(p=>({...p,[col.key]:e.target.value}))}
-                                  style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}>
+                                  style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:16,fontFamily:"inherit",minHeight:44}}>
                                   <option value="">— izvēlies —</option>
                                   {piegadesVietas.map((v,i)=><option key={i} value={v}>{v}</option>)}
                                 </select>
                                 <input value={jaunaPiegade} onChange={e=>setJaunaPiegade(e.target.value)} onBlur={e=>{if(e.target.value){setVerifyData(p=>({...p,piegade:e.target.value}));setJaunaPiegade("")}}}
                                   placeholder="Vai ievadi jaunu piegādes vietu..."
-                                  style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}/>
+                                  style={{background:"#0f1a0f",border:"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:16,fontFamily:"inherit",minHeight:44,boxSizing:"border-box",width:"100%"}}/>
                               </div>
                             : <input type={["kubi","km","kubi_uzmeriti"].includes(col.key)?"number":"text"}
                                 value={verifyData[col.key]??""} onChange={e=>setVerifyData(p=>({...p,[col.key]:e.target.value}))}
-                                style={{background:"#0f1a0f",border:["datums","pvz_nr","kubi","soferis","km"].includes(col.key)&&!verifyData[col.key]?"2px solid #ff6b6b":"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:12,fontFamily:"inherit"}}/>
+                                style={{background:"#0f1a0f",border:["datums","pvz_nr","kubi","soferis","km"].includes(col.key)&&!verifyData[col.key]?"2px solid #ff6b6b":"1px solid #2d5a2d",borderRadius:6,padding:"8px 10px",color:"#e8f5e9",fontSize:16,fontFamily:"inherit",minHeight:44,boxSizing:"border-box",width:"100%"}}/>
                           }
                         </div>
                       ))}

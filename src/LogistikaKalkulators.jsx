@@ -14,19 +14,19 @@ const CENU_KOLS = {
 // ─── STILI ───────────────────────────────────────────────────────────────────
 const s = {
   app: { minHeight: "100vh", background: DS.bg, color: DS.text, fontFamily: F.family },
-  hdr: { background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`, backdropFilter: "blur(8px)", padding: "0 20px", height: 52, display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 10 },
+  hdr: { background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`, backdropFilter: "blur(8px)", padding: "0 12px", height: 52, display: "flex", alignItems: "center", gap: 8, position: "sticky", top: 0, zIndex: 10, overflowX: "auto" },
   hdrTitle: { margin: 0, color: DS.green, fontSize: F.md, fontWeight: F.weightBold },
   backBtn: { background: "transparent", border: "none", color: DS.green, padding: "0 4px", borderRadius: 6, cursor: "pointer", fontSize: 22, minWidth: 36, minHeight: 44 },
-  body: { padding: "20px", maxWidth: 1100, margin: "0 auto" },
+  body: { padding: "16px", maxWidth: 1100, margin: "0 auto" },
   card: { background: "#0d1f0d", border: "1px solid #1e3a1e", borderRadius: 10, padding: 16, marginBottom: 14 },
   cardTitle: { color: "#4caf50", fontWeight: 700, fontSize: 13, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 },
   label: { fontSize: 11, color: "#81c784", fontWeight: 600, marginBottom: 3, display: "block", textTransform: "uppercase", letterSpacing: "0.08em" },
-  input: { background: "#070d07", border: "1px solid #2d5a2d", borderRadius: 6, color: "#e0ede0", padding: "8px 10px", fontSize: 14, outline: "none", width: "100%", boxSizing: "border-box" },
+  input: { background: "#070d07", border: "1px solid #2d5a2d", borderRadius: 6, color: "#e0ede0", padding: "10px 10px", fontSize: 16, outline: "none", width: "100%", boxSizing: "border-box", minHeight: 44 },
   btn: { background: "linear-gradient(135deg,#2e7d32,#1b5e20)", color: "white", border: "none", borderRadius: 8, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer" },
   btnSm: { background: "#1e3a1e", color: "#4caf50", border: "1px solid #2d5a2d", borderRadius: 6, padding: "6px 14px", fontSize: 12, cursor: "pointer" },
   btnDanger: { background: "#1a0000", color: "#ef5350", border: "1px solid #c62828", borderRadius: 6, padding: "6px 14px", fontSize: 12, cursor: "pointer" },
-  grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
-  grid3: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 },
+  grid2: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 },
+  grid3: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 },
   green: { color: "#4caf50", fontWeight: 700 },
   red: { color: "#ef5350", fontWeight: 700 },
   orange: { color: "#e65100", fontWeight: 700 },
@@ -346,7 +346,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
       <div style={s.body}>
         <div style={s.card}>
           <div style={s.cardTitle}>📦 Sortimentu apjomi (m³)</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12 }}>
             {Object.keys(SORT_NOSAUKUMI).map(sort => (
               <div key={sort}>
                 <label style={{ ...s.label, color: SORT_KRASA[sort] || "#81c784" }}>
@@ -456,7 +456,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                     <div style={{ fontSize: 11, fontWeight: 700, color: "#4caf50", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                       ✓ Reģistrētie pircēji — aktuālās cenas
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8, marginBottom: 16 }}>
                       {pircejuVietas.map(v => <VietasKarte key={v.id} vieta={v} isPircejs />)}
                     </div>
                     <div style={{ fontSize: 11, color: "#4a7a4a", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
@@ -464,7 +464,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                     </div>
                   </>
                 )}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8 }}>
                   {statiski.map(v => <VietasKarte key={v.id} vieta={v} isPircejs={false} />)}
                 </div>
               </>
@@ -490,7 +490,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
         <div style={s.body}>
 
           {/* Kopsavilkums */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 14 }}>
             {[
               ["Likvīdā krāja", kopaM3.toFixed(1) + " m³", "#4caf50"],
               ["Transports kopā", kopTransports.toFixed(0) + " €", "#e65100"],

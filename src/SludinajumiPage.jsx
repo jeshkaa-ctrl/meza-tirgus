@@ -36,11 +36,12 @@ const inp = {
   border: `1px solid ${T.border}`,
   color: T.text,
   borderRadius: 4,
-  padding: "7px 9px",
-  fontSize: 13,
+  padding: "10px 9px",
+  fontSize: 16,
   width: "100%",
   boxSizing: "border-box",
   outline: "none",
+  minHeight: 44,
 }
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
@@ -327,7 +328,7 @@ function IzsoleForm({ user, onSaglabat, onAtcelt }) {
         <h3 style={{ color: T.orange, marginTop: 0, fontSize: 16 }}>🏷 Izlikt izsolē</h3>
         {kludas && <div style={{ background: T.errorBg, color: T.error, padding: 8, borderRadius: 4, marginBottom: 12, fontSize: 12, border: `1px solid ${T.error}` }}>{kludas}</div>}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, marginBottom: 12 }}>
           <div>
             <label style={labelSt}>Kadastra numurs:</label>
             <div style={{ display: "flex", gap: 6 }}>
@@ -353,7 +354,7 @@ function IzsoleForm({ user, onSaglabat, onAtcelt }) {
             style={{ ...inp, resize: "vertical" }} />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 }}>
           <div>
             <label style={labelSt}>Sākumcena (€):</label>
             <input type="number" value={sakumcena} onChange={e => setSakumcena(e.target.value)} placeholder="0"
@@ -975,7 +976,7 @@ export default function SludinajumiPage({ user, onBack }) {
   const beigušasIzsoles = izsoles.filter(iz => iz.statuss === "pabeigta"  || getIzsoleFaze(iz) === "beigusies")
 
   const tabSt = (id, krasa) => ({
-    padding: "9px 24px",
+    padding: "9px 16px",
     background: aktīvāCilne === id ? krasa : T.inner,
     color: aktīvāCilne === id ? "white" : T.textMuted,
     border: `2px solid ${krasa}`,
@@ -983,7 +984,8 @@ export default function SludinajumiPage({ user, onBack }) {
     fontWeight: aktīvāCilne === id ? "bold" : "normal",
     borderRadius: 6,
     fontSize: 13,
-    minWidth: 130,
+    minHeight: 44,
+    flex: 1,
   })
 
   const selSt = { ...inp, fontSize: 12, width: "auto" }
