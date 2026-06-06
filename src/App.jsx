@@ -70,7 +70,8 @@ React.useEffect(() => { userRef.current = user }, [user])
 const setPage = React.useCallback((lapa) => {
   setPageRaw(lapa)
   supabase.from('app_events').insert({
-    tips: lapa,
+    tips: 'navigacija',
+    dati: { lapa },
     sesija_id: sesijasId.current,
     user_id: userRef.current?.id || null,
   }).then(() => {}).catch(() => {})
