@@ -35,6 +35,7 @@ const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
 const ParoleLapa             = React.lazy(() => import("./ParoleLapa"))
 const CenuKalkulators        = React.lazy(() => import("./CenuKalkulators"))
 const PircejuCenas           = React.lazy(() => import("./PircejuCenas"))
+const IpasumAnalīze          = React.lazy(() => import("./IpasumAnalīze"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -102,6 +103,11 @@ if(page==="landing") return <>
   <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
+if(page==="ipasums") return (
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50"}}>Ielādē...</div></div>}>
+    <IpasumAnalīze onBack={()=>setPage("main")} user={user} />
+  </React.Suspense>
+)
 if(page==="standard") return <>
   <StandardPage
     onBack={()=>setPage("main")}
