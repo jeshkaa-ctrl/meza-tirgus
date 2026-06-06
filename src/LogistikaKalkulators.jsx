@@ -66,6 +66,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
   // Dinamiskās pircēju vietas no Supabase
   const [dinamiskasVietas, setDinamiskasVietas] = useState([])
   const [visasVietas,      setVisasVietas]      = useState(PIEGADES_VIETAS)
+  const [cenasLade,        setCenasLade]        = useState(true)
 
   // Piegādes vietu cenas — sākotnēji tukšas, aizpilda no Supabase
   const [cenas, setCenas] = useState(() => {
@@ -79,44 +80,46 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
 
   // Ielādē pircēju cenas no Supabase
   useEffect(() => {
+    setCenasLade(true)
     supabase
       .from('pirceja_vietas')
       .select('*')
       .eq('aktiva', true)
       .then(({ data }) => {
-        if (!data?.length) return
-        setDinamiskasVietas(data)
+        if (data?.length) {
+          setDinamiskasVietas(data)
 
-        // Pārveido Supabase datus par PIEGADES_VIETAS formātu
-        const jaunasVietas = data.map(v => ({
-          id:       `sb_${v.id}`,
-          nosaukums: v.nosaukums,
-          lat:      v.lat,
-          lng:      v.lng,
-          novads:   v.novads,
-          talrunis: v.talrunis,
-          epasts:   v.epasts,
-          apraksts: v.apraksts,
-          pienem:   v.pienem || [],
-          noSupabase: true,
-        }))
+          const jaunasVietas = data.map(v => ({
+            id:         `sb_${v.id}`,
+            nosaukums:  v.nosaukums,
+            lat:        v.lat,
+            lng:        v.lng,
+            novads:     v.novads,
+            talrunis:   v.talrunis,
+            epasts:     v.epasts,
+            apraksts:   v.apraksts,
+            pienem:     v.pienem || [],
+            noSupabase: true,
+          }))
 
-        setVisasVietas([...PIEGADES_VIETAS, ...jaunasVietas])
+          setVisasVietas([...jaunasVietas, ...PIEGADES_VIETAS])
 
-        // Pre-aizpilda cenas no Supabase
-        setCenas(prev => {
-          const c = { ...prev }
-          data.forEach(v => {
-            const vid = `sb_${v.id}`;
-            c[vid] = {}
-            ;(v.pienem || []).forEach(s => {
-              const kol = CENU_KOLS[s]
-              c[vid][s] = kol && v[kol] ? String(v[kol]) : ""
+          setCenas(prev => {
+            const c = { ...prev }
+            data.forEach(v => {
+              const vid = `sb_${v.id}`
+              c[vid] = {}
+              ;(v.pienem || []).forEach(s => {
+                const kol = CENU_KOLS[s]
+                c[vid][s] = kol && v[kol] ? String(v[kol]) : ""
+              })
             })
+            return c
           })
-          return c
-        })
+        }
+        setCenasLade(false)
       })
+      .catch(() => setCenasLade(false))
   }, [])
 
   // Rezultāti
@@ -396,30 +399,41 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
             ))}
           </div>
 
-          {/* Cenu ievade aktīvajam sortimentam */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-            {vietasPienemSort.map(vieta => {
-              const lat = parseFloat(krautuveLat)
-              const lng = parseFloat(krautuveLng)
+          {/* Ielādēšanas indikators */}
+          {cenasLade && (
+            <div style={{ fontSize: 12, color: "#4caf50", marginBottom: 10 }}>
+              ⏳ Ielādē reģistrēto pircēju aktuālās cenas...
+            </div>
+          )}
+
+          {/* Pircēju vietas ar Supabase cenām — AUGŠĀ */}
+          {(() => {
+            const pircejuVietas = vietasPienemSort.filter(v => v.noSupabase)
+            const statiski = vietasPienemSort.filter(v => !v.noSupabase)
+            const lat = parseFloat(krautuveLat), lng = parseFloat(krautuveLng)
+
+            const VietasKarte = ({ vieta, isPircejs }) => {
               const km = lat && lng ? aprekinattalumu(lat, lng, vieta.lat, vieta.lng) : "?"
               const trans = typeof km === "number" ? getTransportsCena(km).toFixed(2) : "?"
               const cena = parseFloat(cenas[vieta.id]?.[aktivaisSortiments]) || 0
               const neto = cena > 0 ? (cena - parseFloat(trans)).toFixed(2) : null
-
               return (
                 <div key={vieta.id} style={{
-                  background: "#070d07", border: `1px solid ${cena > 0 ? "#2d5a2d" : "#1a1a1a"}`,
-                  borderRadius: 8, padding: 10
+                  background: isPircejs ? "#0a1a0a" : "#070d07",
+                  border: `1px solid ${isPircejs ? "#2e7d32" : cena > 0 ? "#2d5a2d" : "#1a1a1a"}`,
+                  borderRadius: 8, padding: 10,
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: "#a5d6a7", marginBottom: 4 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: isPircejs ? "#4caf50" : "#a5d6a7", marginBottom: 2, display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
                     {vieta.nosaukums}
-                    {vieta.lat > 57.5 && <span style={{ ...s.tag("#e65100"), marginLeft: 4 }}>EE</span>}
+                    {isPircejs && <span style={{ ...s.tag("#4caf50") }}>✓ Dzīva cena</span>}
+                    {vieta.lat > 57.5 && <span style={{ ...s.tag("#e65100") }}>EE</span>}
+                    {vieta.novads && <span style={{ fontSize: 9, color: "#4a7a4a" }}>📍 {vieta.novads}</span>}
                   </div>
                   <div style={{ fontSize: 10, color: "#558b2f", marginBottom: 6 }}>
                     ~{km} km | Trans: {trans} €/m³
                   </div>
                   <input type="number" step="0.5"
-                    style={{ ...s.input, fontSize: 13, padding: "5px 8px" }}
+                    style={{ ...s.input, fontSize: 13, padding: "5px 8px", borderColor: isPircejs && cena > 0 ? "#2e7d32" : undefined }}
                     value={cenas[vieta.id]?.[aktivaisSortiments] || ""}
                     onChange={e => setCena(vieta.id, aktivaisSortiments, e.target.value)}
                     placeholder="€/m³" />
@@ -428,10 +442,34 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                       Neto: {neto} €/m³
                     </div>
                   )}
+                  {isPircejs && vieta.talrunis && (
+                    <div style={{ marginTop: 4, fontSize: 10, color: "#4a7a4a" }}>📞 {vieta.talrunis}</div>
+                  )}
                 </div>
               )
-            })}
-          </div>
+            }
+
+            return (
+              <>
+                {pircejuVietas.length > 0 && (
+                  <>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#4caf50", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                      ✓ Reģistrētie pircēji — aktuālās cenas
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
+                      {pircejuVietas.map(v => <VietasKarte key={v.id} vieta={v} isPircejs />)}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#4a7a4a", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                      Pārējie uzņēmumi — ievadi manuāli
+                    </div>
+                  </>
+                )}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                  {statiski.map(v => <VietasKarte key={v.id} vieta={v} isPircejs={false} />)}
+                </div>
+              </>
+            )
+          })()}
         </div>
 
         <div style={{ display: "flex", gap: 10 }}>
@@ -491,15 +529,22 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
 
                   {/* Labākā izvēle */}
                   {lab.iepirkumsCena > 0 ? (
-                    <div style={{ background: "#0a1f0a", border: "1px solid #2d5a2d", borderRadius: 8, padding: 10, marginBottom: 8 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ background: "#0a1f0a", border: `1px solid ${lab.vieta.noSupabase ? "#2e7d32" : "#2d5a2d"}`, borderRadius: 8, padding: 10, marginBottom: 8 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
                         <div>
                           <span style={{ fontSize: 13, fontWeight: 700, color: "#4caf50" }}>
                             ✅ {lab.vieta.nosaukums}
                           </span>
-                          <span style={{ fontSize: 11, color: "#558b2f", marginLeft: 8 }}>
-                            ~{lab.km} km
-                          </span>
+                          {lab.vieta.noSupabase && (
+                            <span style={{ ...s.tag("#4caf50"), marginLeft: 6, fontSize: 9 }}>Reģistrēts pircējs</span>
+                          )}
+                          <span style={{ fontSize: 11, color: "#558b2f", marginLeft: 8 }}>~{lab.km} km</span>
+                          {lab.vieta.talrunis && (
+                            <span style={{ fontSize: 11, color: "#4a7a4a", marginLeft: 8 }}>📞 {lab.vieta.talrunis}</span>
+                          )}
+                          {lab.vieta.epasts && (
+                            <span style={{ fontSize: 11, color: "#4a7a4a", marginLeft: 6 }}>✉ {lab.vieta.epasts}</span>
+                          )}
                         </div>
                         <div style={{ textAlign: "right" }}>
                           <div style={{ fontSize: 11, color: "#81c784" }}>
