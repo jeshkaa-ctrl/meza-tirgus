@@ -9,21 +9,31 @@ import { C as DS, F, spinnerCSS } from './ds'
 
 // ─── Sugas: LVM WFS kods → { kods (forestEngine), nos (latviski), krasa } ────
 const SUGAS_KARTE = {
-  1:  { kods:'P',  nos:'Priede',      krasa:'#2e7d32' },
-  2:  { kods:'E',  nos:'Egle',        krasa:'#1565c0' },
-  3:  { kods:'B',  nos:'Bērzs',       krasa:'#f9a825' },
-  4:  { kods:'G',  nos:'Apse',        krasa:'#e65100' },
-  5:  { kods:'Bl', nos:'Melnalksnis', krasa:'#1b5e20' },
-  6:  { kods:'Ba', nos:'Baltalksnis', krasa:'#558b2f' },
-  7:  { kods:'Oz', nos:'Ozols',       krasa:'#4e342e' },
-  8:  { kods:'Os', nos:'Osis',        krasa:'#006064' },
-  9:  { kods:'Os', nos:'Goba',        krasa:'#5d4037' },
-  10: { kods:'Ba', nos:'Liepa',       krasa:'#f57f17' },
-  11: { kods:'Ba', nos:'Vītols',      krasa:'#00897b' },
-  12: { kods:'B',  nos:'Cita',        krasa:'#757575' },
+  1:  { kods:'P',  nos:'Priede',       krasa:'#2e7d32' },
+  2:  { kods:'E',  nos:'Egle',         krasa:'#1565c0' },
+  3:  { kods:'B',  nos:'Bērzs',        krasa:'#f9a825' },
+  4:  { kods:'G',  nos:'Apse',         krasa:'#e65100' },
+  5:  { kods:'Bl', nos:'Melnalksnis',  krasa:'#1b5e20' },
+  6:  { kods:'Ba', nos:'Baltalksnis',  krasa:'#558b2f' },
+  7:  { kods:'Os', nos:'Osis',         krasa:'#006064' },
+  8:  { kods:'Os', nos:'Goba',         krasa:'#5d4037' },
+  9:  { kods:'Oz', nos:'Ozols',        krasa:'#4e342e' },
+  10: { kods:'B',  nos:'Skābardis',    krasa:'#6d4c41' },
+  11: { kods:'P',  nos:'Ciedrupriede', krasa:'#1a5276' },
+  12: { kods:'Oz', nos:'Dižskābardis', krasa:'#4a235a' },
 }
-// LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V
-const BONITATES = { 0:'—', 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
+// LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V; 0→default II
+const BONITATES = { 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
+
+// Aizsardzības noteikumi pa teritoriju tipiem
+const AIZSARDZIBA = {
+  dabas_liegums:     { cirte:'aizliegta',  label:'🔴 Cirte aizliegta'           },
+  biosfera_pamata:   { cirte:'ierobežota', label:'🟠 Ierobežota cirte'           },
+  biosfera_neutrala: { cirte:'kopsana',    label:'🟡 Kopšanas cirte atļauta'     },
+  aizsargjosla:      { cirte:'ierobežota', label:'🟠 Ierobežota cirte'           },
+  mikroliegums:      { cirte:'aizliegta',  label:'🔴 Cirte aizliegta'           },
+  nav:               { cirte:'briva',      label:'🟢 Nav ierobežojumu'           },
+}
 
 const SORT_NOS = {
   log:'Zāģbaļķis', small:'Sīkbaļķis', veneer:'Finieris',
@@ -33,6 +43,33 @@ const SORT_CENAS = { log:93, small:65, veneer:130, tara:48, pulp:50, fire:38, ch
 
 const H_MAX = { Ia:38, I:33, II:28, III:23, IV:18, V:14 }
 const T50   = { Ia:40, I:45, II:50, III:60, IV:70, V:80 }
+
+// Kartes krāsa pēc cirtes lēmuma
+function getLemumKrasa(lemums) {
+  if (!lemums || lemums === '—') return '#757575'
+  if (lemums === 'Cirte aizliegta')       return '#c62828'
+  if (lemums.includes('ierobežot'))       return '#e65100'
+  if (lemums.includes('Kopšanas'))        return '#f9a825'
+  if (lemums.includes('Necērtams') || lemums.includes('Jaunaudze') || lemums.includes('Plantācija')) return '#757575'
+  if (lemums.includes('Kailcirte') || lemums.includes('Galvenā cirte')) return '#2e7d32'
+  return '#4caf50'
+}
+
+// Visstingrākais aizsardzības statuss no DAP feature masīva
+function getAizsardzibaStatus(features) {
+  if (!features?.length) return AIZSARDZIBA.nav
+  const prioritate = ['aizliegta', 'ierobežota', 'kopsana', 'briva']
+  let labakais = AIZSARDZIBA.nav
+  for (const f of features) {
+    const p = f.properties || {}
+    const tips = (p.kategorija || p.tips || p.type || '').toLowerCase().replace(/ /g, '_')
+    const rule = AIZSARDZIBA[tips]
+    if (rule && prioritate.indexOf(rule.cirte) < prioritate.indexOf(labakais.cirte)) {
+      labakais = rule
+    }
+  }
+  return labakais
+}
 
 // ─── Palīgfunkcijas ───────────────────────────────────────────────────────────
 function calcH(bon, vec) {
@@ -84,29 +121,32 @@ async function wfsDiagnostika(geoPath, typeNames) {
 function apstradatNogabalu(feat, i) {
   const p   = feat.properties || {}
   const inf = SUGAS_KARTE[p.s10] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
-  const bon = BONITATES[p.bv10] || 'II'
+  // bv10=0 vai nav → default 3 ('II')
+  const bon = BONITATES[p.bv10 || 3] || 'II'
 
   const platiba = parseFloat(p.nog_plat) || 0
-  const h       = parseFloat(p.h10) || 0
-  const g       = parseFloat(p.g10) || 0
-  const d       = parseFloat(p.d10) || calcD(h || calcH(bon, parseInt(p.a10) || 60))
-  const vec     = parseInt(p.a10)   || 0
+  const vec     = parseInt(p.a10)        || 0
+  const h       = parseFloat(p.h10)     || 0
+  const g       = parseFloat(p.g10)     || 0
+  const d       = parseFloat(p.d10)     || 0
 
-  // Kubatūra pēc formulas: G × H × 0.45 × platiba (ha)
-  const kubatura = g && h && platiba ? Math.round(g * h * 0.45 * platiba) : 0
+  // Efektīvās vērtības: ja WFS atgriež 0 — aprēķina no bonitātes/vecuma
+  const hEff = h || calcH(bon, vec)
+  const gEff = g || calcG(inf.kods, vec)
+  const dEff = d || calcD(hEff)
 
-  // forestEngine sortimentiem (ja jaunaudze/izcirtums — izlaiž)
+  // Kubatūra: G × H × 0.45 × platiba
+  const kubatura = gEff && hEff && platiba ? Math.round(gEff * hEff * 0.45 * platiba) : 0
+
+  // forestEngine sortimentiem (tikai ja ir koki)
   let sortVert = 0, sortimenti = {}, lemums = '—'
   if (kubatura > 0 && vec > 20) {
     try {
-      const row = {
+      const rez = forestEngine({
         formula: `10${inf.kods}`, vec, bon,
-        h: h || calcH(bon, vec),
-        g: g || calcG(inf.kods, vec),
-        d: d || calcD(h),
+        h: hEff, g: gEff, d: dEff,
         platiba, krm3ha: 0, harvestType: '', plantacija: false,
-      }
-      const rez = forestEngine(row)
+      })
       lemums = rez.decision || '—'
       sortimenti = rez.sortiments || {}
       Object.entries(sortimenti).forEach(([k, v]) => { sortVert += (v||0) * (SORT_CENAS[k]||0) })
@@ -126,12 +166,14 @@ function apstradatNogabalu(feat, i) {
 
   return {
     id: feat.id || `n${i}`, nr: i + 1, nr_text,
-    sugaKods: p.s10 || 0,
-    suga:     inf.kods,
-    sugaNos:  inf.nos,
-    sugaKrasa:inf.krasa,
-    vecums: vec, bon, platiba, h, g, d, kubatura,
+    sugaKods:  p.s10    || 0,
+    suga:      inf.kods,
+    sugaNos:   inf.nos,
+    sugaKrasa: inf.krasa,
+    vecums: vec, bon, platiba,
+    h: hEff, g: gEff, d: dEff, kubatura,
     sortVert, sortimenti, lemums, indVertiba,
+    mzVeids: p.mz_veids ?? null,
     geojson: feat, rawProps: p,
   }
 }
@@ -145,7 +187,8 @@ export default function IpasumAnalīze({ onBack }) {
   const [kadGeom,  setKadGeom]  = useState(null)
   const [nogabali, setNogabali] = useState([])   // apstrādāti, nemainīgi
   const [editData, setEditData] = useState([])   // rediģējama kopija
-  const [dapTer,   setDapTer]   = useState([])
+  const [dapTer,          setDapTer]          = useState([])
+  const [aizsardzibaStatus, setAizsardzibaStatus] = useState(AIZSARDZIBA.nav)
   const [cilne,    setCilne]    = useState('karte')
   const [slani,    setSlani]    = useState({ nogabali:true, dap:true, kadastra:true, ortofoto:false })
 
@@ -212,25 +255,31 @@ export default function IpasumAnalīze({ onBack }) {
         const nl = L.geoJSON(
           { type:'FeatureCollection', features: editData.map(n => n.geojson) },
           {
-            style: feat => ({
-              color:'#fff', weight:1.5,
-              fillColor: SUGAS_KARTE[feat?.properties?.s10]?.krasa || '#4caf50',
-              fillOpacity: 0.55,
-            }),
+            style: feat => {
+              const n = editData.find(x => x.id === feat.id)
+              return {
+                color: '#fff', weight: 1.5,
+                fillColor: n ? getLemumKrasa(n.lemums) : '#757575',
+                fillOpacity: 0.65,
+              }
+            },
             onEachFeature: (feat, layer) => {
               const n = editData.find(x => x.id === feat.id)
               if (!n) return
 
+              const lemumKrasa = getLemumKrasa(n.lemums)
               layer.bindPopup(
-                `<div style="font-family:Arial;font-size:12px;min-width:180px">` +
+                `<div style="font-family:Arial;font-size:12px;min-width:190px">` +
                 `<b style="font-size:13px">${n.nr_text} — ${n.sugaNos}</b><br>` +
                 `<table style="margin-top:6px;border-collapse:collapse;width:100%">` +
                 `<tr><td style="color:#666;padding:2px 0">Vecums</td><td style="text-align:right;font-weight:600">${n.vecums} g.</td></tr>` +
                 `<tr><td style="color:#666">Bonitāte</td><td style="text-align:right;font-weight:600">${n.bon}</td></tr>` +
                 `<tr><td style="color:#666">Platība</td><td style="text-align:right;font-weight:600">${n.platiba.toFixed(2)} ha</td></tr>` +
+                `<tr><td style="color:#666">H / G</td><td style="text-align:right;font-weight:600">${n.h} m / ${n.g} m²/ha</td></tr>` +
                 `<tr><td style="color:#666">Kubatūra</td><td style="text-align:right;font-weight:600">${n.kubatura} m³</td></tr>` +
                 `<tr><td style="color:#666">Ind. vērtība</td><td style="text-align:right;color:#4caf50;font-weight:700">~${n.indVertiba.toLocaleString()} €</td></tr>` +
-                (n.lemums !== '—' ? `<tr><td style="color:#666">Lēmums</td><td style="text-align:right;font-size:11px">${n.lemums}</td></tr>` : '') +
+                `<tr><td style="color:#666">Lēmums</td><td style="text-align:right;font-weight:700;color:${lemumKrasa}">${n.lemums}</td></tr>` +
+                (n.mzVeids != null ? `<tr><td style="color:#666">MZ veids</td><td style="text-align:right;font-size:11px">${n.mzVeids}</td></tr>` : '') +
                 `</table></div>`
               )
 
@@ -318,23 +367,37 @@ export default function IpasumAnalīze({ onBack }) {
       )
       const nogFeatures = vmdData?.features || []
 
-      setLadeText('Iegūst aizsardzības zonas...')
+      setLadeText('Iegūst aizsardzības teritorijas...')
 
-      // 3. Egļu aizsardzības nogabali (nav obligāti, nav kadastrs filtra atbalsta)
+      // 3. Aizsardzības teritorijas — INTERSECTS ar kadastra poligonu
       let dapFeatures = []
-      try {
-        const sprData = await lvmWFS(
-          buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', null, 10)
-        )
-        dapFeatures = sprData?.features || []
-      } catch { /* nav kritiski */ }
+      const kadWkt = geojsonToWKT(kadFeat.geometry)
+      if (kadWkt) {
+        try {
+          const dapData = await lvmWFS(
+            buildWFS('/publicwfs/ows', 'publicwfs:vmdprotectedareas', `INTERSECTS(geometry,${kadWkt})`, 50)
+          )
+          dapFeatures = dapData?.features || []
+        } catch { /* nav kritiski — slānis var nebūt pieejams */ }
+      }
 
       setLadeText('Aprēķina meža vērtību...')
 
       const norm = nogFeatures.map((f, i) => apstradatNogabalu(f, i))
-      setNogabali(norm)
-      setEditData(norm.map(n => ({ ...n })))
+
+      // Aizsardzības statuss pārraksta lemumu ja cirte aizliegta
+      const aizsStatus = getAizsardzibaStatus(dapFeatures)
+      const normArAizsardzibu = norm.map(n => ({
+        ...n,
+        lemums: aizsStatus.cirte === 'aizliegta' ? 'Cirte aizliegta'
+              : aizsStatus.cirte === 'ierobežota' ? `${n.lemums !== '—' ? n.lemums + ' — ' : ''}Ierobežota`
+              : n.lemums,
+      }))
+
+      setNogabali(normArAizsardzibu)
+      setEditData(normArAizsardzibu.map(n => ({ ...n })))
       setDapTer(dapFeatures)
+      setAizsardzibaStatus(aizsStatus)
       setCilne('karte')
       setFaze('rezultats')
 
@@ -594,15 +657,28 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
         </button>
       </div>
 
+      {/* Aizsardzības josla */}
+      {aizsardzibaStatus.cirte !== 'briva' && (
+        <div style={{
+          margin:'10px 16px 0', padding:'8px 14px', borderRadius:8, fontSize:13, fontWeight:600,
+          background: aizsardzibaStatus.cirte === 'aizliegta' ? '#2a0a0a' : '#1a1000',
+          border: `1px solid ${aizsardzibaStatus.cirte === 'aizliegta' ? '#c62828' : '#e65100'}`,
+          color: aizsardzibaStatus.cirte === 'aizliegta' ? '#ef9a9a' : '#ffcc80',
+        }}>
+          {aizsardzibaStatus.label}
+          {dapTer.length > 0 && <span style={{ fontSize:11, marginLeft:8, opacity:0.7 }}>({dapTer.length} teritorija)</span>}
+        </div>
+      )}
+
       {/* Kopsavilkuma kartiņas */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:8, padding:'12px 16px 0' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:8, padding:'10px 16px 0' }}>
         {[
-          { label:'Kopplatība',    val:`${kopPlatiba.toFixed(1)} ha`,          color:C.green   },
-          { label:'Nogabali',      val: editData.length,                        color:DS.info   },
-          { label:'Dom. suga',     val: domSuga,                                color:'#f9a825' },
-          { label:'Vid. vecums',   val: vidVecums ? `${vidVecums} g.` : '—',   color:C.sec     },
-          { label:'Kopkubatūra',   val:`${kopKubatura.toFixed(0)} m³`,         color:'#4ade80' },
-          { label:'Ind. vērtība',  val:`${kopIndVert.toLocaleString()} €`,     color:'#4ade80' },
+          { label:'Kopplatība',   val:`${kopPlatiba.toFixed(1)} ha`,        color:C.green   },
+          { label:'Nogabali',     val: editData.length,                      color:DS.info   },
+          { label:'Dom. suga',    val: domSuga,                              color:'#f9a825' },
+          { label:'Vid. vecums',  val: vidVecums ? `${vidVecums} g.` : '—', color:C.sec     },
+          { label:'Kopkubatūra',  val:`${kopKubatura.toFixed(0)} m³`,       color:'#4ade80' },
+          { label:'Ind. vērtība', val:`${kopIndVert.toLocaleString()} €`,   color:'#4ade80' },
         ].map((x,i) => (
           <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:10, padding:'10px 12px' }}>
             <div style={{ fontSize:9, color:C.dim, marginBottom:3, textTransform:'uppercase', letterSpacing:'0.06em' }}>{x.label}</div>
