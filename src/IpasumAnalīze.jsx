@@ -117,9 +117,11 @@ function apstradatNogabalu(feat, i) {
   // Indikatīvā tirgus vērtība (€35/m³ vidēji)
   const indVertiba = kubatura * 35
 
-  // Nogabala numurs (kvartāls.nogabals[.apakšnogabals])
+  // Nogabala numurs: ar apakšnogabalu → "1.1", bez → "1-0"
   const nr_text = p.kvart != null
-    ? `${p.kvart}.${p.nog}${p.anog ? '.'+p.anog : ''}`
+    ? (p.anog && p.anog !== '0' && p.anog !== 0)
+      ? `${p.nog}.${p.anog}`
+      : `${p.nog}-0`
     : String(i + 1)
 
   return {
@@ -169,6 +171,10 @@ export default function IpasumAnalīze({ onBack }) {
         layersRef.current.labels.forEach(l => map.removeLayer(l))
         layersRef.current.labels = []
       }
+      if (layersRef.current.kadPoints) {
+        layersRef.current.kadPoints.forEach(p => map.removeLayer(p))
+        layersRef.current.kadPoints = []
+      }
       if (slani.ortofoto) {
         layersRef.current.ortofoto = L.tileLayer.wms(
           'https://lvmgeoserver.lvm.lv/geoserver/ows?',
@@ -176,9 +182,31 @@ export default function IpasumAnalīze({ onBack }) {
         ).addTo(map)
       }
       if (slani.kadastra && kadGeom) {
-        const kl = L.geoJSON(kadGeom, { style:{ color:'#fff', weight:3, fillOpacity:0.05, dashArray:'6,4' } }).addTo(map)
+        const kl = L.geoJSON(kadGeom, {
+          style: { color:'#00BFFF', weight:3, fillOpacity:0, dashArray:null },
+        }).addTo(map)
         layersRef.current.kadLayer = kl
         map.fitBounds(kl.getBounds(), { padding:[30,30] })
+
+        // Robežpunkti (lauzuma vietas)
+        const geom = kadGeom.geometry
+        if (geom?.coordinates) {
+          const ring = geom.type === 'Polygon'
+            ? geom.coordinates[0]
+            : geom.coordinates[0][0]
+          layersRef.current.kadPoints = []
+          ring.forEach((coord, idx) => {
+            if (idx === ring.length - 1) return // pēdējais = pirmais
+            const cm = L.circleMarker([coord[1], coord[0]], {
+              radius: 4, color:'#00BFFF', fillColor:'#ffffff',
+              fillOpacity:1, weight:2,
+            }).addTo(map)
+            cm.bindTooltip(String(idx + 1), {
+              permanent: false, direction:'top',
+            })
+            layersRef.current.kadPoints.push(cm)
+          })
+        }
       }
       if (slani.nogabali && editData.length > 0) {
         const nl = L.geoJSON(
