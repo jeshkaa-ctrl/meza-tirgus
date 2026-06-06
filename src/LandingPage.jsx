@@ -197,7 +197,7 @@ return(
    {/* KĀ TIEK APRĒĶINĀTS */}
     <div style={{background:"linear-gradient(160deg,#0f1f0f,#1a2e1a)",border:"1px solid #2d5a2d",borderRadius:"16px",padding:"32px",marginBottom:"40px"}}>
       <h3 style={{color:"#4caf50",marginTop:0,fontSize:"20px",fontWeight:800,textAlign:"center",marginBottom:"24px",letterSpacing:"-0.02em"}}>Kā tiek veikti aprēķini?</h3>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"16px"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))",gap:"1rem"}}>
         {[
           {icon:"🪵",title:"Kubatūra",text:"Pēc Latvijā atzītajiem formas faktoriem katrai koku sugai atsevišķi."},
           {icon:"📊",title:"Bonitāte",text:"Pēc augstuma un vecuma attiecības — Latvijas meža bonitātes tabulām."},
