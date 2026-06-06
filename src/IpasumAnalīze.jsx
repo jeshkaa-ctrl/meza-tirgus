@@ -70,20 +70,41 @@ function geojsonToWKT(geom) {
 
 // Izveido WFS URL caur lokālo proxy
 // /api/lvmgeo/publicwfs/wfs?... → dev: Vite proxy; prod: Vercel function
-function buildWFS(geoPath, typeNames, cqlFilter) {
-  const q = `service=WFS&version=2.0.0&request=GetFeature` +
+// CQL_FILTER: GeoServer akceptē daļēji enkodētu — tikai speciālās rakstzīmes
+function buildWFS(geoPath, typeNames, cqlFilter, count = 100) {
+  const cqlEnc = cqlFilter
+    ? '&CQL_FILTER=' + cqlFilter.replace(/ /g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/,/g, '%2C')
+    : ''
+  return `/api/lvmgeo${geoPath}` +
+    `?service=WFS&version=2.0.0&request=GetFeature` +
     `&typeNames=${encodeURIComponent(typeNames)}` +
-    `&outputFormat=application%2Fjson` +
-    (cqlFilter ? `&CQL_FILTER=${encodeURIComponent(cqlFilter)}` : '')
-  return `/api/lvmgeo${geoPath}?${q}`
+    `&outputFormat=application/json` +
+    `&count=${count}` +
+    cqlEnc
 }
 
 async function lvmWFS(proxyUrl) {
   const r = await fetch(proxyUrl)
-  if (!r.ok) throw new Error(`LVM GEO atbildes kods: ${r.status}`)
+  if (!r.ok) {
+    const body = await r.text().catch(() => '')
+    throw new Error(`WFS_${r.status}:${body.slice(0, 300)}`)
+  }
   const data = await r.json()
   if (data.error) throw new Error(data.error)
   return data
+}
+
+// Diagnostika — iegūst 1 feature bez filtra, parāda lauku nosaukumus
+async function wfsDiagnostika(geoPath, typeNames) {
+  try {
+    const url = buildWFS(geoPath, typeNames, null, 1)
+    const data = await lvmWFS(url)
+    const feat = data?.features?.[0]
+    if (feat?.properties) return `Pieejamie lauki: ${Object.keys(feat.properties).join(', ')}`
+    return `Slānis pieejams bet nav features. (totalFeatures: ${data?.totalFeatures ?? '?'})`
+  } catch (e) {
+    return `Diagnostika arī neizdevās: ${e.message.slice(0, 150)}`
+  }
 }
 
 function aprekināt(suga, vecums, bon, platiba, h, g, d) {
@@ -251,13 +272,27 @@ export default function IpasumAnalīze({ onBack }) {
 
     try {
       // 1. Kadastra robežas
-      const kadData = await lvmWFS(
-        buildWFS('/publicwfs/wfs', 'publicwfs:Kadastra_karte', `KADASTRA_APZIMEJUMS='${kad}'`)
-      )
+      let kadData
+      try {
+        kadData = await lvmWFS(
+          buildWFS('/publicwfs/wfs', 'publicwfs:Kadastra_karte', `KADASTRA_APZIMEJUMS='${kad}'`)
+        )
+      } catch (e) {
+        if (e.message.startsWith('WFS_400') || e.message.startsWith('WFS_500')) {
+          setLadeText('Diagnostika — pārbauda lauku nosaukumus...')
+          const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:Kadastra_karte')
+          setFaze('ievads')
+          setKluda(`LVM GEO kļūda (${e.message.slice(4, 7)}). ${info}`)
+          return
+        }
+        throw e
+      }
       const kadFeat = kadData?.features?.[0]
       if (!kadFeat) {
+        setLadeText('Diagnostika — pārbauda lauku nosaukumus...')
+        const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:Kadastra_karte')
         setFaze('ievads')
-        setKluda('Kadastra numurs nav atrasts LVM GEO. Pārbaudi numuru un mēģini vēlreiz.')
+        setKluda(`Kadastra numurs '${kad}' nav atrasts. ${info}`)
         return
       }
       setKadGeom(kadFeat)
