@@ -425,17 +425,14 @@ export default function IpasumAnalīze({ onBack }) {
 
       setLadeText('Iegūst aizsardzības teritorijas...')
 
-      // 3. Aizsardzības teritorijas — INTERSECTS ar kadastra poligonu
+      // 3. Egļu aizsardzības nogabali — vmdspruceprotcompartments (cadaster lauks)
       let dapFeatures = []
-      const kadWkt = geojsonToWKT(kadFeat.geometry)
-      if (kadWkt) {
-        try {
-          const dapData = await lvmWFS(
-            buildWFS('/publicwfs/ows', 'publicwfs:vmdprotectedareas', `INTERSECTS(geometry,${kadWkt})`, 50)
-          )
-          dapFeatures = dapData?.features || []
-        } catch { /* nav kritiski — slānis var nebūt pieejams */ }
-      }
+      try {
+        const dapData = await lvmWFS(
+          buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', `cadaster='${kad}'`, 20)
+        )
+        dapFeatures = dapData?.features || []
+      } catch { /* nav kritiski */ }
 
       setLadeText('Aprēķina meža vērtību...')
 
