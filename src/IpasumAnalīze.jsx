@@ -165,6 +165,10 @@ export default function IpasumAnalīze({ onBack }) {
       ;['kadLayer','nogLayer','dapLayer','ortofoto'].forEach(k => {
         if (layersRef.current[k]) { map.removeLayer(layersRef.current[k]); delete layersRef.current[k] }
       })
+      if (layersRef.current.labels) {
+        layersRef.current.labels.forEach(l => map.removeLayer(l))
+        layersRef.current.labels = []
+      }
       if (slani.ortofoto) {
         layersRef.current.ortofoto = L.tileLayer.wms(
           'https://lvmgeoserver.lvm.lv/geoserver/ows?',
@@ -188,6 +192,7 @@ export default function IpasumAnalīze({ onBack }) {
             onEachFeature: (feat, layer) => {
               const n = editData.find(x => x.id === feat.id)
               if (!n) return
+
               layer.bindPopup(
                 `<div style="font-family:Arial;font-size:12px;min-width:180px">` +
                 `<b style="font-size:13px">${n.nr_text} — ${n.sugaNos}</b><br>` +
@@ -200,6 +205,24 @@ export default function IpasumAnalīze({ onBack }) {
                 (n.lemums !== '—' ? `<tr><td style="color:#666">Lēmums</td><td style="text-align:right;font-size:11px">${n.lemums}</td></tr>` : '') +
                 `</table></div>`
               )
+
+              // Nogabala numura label centrā
+              layer.on('add', function () {
+                try {
+                  const center = layer.getBounds().getCenter()
+                  const label = L.marker(center, {
+                    icon: L.divIcon({
+                      className: '',
+                      html: `<div style="background:rgba(0,0,0,0.65);color:#fff;font-size:10px;font-weight:700;padding:2px 5px;border-radius:3px;white-space:nowrap;pointer-events:none">${n.nr_text}</div>`,
+                      iconAnchor: [15, 10],
+                    }),
+                    interactive: false,
+                  })
+                  label.addTo(map)
+                  if (!layersRef.current.labels) layersRef.current.labels = []
+                  layersRef.current.labels.push(label)
+                } catch { /* ignorē ja nav bounds */ }
+              })
             },
           }
         ).addTo(map)
