@@ -72,16 +72,69 @@ function getAizsardzibaStatus(features) {
 }
 
 // ─── Palīgfunkcijas ───────────────────────────────────────────────────────────
-function calcH(bon, vec) {
-  const hMax = H_MAX[bon] || 23
-  const t50  = T50[bon]   || 55
-  return Math.round(hMax * vec / (vec + t50) * 10) / 10
+
+// Pārvērš GeoJSON poligonu uz WKT (INTERSECTS filtriem)
+function geojsonToWKT(geojson) {
+  if (!geojson) return null
+  if (geojson.type === 'Polygon') {
+    const coords = geojson.coordinates[0].map(c => `${c[0]} ${c[1]}`).join(', ')
+    return `POLYGON((${coords}))`
+  }
+  if (geojson.type === 'MultiPolygon') {
+    const polygons = geojson.coordinates.map(poly =>
+      `(${poly[0].map(c => `${c[0]} ${c[1]}`).join(', ')})`
+    )
+    return `MULTIPOLYGON(${polygons.map(p => `(${p})`).join(', ')})`
+  }
+  return null
 }
-function calcG(kodsFE, vec) {
-  const base = ['P','E'].includes(kodsFE) ? 28 : ['B','Oz','Os'].includes(kodsFE) ? 22 : 18
-  return Math.min(Math.round(base * Math.sqrt(Math.min(vec, 100) / 80) * 10) / 10, 36)
+
+// Sugas nosaukumi (VMD WFS s10 kods → latviski)
+const speciesMap = {
+  1:'Priede', 2:'Egle', 3:'Bērzs', 4:'Apse', 5:'Melnalksnis',
+  6:'Baltalksnis', 7:'Osis', 8:'Goba', 9:'Ozols',
+  10:'Skābardis', 11:'Ciedrupriede', 12:'Dižskābardis',
 }
+
+// Aizsardzības noteikumi (alias — detalizēts variants ar komentāriem)
+const protectionRules = {
+  dabas_liegums:     { cirte:'aizliegta',  label:'🔴 Cirte aizliegta'        },
+  biosfera_pamata:   { cirte:'ierobežota', label:'🟠 Ierobežota cirte'        },
+  biosfera_neutrala: { cirte:'kopsana',    label:'🟡 Kopšanas cirte atļauta'  },
+  aizsargjosla:      { cirte:'ierobežota', label:'🟠 Ierobežota cirte'        },
+  mikroliegums:      { cirte:'aizliegta',  label:'🔴 Cirte aizliegta'        },
+}
+
+// calcH — augstums no numeriskā bonitātes koda (bv10) un vecuma
+function calcH(bonitāte, vecums) {
+  const base = { 1:1.1, 2:1.0, 3:0.9, 4:0.8, 5:0.7, 6:0.6 }
+  return Math.round((base[bonitāte] || 1.0) * Math.sqrt(vecums) * 2.2)
+}
+
+// calcG — šķērslaukums no numeriskā sugas koda (s10) un vecuma
+function calcG(suga, vecums) {
+  const base = { 1:0.9, 2:0.85, 3:0.8, 4:0.7 }
+  return Math.round((base[suga] || 0.8) * vecums * 0.4)
+}
+
 function calcD(h) { return Math.max(Math.round(h * 0.78), 6) }
+
+// Kubatūra: G × H × 0.45 × platiba_ha
+function aprekinātKubaturu(g, h, platiba) {
+  if (!g || !h || !platiba) return 0
+  return Math.round(g * h * 0.45 * platiba)
+}
+
+// Cirtes lēmums pēc MK 935 minimālajiem vecumiem
+function noteiktCirti(vecums, g, aizsardziba, suga) {
+  if (aizsardziba === 'aizliegta') return { lēmums:'Cirte aizliegta', klase:'aizliegta' }
+  if (!g || g === 0)               return { lēmums:'Necērtams',       klase:'nevertams' }
+  const minVec = { 1:81, 2:81, 3:61, 4:41, 5:41, 6:41, 7:61, 8:61, 9:101, 10:101, 11:101, 12:101 }
+  const gMin = 12
+  if (vecums >= (minVec[suga] || 81) && g >= gMin) return { lēmums:'Kailcirte',      klase:'kailcirte' }
+  if (g >= gMin * 1.2)                             return { lēmums:'Kopšanas cirte', klase:'kopsana'   }
+  return { lēmums:'Necērtams', klase:'nevertams' }
+}
 
 // WFS URL caur proxy (dev: Vite; prod: Vercel)
 function buildWFS(geoPath, typeNames, cqlFilter, count = 100) {
@@ -120,9 +173,10 @@ async function wfsDiagnostika(geoPath, typeNames) {
 // ─── Nogabala apstrāde (pēc WFS feature) ─────────────────────────────────────
 function apstradatNogabalu(feat, i) {
   const p   = feat.properties || {}
-  const inf = SUGAS_KARTE[p.s10] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
-  // bv10=0 vai nav → default 3 ('II')
-  const bon = BONITATES[p.bv10 || 3] || 'II'
+  const sugaNum = p.s10  || 1   // numerisks kods 1-12, default 1=Priede
+  const bonNum  = p.bv10 || 3   // numerisks kods 1-6, default 3=II
+  const inf = SUGAS_KARTE[sugaNum] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
+  const bon = BONITATES[bonNum] || 'II'
 
   const platiba = parseFloat(p.nog_plat) || 0
   const vec     = parseInt(p.a10)        || 0
@@ -130,16 +184,19 @@ function apstradatNogabalu(feat, i) {
   const g       = parseFloat(p.g10)     || 0
   const d       = parseFloat(p.d10)     || 0
 
-  // Efektīvās vērtības: ja WFS atgriež 0 — aprēķina no bonitātes/vecuma
-  const hEff = h || calcH(bon, vec)
-  const gEff = g || calcG(inf.kods, vec)
+  // Efektīvās vērtības: ja WFS atgriež 0 — aprēķina no numeriskajiem kodiem
+  const hEff = h || calcH(bonNum, vec)
+  const gEff = g || calcG(sugaNum, vec)
   const dEff = d || calcD(hEff)
 
   // Kubatūra: G × H × 0.45 × platiba
-  const kubatura = gEff && hEff && platiba ? Math.round(gEff * hEff * 0.45 * platiba) : 0
+  const kubatura = aprekinātKubaturu(gEff, hEff, platiba)
+
+  // Cirtes lēmums (aizsardzība tiks pielietota pēc DAP ielādes)
+  const { lēmums: lemumsBezAizsardzibas } = noteiktCirti(vec, gEff, 'briva', sugaNum)
 
   // forestEngine sortimentiem (tikai ja ir koki)
-  let sortVert = 0, sortimenti = {}, lemums = '—'
+  let sortVert = 0, sortimenti = {}, lemums = lemumsBezAizsardzibas
   if (kubatura > 0 && vec > 20) {
     try {
       const rez = forestEngine({
@@ -147,7 +204,6 @@ function apstradatNogabalu(feat, i) {
         h: hEff, g: gEff, d: dEff,
         platiba, krm3ha: 0, harvestType: '', plantacija: false,
       })
-      lemums = rez.decision || '—'
       sortimenti = rez.sortiments || {}
       Object.entries(sortimenti).forEach(([k, v]) => { sortVert += (v||0) * (SORT_CENAS[k]||0) })
       sortVert = Math.round(sortVert)
