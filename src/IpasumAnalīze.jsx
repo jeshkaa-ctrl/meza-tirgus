@@ -389,12 +389,15 @@ export default function IpasumAnalīze({ onBack }) {
     if (faze !== 'rezultats' || cilne !== 'karte' || !mapRef.current) return
     const initLapja = async () => {
       const L = (await import('leaflet')).default
-      if (!leafletRef.current) {
-        const map = L.map(mapRef.current, { zoomControl: true, attributionControl: false })
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 20 }).addTo(map)
-        leafletRef.current = map
+      // Vienmēr destroy veco karti — div var būt remounted pēc cilnes maiņas
+      if (leafletRef.current) {
+        leafletRef.current.remove()
+        leafletRef.current = null
+        layersRef.current = {}
       }
-      const map = leafletRef.current
+      const map = L.map(mapRef.current, { zoomControl: true, attributionControl: false })
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 20 }).addTo(map)
+      leafletRef.current = map
       ;['kadLayer','nogLayer','dapLayer','ortofoto'].forEach(k => {
         if (layersRef.current[k]) { map.removeLayer(layersRef.current[k]); delete layersRef.current[k] }
       })
