@@ -7,35 +7,40 @@ import {
 import { forestEngine } from './forestEngine'
 import { C as DS, F, spinnerCSS } from './ds'
 
-// ─── Sugas: LVM WFS kods (s10) → latviski nosaukums ─────────────────────────
+// ─── Sugas: VMD WFS kods (s10) → latviski nosaukums ──────────────────────────
+// Pārbaudīts pēc reāliem LVM GEO datiem: 03=Egle, 04=Bērzs, 08=Apse
 const SUGAS_KARTE = {
-  1:'Priede', 2:'Egle',  3:'Bērzs',  4:'Apse',  5:'Melnalksnis',
-  6:'Baltalksnis', 7:'Osis', 8:'Goba', 9:'Ozols',
-  10:'Skābardis', 11:'Ciedrupriede', 12:'Dižskābardis',
+  1:'Priede',      2:'Lapegle',     3:'Egle',        4:'Bērzs',
+  5:'Melnalksnis', 6:'Baltalksnis', 7:'Ozols',       8:'Apse',
+  9:'Osis',        10:'Goba',       11:'Liepa',       12:'Vītols',
 }
-// ForestEngine īsie kodi (formula parameterim)
+// ForestEngine īsie kodi
 const SUGAS_KODS = {
-  1:'P', 2:'E', 3:'B', 4:'G',  5:'Bl', 6:'Ba',
-  7:'Os', 8:'Os', 9:'Oz', 10:'B', 11:'P', 12:'Oz',
+  1:'P',  2:'P',  3:'E',  4:'B',
+  5:'Bl', 6:'Ba', 7:'Oz', 8:'G',
+  9:'Os', 10:'Os',11:'Ba',12:'Ba',
 }
 // Kartes krāsas
 const SUGAS_KRASA = {
-  1:'#2e7d32', 2:'#1565c0', 3:'#f9a825', 4:'#e65100',
-  5:'#1b5e20', 6:'#558b2f', 7:'#006064', 8:'#5d4037',
-  9:'#4e342e', 10:'#6d4c41', 11:'#1a5276', 12:'#4a235a',
+  1:'#2e7d32', 2:'#1b5e20', 3:'#1565c0', 4:'#f9a825',
+  5:'#006064', 6:'#558b2f', 7:'#4e342e', 8:'#e65100',
+  9:'#006064', 10:'#5d4037',11:'#f57f17',12:'#00897b',
 }
 // LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V; 0→default II
 const BONITATES = { 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
 
-// Karte: krāsa pēc sugas + bonitātes (suga-bonNum)
+// Karte: krāsa pēc sugas + bonitātes — VMD standarta krāsas (suga-bonNum)
+// 1=Priede(zaļa), 3=Egle(zila), 4=Bērzs(dzeltena), 8=Apse(oranža)...
 const NOGABALA_KRASA = {
-  '1-1':'#1a5c1a', '1-2':'#2d8c2d', '1-3':'#5cb85c', '1-4':'#a8d8a8',
-  '2-1':'#1a1a8c', '2-2':'#2d2db8', '2-3':'#6666cc',
-  '3-1':'#cccc00', '3-2':'#e0e066',
-  '4-1':'#cc6600',
-  '5-1':'#006666',
-  '6-1':'#cc66cc',
-  '7-1':'#8B4513',
+  '1-1':'#1a5c1a', '1-2':'#2d8c2d', '1-3':'#5cb85c', '1-4':'#a8d8a8',  // Priede
+  '2-1':'#2d5016', '2-2':'#4a7c28',                                       // Lapegle
+  '3-1':'#1a1a8c', '3-2':'#2d2db8', '3-3':'#6666cc', '3-4':'#aaaaee',   // Egle
+  '4-1':'#b8a800', '4-2':'#d4c200', '4-3':'#e8d84a',                     // Bērzs
+  '5-1':'#004d4d', '5-2':'#006666',                                       // Melnalksnis
+  '6-1':'#cc66cc', '6-2':'#d988d9',                                       // Baltalksnis
+  '7-1':'#5c3317', '7-2':'#7a4520',                                       // Ozols
+  '8-1':'#cc4400', '8-2':'#e05a00',                                       // Apse
+  '9-1':'#006060', '9-2':'#007a7a',                                       // Osis
 }
 
 // Sortimentu krāsas diagrammām
@@ -139,10 +144,19 @@ function aprekinātKubaturu(g, h, platiba) {
 }
 
 // Cirtes lēmums pēc MK 935 minimālajiem vecumiem
-// Minimālie cirtes vecumi pēc MK 935 (null = nav vecuma ierobežojuma)
+// Minimālie cirtes vecumi pēc MK 935 — pēc PAREIZAJIEM VMD kodiem
+// 1=Priede, 3=Egle, 4=Bērzs, 8=Apse, 9=Osis
 const MIN_VECUMS = {
-  1:101, 2:81, 3:61, 4:41, 5:71, 6:null,
-  7:61, 8:null, 9:101, 10:101, 11:101, 12:101,
+  1:101,  // Priede
+  2:101,  // Lapegle
+  3:81,   // Egle
+  4:61,   // Bērzs
+  5:71,   // Melnalksnis
+  6:null, // Baltalksnis
+  7:101,  // Ozols
+  8:41,   // Apse
+  9:61,   // Osis
+  10:null, 11:null, 12:null,
 }
 
 function noteiktCirti(vecums, g, aizsardziba, suga) {
