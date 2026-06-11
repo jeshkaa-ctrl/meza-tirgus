@@ -20,27 +20,44 @@ const SUGAS_KODS = {
   5:'Bl', 6:'Ba', 7:'Oz', 8:'G',
   9:'Os', 10:'Os',11:'Ba',12:'Ba',
 }
-// Kartes krāsas
+// Kartes fallback krāsas (ja bonNum nav NOGABALA_KRASA) — VMD standarts
 const SUGAS_KRASA = {
-  1:'#2e7d32', 2:'#1b5e20', 3:'#1565c0', 4:'#f9a825',
-  5:'#006064', 6:'#558b2f', 7:'#4e342e', 8:'#e65100',
-  9:'#006064', 10:'#5d4037',11:'#f57f17',12:'#00897b',
+  1:'#e06030', // Priede — sārtinš
+  2:'#e09000', // Lapegle — oranžs
+  3:'#7050b0', // Egle — violets
+  4:'#e8d800', // Bērzs — dzeltens
+  5:'#d84088', // Melnalksnis — magenta
+  6:'#e880b8', // Baltalksnis — rozā
+  7:'#606060', // Ozols — pelēks
+  8:'#00a0a0', // Apse — tirkīzs
+  9:'#a0a000', // Osis — olīvs
+  10:'#5d4037', 11:'#f57f17', 12:'#00897b',
 }
 // LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V; 0→default II
 const BONITATES = { 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
 
-// Karte: krāsa pēc sugas + bonitātes — VMD standarta krāsas (suga-bonNum)
-// 1=Priede(zaļa), 3=Egle(zila), 4=Bērzs(dzeltena), 8=Apse(oranža)...
+// Karte: krāsas pēc VMD/LVM standarta leģendas
+// bonNum: 1=Ia(gaišākā), 2=I, 3=II, 4=III, 5=IV(tumšākā)
+// Priede=sārts/rozā, Egle=violets, Bērzs=dzeltens, Apse=tirkīzs/zils
 const NOGABALA_KRASA = {
-  '1-1':'#1a5c1a', '1-2':'#2d8c2d', '1-3':'#5cb85c', '1-4':'#a8d8a8',  // Priede
-  '2-1':'#2d5016', '2-2':'#4a7c28',                                       // Lapegle
-  '3-1':'#1a1a8c', '3-2':'#2d2db8', '3-3':'#6666cc', '3-4':'#aaaaee',   // Egle
-  '4-1':'#b8a800', '4-2':'#d4c200', '4-3':'#e8d84a',                     // Bērzs
-  '5-1':'#004d4d', '5-2':'#006666',                                       // Melnalksnis
-  '6-1':'#cc66cc', '6-2':'#d988d9',                                       // Baltalksnis
-  '7-1':'#5c3317', '7-2':'#7a4520',                                       // Ozols
-  '8-1':'#cc4400', '8-2':'#e05a00',                                       // Apse
-  '9-1':'#006060', '9-2':'#007a7a',                                       // Osis
+  // 1 = Priede (sārts→sarkans)
+  '1-1':'#fcdab8', '1-2':'#f4a070', '1-3':'#e06030', '1-4':'#c04020', '1-5':'#8b2010',
+  // 2 = Lapegle (oranžs)
+  '2-1':'#ffe4b0', '2-2':'#ffb830', '2-3':'#e09000', '2-4':'#b06000', '2-5':'#804000',
+  // 3 = Egle (violets/purpurs)
+  '3-1':'#ddd0f0', '3-2':'#b090d8', '3-3':'#7050b0', '3-4':'#4a3090', '3-5':'#2a1060',
+  // 4 = Bērzs (dzeltens)
+  '4-1':'#fffff0', '4-2':'#ffff80', '4-3':'#e8d800', '4-4':'#c0b000', '4-5':'#908000',
+  // 5 = Melnalksnis (tumši rozā/magenta)
+  '5-1':'#ffd0e0', '5-2':'#ff90b8', '5-3':'#d84088', '5-4':'#a81060', '5-5':'#700038',
+  // 6 = Baltalksnis (gaiši rozā)
+  '6-1':'#ffe0f0', '6-2':'#ffb0d8', '6-3':'#e880b8', '6-4':'#c05090', '6-5':'#902868',
+  // 7 = Ozols (pelēks)
+  '7-1':'#c0c0c0', '7-2':'#909090', '7-3':'#606060', '7-4':'#404040', '7-5':'#202020',
+  // 8 = Apse (tirkīzs/zils)
+  '8-1':'#c0f0f0', '8-2':'#50d0d0', '8-3':'#00a0a0', '8-4':'#007070', '8-5':'#004040',
+  // 9 = Osis (olīvzaļš)
+  '9-1':'#e8e890', '9-2':'#c8c840', '9-3':'#a0a000', '9-4':'#707000', '9-5':'#484800',
 }
 
 // Sortimentu krāsas diagrammām
