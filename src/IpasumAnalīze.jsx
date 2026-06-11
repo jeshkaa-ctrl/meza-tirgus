@@ -487,12 +487,16 @@ export default function IpasumAnalīze({ onBack }) {
       setKluda('Kadastra numuram jābūt 11 cipariem (piemērs: 42820040063)'); return
     }
     setKluda(''); setFaze('lade'); setLadeText('Saņem kadastra robežas...')
+    console.log('🔍 DEBUG analizet sākums, kad=', kad)
     try {
       // 1. Kadastra robeža (publicwfs:kkparcel, lauks: code)
+      const kadUrl = buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`)
+      console.log('🔍 KAD URL:', kadUrl)
       let kadData
       try {
-        kadData = await lvmWFS(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
+        kadData = await lvmWFS(kadUrl)
       } catch (e) {
+        console.log('🔍 KAD kļūda:', e.message)
         if (e.message.startsWith('WFS_400') || e.message.startsWith('WFS_500')) {
           setLadeText('Diagnostika...')
           const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:kkparcel')
@@ -500,6 +504,7 @@ export default function IpasumAnalīze({ onBack }) {
         }
         throw e
       }
+      console.log('🔍 KAD features:', kadData?.features?.length, 'pirmais:', kadData?.features?.[0]?.properties?.code)
       const kadFeat = kadData?.features?.[0]
       if (!kadFeat) {
         setFaze('ievads'); setKluda(`Kadastra '${kad}' nav atrasts LVM GEO.`); return
