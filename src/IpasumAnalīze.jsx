@@ -36,28 +36,41 @@ const SUGAS_KRASA = {
 // LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V; 0→default II
 const BONITATES = { 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
 
-// Karte: krāsas pēc VMD/LVM standarta leģendas
-// bonNum: 1=Ia(gaišākā), 2=I, 3=II, 4=III, 5=IV(tumšākā)
-// Priede=sārts/rozā, Egle=violets, Bērzs=dzeltens, Apse=tirkīzs/zils
+// Vecuma grupas robežas (gadi) — standarta Latvijas meža inventarizācija
+const VECUMA_ROBEZAS = {
+  1:[20,40,80], 2:[20,40,80], 3:[20,40,80],  // Priede, Lapegle, Egle
+  4:[10,20,40], 5:[10,20,40], 6:[10,20,40],  // Bērzs, Melnalksnis, Baltalksnis
+  7:[20,40,80], 8:[10,20,40], 9:[10,20,40],  // Ozols, Apse, Osis
+}
+function getVecumaGrupa(sugaKods, vecums) {
+  const b = VECUMA_ROBEZAS[sugaKods] || [20, 40, 80]
+  if (vecums <= b[0]) return 1  // jaunaudze
+  if (vecums <= b[1]) return 2  // vidēja vecuma
+  if (vecums <= b[2]) return 3  // briestaudze
+  return 4                       // pieaugusi
+}
+
+// Karte: krāsa pēc sugas + VECUMA GRUPAS (1=jaunaudze, 4=pieaugusi)
+// Atbilst LVM GEO standarta leģendai
 const NOGABALA_KRASA = {
-  // 1 = Priede (sārts→sarkans)
-  '1-1':'#fcdab8', '1-2':'#f4a070', '1-3':'#e06030', '1-4':'#c04020', '1-5':'#8b2010',
-  // 2 = Lapegle (oranžs)
-  '2-1':'#ffe4b0', '2-2':'#ffb830', '2-3':'#e09000', '2-4':'#b06000', '2-5':'#804000',
-  // 3 = Egle (violets/purpurs)
-  '3-1':'#ddd0f0', '3-2':'#b090d8', '3-3':'#7050b0', '3-4':'#4a3090', '3-5':'#2a1060',
-  // 4 = Bērzs (dzeltens)
-  '4-1':'#fffff0', '4-2':'#ffff80', '4-3':'#e8d800', '4-4':'#c0b000', '4-5':'#908000',
-  // 5 = Melnalksnis (tumši rozā/magenta)
-  '5-1':'#ffd0e0', '5-2':'#ff90b8', '5-3':'#d84088', '5-4':'#a81060', '5-5':'#700038',
-  // 6 = Baltalksnis (gaiši rozā)
-  '6-1':'#ffe0f0', '6-2':'#ffb0d8', '6-3':'#e880b8', '6-4':'#c05090', '6-5':'#902868',
-  // 7 = Ozols (pelēks)
-  '7-1':'#c0c0c0', '7-2':'#909090', '7-3':'#606060', '7-4':'#404040', '7-5':'#202020',
-  // 8 = Apse (tirkīzs/zils)
-  '8-1':'#c0f0f0', '8-2':'#50d0d0', '8-3':'#00a0a0', '8-4':'#007070', '8-5':'#004040',
-  // 9 = Osis (olīvzaļš)
-  '9-1':'#e8e890', '9-2':'#c8c840', '9-3':'#a0a000', '9-4':'#707000', '9-5':'#484800',
+  // 1=Priede: salmon→sarkans
+  '1-1':'#fcd8b8','1-2':'#f4a060','1-3':'#e06028','1-4':'#8b2010',
+  // 2=Lapegle: oranžs
+  '2-1':'#ffe0a0','2-2':'#ffb030','2-3':'#d88000','2-4':'#905000',
+  // 3=Egle: gaiši violets→tumši violets
+  '3-1':'#ddd0f0','3-2':'#9880c8','3-3':'#6040a0','3-4':'#2a0868',
+  // 4=Bērzs: gaiši dzeltens→tumši dzeltens/zaļš
+  '4-1':'#ffffe0','4-2':'#ffff60','4-3':'#d8c000','4-4':'#909010',
+  // 5=Melnalksnis: gaiši rozā→tumši magenta
+  '5-1':'#ffd8e8','5-2':'#ff80b0','5-3':'#d03880','5-4':'#781040',
+  // 6=Baltalksnis: rozā (cits tonis)
+  '6-1':'#ffe8f8','6-2':'#ffa8d8','6-3':'#e060a8','6-4':'#a02868',
+  // 7=Ozols: pelēks→tumšs
+  '7-1':'#c8c8c8','7-2':'#909090','7-3':'#585858','7-4':'#282828',
+  // 8=Apse: gaiši tirkīzs→tumši tirkīzs
+  '8-1':'#c8f0f0','8-2':'#40c8c8','8-3':'#009090','8-4':'#004848',
+  // 9=Osis: olīvdzeltens→tumšs
+  '9-1':'#e8e870','9-2':'#c0c020','9-3':'#888800','9-4':'#484800',
 }
 
 // Sortimentu krāsas diagrammām
@@ -428,11 +441,12 @@ export default function IpasumAnalīze({ onBack }) {
           {
             style: feat => {
               const n = editData.find(x => x.id === feat.id)
-              const colorKey = n ? `${n.sugaKods}-${n.bonNum}` : ''
+              const vg = n ? getVecumaGrupa(n.sugaKods, n.vecums) : 2
+              const colorKey = n ? `${n.sugaKods}-${vg}` : ''
               return {
-                color: '#222', weight: 1,
-                fillColor: NOGABALA_KRASA[colorKey] || (n ? SUGAS_KRASA[n.sugaKods] : '#757575') || '#4caf50',
-                fillOpacity: 0.70,
+                color: '#333', weight: 1,
+                fillColor: NOGABALA_KRASA[colorKey] || SUGAS_KRASA[n?.sugaKods] || '#888',
+                fillOpacity: 0.80,
               }
             },
             onEachFeature: (feat, layer) => {
@@ -964,12 +978,13 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
           <div ref={mapRef} style={{ width:'100%', height:420, borderRadius:12,
             border:`1px solid ${C.border}`, background:'#1a2e1a', overflow:'hidden' }} />
 
-          {/* Leģenda — krāsa pēc sugas+bonitātes */}
+          {/* Leģenda — suga + vecuma grupa */}
           <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:10 }}>
-            {[...new Map(editData.map(n=>[
-              `${n.sugaNos} ${n.bon}`,
-              NOGABALA_KRASA[`${n.sugaKods}-${n.bonNum}`] || n.sugaKrasa
-            ]))].map(([label, krasa]) => (
+            {[...new Map(editData.map(n => {
+              const vg = getVecumaGrupa(n.sugaKods, n.vecums)
+              const vgLabel = ['','I','II','III','IV'][vg] || ''
+              return [`${n.sugaNos} ${vgLabel}`, NOGABALA_KRASA[`${n.sugaKods}-${vg}`] || n.sugaKrasa]
+            }))].map(([label, krasa]) => (
               <span key={label} style={{ display:'flex', alignItems:'center', gap:5,
                 background:C.inner, border:`1px solid ${C.border}`, borderRadius:12, padding:'3px 10px', fontSize:11 }}>
                 <span style={{ width:10, height:10, borderRadius:'50%', background:krasa, display:'inline-block' }}/>
