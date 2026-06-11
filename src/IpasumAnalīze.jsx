@@ -508,24 +508,24 @@ export default function IpasumAnalīze({ onBack }) {
 
       setLadeText('Iegūst VMD nogabalu datus...')
 
-      // 2. VMD nogabali (tieši pēc kadastrs='...' — nav INTERSECTS vajadzīgs)
-      const vmdData = await lvmWFS(
-        buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500)
-      )
-      const nogFeatures = vmdData?.features || []
+      // 2. VMD nogabali — pilnais debug
+      const vmdUrl = buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500)
+      console.log('=== WFS URL ===', vmdUrl)
 
-      // DEBUG — izdrukā pirmos 3 nogabalus konsolē
-      const features = vmdData?.features || []
-      features.slice(0, 3).forEach((f, i) => {
-        const p = f.properties
-        console.log(`=== NOGABALS ${i} ===`)
-        console.log('s10:', p.s10, 's11:', p.s11, 's12:', p.s12, 's13:', p.s13)
-        console.log('g10:', p.g10, 'g11:', p.g11, 'g12:', p.g12)
-        console.log('h10:', p.h10, 'a10:', p.a10, 'd10:', p.d10)
-        console.log('bv10:', p.bv10, 'color:', p.color, 'gtf:', p.gtf)
-        console.log('nog_plat:', p.nog_plat, 'kvart:', p.kvart, 'nog:', p.nog)
-        console.log('RAW properties:', JSON.stringify(p, null, 2))
-      })
+      const vmdRaw = await fetch(vmdUrl)
+      const vmdText = await vmdRaw.text()
+      console.log('=== RESPONSE STATUS ===', vmdRaw.status)
+      console.log('=== WFS RAW RESPONSE (pirmie 2000 simboli) ===')
+      console.log(vmdText.substring(0, 2000))
+
+      let vmdData
+      try { vmdData = JSON.parse(vmdText) } catch (e) { throw new Error('WFS nav JSON: ' + vmdText.slice(0, 200)) }
+      if (vmdData.error) throw new Error(vmdData.error)
+
+      console.log('=== FEATURES SKAITS ===', vmdData.features?.length)
+      console.log('=== PIRMAIS FEATURE ===', JSON.stringify(vmdData.features?.[0], null, 2))
+
+      const nogFeatures = vmdData?.features || []
 
       setLadeText('Iegūst aizsardzības teritorijas...')
 
