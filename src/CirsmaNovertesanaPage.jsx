@@ -484,7 +484,7 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
               
               <div style={{gridColumn:"span 4"}}>
                 <label style={{fontSize:"11px",fontWeight:"bold"}}>Piezīmes:</label><br/>
-                <input value={cirsma.piezimes} onChange={e=>updateCirsma(ci,"piezimes",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}} placeholder="Dzīvnieku bojājumi, piepe, pievešanas apstākļi..."/>
+                <input value={cirsma.piezimes} onChange={e=>updateCirsma(ci,"piezimes",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #2d5a2d",borderRadius:"4px",fontSize:"12px",color:"#e8f5e9",background:"#0f2b0f",boxSizing:"border-box"}} placeholder="Dzīvnieku bojājumi, piepe, pievešanas apstākļi..."/>
               </div>
             </div>
 
@@ -505,11 +505,11 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"8px",marginBottom:"10px"}}>
                     <div>
                       <label style={{fontSize:"11px",fontWeight:"bold"}}>Nogabala Nr.:</label><br/>
-                      <input value={nog.nr} onChange={e=>updateNogabals(ci,ni,"nr",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}} placeholder="p.ē. 5"/>
+                      <input value={nog.nr} onChange={e=>updateNogabals(ci,ni,"nr",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px",color:"#e8f5e9",background:"#0f2b0f",boxSizing:"border-box"}} placeholder="p.ē. 5"/>
                     </div>
                     <div>
                       <label style={{fontSize:"11px",fontWeight:"bold"}}>Platība (ha):</label><br/>
-                      <input value={nog.platiba} onChange={e=>updateNogabals(ci,ni,"platiba",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px"}} placeholder="1,5"/>
+                      <input value={nog.platiba} onChange={e=>updateNogabals(ci,ni,"platiba",e.target.value)} style={{width:"100%",padding:"4px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"12px",color:"#e8f5e9",background:"#0f2b0f",boxSizing:"border-box"}} placeholder="1,5"/>
                     </div>
                     <div>
                       <label style={{fontSize:"11px",fontWeight:"bold"}}>Augsnes tips:</label><br/>
@@ -533,17 +533,17 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
                         {nog.sugas.map((s, si) => (
                           <tr key={si} style={{background:si%2===0?"#0f1a0f":"#141f14",color:"#e8f5e9"}}>
                             <td>
-                              <select value={s.suga} onChange={e=>updateSuga(ci,ni,si,"suga",e.target.value)} style={{padding:"2px",fontSize:"11px"}}>
+                              <select value={s.suga} onChange={e=>updateSuga(ci,ni,si,"suga",e.target.value)} style={{padding:"2px",fontSize:"11px",background:"#0f2b0f",color:"#e8f5e9",border:"1px solid #2d5a2d",boxSizing:"border-box"}}>
                                 {SUGAS.map(sg=><option key={sg}>{sg}</option>)}
                               </select>
                             </td>
-                            <td><input type="number" value={s.vecums||""} onChange={e=>updateSuga(ci,ni,si,"vecums",e.target.value)} style={{width:"42px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
-                            <td><input type="number" value={s.h||""} onChange={e=>updateSuga(ci,ni,si,"h",e.target.value)} style={{width:"38px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
-                            <td><input type="number" value={s.d||""} onChange={e=>updateSuga(ci,ni,si,"d",e.target.value)} style={{width:"38px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
-                            <td><input value={s.g||""} onChange={e=>updateSuga(ci,ni,si,"g",e.target.value)} style={{width:"42px",fontSize:"11px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px"}}/></td>
+                            <td><input type="number" value={s.vecums||""} onChange={e=>updateSuga(ci,ni,si,"vecums",e.target.value)} style={{width:"42px",fontSize:"11px",padding:"2px 3px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px",boxSizing:"border-box"}}/></td>
+                            <td><input type="number" value={s.h||""} onChange={e=>updateSuga(ci,ni,si,"h",e.target.value)} style={{width:"38px",fontSize:"11px",padding:"2px 3px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px",boxSizing:"border-box"}}/></td>
+                            <td><input type="number" value={s.d||""} onChange={e=>updateSuga(ci,ni,si,"d",e.target.value)} style={{width:"38px",fontSize:"11px",padding:"2px 3px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px",boxSizing:"border-box"}}/></td>
+                            <td><input value={s.g||""} onChange={e=>updateSuga(ci,ni,si,"g",e.target.value)} style={{width:"42px",fontSize:"11px",padding:"2px 3px",background:"#0f2b0f",border:"1px solid #2d5a2d",color:"#e8f5e9",borderRadius:"3px",boxSizing:"border-box"}}/></td>
                             <td style={{textAlign:"center",fontWeight:"bold",color:"#4caf50"}}>{s.bonitate||"—"}</td>
                             <td>
-                              <select value={s.kvalitate} onChange={e=>updateSuga(ci,ni,si,"kvalitate",e.target.value)} style={{padding:"2px",fontSize:"11px"}}>
+                              <select value={s.kvalitate} onChange={e=>updateSuga(ci,ni,si,"kvalitate",e.target.value)} style={{padding:"2px",fontSize:"11px",background:"#0f2b0f",color:"#e8f5e9",border:"1px solid #2d5a2d",boxSizing:"border-box"}}>
                                 {KVALITATES.map(k=><option key={k}>{k}</option>)}
                               </select>
                             </td>
