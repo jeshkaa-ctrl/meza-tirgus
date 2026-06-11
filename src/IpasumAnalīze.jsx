@@ -514,6 +514,19 @@ export default function IpasumAnalīze({ onBack }) {
       )
       const nogFeatures = vmdData?.features || []
 
+      // DEBUG — izdrukā pirmos 3 nogabalus konsolē
+      const features = vmdData?.features || []
+      features.slice(0, 3).forEach((f, i) => {
+        const p = f.properties
+        console.log(`=== NOGABALS ${i} ===`)
+        console.log('s10:', p.s10, 's11:', p.s11, 's12:', p.s12, 's13:', p.s13)
+        console.log('g10:', p.g10, 'g11:', p.g11, 'g12:', p.g12)
+        console.log('h10:', p.h10, 'a10:', p.a10, 'd10:', p.d10)
+        console.log('bv10:', p.bv10, 'color:', p.color, 'gtf:', p.gtf)
+        console.log('nog_plat:', p.nog_plat, 'kvart:', p.kvart, 'nog:', p.nog)
+        console.log('RAW properties:', JSON.stringify(p, null, 2))
+      })
+
       setLadeText('Iegūst aizsardzības teritorijas...')
 
       // 3. Egļu aizsardzības nogabali — vmdspruceprotcompartments (cadaster lauks)
