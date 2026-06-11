@@ -27,6 +27,23 @@ const SUGAS_KRASA = {
 // LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V; 0→default II
 const BONITATES = { 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
 
+// Karte: krāsa pēc sugas + bonitātes (suga-bonNum)
+const NOGABALA_KRASA = {
+  '1-1':'#1a5c1a', '1-2':'#2d8c2d', '1-3':'#5cb85c', '1-4':'#a8d8a8',
+  '2-1':'#1a1a8c', '2-2':'#2d2db8', '2-3':'#6666cc',
+  '3-1':'#cccc00', '3-2':'#e0e066',
+  '4-1':'#cc6600',
+  '5-1':'#006666',
+  '6-1':'#cc66cc',
+  '7-1':'#8B4513',
+}
+
+// Sortimentu krāsas diagrammām
+const SORT_KRASA = {
+  log:'#2e7d32', small:'#4caf50', veneer:'#fbbf24',
+  tara:'#f97316', pulp:'#64748b', fire:'#ef4444', chips:'#92400e',
+}
+
 // Aizsardzības noteikumi pa teritoriju tipiem
 const AIZSARDZIBA = {
   dabas_liegums:     { cirte:'aizliegta',  label:'🔴 Cirte aizliegta'           },
@@ -262,6 +279,17 @@ function apstradatNogabalu(feat, i) {
 
   const indVertiba = kubaturaKopa * 35
 
+  // Izcērtamā krāja pēc lēmuma
+  const gMin = 12
+  let izcertamaKraja = 0
+  const lBase = lemumsBezAiz.toLowerCase()
+  if (lBase.includes('kailcirte') || lBase.includes('galvenā cirte')) {
+    izcertamaKraja = kubaturaKopa
+  } else if (lBase.includes('kopšanas cirte')) {
+    const ratio = gKopa > gMin ? (gKopa - gMin) / gKopa : 0
+    izcertamaKraja = Math.round(Math.min(ratio * kubaturaKopa, kubaturaKopa * 0.30))
+  }
+
   // Nogabala numurs
   const nr_text = p.kvart != null
     ? (p.anog && p.anog !== '0' && p.anog !== 0)
@@ -279,11 +307,11 @@ function apstradatNogabalu(feat, i) {
     vecums:      main.vec,
     vecumsWfs:   main.aWfs,
     taksGads,
-    bon, bieziba,
+    bon, bonNum, bieziba,
     platiba,
     h: main.hEff, g: gKopa, d: main.dEff,
-    kubatura: kubaturaKopa,
-    slani,    // visi sugu slāņi
+    kubatura: kubaturaKopa, izcertamaKraja,
+    slani,
     sortVert, sortimenti, lemums, indVertiba,
     mzVeids: p.mz_veids ?? null,
     geojson: feat, rawProps: p,
@@ -369,10 +397,11 @@ export default function IpasumAnalīze({ onBack }) {
           {
             style: feat => {
               const n = editData.find(x => x.id === feat.id)
+              const colorKey = n ? `${n.sugaKods}-${n.bonNum}` : ''
               return {
-                color: '#fff', weight: 1.5,
-                fillColor: n ? getLemumKrasa(n.lemums) : '#757575',
-                fillOpacity: 0.65,
+                color: '#222', weight: 1,
+                fillColor: NOGABALA_KRASA[colorKey] || (n ? SUGAS_KRASA[n.sugaKods] : '#757575') || '#4caf50',
+                fillOpacity: 0.70,
               }
             },
             onEachFeature: (feat, layer) => {
@@ -601,6 +630,12 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
   const kopPlatiba  = editData.reduce((s,n) => s + n.platiba, 0)
   const kopKubatura = editData.reduce((s,n) => s + n.kubatura, 0)
   const kopIndVert  = editData.reduce((s,n) => s + n.indVertiba, 0)
+  const izcGalv = editData.reduce((s,n) =>
+    (n.lemums.toLowerCase().includes('kailcirte') || n.lemums.toLowerCase().includes('galvenā cirte'))
+      ? s + n.izcertamaKraja : s, 0)
+  const izcKops = editData.reduce((s,n) =>
+    n.lemums.toLowerCase().includes('kopšanas cirte')
+      ? s + n.izcertamaKraja : s, 0)
 
   // Dominējošā suga (pēc platības)
   const sugasPaPlat = editData.reduce((acc, n) => {
@@ -640,6 +675,22 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
   const barKub = editData
     .filter(n => n.kubatura > 0)
     .map(n => ({ name: n.nr_text, m3: n.kubatura, fill: n.sugaKrasa }))
+
+  const barVert = editData
+    .filter(n => n.sortVert > 0)
+    .map(n => ({ name: n.nr_text, eur: n.sortVert, fill: n.sugaKrasa }))
+
+  const sortPieData = Object.entries(
+    editData.reduce((acc, n) => {
+      Object.entries(n.sortimenti).forEach(([k, v]) => { acc[k] = (acc[k]||0) + (v||0) })
+      return acc
+    }, {})
+  ).filter(([,v]) => v > 0.5)
+    .map(([k, v]) => ({
+      name: SORT_NOS[k] || k,
+      value: Math.round(v),
+      fill: SORT_KRASA[k] || '#4caf50',
+    }))
 
   const sortKopa = editData.reduce((acc, n) => {
     Object.entries(n.sortimenti).forEach(([k,v]) => { acc[k] = (acc[k]||0) + (v||0) })
@@ -815,12 +866,14 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
       {/* Kopsavilkuma kartiņas */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:8, padding:'10px 16px 0' }}>
         {[
-          { label:'Kopplatība',   val:`${kopPlatiba.toFixed(1)} ha`,        color:C.green   },
-          { label:'Nogabali',     val: editData.length,                      color:DS.info   },
-          { label:'Dom. suga',    val: domSuga,                              color:'#f9a825' },
-          { label:'Vid. vecums',  val: vidVecums ? `${vidVecums} g.` : '—', color:C.sec     },
-          { label:'Kopkubatūra',  val:`${kopKubatura.toFixed(0)} m³`,       color:'#4ade80' },
-          { label:'Ind. vērtība', val:`${kopIndVert.toLocaleString()} €`,   color:'#4ade80' },
+          { label:'Kopplatība',     val:`${kopPlatiba.toFixed(1)} ha`,        color:C.green   },
+          { label:'Nogabali',       val: editData.length,                      color:DS.info   },
+          { label:'Dom. suga',      val: domSuga,                              color:'#f9a825' },
+          { label:'Vid. vecums',    val: vidVecums ? `${vidVecums} g.` : '—', color:C.sec     },
+          { label:'Kopkubatūra',    val:`${kopKubatura.toFixed(0)} m³`,       color:'#4ade80' },
+          { label:'Galv. cirtē',    val: izcGalv > 0 ? `${izcGalv} m³` : '—', color:'#2e7d32' },
+          { label:'Kopš. cirtē',    val: izcKops > 0 ? `${izcKops} m³` : '—', color:'#f9a825' },
+          { label:'Ind. vērtība',   val:`${kopIndVert.toLocaleString()} €`,   color:'#4ade80' },
         ].map((x,i) => (
           <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:10, padding:'10px 12px' }}>
             <div style={{ fontSize:9, color:C.dim, marginBottom:3, textTransform:'uppercase', letterSpacing:'0.06em' }}>{x.label}</div>
@@ -862,13 +915,16 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
           <div ref={mapRef} style={{ width:'100%', height:420, borderRadius:12,
             border:`1px solid ${C.border}`, background:'#1a2e1a', overflow:'hidden' }} />
 
-          {/* Leģenda */}
+          {/* Leģenda — krāsa pēc sugas+bonitātes */}
           <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:10 }}>
-            {[...new Map(editData.map(n=>[n.sugaNos, n.sugaKrasa]))].map(([nos, krasa]) => (
-              <span key={nos} style={{ display:'flex', alignItems:'center', gap:5,
+            {[...new Map(editData.map(n=>[
+              `${n.sugaNos} ${n.bon}`,
+              NOGABALA_KRASA[`${n.sugaKods}-${n.bonNum}`] || n.sugaKrasa
+            ]))].map(([label, krasa]) => (
+              <span key={label} style={{ display:'flex', alignItems:'center', gap:5,
                 background:C.inner, border:`1px solid ${C.border}`, borderRadius:12, padding:'3px 10px', fontSize:11 }}>
                 <span style={{ width:10, height:10, borderRadius:'50%', background:krasa, display:'inline-block' }}/>
-                {nos}
+                {label}
               </span>
             ))}
             {dapTer.length > 0 && (
@@ -1002,6 +1058,40 @@ ${dapTer.length>0?`<p style="color:#c62828;font-size:10px">⚠️ ${dapTer.lengt
                     {barKub.map((e,i) => <Cell key={i} fill={e.fill} />)}
                   </Bar>
                 </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Vērtība pa nogabaliem */}
+          {barVert.length > 0 && (
+            <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:16, marginBottom:14 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:C.green, marginBottom:12 }}>💰 Vērtība pa nogabaliem (€)</div>
+              <ResponsiveContainer width="100%" height={Math.min(220, barVert.length*32+60)}>
+                <BarChart data={barVert} layout="vertical" margin={{ left:30, right:20 }}>
+                  <XAxis type="number" tick={tkStyle} />
+                  <YAxis type="category" dataKey="name" tick={{ ...tkStyle, fontSize:11 }} width={50} />
+                  <Tooltip contentStyle={tpStyle} formatter={v=>[`${v.toLocaleString()} €`,'Vērtība']} />
+                  <Bar dataKey="eur" radius={[0,4,4,0]}>
+                    {barVert.map((e,i) => <Cell key={i} fill={e.fill} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Sortimentu sadalījums — sektoru */}
+          {sortPieData.length > 0 && (
+            <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:12, padding:16, marginBottom:14 }}>
+              <div style={{ fontSize:12, fontWeight:700, color:C.green, marginBottom:12 }}>🪵 Sortimentu sadalījums (m³)</div>
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie data={sortPieData} dataKey="value" nameKey="name"
+                    cx="50%" cy="50%" outerRadius={80} innerRadius={28}
+                    label={({name,value})=>`${name} ${value}m³`} labelLine={{ stroke:C.sec, strokeWidth:1 }}>
+                    {sortPieData.map((e,i) => <Cell key={i} fill={e.fill} />)}
+                  </Pie>
+                  <Tooltip contentStyle={tpStyle} formatter={v=>[`${v} m³`,'Apjoms']} />
+                </PieChart>
               </ResponsiveContainer>
             </div>
           )}
