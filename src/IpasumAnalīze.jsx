@@ -7,20 +7,22 @@ import {
 import { forestEngine } from './forestEngine'
 import { C as DS, F, spinnerCSS } from './ds'
 
-// ─── Sugas: LVM WFS kods → { kods (forestEngine), nos (latviski), krasa } ────
+// ─── Sugas: LVM WFS kods (s10) → latviski nosaukums ─────────────────────────
 const SUGAS_KARTE = {
-  1:  { kods:'P',  nos:'Priede',       krasa:'#2e7d32' },
-  2:  { kods:'E',  nos:'Egle',         krasa:'#1565c0' },
-  3:  { kods:'B',  nos:'Bērzs',        krasa:'#f9a825' },
-  4:  { kods:'G',  nos:'Apse',         krasa:'#e65100' },
-  5:  { kods:'Bl', nos:'Melnalksnis',  krasa:'#1b5e20' },
-  6:  { kods:'Ba', nos:'Baltalksnis',  krasa:'#558b2f' },
-  7:  { kods:'Os', nos:'Osis',         krasa:'#006064' },
-  8:  { kods:'Os', nos:'Goba',         krasa:'#5d4037' },
-  9:  { kods:'Oz', nos:'Ozols',        krasa:'#4e342e' },
-  10: { kods:'B',  nos:'Skābardis',    krasa:'#6d4c41' },
-  11: { kods:'P',  nos:'Ciedrupriede', krasa:'#1a5276' },
-  12: { kods:'Oz', nos:'Dižskābardis', krasa:'#4a235a' },
+  1:'Priede', 2:'Egle',  3:'Bērzs',  4:'Apse',  5:'Melnalksnis',
+  6:'Baltalksnis', 7:'Osis', 8:'Goba', 9:'Ozols',
+  10:'Skābardis', 11:'Ciedrupriede', 12:'Dižskābardis',
+}
+// ForestEngine īsie kodi (formula parameterim)
+const SUGAS_KODS = {
+  1:'P', 2:'E', 3:'B', 4:'G',  5:'Bl', 6:'Ba',
+  7:'Os', 8:'Os', 9:'Oz', 10:'B', 11:'P', 12:'Oz',
+}
+// Kartes krāsas
+const SUGAS_KRASA = {
+  1:'#2e7d32', 2:'#1565c0', 3:'#f9a825', 4:'#e65100',
+  5:'#1b5e20', 6:'#558b2f', 7:'#006064', 8:'#5d4037',
+  9:'#4e342e', 10:'#6d4c41', 11:'#1a5276', 12:'#4a235a',
 }
 // LVM bonitātes kodi (bv10 lauks): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V; 0→default II
 const BONITATES = { 1:'Ia', 2:'I', 3:'II', 4:'III', 5:'IV', 6:'V' }
@@ -89,12 +91,6 @@ function geojsonToWKT(geojson) {
   return null
 }
 
-// Sugas nosaukumi (VMD WFS s10 kods → latviski)
-const speciesMap = {
-  1:'Priede', 2:'Egle', 3:'Bērzs', 4:'Apse', 5:'Melnalksnis',
-  6:'Baltalksnis', 7:'Osis', 8:'Goba', 9:'Ozols',
-  10:'Skābardis', 11:'Ciedrupriede', 12:'Dižskābardis',
-}
 
 // Aizsardzības noteikumi (alias — detalizēts variants ar komentāriem)
 const protectionRules = {
@@ -126,13 +122,20 @@ function aprekinātKubaturu(g, h, platiba) {
 }
 
 // Cirtes lēmums pēc MK 935 minimālajiem vecumiem
+// Minimālie cirtes vecumi pēc MK 935 (null = nav vecuma ierobežojuma)
+const MIN_VECUMS = {
+  1:101, 2:81, 3:61, 4:41, 5:71, 6:null,
+  7:61, 8:null, 9:101, 10:101, 11:101, 12:101,
+}
+
 function noteiktCirti(vecums, g, aizsardziba, suga) {
   if (aizsardziba === 'aizliegta') return { lēmums:'Cirte aizliegta', klase:'aizliegta' }
   if (!g || g === 0)               return { lēmums:'Necērtams',       klase:'nevertams' }
-  const minVec = { 1:81, 2:81, 3:61, 4:41, 5:41, 6:41, 7:61, 8:61, 9:101, 10:101, 11:101, 12:101 }
-  const gMin = 12
-  if (vecums >= (minVec[suga] || 81) && g >= gMin) return { lēmums:'Kailcirte',      klase:'kailcirte' }
-  if (g >= gMin * 1.2)                             return { lēmums:'Kopšanas cirte', klase:'kopsana'   }
+  const gMin  = 12
+  const minV  = MIN_VECUMS[suga]
+  const vecOk = minV === null || minV === undefined ? true : vecums >= minV
+  if (vecOk && g >= gMin) return { lēmums:'Kailcirte',      klase:'kailcirte' }
+  if (g >= gMin * 1.2)    return { lēmums:'Kopšanas cirte', klase:'kopsana'   }
   return { lēmums:'Necērtams', klase:'nevertams' }
 }
 
@@ -213,21 +216,22 @@ function apstradatNogabalu(feat, i) {
     const gEff = g || calcG(sKods, vec)
     const dEff = d || calcD(hEff)
     const kub  = aprekinātKubaturu(gEff, hEff, platiba)
-    const inf  = SUGAS_KARTE[sKods] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
-    return { sKods, inf, vec, aWfs, hEff, gEff, dEff, kub }
+    const nos  = SUGAS_KARTE[sKods] || 'Nezināma'
+    const kods = SUGAS_KODS[sKods]  || 'P'
+    const krasa= SUGAS_KRASA[sKods] || '#4caf50'
+    return { sKods, nos, kods, krasa, vec, aWfs, hEff, gEff, dEff, kub }
   }).filter(Boolean)
 
   // Galvenā suga (pirmais slānis)
-  const main = slani[0] || { sKods:1, inf:SUGAS_KARTE[1], vec:60, aWfs:0, hEff:0, gEff:0, dEff:0, kub:0 }
-  const inf  = main.inf
+  const main = slani[0] || { sKods:1, nos:'Priede', kods:'P', krasa:'#2e7d32', vec:60, aWfs:0, hEff:0, gEff:0, dEff:0, kub:0 }
 
   // Kopējie rādītāji
-  const gKopa      = slani.reduce((s, l) => s + l.gEff, 0)
-  const kubaturaKopa = slani.reduce((s, l) => s + l.kub, 0)
+  const gKopa        = slani.reduce((s, l) => s + l.gEff, 0)
+  const kubaturaKopa = slani.reduce((s, l) => s + l.kub,  0)
 
   // Audzes formula tekstā (piemēram "8P 2E")
   const audzeFormula = slani.map(l =>
-    `${Math.round(l.gEff / Math.max(gKopa, 1) * 10)}${l.inf.kods}`
+    `${Math.round(l.gEff / Math.max(gKopa, 1) * 10)}${l.kods}`
   ).join(' ')
 
   // Cirtes lēmums pēc galvenās sugas (ar biezību kā brīdinājumu)
@@ -239,11 +243,18 @@ function apstradatNogabalu(feat, i) {
   if (kubaturaKopa > 0 && main.vec > 20) {
     try {
       const rez = forestEngine({
-        formula: `10${inf.kods}`, vec: main.vec, bon,
+        formula: `10${main.kods}`, vec: main.vec, bon,
         h: main.hEff, g: gKopa, d: main.dEff,
         platiba, krm3ha: 0, harvestType: '', plantacija: false,
       })
       sortimenti = rez.sortiments || {}
+      // Bērzam: malka tikai nokaltis audze, parastā audzē 0
+      if (main.sKods === 3 && kubaturaKopa > 0) {
+        sortimenti.fire = 0
+        sortimenti.tara = kubaturaKopa * 0.55
+        sortimenti.pulp = kubaturaKopa * 0.45
+      }
+      sortVert = 0
       Object.entries(sortimenti).forEach(([k, v]) => { sortVert += (v||0) * (SORT_CENAS[k]||0) })
       sortVert = Math.round(sortVert)
     } catch { /* ignorē */ }
@@ -261,9 +272,9 @@ function apstradatNogabalu(feat, i) {
   return {
     id: feat.id || `n${i}`, nr: i + 1, nr_text,
     sugaKods:    main.sKods,
-    suga:        inf.kods,
-    sugaNos:     inf.nos,
-    sugaKrasa:   inf.krasa,
+    suga:        main.kods,
+    sugaNos:     main.nos,
+    sugaKrasa:   main.krasa,
     audzeFormula,
     vecums:      main.vec,
     vecumsWfs:   main.aWfs,
@@ -371,7 +382,7 @@ export default function IpasumAnalīze({ onBack }) {
               const lemumKrasa = getLemumKrasa(n.lemums)
               const taksInfo = n.taksGads ? ` (taks. ${n.taksGads})` : ''
               const sugasRindas = (n.slani || []).map(l =>
-                `<tr><td style="color:#888;font-size:10px">${l.inf.nos}</td>` +
+                `<tr><td style="color:#888;font-size:10px">${l.nos}</td>` +
                 `<td style="text-align:right;font-size:10px">${l.vec} g · H${l.hEff}m · G${l.gEff} · ${l.kub}m³</td></tr>`
               ).join('')
               layer.bindPopup(
@@ -517,8 +528,9 @@ export default function IpasumAnalīze({ onBack }) {
     setEditData(prev => {
       const arr = [...prev]
       const r = { ...arr[i], [lauks]: lauks === 'bon' ? val : (parseFloat(val) || 0) }
-      const inf = SUGAS_KARTE[r.sugaKods] || { kods:'P', nos:'Nezināma', krasa:'#4caf50' }
-      r.suga = inf.kods; r.sugaNos = inf.nos; r.sugaKrasa = inf.krasa
+      r.suga     = SUGAS_KODS[r.sugaKods]  || 'P'
+      r.sugaNos  = SUGAS_KARTE[r.sugaKods] || 'Nezināma'
+      r.sugaKrasa= SUGAS_KRASA[r.sugaKods] || '#4caf50'
       const h = r.h || calcH(r.bon, r.vecums)
       const g = r.g || calcG(r.suga, r.vecums)
       r.kubatura = g && h && r.platiba ? Math.round(g * h * 0.45 * r.platiba) : 0
