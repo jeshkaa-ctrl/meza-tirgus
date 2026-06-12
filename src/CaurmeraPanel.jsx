@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { getBonitate } from "./bonityEngine"
-import { minDiameter, formFactor } from "./tables"
+import { minDiameter, getVeidaugstums } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
 
 export const getKlienti = () => { try { return JSON.parse(localStorage.getItem("rekins_klienti") || "[]") } catch { return [] } }
@@ -69,11 +69,11 @@ function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, on
   const [kvalitate, setKvalitate] = useState("A")
   const [platiba, setPlatiba2] = useState("")
   const kraja = (sumN > 0 && h) ? (() => {
-    const F = formFactor[suga] || 0.5
+    const vh = getVeidaugstums(Number(h), suga)
     return merijumi.reduce((sum, r) => {
       if(!r.n) return sum
       const d = r.d / 100
-      const vol = Math.PI * (d/2)**2 * Number(h) * F * r.n
+      const vol = Math.PI * (d/2)**2 * vh * r.n
       return sum + vol
     }, 0)
   })() : 0

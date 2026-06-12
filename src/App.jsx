@@ -104,29 +104,14 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onIpasums={()=>setPage("ipasums")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
-if(page==="ipasums") {
-  if(user?.epasts !== "jeshkaa@inbox.lv") return (
-    <div style={{minHeight:"100vh",background:"#080f08",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16,fontFamily:"Arial,sans-serif",padding:24}}>
-      <div style={{fontSize:40}}>🚧</div>
-      <div style={{color:"#4caf50",fontSize:20,fontWeight:700}}>Izstrādē</div>
-      <div style={{color:"#7ab87a",fontSize:14,textAlign:"center",maxWidth:320,lineHeight:1.6}}>
-        Šis rīks pašlaik tiek izstrādāts un vēl nav publiski pieejams.
-        Drīzumā būs pieejams visiem lietotājiem.
-      </div>
-      <button onClick={()=>setPage("main")} style={{marginTop:8,padding:"10px 24px",background:"transparent",border:"1px solid #2d5a2d",borderRadius:8,color:"#7ab87a",fontSize:14,cursor:"pointer"}}>
-        ← Atpakaļ
-      </button>
-    </div>
-  )
-  return (
-  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50"}}>Ielādē...</div></div>}>
+if(page==="ipasums") return (
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50",fontSize:16}}>Ielādē...</div></div>}>
     <IpasumAnalīze onBack={()=>setPage("main")} user={user} />
   </React.Suspense>
 )
-}
 if(page==="standard") return <>
   <StandardPage
     onBack={()=>setPage("main")}

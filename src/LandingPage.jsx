@@ -18,56 +18,71 @@ return(
 }
 
 // ========== GALVENA APP ==========
-function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums, onIpasums}){
 return(
 <div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
   {/* HERO */}
- <div style={{background:"linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 60%, #0f2a0f 100%)",padding:"40px 20px 48px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative",overflow:"hidden"}}>
-  {/* Dekoratīvs fona elements */}
-  <div style={{position:"absolute",top:"-60px",right:"-60px",width:"300px",height:"300px",background:"radial-gradient(circle, rgba(76,175,80,0.08) 0%, transparent 70%)",pointerEvents:"none"}}/>
-  <div style={{position:"absolute",bottom:"-40px",left:"-40px",width:"200px",height:"200px",background:"radial-gradient(circle, rgba(76,175,80,0.05) 0%, transparent 70%)",pointerEvents:"none"}}/>
+ <div style={{background:"linear-gradient(160deg, #0a1a0a 0%, #1a3a1a 60%, #0f2a0f 100%)",padding:"40px 20px 48px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"}}>
+  <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,overflow:"hidden",pointerEvents:"none",zIndex:0}}>
+    <div style={{position:"absolute",top:"-60px",right:"-60px",width:"300px",height:"300px",background:"radial-gradient(circle, rgba(76,175,80,0.08) 0%, transparent 70%)"}}/>
+    <div style={{position:"absolute",bottom:"-40px",left:"-40px",width:"200px",height:"200px",background:"radial-gradient(circle, rgba(76,175,80,0.05) 0%, transparent 70%)"}}/>
+  </div>
 
+  <div style={{position:"relative",zIndex:1,width:"100%",display:"flex",flexDirection:"column",alignItems:"center"}}>
   <MezaTirgusLogo/>
 
-  <h1 style={{color:"white",fontSize:"32px",fontWeight:800,margin:"24px 0 8px",letterSpacing:"-0.03em",lineHeight:1.2}}>
+  <h1 style={{color:"white",fontSize:"clamp(22px,5vw,32px)",fontWeight:800,margin:"24px 0 8px",letterSpacing:"-0.03em",lineHeight:1.2}}>
     Meža vērtība — vienā skatā
   </h1>
-  <p style={{color:"#7ab87a",fontSize:"16px",maxWidth:"520px",margin:"0 auto 32px",lineHeight:1.6}}>
+  <p style={{color:"#7ab87a",fontSize:"clamp(14px,3.5vw,16px)",maxWidth:"520px",margin:"0 auto 28px",lineHeight:1.6,padding:"0 4px"}}>
     Profesionāli rīki meža speciālistam — cirsmu vērtēšana, dastojumi, rēķini un pavadzīmes vienā platformā.
   </p>
 
-  <div style={{display:"flex",gap:"12px",justifyContent:"center",flexWrap:"wrap"}}>
-    <button onClick={onStandard} style={{padding:"13px 32px",background:"linear-gradient(135deg, #4caf50, #2e7d32)",color:"white",border:"none",borderRadius:"8px",fontSize:"15px",fontWeight:700,cursor:"pointer",boxShadow:"0 4px 16px rgba(76,175,80,0.3)",minHeight:44}}>
-      Sākt bezmaksas →
+  {/* KADASTRA ANALĪZE — galvenā CTA */}
+  <button onClick={onIpasums} style={{
+    padding:"16px 24px",
+    background:"linear-gradient(135deg, #4caf50, #2e7d32)",
+    color:"white", border:"none", borderRadius:"12px",
+    fontSize:"clamp(16px,4vw,18px)", fontWeight:800, cursor:"pointer",
+    boxShadow:"0 6px 24px rgba(76,175,80,0.4)",
+    minHeight:56, marginBottom:12,
+    width:"100%", maxWidth:400, boxSizing:"border-box",
+  }}>
+    🗺 Ievadi kadastra numuru →
+  </button>
+
+  {/* Izmēģini Pro — otrā prioritāte */}
+  <button onClick={onEnter} style={{
+    padding:"13px 24px",
+    background:"transparent", color:"#4caf50",
+    border:"2px solid #4caf50", borderRadius:"10px",
+    fontSize:"clamp(14px,3.5vw,15px)", fontWeight:700, cursor:"pointer",
+    minHeight:48, marginBottom:16,
+    width:"100%", maxWidth:400, boxSizing:"border-box",
+  }}>
+    ★ Izmēģini Pro →
+  </button>
+
+  {/* Sekundārās pogas */}
+  <div style={{display:"flex",gap:"8px",justifyContent:"center",flexWrap:"wrap",maxWidth:500}}>
+    <button onClick={onStandard} style={{padding:"10px 18px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>
+      Bezmaksas
     </button>
     {user
       ? <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
-          <span style={{color:"#7ab87a",fontSize:"14px",padding:"8px 14px",background:"rgba(255,255,255,0.05)",borderRadius:"8px",border:"1px solid #2d5a2d"}}>👤 {user.vards}</span>
-          <button onClick={onIziet} style={{padding:"11px 20px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>Iziet</button>
+          <span style={{color:"#7ab87a",fontSize:"13px",padding:"8px 12px",background:"rgba(255,255,255,0.05)",borderRadius:"8px",border:"1px solid #2d5a2d"}}>👤 {user.vards}</span>
+          <button onClick={onIziet} style={{padding:"10px 16px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"13px",cursor:"pointer",minHeight:44}}>Iziet</button>
         </div>
-      : <button onClick={onReg} style={{padding:"13px 32px",background:"transparent",color:"white",border:"2px solid rgba(255,255,255,0.3)",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600,minHeight:44}}>Reģistrēties</button>
+      : <button onClick={onReg} style={{padding:"10px 18px",background:"transparent",color:"white",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>Reģistrēties</button>
     }
-    <button onClick={onSludinajumi} style={{padding:"13px 28px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer",minHeight:44}}>
+    <button onClick={onSludinajumi} style={{padding:"10px 18px",background:"transparent",color:"#7ab87a",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>
       📢 Sludinājumi
     </button>
-    <button onClick={onLikumi} style={{padding:"13px 28px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"15px",cursor:"pointer",minHeight:44}}>
+    <button onClick={onLikumi} style={{padding:"10px 18px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>
       ⚖️ Meža likumi
     </button>
-    <div style={{position:"relative",display:"inline-block"}}
-      onMouseEnter={e=>e.currentTarget.querySelector('.pilna-menu').style.display='block'}
-      onMouseLeave={e=>e.currentTarget.querySelector('.pilna-menu').style.display='none'}>
-      <button onClick={onEnter} style={{padding:"13px 28px",background:"transparent",color:"#4caf50",border:"2px solid #4caf50",borderRadius:"8px",fontSize:"15px",cursor:"pointer",fontWeight:600,minHeight:44}}>
-        Pilnā versija ▾
-      </button>
-      <div className="pilna-menu" style={{display:"none",position:"absolute",top:"100%",left:0,background:"#1a2e1a",border:"1px solid #2d5a2d",borderRadius:"8px",padding:"8px 0",minWidth:"220px",zIndex:100,marginTop:"6px",boxShadow:"0 8px 24px rgba(0,0,0,0.4)"}}>
-        {["📐 Cirsmas skice","📏 Caurmēra mērījumi","🌲 Dastojumu aprēķini","🧾 Rēķinu izveide","📊 Cirsmu vērtēšana"].map((t,i)=>(
-          <div key={i} onClick={onEnter} style={{padding:"10px 16px",fontSize:"13px",color:"#a8d8a8",cursor:"pointer",borderBottom:"1px solid #1a2e1a"}}
-            onMouseEnter={e=>e.currentTarget.style.background="#225522"}
-            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>{t}</div>
-        ))}
-      </div>
-    </div>
+  </div>
   </div>
 </div>
 
@@ -148,7 +163,7 @@ return(
             <span style={{fontSize:"14px"}}>{t.icon}</span>{t.text}
           </div>
         ))}
-        <button onClick={onEnter} style={{marginTop:"auto",paddingTop:"16px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#4caf50,#2e7d32)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px"}}>
+        <button onClick={onEnter} style={{marginTop:"16px",width:"100%",padding:"14px",background:"linear-gradient(135deg,#4caf50,#2e7d32)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"15px",minHeight:48}}>
           Izmēģināt Pro →
         </button>
       </div>

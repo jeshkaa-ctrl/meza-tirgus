@@ -242,7 +242,7 @@ return(
   </div>
   {user
 ? <button onClick={exportRekins} style={{padding:"8px 24px",background:"#225522",color:"white",border:"1px solid #4caf50",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🖨 Drukāt / Saglabāt PDF</button>
-: <button onClick={()=>{ console.log("onReg:", onReg); onReg?.() }} style={{padding:"8px 24px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
+: <button onClick={()=>onReg?.()} style={{padding:"8px 24px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
   }
 </div>
 )

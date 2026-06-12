@@ -1,4 +1,4 @@
-import {formFactor, rotationAge, minDiameter} from "./tables"
+import {rotationAge, minDiameter, getVeidaugstums} from "./tables"
 import {thinningDecision, thinningRemoveG} from "./thinningEngine"
 
 const speciesPriority = ["Ba","Bl","A","M","G","B","E","P","Oz","Os"]
@@ -126,7 +126,7 @@ return{log:volume*0.60,small:volume*0.20,veneer:0,tara:volume*0.08,pulp:volume*0
 function decisionEngine(row){
 const sp=dominantSpecies(row.formula)
 
-if((sp==="Ba"||sp==="Bl") && row.vec>=20 && row.h>=12){
+if(sp==="Ba" && row.vec>=20 && row.h>=12){
 return "Galvenā cirte (vecums)"
 }
 
@@ -137,7 +137,7 @@ return "Kopšanas cirte"
 const rot=rotationAge[sp]?.[row.bon]
 const minD=minDiameter[sp]?.[row.bon]
 if(rot && row.vec>=rot){return "Galvenā cirte (vecums)"}
-if(minD && row.d>=minD){return "Galvenā cirte (caurmērs)"}
+if(minD && row.d>=minD){return "Ieteicams caurmēra cirtē"}
 return thinningDecision(row)
 }
 
@@ -151,8 +151,7 @@ return speciesPriority.indexOf(a.species)-speciesPriority.indexOf(b.species)
 const decision = row.harvestType && row.harvestType !== "" ? row.harvestType : decisionEngine(row)
 if(decision==="Kailcirte"){
 const sp=dominantSpecies(row.formula)
-const F=formFactor[sp]||0.5
-const totalVol=row.g*row.h*F*row.platiba
+const totalVol=row.g*getVeidaugstums(row.h,sp)*row.platiba
 const sortiments=calcSortiments(totalVol,"Kailcirte",row)
 const prices={log:93,small:65,veneer:130,tara:48,pulp:50,fire:38,chips:15}
 let cutVal=0
@@ -185,8 +184,7 @@ const totalInventoryVolume=(row.krm3ha||0)*row.platiba
 
 if(row.plantacija){
 const sp = dominantSpecies(row.formula)
-const F = formFactor[sp] || 0.5
-const calcVol = row.g * row.h * F * row.platiba
+const calcVol = row.g * getVeidaugstums(row.h, sp) * row.platiba
 const plantVolume = calcVol > 0 ? calcVol : totalInventoryVolume
 
 if(sp==="Ba" || sp==="Bl"){
@@ -274,9 +272,8 @@ remainingG-=removeG
 cutG=removeG
 }
 
-const F=formFactor[s.species] || 0.5
 const speciesAge=(row.speciesAges && row.speciesAges[s.species]) ? row.speciesAges[s.species] : row.vec
-const volumeHaFull=row.g*(s.percent/100)*row.h*F
+const volumeHaFull=row.g*(s.percent/100)*getVeidaugstums(row.h,s.species)
 const volumeHaCut=decision==="Kopšanas cirte" ? (G>0 ? volumeHaFull*(cutG/G) : 0) : volumeHaFull
 
 const fullVolume=volumeHaFull*row.platiba

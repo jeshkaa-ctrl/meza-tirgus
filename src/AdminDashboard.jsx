@@ -20,6 +20,17 @@ export default function AdminDashboard({ onBack }) {
   const [notikumi,   setNotikumi]   = useState([])
   const [kopsavilkums, setKopsavilkums] = useState(null)
   const [loading,    setLoading]    = useState(true)
+  const [pinVal,     setPinVal]     = useState('')
+  const [pinAtlasits,setPinAtlasits]= useState(false)
+  const [pinErr,     setPinErr]     = useState(false)
+
+  function parbauditPin() {
+    if (pinVal === String.fromCharCode(50,53,48,57)) {
+      setPinAtlasits(true); setPinErr(false)
+    } else {
+      setPinErr(true); setPinVal('')
+    }
+  }
 
   useEffect(() => {
     Promise.all([
@@ -101,6 +112,7 @@ export default function AdminDashboard({ onBack }) {
         {[
           { id: 'lietotaji', label: '👥 Lietotāji' },
           { id: 'analytics', label: '📊 Analītika' },
+          { id: 'bots',      label: '🤖 Bots meklētājs' },
         ].map(c => (
           <button key={c.id} onClick={() => setCilne(c.id)} style={{
             background: 'none', border: 'none',
@@ -246,6 +258,66 @@ CREATE POLICY "visi_ieraksta" ON app_events
 CREATE POLICY "admin_lasa" ON app_events
   FOR SELECT USING (true);`}</pre>
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+        {/* ── PRODUKTU BOTS ── */}
+        {cilne === 'bots' && (
+          <div>
+            {!pinAtlasits ? (
+              <div style={{ maxWidth: 360, margin: '60px auto', textAlign: 'center' }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>🤖</div>
+                <div style={{ color: C.text, fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+                  Bots meklētājs
+                </div>
+                <div style={{ color: C.textMut, fontSize: 13, marginBottom: 24, lineHeight: 1.6 }}>
+                  Meklē cenas Amazon, Alibaba, AliExpress.<br/>Aprēķina LV pārdošanas cenu un maržu.
+                </div>
+                <input
+                  autoFocus
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={pinVal}
+                  onChange={e => { setPinVal(e.target.value); setPinErr(false) }}
+                  onKeyDown={e => e.key === 'Enter' && parbauditPin()}
+                  placeholder="PIN kods"
+                  style={{
+                    width: '100%', background: '#0d1117',
+                    border: `1px solid ${pinErr ? '#f85149' : '#30363d'}`,
+                    borderRadius: 8, padding: '14px 16px', color: '#e6edf3',
+                    fontSize: 22, textAlign: 'center', outline: 'none',
+                    fontFamily: 'monospace', letterSpacing: 10, marginBottom: 8,
+                  }}
+                />
+                {pinErr && (
+                  <div style={{ color: '#f85149', fontSize: 12, marginBottom: 8 }}>Nepareizs PIN</div>
+                )}
+                <button onClick={parbauditPin} style={{
+                  width: '100%', padding: 13, borderRadius: 8, border: 'none',
+                  background: '#388bfd', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                }}>
+                  Atvērt botu →
+                </button>
+              </div>
+            ) : (
+              <div style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 0', gap: 8 }}>
+                  <button
+                    onClick={() => window.open('/meza_tirgus_product_bot.html', '_blank', 'noopener')}
+                    style={{ padding: '6px 14px', background: '#1c2d3f', color: '#388bfd', border: '1px solid #388bfd', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
+                  >↗ Atvērt jaunā cilnē</button>
+                  <button
+                    onClick={() => { setPinAtlasits(false); setPinVal('') }}
+                    style={{ padding: '6px 14px', background: 'none', color: '#8b949e', border: '1px solid #30363d', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
+                  >🔒 Bloķēt</button>
+                </div>
+                <iframe
+                  src="/meza_tirgus_product_bot.html"
+                  style={{ width: '100%', height: 'calc(100vh - 160px)', border: 'none', borderRadius: 8 }}
+                  title="Produktu izpētes bots"
+                />
               </div>
             )}
           </div>

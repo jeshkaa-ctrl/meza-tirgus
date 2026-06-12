@@ -591,10 +591,12 @@ td.r{text-align:right}
   <div>Novērtēja: _________________________</div>
 </div>
 </body></html>`;
-      const win = window.open('', '_blank');
-      win.document.write(html);
-      win.document.close();
-      win.print();
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
     };
 
     return (

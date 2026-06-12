@@ -6,11 +6,11 @@ export const rotationAge = {
   E:  {Ia:81,  I:81,  II:81,  III:81,  IV:101, V:121, Va:121},
   B:  {Ia:71,  I:71,  II:71,  III:71,  IV:71,  V:71,  Va:71},
   A:  {Ia:41,  I:41,  II:41,  III:41,  IV:41,  V:41,  Va:41},
-  Ba: {Ia:41,  I:41,  II:41,  III:41,  IV:41,  V:41,  Va:41},
-  Bl: {Ia:41,  I:41,  II:41,  III:41,  IV:41,  V:41,  Va:41},
+  Ba: null,
+  Bl: {Ia:71,  I:71,  II:71,  III:71,  IV:71,  V:71,  Va:71},
   M:  {Ia:71,  I:71,  II:71,  III:71,  IV:91,  V:91,  Va:91},
   Oz: {Ia:101, I:101, II:121, III:121, IV:141, V:141, Va:141},
-  Os: {Ia:81,  I:81,  II:81,  III:101, IV:101, V:121, Va:121},
+  Os: {Ia:101, I:101, II:101, III:101, IV:101, V:121, Va:121},
   G:  {Ia:81,  I:81,  II:81,  III:101, IV:101, V:121, Va:121}
 }
 
@@ -98,7 +98,57 @@ export const normalTreeCount = {
   G:    1500,
 }
 
-// Vidējie veidakstumi pa sugām
+// MK noteikumi Nr.228 — Veidaugstumu tabula (V = G × veidaugstums × ha)
+// Kolonnas: P=priede, E=egle, Oz=ozols, Os=osis, B=bērzs, Bl=melnalksnis, A=apse, Ba=baltalksnis
+// Liepa (VMD kods 11) → Ba vērtības (tuvākā suga)
+export const veidaugstumi = {
+  9:  { P:5.26, E:5.62, Oz:4.63, Os:5.25, B:4.75, Bl:4.95, A:4.9,  Ba:5.09 },
+  10: { P:5.71, E:6.09, Oz:5.04, Os:5.7,  B:5.14, Bl:5.36, A:5.29, Ba:5.41 },
+  11: { P:6.14, E:6.55, Oz:5.45, Os:6.13, B:5.53, Bl:5.78, A:5.71, Ba:5.74 },
+  12: { P:6.54, E:7.05, Oz:5.87, Os:6.55, B:5.92, Bl:6.2,  A:6.15, Ba:6.15 },
+  13: { P:6.96, E:7.39, Oz:6.28, Os:6.97, B:6.31, Bl:6.62, A:6.59, Ba:6.52 },
+  14: { P:7.34, E:7.87, Oz:6.69, Os:7.39, B:6.7,  Bl:7.05, A:7.03, Ba:6.92 },
+  15: { P:7.69, E:8.27, Oz:7.1,  Os:7.8,  B:7.1,  Bl:7.48, A:7.48, Ba:7.29 },
+  16: { P:8.07, E:8.75, Oz:7.52, Os:8.2,  B:7.49, Bl:7.9,  A:7.91, Ba:7.61 },
+  17: { P:8.44, E:9.12, Oz:7.93, Os:8.6,  B:7.88, Bl:8.34, A:8.35, Ba:7.97 },
+  18: { P:8.81, E:9.49, Oz:8.35, Os:9.0,  B:8.28, Bl:8.74, A:8.8,  Ba:8.37 },
+  19: { P:9.14, E:9.85, Oz:8.78, Os:9.4,  B:8.68, Bl:9.15, A:9.24, Ba:8.73 },
+  20: { P:9.5,  E:10.2, Oz:9.2,  Os:9.79, B:9.09, Bl:9.6,  A:9.69, Ba:8.98 },
+  21: { P:9.85, E:10.54,Oz:9.62, Os:10.19,B:9.49, Bl:10.05,A:10.14,Ba:9.38 },
+  22: { P:10.25,E:10.76,Oz:10.06,Os:10.58,B:9.9,  Bl:10.51,A:10.59,Ba:9.74 },
+  23: { P:10.61,E:10.95,Oz:10.49,Os:10.96,B:10.32,Bl:10.96,A:11.04,Ba:10.14},
+  24: { P:11.0, E:11.39,Oz:10.92,Os:11.35,B:10.73,Bl:11.42,A:11.5, Ba:10.49},
+  25: { P:11.4, E:11.83,Oz:11.37,Os:11.74,B:11.16,Bl:11.9, A:11.95,Ba:10.89},
+  26: { P:11.8, E:12.14,Oz:11.81,Os:12.12,B:11.58,Bl:12.36,A:12.41,Ba:11.26},
+  27: { P:12.15,E:12.57,Oz:12.26,Os:12.5, B:12.01,Bl:12.84,A:12.86,Ba:11.65},
+  28: { P:12.55,E:13.01,Oz:12.72,Os:12.89,B:12.44,Bl:13.32,A:13.32,Ba:12.0 },
+  29: { P:12.9, E:13.45,Oz:13.18,Os:13.27,B:12.88,Bl:13.8, A:13.78,Ba:12.35},
+  30: { P:13.28,E:13.8, Oz:13.63,Os:13.65,B:13.3, Bl:14.27,A:14.24,Ba:12.72},
+  31: { P:13.66,E:14.15,Oz:14.07,Os:14.03,B:13.72,Bl:14.74,A:14.69,Ba:13.1 },
+  32: { P:14.04,E:14.49,Oz:14.52,Os:14.41,B:14.15,Bl:15.21,A:15.15,Ba:13.48},
+  33: { P:14.42,E:14.83,Oz:14.96,Os:14.79,B:14.57,Bl:15.68,A:15.61,Ba:13.85},
+  34: { P:14.8, E:15.17,Oz:15.41,Os:15.16,B:15.0, Bl:16.15,A:16.07,Ba:14.23},
+  35: { P:15.18,E:15.51,Oz:15.85,Os:15.54,B:15.42,Bl:16.62,A:16.52,Ba:14.61},
+  36: { P:15.56,E:15.85 },
+  37: { P:15.94,E:16.19 },
+  38: { P:16.32,E:16.52 },
+  39: { P:16.7, E:16.86 },
+  40: { P:17.08,E:17.19 },
+}
+
+// Veidaugstuma uzmeklēšana pēc augstuma un sugas koda
+// Ja konkrētai sugai nav tabulas vērtības — izmanto G × H × formFactor (atgriežot veidaugstumu)
+export function getVeidaugstums(h, kods) {
+  if (!h || h <= 0) return 0
+  const hInt = Math.max(9, Math.min(40, Math.round(h)))
+  // Meklē tabulā; ja augstāk par 35m un nav vērtības — izmanto H=35 vērtību
+  const row = veidaugstumi[hInt]
+    ?? veidaugstumi[35]
+    ?? {}
+  return row[kods] ?? (h * (formFactor[kods] ?? 0.45))
+}
+
+// Vidējie veidakstumi pa sugām (rezerves vērtības kad augstums nav zināms)
 export const formFactor = {
   P:  0.45,
   E:  0.48,

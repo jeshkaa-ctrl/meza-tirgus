@@ -2,7 +2,7 @@ import { useState } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { getBonitate } from "./bonityEngine"
 import { calcSortimentsByQuality } from "./qualityEngine"
-import { formFactor, GminTable, GkritTable } from "./tables"
+import { getVeidaugstums, GminTable, GkritTable } from "./tables"
 import { SORT_KEYS, SORT_NAMES, DEFAULT_PRICES } from "./sortimentConfig"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -120,8 +120,7 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
       n[ci].nogabali[ni].sugas = n[ci].nogabali[ni].sugas.map(s => {
         const g = parseNum(s.g)
         const h = parseNum(s.h)
-        const F = formFactor[s.suga] || 0.5
-        const kraja = g * h * F * plat
+        const kraja = g * getVeidaugstums(h, s.suga) * plat
        return {...s, kraja, sortimenti: calcSortimentsByQuality(kraja, s.suga, s.kvalitate, parseNum(s.d), prices)}
       })
     }
@@ -138,9 +137,8 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
       const g   = field==="g"     ? parseNum(value) : parseNum(suga.g)
       const sp  = field==="suga"  ? value : suga.suga
       if(vec>0 && h>0) suga.bonitate = getBonitate(sp, vec, h)
-      const F = formFactor[sp] || 0.5
       const plat = parseNum(nog.platiba) || 1
-      suga.kraja = g * h * F * plat
+      suga.kraja = g * getVeidaugstums(h, sp) * plat
       suga.sortimenti = calcSortimentsByQuality(suga.kraja, sp, suga.kvalitate, parseNum(suga.d), prices)
     }
     if(field==="kvalitate"){

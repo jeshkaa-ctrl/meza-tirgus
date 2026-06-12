@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bots Meklētājs — Meža Tirgus</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
+    --border: #30363d; --accent: #2ea043; --accent2: #388bfd;
+    --warn: #e3b341; --red: #f85149; --text: #e6edf3;
+    --text2: #8b949e; --text3: #484f58;
+    --green-dim: #1a3426; --blue-dim: #1c2d3f;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:13px; min-height:100vh; }
+
+  .header { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; }
+  .header .logo { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; color:var(--accent); }
+  .header .badge { background:var(--green-dim); color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 8px; border-radius:12px; border:1px solid var(--accent); }
+  .header .title { color:var(--text2); font-size:12px; }
+
+  .layout { display:grid; grid-template-columns:340px 1fr; gap:0; height:calc(100vh - 49px); }
+
+  .left { background:var(--surface); border-right:1px solid var(--border); overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .panel-title { font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--text3); padding-bottom:8px; border-bottom:1px solid var(--border); }
+
+  .search-box { display:flex; flex-direction:column; gap:8px; }
+  .search-box input, .search-box select { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:9px 12px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px; outline:none; width:100%; }
+  .search-box input:focus, .search-box select:focus { border-color:var(--accent2); }
+  .search-box input::placeholder { color:var(--text3); }
+
+  .price-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .price-row input { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px; outline:none; }
+  .price-row input:focus { border-color:var(--accent2); }
+
+  label { font-size:11px; color:var(--text2); margin-bottom:2px; display:block; }
+
+  .btn-search { background:var(--accent); color:white; border:none; border-radius:6px; padding:10px 16px; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; width:100%; letter-spacing:.05em; transition:opacity .15s; }
+  .btn-search:hover { opacity:.85; }
+  .btn-search:disabled { opacity:.4; cursor:not-allowed; }
+
+  .sources-grid { display:flex; flex-wrap:wrap; gap:6px; }
+  .source-tag { background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:4px 8px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); cursor:pointer; user-select:none; transition:all .15s; }
+  .source-tag.active { background:var(--blue-dim); border-color:var(--accent2); color:var(--accent2); }
+
+  .calc-box { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:12px; }
+  .calc-box .calc-title { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); text-transform:uppercase; margin-bottom:8px; }
+  .calc-row { display:flex; justify-content:space-between; font-size:11px; padding:3px 0; border-bottom:1px solid var(--border); font-family:'JetBrains Mono',monospace; }
+  .calc-row:last-child { border:none; font-weight:700; color:var(--accent); }
+  .calc-row span:first-child { color:var(--text2); }
+
+  .history-list { display:flex; flex-direction:column; gap:4px; }
+  .history-item { background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:6px 10px; cursor:pointer; transition:border-color .15s; }
+  .history-item:hover { border-color:var(--accent2); }
+  .history-item .h-query { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text); }
+  .history-item .h-meta { font-size:10px; color:var(--text3); margin-top:2px; }
+
+  .right { overflow-y:auto; padding:20px; background:var(--bg); }
+
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:var(--text3); }
+  .empty-state .big { font-size:48px; }
+  .empty-state h2 { font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--text2); }
+  .empty-state p { font-size:12px; text-align:center; max-width:300px; line-height:1.6; }
+
+  .results-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .results-header h2 { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text); }
+  .results-header .meta { font-size:11px; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+
+  .btn-export { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:6px 12px; color:var(--text2); font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; transition:all .15s; }
+  .btn-export:hover { border-color:var(--accent); color:var(--accent); }
+
+  .verdict { border-radius:6px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; gap:12px; border:1px solid; }
+  .verdict.go { background:var(--green-dim); border-color:var(--accent); }
+  .verdict.wait { background:#2d2a1a; border-color:var(--warn); }
+  .verdict.no { background:#2d1a1a; border-color:var(--red); }
+  .verdict .v-icon { font-size:20px; }
+  .verdict .v-text { font-family:'JetBrains Mono',monospace; font-size:12px; }
+  .verdict .v-title { font-weight:700; color:var(--text); }
+  .verdict .v-sub { color:var(--text2); font-size:11px; margin-top:2px; }
+
+  .results-grid { display:grid; gap:10px; }
+  .result-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; transition:border-color .15s; }
+  .result-card:hover { border-color:var(--accent2); }
+  .result-card .rc-header { padding:10px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+  .rc-source { font-family:'JetBrains Mono',monospace; font-size:10px; }
+  .rc-source.amazon { color:#ff9900; }
+  .rc-source.alibaba { color:#ff6a00; }
+  .rc-source.aliexpress { color:#e43225; }
+  .rc-source.google { color:var(--accent2); }
+  .rc-source.local { color:var(--warn); }
+  .rc-source.manufacturer { color:#bc8cff; }
+  .rc-rating { display:flex; align-items:center; gap:4px; font-family:'JetBrains Mono',monospace; font-size:11px; }
+  .rc-rating .stars { color:#e3b341; }
+  .rc-rating .count { color:var(--text3); }
+  .rc-body { padding:12px 14px; display:grid; grid-template-columns:1fr auto; gap:8px; align-items:start; }
+  .rc-name { font-size:12px; color:var(--text); line-height:1.5; }
+  .rc-name a { color:var(--accent2); text-decoration:none; }
+  .rc-name a:hover { text-decoration:underline; }
+  .rc-prices { text-align:right; }
+  .rc-price-orig { font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:700; color:var(--text); }
+  .rc-price-lv { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); margin-top:2px; }
+  .rc-price-lv.good { color:var(--accent); }
+  .rc-price-lv.bad { color:var(--red); }
+  .rc-footer { padding:8px 14px; background:var(--surface2); display:flex; gap:8px; flex-wrap:wrap; }
+  .rc-tag { font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 6px; border-radius:3px; }
+  .rc-tag.green { background:var(--green-dim); color:var(--accent); }
+  .rc-tag.warn { background:#2d2a1a; color:var(--warn); }
+  .rc-tag.red { background:#2d1a1a; color:var(--red); }
+  .rc-tag.blue { background:var(--blue-dim); color:var(--accent2); }
+
+  .reviews-section { margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .reviews-section .rs-header { padding:10px 14px; border-bottom:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); text-transform:uppercase; }
+  .review-item { padding:10px 14px; border-bottom:1px solid var(--border); }
+  .review-item:last-child { border:none; }
+  .review-item .ri-text { font-size:11px; color:var(--text2); line-height:1.5; }
+
+  .lv-check { margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .lv-check .lc-header { padding:10px 14px; border-bottom:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); text-transform:uppercase; display:flex; justify-content:space-between; }
+  .lc-item { padding:8px 14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .lc-item:last-child { border:none; }
+  .lc-item .lci-name { font-size:11px; color:var(--text2); }
+  .lc-item .lci-name a { color:var(--accent2); text-decoration:none; }
+  .lc-item .lci-price { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; }
+  .lci-price.cheaper { color:var(--red); }
+  .lci-price.expensive { color:var(--accent); }
+
+  .loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:300px; gap:16px; }
+  .spinner { width:32px; height:32px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-text { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text3); }
+  .loading-steps { display:flex; flex-direction:column; gap:4px; margin-top:8px; }
+  .loading-step { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); display:flex; align-items:center; gap:8px; }
+  .loading-step.done { color:var(--accent); }
+  .loading-step.active { color:var(--accent2); }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">🌲 MEŽA TIRGUS</span>
+  <span class="badge">BOTS MEKLĒTĀJS</span>
+  <span class="title">Produktu meklēšanas rīks — tikai iekšējai lietošanai</span>
+</div>
+
+<div class="layout">
+  <div class="left">
+    <div class="panel-title">🔍 Meklēšana</div>
+
+    <div class="search-box">
+      <div>
+        <label>Produkts (jebkurā valodā)</label>
+        <input type="text" id="query" placeholder="bear spray, ērču ķeksis, relaskops..." />
+      </div>
+      <div>
+        <label>Konteksts / Kategorija</label>
+        <select id="category">
+          <option value="general">Vispārīgs</option>
+          <option value="safety">Drošība mežā</option>
+          <option value="measurement">Mārinstrumenti</option>
+          <option value="ticks">Ērču aizsardzība</option>
+          <option value="bears">Lāču drošība</option>
+          <option value="surveillance">Novērošana</option>
+          <option value="hunting">Medības</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">💰 Cenu robežas (€)</div>
+      <div class="price-row">
+        <div><label>Min pārdošanas €</label><input type="number" id="priceMin" placeholder="15" /></div>
+        <div><label>Max pirkšanas €</label><input type="number" id="priceMax" placeholder="50" /></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">📡 Avoti</div>
+      <div class="sources-grid">
+        <span class="source-tag active" data-source="amazon">Amazon</span>
+        <span class="source-tag active" data-source="alibaba">Alibaba</span>
+        <span class="source-tag active" data-source="aliexpress">AliExpress</span>
+        <span class="source-tag active" data-source="google">Google Shop</span>
+        <span class="source-tag active" data-source="manufacturer">Ražotājs</span>
+        <span class="source-tag active" data-source="lv">LV tirgus</span>
+        <span class="source-tag active" data-source="reddit">Reddit/Atsauksmes</span>
+      </div>
+    </div>
+
+    <button class="btn-search" id="searchBtn" onclick="runSearch()">
+      🔍 SĀKT IZPĒTI
+    </button>
+
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">🧮 Ātrais kalkulators</div>
+      <div class="calc-box">
+        <div class="calc-title">LV cenas aprēķins</div>
+        <div style="margin-bottom:8px;">
+          <label>Pirkšanas cena (€)</label>
+          <input type="number" id="calcPrice" placeholder="12.50" oninput="updateCalc()" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:6px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;width:100%;outline:none;" />
+        </div>
+        <div class="calc-row"><span>Pirkšanas cena</span><span id="c1">—</span></div>
+        <div class="calc-row"><span>Piegāde uz LV</span><span id="c2">—</span></div>
+        <div class="calc-row"><span>Muita (5%)</span><span id="c3">—</span></div>
+        <div class="calc-row"><span>PVN (21%)</span><span id="c4">—</span></div>
+        <div class="calc-row"><span>Marža (50%)</span><span id="c5">—</span></div>
+        <div class="calc-row"><span>PĀRDOŠANAS CENA</span><span id="c6">—</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">📜 Vēsture</div>
+      <div class="history-list" id="historyList">
+        <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;">Nav meklēšanas vēstures</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right" id="rightPanel">
+    <div class="empty-state">
+      <div class="big">🌲</div>
+      <h2>Meža Tirgus Produktu Bots</h2>
+      <p>Ievadi produkta nosaukumu kreisajā panelī un nospied "Sākt izpēti". Bots sameklēs cenas, pārbaudīs atsauksmes un aprēķinās vai ir izdevīgi pārdot Latvijā.</p>
+      <p style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);">TIKAI ADMINAM · MEŽA-TIRGUS.LV</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ACM — rotējošs proxy tokens (kopija no src/utils/acm.js)
+function acmGeneretToken(sesijasId = '') {
+  const NEDELA = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+  const METODE = NEDELA % 4;
+  const min    = Math.floor(Date.now() / 60000);
+  switch (METODE) {
+    case 0: { const baze = (NEDELA + sesijasId).split('').reduce((a,c)=>a+c.charCodeAt(0),0); return (baze*7+min).toString(36).substring(0,12); }
+    case 1: { const n=(NEDELA%15)+5; let a=0,b=1; for(let i=0;i<n;i++){[a,b]=[b,a+b];} return (a%1000).toString().padStart(3,'0')+min.toString(36); }
+    case 2: return min.toString().split('').reverse().join('')+(NEDELA%97).toString();
+    case 3: { const xor=(NEDELA^min^sesijasId.length)>>>0; return xor.toString(16).padStart(8,'0'); }
+    default: return min.toString(36);
+  }
+}
+function acmHeaders(userId = '') {
+  return { 'Content-Type':'application/json', 'x-acm-token':acmGeneretToken(userId), 'x-sesija-id':userId };
+}
+
+document.querySelectorAll('.source-tag').forEach(tag => {
+  tag.addEventListener('click', () => tag.classList.toggle('active'));
+});
+
+function updateCalc() {
+  const p = parseFloat(document.getElementById('calcPrice').value) || 0;
+  if (!p) {
+    ['c1','c2','c3','c4','c5','c6'].forEach(id => document.getElementById(id).textContent = '—');
+    return;
+  }
+  const delivery = p < 20 ? 8 : p < 50 ? 12 : 15;
+  const customs  = p * 0.05;
+  const base     = p + delivery + customs;
+  const pvn      = base * 0.21;
+  const total    = base + pvn;
+  const sell     = total * 1.5;
+  document.getElementById('c1').textContent = p.toFixed(2) + ' €';
+  document.getElementById('c2').textContent = delivery.toFixed(2) + ' €';
+  document.getElementById('c3').textContent = customs.toFixed(2) + ' €';
+  document.getElementById('c4').textContent = pvn.toFixed(2) + ' €';
+  document.getElementById('c5').textContent = (sell - total).toFixed(2) + ' €';
+  document.getElementById('c6').textContent = sell.toFixed(2) + ' €';
+}
+
+let searchHistory = JSON.parse(localStorage.getItem('mt_bot_history') || '[]');
+
+function saveHistory(query, results) {
+  searchHistory.unshift({ query, time: new Date().toLocaleString('lv'), results: results.length });
+  if (searchHistory.length > 20) searchHistory.pop();
+  localStorage.setItem('mt_bot_history', JSON.stringify(searchHistory));
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!searchHistory.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--text3);font-family:\'JetBrains Mono\',monospace;">Nav meklēšanas vēstures</div>';
+    return;
+  }
+  el.innerHTML = searchHistory.slice(0,8).map(h => `
+    <div class="history-item" onclick="document.getElementById('query').value='${h.query.replace(/'/g,"\\'")}';runSearch()">
+      <div class="h-query">${h.query}</div>
+      <div class="h-meta">${h.time} · ${h.results} rezultāti</div>
+    </div>
+  `).join('');
+}
+renderHistory();
+
+async function runSearch() {
+  const query = document.getElementById('query').value.trim();
+  if (!query) { alert('Ievadi produkta nosaukumu!'); return; }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true; btn.textContent = '⏳ Meklē...';
+
+  const panel    = document.getElementById('rightPanel');
+  const category = document.getElementById('category').value;
+  const priceMin = document.getElementById('priceMin').value || '10';
+  const priceMax = document.getElementById('priceMax').value || '100';
+
+  panel.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Izpēta "${query}"...</div>
+      <div class="loading-steps">
+        <div class="loading-step active">Tulko un gatavo meklēšanu</div>
+        <div class="loading-step">Meklē Amazon, Alibaba, AliExpress</div>
+        <div class="loading-step">Pārbauda LV tirgu</div>
+        <div class="loading-step">Vāc atsauksmes</div>
+        <div class="loading-step">Aprēķina LV cenas</div>
+      </div>
+    </div>`;
+
+  try {
+    const result = await callClaudeAPI(query, category, priceMin, priceMax);
+    renderResults(result, query);
+    saveHistory(query, result.products || []);
+  } catch(e) {
+    panel.innerHTML = `<div class="empty-state"><div class="big">⚠️</div><h2>Kļūda</h2><p>${e.message}</p></div>`;
+  }
+
+  btn.disabled = false; btn.textContent = '🔍 SĀKT IZPĒTI';
+}
+
+async function callClaudeAPI(query, category, priceMin, priceMax) {
+  const systemPrompt = `Tu esi Meža Tirgus e-veikala produktu izpētes asistents. Tavs uzdevums ir analizēt produktus ko var pārdot Latvijā meža, medību, un lauku tematikā.
+
+Konteksts par Meža Tirgus:
+- Latvijas meža nozares platforma
+- Mērķauditorija: meža īpašnieki, mežsaimnieki, mednieki, sēņotāji, ogotāji, biškopji
+- Kategorijas: lāču drošība, ērču aizsardzība, mārinstrumenti, novērošana, drošība mežā
+- Pārdošana Latvijā ar piegādi 1-2 darba dienās
+
+Atgriez TIKAI JSON (bez markdown) ar šādu struktūru:
+{
+  "query_en": "angļu tulkojums",
+  "query_de": "vācu tulkojums",
+  "category": "kategorija",
+  "verdict": "GO|WAIT|NO",
+  "verdict_reason": "īss pamatojums latviski",
+  "lv_price_estimate": "aptuvena pārdošanas cena LV €",
+  "products": [
+    {
+      "source": "amazon|alibaba|aliexpress|google|manufacturer|local",
+      "name": "produkta nosaukums",
+      "url": "https://...",
+      "price_orig": "cena oriģinālā valūtā",
+      "price_eur": skaitlis,
+      "price_lv_estimate": skaitlis,
+      "sell_price_lv": skaitlis,
+      "profit_per_unit": skaitlis,
+      "rating": "4.5/5",
+      "review_count": "1234",
+      "pros": ["plus1","plus2"],
+      "cons": ["mīnus1"],
+      "lv_available": true,
+      "lv_cheaper": false
+    }
+  ],
+  "lv_competition": [
+    { "name": "konkurents LV", "url": "https://...", "price": skaitlis, "cheaper_than_import": false }
+  ],
+  "reviews_summary": "atsauksmju kopsavilkums latviski",
+  "recommendation": "ieteikums latviski",
+  "search_links": {
+    "amazon": "https://amazon.de/s?k=...",
+    "alibaba": "https://alibaba.com/trade/search?SearchText=...",
+    "aliexpress": "https://aliexpress.com/wholesale?SearchText=...",
+    "google_shopping": "https://google.com/search?q=...&tbm=shop"
+  }
+}`;
+
+  const userPrompt = `Izpēti produktu: "${query}"
+Kategorija: ${category}
+Cenu diapazons: ${priceMin}–${priceMax} EUR (pirkšanas cena)
+
+Analizē:
+1. Tulko produktu EN, DE
+2. Atrodi labākās cenas Amazon.de, Alibaba, AliExpress, ražotājs
+3. Pārbaudi vai LV jau ir (220.lv, ss.com, amazon.de)
+4. Aprēķini LV pārdošanas cenu (piegāde 8–15€ + muita 5% + PVN 21% + 50% marža)
+5. Novērtē atsauksmes
+6. Dod verdict: GO (ir izdevīgi), WAIT (jāpārbauda), NO (nav vērts)`;
+
+  const response = await fetch('/api/anthropic/v1/messages', {
+    method: 'POST',
+    headers: acmHeaders(),
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 3000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  const text = data.content.map(i => i.text || '').join('').replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+function renderResults(data, query) {
+  const panel = document.getElementById('rightPanel');
+  const verdictClass = { GO:'go', WAIT:'wait', NO:'no' }[data.verdict] || 'wait';
+  const verdictIcon  = { GO:'✅', WAIT:'⚠️', NO:'❌' }[data.verdict] || '⚠️';
+
+  const productsHTML = (data.products || []).map(p => `
+    <div class="result-card">
+      <div class="rc-header">
+        <span class="rc-source ${p.source}">${sourceLabel(p.source)}</span>
+        <div class="rc-rating">
+          <span class="stars">${starsHTML(p.rating)}</span>
+          <span>${p.rating || '—'}</span>
+          <span class="count">(${p.review_count || '?'})</span>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-name">
+          <a href="${p.url}" target="_blank" rel="noopener">${p.name}</a>
+          ${(p.pros||[]).map(pro => `<div style="color:var(--accent);font-size:10px;margin-top:3px;">+ ${pro}</div>`).join('')}
+          ${(p.cons||[]).map(con => `<div style="color:var(--red);font-size:10px;">− ${con}</div>`).join('')}
+        </div>
+        <div class="rc-prices">
+          <div class="rc-price-orig">${p.price_orig || p.price_eur + ' €'}</div>
+          <div class="rc-price-lv ${p.profit_per_unit > 15 ? 'good' : 'bad'}">LV: ~${p.sell_price_lv} €</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);">peļņa: ${p.profit_per_unit} €</div>
+        </div>
+      </div>
+      <div class="rc-footer">
+        ${p.lv_available ? '<span class="rc-tag warn">⚠️ LV pieejams</span>' : '<span class="rc-tag green">✓ Nav LV</span>'}
+        ${p.lv_cheaper ? '<span class="rc-tag red">LV lētāks!</span>' : '<span class="rc-tag blue">Import izdevīgs</span>'}
+        <span class="rc-tag blue">📦 ${p.source.toUpperCase()}</span>
+      </div>
+    </div>
+  `).join('');
+
+  const competitionHTML = (data.lv_competition || []).map(c => `
+    <div class="lc-item">
+      <div class="lci-name"><a href="${c.url}" target="_blank" rel="noopener">${c.name}</a></div>
+      <div class="lci-price ${c.cheaper_than_import ? 'cheaper' : 'expensive'}">${c.price} €${c.cheaper_than_import ? ' ⚠️' : ' ✓'}</div>
+    </div>
+  `).join('');
+
+  const searchLinksHTML = data.search_links
+    ? Object.entries(data.search_links).map(([k,v]) =>
+        `<a href="${v}" target="_blank" rel="noopener" class="btn-export" style="text-decoration:none;">${k.toUpperCase()} →</a>`
+      ).join('')
+    : '';
+
+  panel.innerHTML = `
+    <div class="results-header">
+      <div>
+        <h2>"${query}" ${data.query_en ? `/ ${data.query_en}` : ''}</h2>
+        <div class="meta">${data.category || ''} · ${(data.products||[]).length} rezultāti · LV cena ~${data.lv_price_estimate}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        ${searchLinksHTML}
+        <button class="btn-export" onclick="exportResults()">⬇ Saglabāt HTML</button>
+      </div>
+    </div>
+
+    <div class="verdict ${verdictClass}">
+      <span class="v-icon">${verdictIcon}</span>
+      <div class="v-text">
+        <div class="v-title">${data.verdict} — ${data.verdict_reason}</div>
+        <div class="v-sub">${data.recommendation || ''}</div>
+      </div>
+    </div>
+
+    <div class="results-grid">${productsHTML}</div>
+
+    ${data.lv_competition && data.lv_competition.length ? `
+    <div class="lv-check">
+      <div class="lc-header"><span>🇱🇻 LV konkurenti</span><span style="color:var(--text2)">Salīdzinājums</span></div>
+      ${competitionHTML}
+    </div>` : ''}
+
+    ${data.reviews_summary ? `
+    <div class="reviews-section" style="margin-top:16px;">
+      <div class="rs-header">💬 Atsauksmju kopsavilkums</div>
+      <div class="review-item"><div class="ri-text">${data.reviews_summary}</div></div>
+    </div>` : ''}
+  `;
+}
+
+function sourceLabel(s) {
+  return { amazon:'🟡 Amazon', alibaba:'🟠 Alibaba', aliexpress:'🔴 AliExpress', google:'🔵 Google Shop', manufacturer:'🟣 Ražotājs', local:'🟡 LV Tirgus' }[s] || s;
+}
+
+function starsHTML(rating) {
+  const r = parseFloat(rating) || 0;
+  return '★'.repeat(Math.round(r)) + '☆'.repeat(5 - Math.round(r));
+}
+
+function exportResults() {
+  const blob = new Blob([document.documentElement.outerHTML], { type:'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `mt_izpete_${Date.now()}.html`;
+  a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+document.getElementById('query').addEventListener('keypress', e => {
+  if (e.key === 'Enter') runSearch();
+});
+</script>
+</body>
+</html>

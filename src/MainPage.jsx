@@ -162,7 +162,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
                 border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
               }}>📲 Instalēt app</button>
             )}
-            {user?.epasts === 'jeshkaa@inbox.lv' && (
+            {isAdmin && (
               <button onClick={() => onNavigate('admin')} style={{
                 padding: '7px 14px', background: `${C.green}22`, color: C.green,
                 border: `1px solid ${C.green}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',
@@ -356,6 +356,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       </main>
 
       {pwaModalOpen && <PwaInstalModal onAizveret={() => setPwaModalOpen(false)} />}
+
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { calcSortimentsByQuality } from "./qualityEngine"
+import { getVeidaugstums } from "./tables"
 import { C as DS, F, spinnerCSS } from "./ds"
 
 // ── Tulkojumi ────────────────────────────────────────────────────────────────
@@ -147,7 +148,6 @@ const T = {
 const SUGAS = ["P","E","B","A","M","Oz","Os","G","Ba","Bl"]
 const KVALITATES = ["A1","A","B","C","D","Papīrmalka","Malka"]
 const KVAL_LBL = {A1:"A1 — Izcila",A:"A — Laba",B:"B — Vidēja",C:"C — Zema",D:"D — Ļoti zema",Papīrmalka:"Papīrmalka",Malka:"Malka"}
-const FF = {P:0.46,E:0.46,B:0.42,A:0.42,M:0.42,Oz:0.42,Os:0.42,G:0.42,Ba:0.42,Bl:0.42}
 const DEF_CENAS = {log:105,small:45,pulp:35,veneer:95,tara:48,fire:20,chips:15}
 const SK = "cirsma_mobile_v4"
 const CMAP = {log:"log",small:"small",veneer:"veneer",tara:"tara",pulp:"pulp",fire:"fire",chips:"chips"}
@@ -313,7 +313,7 @@ export default function CirsmaNovertesanaMobile({ onBack }) {
         if (G <= 0) return
         const H = parseFloat(stavs===1 ? (augstumi[`${suga}_1`]||augstumi[suga]) : augstumi[`${suga}_2`]) || 0
         if (H <= 0) return
-        const kub = G * H * (FF[suga]||0.42)
+        const kub = G * getVeidaugstums(H, suga)
         const vD = vidD(suga, stavs)
       const kval = vidKval(suga, stavs)
         const arr2 = stavs===1?"sugas":"otraisStavs"
@@ -441,7 +441,12 @@ ${piezimes?`<tr><td>${piezimes}</td></tr>`:""}</tbody></table>`:""}
 <div>Novērtēja: ___________________________</div><div>${today}</div></div>
 <p style="font-size:8px;color:#888;margin-top:12px">* Sagatavots ar Meža tirgus mobilā rīka palīdzību</p>
 </body></html>`
-    const win = window.open("","_blank"); win.document.write(html); win.document.close(); win.print()
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href = url; a.target = '_blank'; a.rel = 'noopener'
+    document.body.appendChild(a); a.click(); document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
   }
 
   const SOLI = [t.step0, t.step1, t.step2, t.step3, t.step4]

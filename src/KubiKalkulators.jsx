@@ -110,6 +110,7 @@ export default function KubiKalkulators({ onBack }) {
   const groups = getSortGroups()
 
   const printReport = () => {
+    if (!entries.length) return
     const today = new Date().toLocaleDateString("lv-LV")
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kubikmetru pārskats</title>
 <style>body{font-family:Arial;font-size:11px;padding:20px;max-width:800px;margin:0 auto}h2{color:#225522;border-bottom:2px solid #225522;padding-bottom:4px}table{border-collapse:collapse;width:100%;margin-bottom:12px}th{background:#225522;color:white;padding:4px 8px;text-align:left;font-size:10px}td{border:1px solid #ccc;padding:3px 8px;font-size:10px}tr:nth-child(even){background:#f0f8f0}.total{font-weight:bold;background:#e8f5e9}</style>
@@ -127,7 +128,17 @@ ${entries.map((e, i) => `<tr><td>${i + 1}</td><td>${e.sort || "—"}</td><td>${e
 </tbody></table>
 <p style="font-size:9px;color:#888;margin-top:16px">Meža tirgus kalkulators · ${today}</p>
 </body></html>`
-    const w = window.open("", "_blank"); w.document.write(html); w.document.close(); w.print()
+    // Blob URL — darbojas iOS Safari, Android Chrome un PWA
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.rel = 'noopener'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
   }
 
   const doReset = () => {
@@ -148,6 +159,9 @@ ${entries.map((e, i) => `<tr><td>${i + 1}</td><td>${e.sort || "—"}</td><td>${e
         <button onClick={onBack} style={{ background: "transparent", border: "none", color: DS.green, fontSize: "22px", cursor: "pointer", minWidth: 36, minHeight: 44 }}>←</button>
         <span style={{ color: DS.textSec, fontSize: F.base, fontWeight: F.weightBold, flex: 1 }}>📐 Kubikmetru kalkulators</span>
         <button onClick={() => setShowOv(v => !v)} style={{ padding: "5px 10px", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "700", border: "2px solid #4caf50", color: showOv ? "#000" : "#4caf50", background: showOv ? "#4caf50" : "transparent" }}>Pārskats</button>
+        {entries.length > 0 && (
+          <button onClick={printReport} style={{ padding: "5px 10px", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "700", border: "2px solid #81c784", color: "#000", background: "#4caf50" }}>📥 PDF</button>
+        )}
         <span style={{ color: "#81c784", fontSize: "10px", whiteSpace: "nowrap" }}>{savedTime}</span>
       </div>
 

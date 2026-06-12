@@ -132,8 +132,7 @@ export default function CaurmeraMobile({ onBack }) {
     const statusTxt = isOk===null?'—':isOk
       ?`✓ ATBILST (vid. ${vidD.toFixed(1)} cm, min. ${minCaur} cm, +${diff} cm)`
       :`✗ NEATBILST (vid. ${vidD.toFixed(1)} cm, min. ${minCaur} cm, ${diff} cm)`
-    const win = window.open('','_blank')
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Caurmērs</title>
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Caurmērs</title>
 <style>body{font-family:monospace;padding:20px;font-size:13px}h2{border-bottom:2px solid #111;padding-bottom:6px}.info{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px;margin-bottom:14px}.lbl{color:#555;font-size:11px;text-transform:uppercase}.val{font-weight:bold}.status{border:2px solid ${isOk?'#16a34a':'#dc2626'};padding:10px;border-radius:6px;margin-bottom:14px;font-weight:bold;color:${isOk?'#16a34a':'#dc2626'}}table{width:100%;border-collapse:collapse}th{text-align:left;border-bottom:1px solid #ccc;padding:4px 8px;font-size:11px;color:#555}td{padding:4px 8px;border-bottom:1px solid #eee}.summary{background:#f5f5f5;padding:10px;border-radius:6px;display:flex;gap:32px}.sv{font-size:20px;font-weight:bold}.sl{font-size:10px;color:#777;text-transform:uppercase}</style>
 </head><body>
 <h2>Caurmērs — Mērījumu izdruka</h2>
@@ -141,9 +140,13 @@ export default function CaurmeraMobile({ onBack }) {
 <div class="status">${statusTxt}</div>
 <table><tr><th>Nr.</th><th>Diametrs</th></tr>${tblRows}</table>
 <div class="summary"><div><div class="sv">${measurements.length}</div><div class="sl">Koki</div></div><div><div class="sv">${summa}</div><div class="sl">G.summa</div></div><div><div class="sv">${vidD?vidD.toFixed(1):'—'}</div><div class="sl">Vid.D cm</div></div></div>
-<script>window.onload=()=>window.print();<\/script>
-</body></html>`)
-    win.document.close()
+</body></html>`
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href = url; a.target = '_blank'; a.rel = 'noopener'
+    document.body.appendChild(a); a.click(); document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 10000)
   }
 
   return (
@@ -151,7 +154,6 @@ export default function CaurmeraMobile({ onBack }) {
       <div style={{background:'#12151e',borderBottom:'1px solid #2a2d3a',padding:'14px 16px 10px',position:'sticky',top:0,zIndex:10}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
   <div style={{fontSize:22,fontWeight:800,letterSpacing:-1,fontFamily:'monospace'}}>Caur<span style={{color:'#4ade80'}}>mērs</span></div>
-          <button onClick={onBack} style={{background:'transparent',border:'1px solid #2a2d3a',color:'#6b7280',padding:'6px 14px',borderRadius:8,cursor:'pointer',fontSize:13}}>← Atpakaļ</button>
           <button onClick={onBack} style={{background:'transparent',border:'1px solid #2a2d3a',color:'#6b7280',padding:'6px 14px',borderRadius:8,cursor:'pointer',fontSize:13}}>← Atpakaļ</button>
         </div>
         <div style={{fontSize:10,color:'#6b7280',minHeight:14,marginTop:4}}>{saved}</div>
