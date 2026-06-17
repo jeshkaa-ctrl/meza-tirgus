@@ -51,15 +51,13 @@ const sendTrackingEmail = async (order) => {
         delivery_days: '3-5',
       }),
     })
-    const data = await response.json()
-    if (data.success || data.ok) {
-      await supabase
-        .from('orders')
-        .update({ email_sent: true })
-        .eq('id', order.id)
+    let data = {}
+    try { data = await response.json() } catch { /* tukša atbilde */ }
+    if (response.ok) {
+      await supabase.from('orders').update({ email_sent: true }).eq('id', order.id)
       alert(`E-pasts nosūtīts uz ${order.email}`)
     } else {
-      alert('E-pasta kļūda: ' + JSON.stringify(data.error))
+      alert('E-pasta kļūda: ' + (data.error || `HTTP ${response.status}`))
     }
   } catch (err) {
     alert('Savienojuma kļūda: ' + err.message)
