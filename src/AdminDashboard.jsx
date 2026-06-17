@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import { C, F, R, S } from './ds'
+import BotsPardevejs from './BotsPardevejs'
+import BotsBankieris from './BotsBankieris'
 
 const LAPU_NOSAUKUMI = {
   landing: '🏠 Sākumlapa', main: '🛠 Darba virsma', tirgus: '🌿 Tirgus',
@@ -110,9 +112,12 @@ export default function AdminDashboard({ onBack }) {
         background: C.bgCard, padding: '0 20px',
       }}>
         {[
-          { id: 'lietotaji', label: '👥 Lietotāji' },
-          { id: 'analytics', label: '📊 Analītika' },
-          { id: 'bots',      label: '🤖 Bots meklētājs' },
+          { id: 'lietotaji',   label: '👥 Lietotāji' },
+          { id: 'analytics',   label: '📊 Analītika' },
+          { id: 'bots',        label: '🤖 Bots meklētājs' },
+          { id: 'makslinieks', label: '🎨 Mākslinieks' },
+          { id: 'pardevejs',   label: '📦 Pārdevējs' },
+          { id: 'bankieris',   label: '💳 Banķieris' },
         ].map(c => (
           <button key={c.id} onClick={() => setCilne(c.id)} style={{
             background: 'none', border: 'none',
@@ -262,17 +267,26 @@ CREATE POLICY "admin_lasa" ON app_events
             )}
           </div>
         )}
-        {/* ── PRODUKTU BOTS ── */}
-        {cilne === 'bots' && (
+        {/* ── BOTI (meklētājs / mākslinieks / pārdevējs) ── */}
+        {(cilne === 'bots' || cilne === 'makslinieks' || cilne === 'pardevejs' || cilne === 'bankieris') && (
           <div>
             {!pinAtlasits ? (
               <div style={{ maxWidth: 360, margin: '60px auto', textAlign: 'center' }}>
-                <div style={{ fontSize: 48, marginBottom: 12 }}>🤖</div>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>
+                  {cilne === 'bankieris' ? '💳' : cilne === 'pardevejs' ? '📦' : cilne === 'makslinieks' ? '🎨' : '🤖'}
+                </div>
                 <div style={{ color: C.text, fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
-                  Bots meklētājs
+                  {cilne === 'bankieris' ? 'Banķieris' : cilne === 'pardevejs' ? 'Pārdevējs' : cilne === 'makslinieks' ? 'Mākslinieks' : 'Bots meklētājs'}
                 </div>
                 <div style={{ color: C.textMut, fontSize: 13, marginBottom: 24, lineHeight: 1.6 }}>
-                  Meklē cenas Amazon, Alibaba, AliExpress.<br/>Aprēķina LV pārdošanas cenu un maržu.
+                  {cilne === 'bankieris'
+                    ? <>Automātiska pasūtīšana un e-pasta sūtīšana.<br/>CJdropshipping + manuālo pasūtījumu saraksts.</>
+                    : cilne === 'pardevejs'
+                    ? <>Apstrādā ienākošos pasūtījumus.<br/>Nosūta pie piegādātāja, izseko piegādi.</>
+                    : cilne === 'makslinieks'
+                    ? <>Tulko produktu latviski, ģenerē aprakstu,<br/>soc. tīklu saturu un attēla promptus.</>
+                    : <>Meklē cenas Amazon, Alibaba, AliExpress.<br/>Aprēķina LV pārdošanas cenu un maržu.</>
+                  }
                 </div>
                 <input
                   autoFocus
@@ -301,11 +315,31 @@ CREATE POLICY "admin_lasa" ON app_events
                   Atvērt botu →
                 </button>
               </div>
+            ) : cilne === 'bankieris' ? (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 0' }}>
+                  <button
+                    onClick={() => { setPinAtlasits(false); setPinVal('') }}
+                    style={{ padding: '6px 14px', background: 'none', color: '#8b949e', border: '1px solid #30363d', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
+                  >🔒 Bloķēt</button>
+                </div>
+                <BotsBankieris />
+              </div>
+            ) : cilne === 'pardevejs' ? (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 0' }}>
+                  <button
+                    onClick={() => { setPinAtlasits(false); setPinVal('') }}
+                    style={{ padding: '6px 14px', background: 'none', color: '#8b949e', border: '1px solid #30363d', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
+                  >🔒 Bloķēt</button>
+                </div>
+                <BotsPardevejs />
+              </div>
             ) : (
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 0', gap: 8 }}>
                   <button
-                    onClick={() => window.open('/meza_tirgus_product_bot.html', '_blank', 'noopener')}
+                    onClick={() => window.open(cilne === 'makslinieks' ? '/meza_tirgus_makslinieks.html' : '/meza_tirgus_product_bot.html', '_blank', 'noopener')}
                     style={{ padding: '6px 14px', background: '#1c2d3f', color: '#388bfd', border: '1px solid #388bfd', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
                   >↗ Atvērt jaunā cilnē</button>
                   <button
@@ -314,9 +348,10 @@ CREATE POLICY "admin_lasa" ON app_events
                   >🔒 Bloķēt</button>
                 </div>
                 <iframe
-                  src="/meza_tirgus_product_bot.html"
+                  key={cilne}
+                  src={cilne === 'makslinieks' ? '/meza_tirgus_makslinieks.html' : '/meza_tirgus_product_bot.html'}
                   style={{ width: '100%', height: 'calc(100vh - 160px)', border: 'none', borderRadius: 8 }}
-                  title="Produktu izpētes bots"
+                  title={cilne === 'makslinieks' ? 'Mākslinieks bots' : 'Produktu izpētes bots'}
                 />
               </div>
             )}
