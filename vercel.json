@@ -1,14 +1,9 @@
 {
   "rewrites": [
-    { "source": "/api/anthropic/(.*)", "destination": "/api/anthropic" },
-    { "source": "/api/lvmgeo",        "destination": "/api/lvmgeo"    },
-    { "source": "/api/lvmgeo/(.*)",   "destination": "/api/lvmgeo"    },
-    { "source": "/api/email",         "destination": "/api/email"     },
-    { "source": "/api/cj",            "destination": "/api/cj"        },
-    { "source": "/api/omniva",        "destination": "/api/omniva"    },
-    { "source": "/cirsma",             "destination": "/cirsma.html"   },
-    { "source": "/krautuve",           "destination": "/krautuve.html" },
-    { "source": "/caurmers",           "destination": "/caurmers.html" },
-    { "source": "/(.*)",               "destination": "/index.html"    }
+    { "source": "/api/(.*)", "destination": "/api/$1"       },
+    { "source": "/cirsma",   "destination": "/cirsma.html"  },
+    { "source": "/krautuve", "destination": "/krautuve.html"},
+    { "source": "/caurmers", "destination": "/caurmers.html"},
+    { "source": "/(.*)",     "destination": "/index.html"   }
   ]
 }
