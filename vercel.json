@@ -1,8 +1,15 @@
 {
+  "functions": {
+    "api/email.js":    { "runtime": "nodejs20.x" },
+    "api/cj.js":       { "runtime": "nodejs20.x" },
+    "api/omniva.js":   { "runtime": "nodejs20.x" },
+    "api/anthropic.js":{ "runtime": "nodejs20.x" },
+    "api/lvmgeo.js":   { "runtime": "nodejs20.x" }
+  },
   "rewrites": [
-    { "source": "/cirsma",          "destination": "/cirsma.html"  },
-    { "source": "/krautuve",        "destination": "/krautuve.html"},
-    { "source": "/caurmers",        "destination": "/caurmers.html"},
-    { "source": "/((?!api/).*)",    "destination": "/index.html"   }
+    { "source": "/cirsma",   "destination": "/cirsma.html"   },
+    { "source": "/krautuve", "destination": "/krautuve.html" },
+    { "source": "/caurmers", "destination": "/caurmers.html" },
+    { "source": "/(.*)",     "destination": "/index.html"    }
   ]
 }
