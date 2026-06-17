@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meža Tirgus — Mākslinieks</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+  :root {
+    --bg:#0d1117; --surface:#161b22; --surface2:#1c2128;
+    --border:#30363d; --accent:#2ea043; --blue:#388bfd;
+    --purple:#bc8cff; --warn:#e3b341; --red:#f85149;
+    --text:#e6edf3; --text2:#8b949e; --text3:#484f58;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-size:13px; min-height:100vh; }
+
+  .header { background:var(--surface); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; }
+  .logo { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:14px; color:var(--accent); }
+  .badge { background:#1a2d3f; color:var(--purple); font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 8px; border-radius:12px; border:1px solid var(--purple); }
+
+  .layout { display:grid; grid-template-columns:320px 1fr; height:calc(100vh - 49px); }
+
+  /* LEFT */
+  .left { background:var(--surface); border-right:1px solid var(--border); overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .panel-title { font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--text3); padding-bottom:6px; border-bottom:1px solid var(--border); }
+
+  label { font-size:11px; color:var(--text2); display:block; margin-bottom:3px; }
+  input, textarea, select { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:11px; outline:none; width:100%; }
+  input:focus, textarea:focus, select:focus { border-color:var(--blue); }
+  textarea { resize:vertical; min-height:80px; }
+
+  .price-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+  .btn { border:none; border-radius:6px; padding:10px 16px; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; width:100%; transition:opacity .15s; letter-spacing:.04em; }
+  .btn-primary { background:var(--purple); color:white; }
+  .btn-primary:hover { opacity:.85; }
+  .btn-primary:disabled { opacity:.4; cursor:not-allowed; }
+  .btn-secondary { background:var(--surface2); color:var(--text2); border:1px solid var(--border); margin-top:6px; }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+
+  .calc-mini { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:10px; }
+  .calc-row { display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:2px 0; }
+  .calc-row span:first-child { color:var(--text2); }
+  .calc-row.total { font-weight:700; color:var(--accent); border-top:1px solid var(--border); margin-top:4px; padding-top:4px; }
+
+  /* RIGHT */
+  .right { overflow-y:auto; padding:20px; }
+
+  .empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; color:var(--text3); text-align:center; }
+  .empty .big { font-size:48px; }
+  .empty h2 { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text2); }
+
+  /* LOADING */
+  .loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:300px; gap:12px; }
+  .spinner { width:28px; height:28px; border:2px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin 1s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .step { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); padding:2px 0; }
+  .step.done { color:var(--accent); }
+  .step.active { color:var(--purple); }
+
+  /* OUTPUT SECTIONS */
+  .output-grid { display:flex; flex-direction:column; gap:16px; }
+
+  .section { background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .section-hdr { padding:10px 14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .section-hdr h3 { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:.08em; }
+  .section-body { padding:14px; }
+
+  /* PRODUCT HEADER */
+  .product-header { background:linear-gradient(135deg, #1a2d1a, #0d1a2d); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:16px; }
+  .product-name { font-size:18px; font-weight:700; color:var(--text); margin-bottom:6px; }
+  .product-tagline { font-size:13px; color:var(--text2); margin-bottom:12px; font-style:italic; }
+  .product-price-row { display:flex; gap:16px; align-items:center; }
+  .price-sell { font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:700; color:var(--accent); }
+  .price-old { font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text3); text-decoration:line-through; }
+  .profit-badge { background:#1a3426; border:1px solid var(--accent); border-radius:4px; padding:4px 10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); }
+
+  /* DESCRIPTION */
+  .desc-text { font-size:13px; line-height:1.7; color:var(--text); white-space:pre-wrap; }
+
+  /* FEATURES */
+  .features-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .feature-item { background:var(--surface2); border-radius:6px; padding:10px 12px; display:flex; gap:8px; align-items:flex-start; }
+  .feature-icon { font-size:16px; flex-shrink:0; }
+  .feature-text { font-size:11.5px; color:var(--text2); line-height:1.4; }
+
+  /* SLIDES */
+  .slides-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .slide { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px; min-height:120px; display:flex; flex-direction:column; gap:6px; }
+  .slide-num { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text3); }
+  .slide-title { font-size:12px; font-weight:700; color:var(--text); }
+  .slide-body { font-size:11px; color:var(--text2); line-height:1.5; flex:1; }
+  .slide-icon { font-size:24px; margin-bottom:4px; }
+
+  /* IMAGE PROMPT */
+  .prompt-box { background:#0d1a2d; border:1px solid var(--blue); border-radius:6px; padding:12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#a5d6ff; line-height:1.6; position:relative; }
+  .prompt-text { display:block; padding-right:70px; }
+  .copy-btn { position:absolute; top:8px; right:8px; background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:3px 8px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text2); cursor:pointer; }
+  .copy-btn:hover { border-color:var(--blue); color:var(--blue); }
+
+  /* SOCIAL */
+  .social-section { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .social-card { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:12px; }
+  .social-platform { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text3); text-transform:uppercase; margin-bottom:6px; }
+  .social-text { font-size:11.5px; color:var(--text2); line-height:1.6; white-space:pre-wrap; }
+  .hashtags { margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--blue); }
+
+  /* EXPORT */
+  .export-bar { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .export-bar span { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); }
+  .ebtn { background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:6px 12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text2); cursor:pointer; transition:all .15s; }
+  .ebtn:hover { border-color:var(--accent); color:var(--accent); }
+  .ebtn:disabled { opacity:.4; cursor:not-allowed; }
+
+  /* GENERATED IMAGE */
+  .gen-img-loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:240px; gap:10px; background:var(--surface2); border-radius:8px; }
+  .gen-img-wrap img { width:100%; height:auto; display:block; border-radius:8px; }
+  .gen-img-wrap { position:relative; }
+
+  /* KEY ROW */
+  .key-row { display:flex; gap:6px; }
+  .key-row input { flex:1; }
+  .key-save { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:8px 12px; color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+  .key-save:hover { border-color:var(--accent); }
+
+  /* SB STATUS */
+  .sb-status { display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; margin-top:6px; }
+  .sb-dot { width:7px; height:7px; border-radius:50%; background:var(--text3); flex-shrink:0; }
+  .sb-dot.ok { background:var(--accent); }
+  .sb-dot.err { background:var(--red); }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button onclick="goBack()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">← Atpakaļ</button>
+  <button onclick="window.top.history.back()" style="background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">↑ Admin</button>
+  <span class="logo">🌲 MEŽA TIRGUS</span>
+  <span class="badge">🎨 MĀKSLINIEKS</span>
+</div>
+
+<div class="layout">
+  <!-- LEFT PANEL -->
+  <div class="left">
+
+    <!-- SUPABASE -->
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">🗄️ Supabase datubāze</div>
+      <div style="margin-bottom:6px;">
+        <label>URL</label>
+        <input type="text" id="sbUrl" placeholder="https://xxx.supabase.co" />
+      </div>
+      <div style="margin-bottom:6px;">
+        <label>Publishable Key</label>
+        <input type="password" id="sbKey" placeholder="sb_publishable_..." />
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="key-save" onclick="saveSupabase()">💾 Saglabāt</button>
+      </div>
+      <div class="sb-status">
+        <div class="sb-dot" id="sbDot"></div>
+        <span id="sbStatusText" style="color:var(--text3);">Nav konfigurēts</span>
+      </div>
+    </div>
+
+    <!-- OPENAI -->
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">🔑 OpenAI API atslēga</div>
+      <div class="key-row">
+        <input type="password" id="openaiKey" placeholder="sk-proj-..." />
+        <button class="key-save" onclick="saveOpenaiKey()">💾</button>
+      </div>
+      <div style="margin-top:6px;">
+        <select id="dalleModel" style="font-size:10px;padding:4px 6px;">
+          <option value="gpt-image-1">gpt-image-1 · jaunākais (2025)</option>
+          <option value="dall-e-3">dall-e-3 · HD (ja pieejams plānā)</option>
+          <option value="dall-e-2">dall-e-2 · lētāks (ja pieejams plānā)</option>
+        </select>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;">platform.openai.com → API Keys</div>
+    </div>
+
+    <div class="panel-title">📦 Produkta dati</div>
+
+    <div>
+      <label>Produkta saite vai nosaukums</label>
+      <textarea id="productUrl" placeholder="Ielīmē AliExpress/Amazon saiti vai apraksti produktu...&#10;&#10;Piemērs: 130dB Personal Safety Alarm Strobe Light Keychain from AliExpress, price 6.10€"></textarea>
+    </div>
+
+    <div>
+      <label>Kategorija</label>
+      <select id="category">
+        <option value="bears">🐻 Lāču drošība</option>
+        <option value="ticks">🦟 Ērču/odu aizsardzība</option>
+        <option value="measurement">📏 Mērinstrumenti</option>
+        <option value="boots">👟 Apavu aizsardzība</option>
+        <option value="surveillance">📷 Novērošana</option>
+        <option value="safety">🔦 Drošība mežā</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="panel-title" style="margin-bottom:8px;">💰 Cenas</div>
+      <div class="price-grid">
+        <div><label>Pirkšanas cena (€)</label><input type="number" id="buyPrice" placeholder="6.10" step="0.01" oninput="updateCalc()" /></div>
+        <div><label>Piegāde (€)</label><input type="number" id="delivery" placeholder="12" step="0.01" oninput="updateCalc()" /></div>
+      </div>
+      <div style="margin-top:8px;">
+        <label>Marža (%)</label>
+        <input type="number" id="margin" value="100" oninput="updateCalc()" />
+      </div>
+    </div>
+
+    <!-- MINI CALCULATOR -->
+    <div class="calc-mini">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:6px;">CENU KALKULATORS</div>
+      <div class="calc-row"><span>Pirkšanas cena</span><span id="c1">—</span></div>
+      <div class="calc-row"><span>Piegāde</span><span id="c2">—</span></div>
+      <div class="calc-row"><span>Muita (5% ja >150€)</span><span id="c3">—</span></div>
+      <div class="calc-row"><span>PVN imports (21%)</span><span id="c4">—</span></div>
+      <div class="calc-row"><span>Pašizmaksa</span><span id="c5">—</span></div>
+      <div class="calc-row"><span>Marža</span><span id="c6">—</span></div>
+      <div class="calc-row total"><span>PĀRDOŠANAS CENA</span><span id="c7">—</span></div>
+      <div class="calc-row"><span style="color:#f85149">Tīrā peļņa/gab</span><span id="c8" style="color:#f85149">—</span></div>
+    </div>
+
+    <div>
+      <label>📸 Produkta oriģinālā bilde <span style="color:var(--accent);font-weight:700;">(ieteicams!)</span></label>
+      <input type="file" id="productImageFile" accept="image/*" style="padding:6px 8px;cursor:pointer;" />
+      <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;line-height:1.5;">
+        Augšupielādē piegādātāja bildi → AI veidos mākslas darbu no <i>šīs</i> bildes.<br>
+        Bez bildes — AI fantazē un produkts var izskatīties pavisam savādāk.
+      </div>
+    </div>
+
+    <div>
+      <label>Papildu info (neobligāti)</label>
+      <textarea id="extra" placeholder="Ko zini par produktu? Atsauksmes, īpašības, izmēri, krāsas..."></textarea>
+    </div>
+
+    <button class="btn btn-primary" id="goBtn" onclick="runArtist()">🎨 RADĪT VEIKALA IERAKSTU</button>
+    <button class="btn btn-secondary" onclick="clearAll()">🗑 Notīrīt</button>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right" id="rightPanel">
+    <div class="empty">
+      <div class="big">🎨</div>
+      <h2>Mākslinieks gatavs darbam</h2>
+      <p style="font-size:12px;color:var(--text3);max-width:280px;margin-top:4px;">Ielīmē produkta saiti vai apraksti produktu. Mākslinieks sagatavos LV nosaukumu, aprakstu, cenu, attēla promptu un soc. tīklu saturu.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ACM ──────────────────────────────────────────────────────────
+function acmGeneretToken(sesijasId = '') {
+  const NEDELA = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000));
+  const METODE = NEDELA % 4;
+  const min    = Math.floor(Date.now() / 60000);
+  switch (METODE) {
+    case 0: { const baze = (NEDELA + sesijasId).split('').reduce((a,c)=>a+c.charCodeAt(0),0); return (baze*7+min).toString(36).substring(0,12); }
+    case 1: { const n=(NEDELA%15)+5; let a=0,b=1; for(let i=0;i<n;i++){[a,b]=[b,a+b];} return (a%1000).toString().padStart(3,'0')+min.toString(36); }
+    case 2: return min.toString().split('').reverse().join('')+(NEDELA%97).toString();
+    case 3: { const xor=(NEDELA^min^sesijasId.length)>>>0; return xor.toString(16).padStart(8,'0'); }
+    default: return min.toString(36);
+  }
+}
+function acmHeaders(userId = '') {
+  return { 'Content-Type':'application/json', 'x-acm-token':acmGeneretToken(userId), 'x-sesija-id':userId };
+}
+
+// ── SUPABASE ─────────────────────────────────────────────────────
+function saveSupabase() {
+  const url = document.getElementById('sbUrl').value.trim();
+  const key = document.getElementById('sbKey').value.trim();
+  if (!url || !key) { alert('Ievadi gan URL, gan Key!'); return; }
+  localStorage.setItem('mt_sb_url', url);
+  localStorage.setItem('mt_sb_key', key);
+  setSbStatus(true, 'Saglabāts ✓');
+}
+
+function setSbStatus(ok, text) {
+  const dot  = document.getElementById('sbDot');
+  const span = document.getElementById('sbStatusText');
+  if (!dot || !span) return;
+  dot.className  = 'sb-dot' + (ok ? ' ok' : ' err');
+  span.textContent = text;
+  span.style.color = ok ? 'var(--accent)' : 'var(--red)';
+}
+
+async function saglabatVeikala() {
+  if (!window._lastResult) { alert('Vispirms ģenerē produktu!'); return; }
+  const sbUrl = localStorage.getItem('mt_sb_url') || '';
+  const sbKey = localStorage.getItem('mt_sb_key') || '';
+  if (!sbUrl || !sbKey) { alert('Ievadi Supabase URL un Key kreisajā panelī!'); return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Saglabā...';
+
+  const { data: d, sellPrice, buyPrice, netProfit } = window._lastResult;
+  const category = document.getElementById('category').value;
+
+  // Ja attēls ir base64 — augšupielādē Supabase Storage
+  let imageUrl = window._lastImageUrl || null;
+  if (imageUrl && imageUrl.startsWith('data:')) {
+    try {
+      imageUrl = await uploadImageToSupabase(imageUrl, sbUrl, sbKey);
+    } catch(uploadErr) {
+      console.warn('Storage upload neizdevās, saglabā base64:', uploadErr.message);
+      // Saglabājam base64 tieši — darbojas bez Storage konfigurācijas
+    }
+  }
+
+  const product = {
+    name_lv:        d.name_lv        || '',
+    tagline:         d.tagline         || '',
+    description_lv:  d.description_lv  || '',
+    features:        d.features        || [],
+    slides:          d.slides          || [],
+    image_url:       imageUrl,
+    image_prompt_en: d.image_prompt_en || '',
+    price_sell:      sellPrice,
+    price_buy:       buyPrice,
+    profit:          parseFloat(netProfit.toFixed(2)),
+    category,
+    delivery_info:   d.delivery_info   || '',
+    seo_keywords:    d.seo_keywords    || [],
+    tiktok_text:     d.tiktok_text     || '',
+    tiktok_hashtags: d.tiktok_hashtags || '',
+    facebook_text:   d.facebook_text   || '',
+    facebook_hashtags: d.facebook_hashtags || '',
+    active: true,
+  };
+
+  try {
+    const resp = await fetch(`${sbUrl}/rest/v1/products`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        sbKey,
+        'Authorization': `Bearer ${sbKey}`,
+        'Prefer':        'return=minimal',
+      },
+      body: JSON.stringify(product),
+    });
+
+    if (!resp.ok) {
+      const rawText = await resp.text().catch(() => '');
+      let errMsg = `HTTP ${resp.status}`;
+      try {
+        const err = JSON.parse(rawText);
+        errMsg = err.message || err.error || err.hint || errMsg;
+        if (err.details) errMsg += '\n' + err.details;
+      } catch {}
+      throw new Error(`${errMsg}\n\n(HTTP ${resp.status})\nURL: ${sbUrl}/rest/v1/products`);
+    }
+
+    btn.textContent = '✓ Saglabāts!';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+    setSbStatus(true, 'Produkts saglabāts ✓');
+
+    // Parāda "Skatīt veikalā" saiti blakus pogai
+    const existingLink = document.getElementById('veikalsLink');
+    if (!existingLink) {
+      const link = document.createElement('a');
+      link.id = 'veikalsLink';
+      link.href = window !== window.top ? '#' : '/';
+      link.textContent = '→ Skatīt veikalā';
+      link.style.cssText = 'font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--accent);text-decoration:none;padding:6px 12px;border:1px solid var(--accent);border-radius:4px;background:var(--surface2);cursor:pointer;display:inline-block;';
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window !== window.top) {
+          window.top.location.href = '/?page=veikals';
+        } else {
+          window.location.href = '/';
+        }
+      });
+      btn.after(link);
+    }
+
+    setTimeout(() => {
+      btn.textContent = '💾 Saglabāt veikalā';
+      btn.style.borderColor = ''; btn.style.color = '';
+      btn.disabled = false;
+    }, 3000);
+  } catch(e) {
+    btn.textContent = '⚠️ Kļūda';
+    btn.style.borderColor = 'var(--red)';
+    btn.style.color = 'var(--red)';
+    btn.disabled = false;
+    setSbStatus(false, 'Kļūda — skatīt alert');
+    alert('❌ Saglabāšanas kļūda:\n\n' + e.message);
+    setTimeout(() => { btn.textContent = '💾 Saglabāt veikalā'; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
+  }
+}
+
+async function uploadImageToSupabase(dataUrl, sbUrl, sbKey) {
+  const { createClient } = window.supabase || supabase;
+  const sb = createClient(sbUrl, sbKey);
+  const resp = await fetch(dataUrl);
+  const blob = await resp.blob();
+  const fname = `product_${Date.now()}.png`;
+  const { error } = await sb.storage
+    .from('product-images')
+    .upload(fname, blob, { contentType: 'image/png', upsert: false });
+  if (error) throw new Error('Storage: ' + error.message);
+  const { data } = sb.storage.from('product-images').getPublicUrl(fname);
+  return data.publicUrl;
+}
+
+// ── OPENAI ───────────────────────────────────────────────────────
+function saveOpenaiKey() {
+  const k = document.getElementById('openaiKey').value.trim();
+  if (k) {
+    localStorage.setItem('mt_openai_key', k);
+    const btn = document.querySelector('#openaiKey + button') || document.querySelector('.key-save');
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = '💾', 1500);
+  }
+}
+
+function getImageContext(category) {
+  return {
+    bears:       'A frightened bear retreating into a misty Latvian spruce forest at dusk, dramatic backlighting',
+    ticks:       'Extreme macro closeup of a tick crawling on human skin in a dense forest, amber warning light',
+    boots:       'Rugged leather forest boots standing in deep mud, water droplets beading off the surface, golden hour light',
+    measurement: 'A weathered forest ranger measuring a towering pine tree at sunset, silhouette against fiery orange sky',
+    surveillance:'A wolf staring directly into a trail camera at night, glowing amber eyes, infrared glow, pitch black forest',
+  }[category] || 'A lone person deep in a dark dense forest holding the product, mysterious fog, dramatic cinematic light';
+}
+
+async function generateImage(prompt) {
+  const key = localStorage.getItem('mt_openai_key') || '';
+  if (!key) throw new Error('OpenAI API atslēga nav saglabāta! Ievadi to kreisajā panelī un nospied 💾');
+
+  const fileInput = document.getElementById('productImageFile');
+  const file = fileInput?.files?.[0];
+
+  // Ja ir augšupielādēta produkta bilde — izmanto image editing (image-to-image)
+  if (file) {
+    const editPrompt = `Professional product photography. Keep this exact product unchanged — same shape, colors, design, and details. Place it in a dramatic Latvian forest/nature setting with cinematic lighting. The product must be clearly recognizable and identical to the input image. ${prompt}`;
+    const form = new FormData();
+    form.append('image', file, file.name);
+    form.append('prompt', editPrompt);
+    form.append('model', 'gpt-image-1');
+    form.append('n', '1');
+    form.append('size', '1024x1024');
+    const resp = await fetch('https://api.openai.com/v1/images/edits', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}` },
+      body: form,
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `OpenAI edits kļūda: ${resp.status}`);
+    }
+    const data = await resp.json();
+    if (data.data[0].b64_json) return `data:image/png;base64,${data.data[0].b64_json}`;
+    return data.data[0].url;
+  }
+
+  // Bez bildes — parasta teksta ģenerēšana (mazāk precīza)
+  const model = document.getElementById('dalleModel')?.value || 'gpt-image-1';
+  const body = { model, prompt, n: 1, size: '1024x1024' };
+  if (model === 'dall-e-3') body.quality = 'hd';
+  if (model === 'gpt-image-1') body.output_format = 'png';
+  const resp = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `OpenAI kļūda: ${resp.status}`);
+  }
+  const data = await resp.json();
+  if (data.data[0].b64_json) return `data:image/png;base64,${data.data[0].b64_json}`;
+  return data.data[0].url;
+}
+
+async function downloadImage(url) {
+  try {
+    const resp = await fetch(url);
+    const blob = await resp.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mt_attels_${Date.now()}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  } catch {
+    window.open(url, '_blank', 'noopener');
+  }
+}
+
+async function regenImage() {
+  if (!window._lastImagePrompt) return;
+  const sec = document.getElementById('imageSection');
+  if (!sec) return;
+  sec.innerHTML = `<div class="gen-img-loading"><div class="spinner"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">Ģenerē jaunu attēlu...</div></div>`;
+  try {
+    const url = await generateImage(window._lastImagePrompt);
+    window._lastImageUrl = url;
+    sec.innerHTML = imageResultHTML(url);
+  } catch(e) {
+    sec.innerHTML = `<div style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 0;">⚠️ ${e.message}</div><button class="ebtn" onclick="regenImage()" style="margin-top:6px;">🔄 Mēģināt vēlreiz</button>`;
+  }
+}
+
+function imageResultHTML(url) {
+  return `
+    <div class="gen-img-wrap"><img src="${url}" alt="Produkta attēls" /></div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="ebtn" onclick="downloadImage(window._lastImageUrl)">⬇ Lejupielādēt</button>
+      <button class="ebtn" onclick="regenImage()">🔄 Ģenerēt vēlreiz</button>
+    </div>`;
+}
+
+// ── KALKULATORS ──────────────────────────────────────────────────
+function updateCalc() {
+  const buy = parseFloat(document.getElementById('buyPrice').value) || 0;
+  const del = parseFloat(document.getElementById('delivery').value) || 12;
+  const mar = parseFloat(document.getElementById('margin').value) || 100;
+  if (!buy) { ['c1','c2','c3','c4','c5','c6','c7','c8'].forEach(id => document.getElementById(id).textContent = '—'); return; }
+  const customs = buy > 150 ? buy * 0.05 : 0;
+  const base = buy + del + customs;
+  const pvn = base * 0.21;
+  const cost = base + pvn;
+  const profit_margin = cost * (mar/100);
+  const sell = Math.ceil((cost + profit_margin) / 0.5) * 0.5;
+  const net_profit = sell - cost - sell*0.21;
+  document.getElementById('c1').textContent = buy.toFixed(2) + ' €';
+  document.getElementById('c2').textContent = del.toFixed(2) + ' €';
+  document.getElementById('c3').textContent = customs > 0 ? customs.toFixed(2) + ' €' : '0 €';
+  document.getElementById('c4').textContent = pvn.toFixed(2) + ' €';
+  document.getElementById('c5').textContent = cost.toFixed(2) + ' €';
+  document.getElementById('c6').textContent = profit_margin.toFixed(2) + ' €';
+  document.getElementById('c7').textContent = sell.toFixed(2) + ' €';
+  document.getElementById('c8').textContent = net_profit.toFixed(2) + ' €';
+}
+
+function clearAll() {
+  document.getElementById('productUrl').value = '';
+  document.getElementById('buyPrice').value = '';
+  document.getElementById('delivery').value = '';
+  document.getElementById('extra').value = '';
+  document.getElementById('productImageFile').value = '';
+  document.getElementById('rightPanel').innerHTML = `<div class="empty"><div class="big">🎨</div><h2>Mākslinieks gatavs darbam</h2></div>`;
+  ['c1','c2','c3','c4','c5','c6','c7','c8'].forEach(id => document.getElementById(id).textContent = '—');
+  window._lastResult = null;
+  window._lastImageUrl = null;
+  window._lastImagePrompt = null;
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Nokopēts!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+function copySocial(platform) {
+  if (!window._lastResult) return;
+  const d = window._lastResult.data;
+  const text = platform === 'tiktok'
+    ? (d.tiktok_text || '') + '\n\n' + (d.tiktok_hashtags || '')
+    : (d.facebook_text || '') + '\n\n' + (d.facebook_hashtags || '');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy_' + platform);
+    if (btn) { btn.textContent = '✓ Nokopēts!'; setTimeout(() => btn.textContent = '📋 Kopēt', 1500); }
+  });
+}
+
+function goBack() {
+  if (window !== window.top) {
+    window.location.href = '/meza_tirgus_product_bot.html';
+  } else if (history.length > 1) {
+    history.back();
+  } else {
+    window.location.href = '/';
+  }
+}
+
+// ── GALVENĀ FUNKCIJA ─────────────────────────────────────────────
+async function runArtist() {
+  const productUrl = document.getElementById('productUrl').value.trim();
+  if (!productUrl) { alert('Ievadi produkta saiti vai aprakstu!'); return; }
+
+  const buy      = parseFloat(document.getElementById('buyPrice').value) || 0;
+  const del      = parseFloat(document.getElementById('delivery').value) || 12;
+  const mar      = parseFloat(document.getElementById('margin').value) || 100;
+  const category = document.getElementById('category').value;
+  const extra    = document.getElementById('extra').value;
+
+  const customs    = buy > 150 ? buy * 0.05 : 0;
+  const base       = buy + del + customs;
+  const pvn        = base * 0.21;
+  const cost       = base + pvn;
+  const sell       = Math.ceil((cost * (1 + mar/100)) / 0.5) * 0.5;
+  const net_profit = sell - cost - sell*0.21;
+
+  const btn = document.getElementById('goBtn');
+  btn.disabled = true; btn.textContent = '⏳ Radām...';
+
+  const panel = document.getElementById('rightPanel');
+  panel.innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--purple);">Mākslinieks strādā...</div>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:8px;">
+        <div class="step active" id="s1">▶ Analizē produktu</div>
+        <div class="step" id="s2">○ Raksta LV aprakstu</div>
+        <div class="step" id="s3">○ Aprēķina cenu</div>
+        <div class="step" id="s4">○ Ģenerē attēla promptu</div>
+        <div class="step" id="s5">○ Veido slaidus</div>
+        <div class="step" id="s6">○ Sagatavo soc. tīklus</div>
+      </div>
+    </div>`;
+
+  const stepInterval = setInterval(() => {
+    const steps = ['s1','s2','s3','s4','s5','s6'];
+    const cur = steps.find(s => document.getElementById(s)?.classList.contains('active'));
+    if (cur) {
+      const el = document.getElementById(cur);
+      el.classList.replace('active','done');
+      el.textContent = '✓ ' + el.textContent.slice(2);
+      const nxt = steps[steps.indexOf(cur)+1];
+      if (nxt && document.getElementById(nxt)) {
+        const nel = document.getElementById(nxt);
+        nel.classList.add('active');
+        nel.textContent = '▶ ' + nel.textContent.slice(2);
+      }
+    }
+  }, 1200);
+
+  try {
+    const result = await callArtistAPI(productUrl, category, buy, del, mar, sell, net_profit, extra);
+    clearInterval(stepInterval);
+    renderOutput(result, sell, net_profit, buy, del);
+
+    // Attēla ģenerēšana paralēli
+    const imagePrompt = `${result.image_prompt_en}. ${getImageContext(category)}. The product is prominently in the foreground, photorealistic, dramatic lighting, cinematic, mobile vertical format.`;
+    window._lastImagePrompt = imagePrompt;
+    window._lastImageUrl = null;
+    generateImage(imagePrompt).then(url => {
+      window._lastImageUrl = url;
+      const sec = document.getElementById('imageSection');
+      if (sec) sec.innerHTML = imageResultHTML(url);
+    }).catch(e => {
+      const sec = document.getElementById('imageSection');
+      if (sec) sec.innerHTML = `<div style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 0;">⚠️ ${e.message}</div><button class="ebtn" onclick="regenImage()" style="margin-top:6px;">🔄 Mēģināt vēlreiz</button>`;
+    });
+  } catch(e) {
+    clearInterval(stepInterval);
+    panel.innerHTML = `<div class="empty"><div class="big">⚠️</div><h2>Kļūda</h2><p style="color:var(--red)">${e.message}</p></div>`;
+  }
+
+  btn.disabled = false; btn.textContent = '🎨 RADĪT VEIKALA IERAKSTU';
+}
+
+async function callArtistAPI(productUrl, category, buy, delivery, margin, sellPrice, netProfit, extra) {
+  const categoryNames = {
+    bears: 'Lāču drošība — mežstrādnieki, mednieki, sēņotāji, tūristi',
+    ticks: 'Ērču un odu aizsardzība — visi meža apmeklētāji',
+    measurement: 'Meža mērinstrumenti — meža īpašnieki, taksatori',
+    boots: 'Apavu aizsardzība — pārgājieni, lauksaimniecība',
+    surveillance: 'Novērošana — mednieki, saimniecību īpašnieki',
+    safety: 'Drošība mežā — visi lauku un meža cilvēki',
+  };
+
+  const systemPrompt = `Tu esi e-veikala produktu aprakstu veidotājs Latvijā. Meža Tirgus ir latviskais meža nozares portāls — pārdod likumīgus āra aktivitāšu un drošības piederumus meža īpašniekiem, mežstrādniekiem, medniekiem, sēņotājiem, ogotājiem, biškopjiem. Visi produkti ir legāli un brīvi pieejami Latvijā — personīgie signalizatori, lāču zvaniņi, tūristu drošības rīki, meža novērošanas ierīces, apavu aizsardzība, mērinstrumenti. Tavi uzdevumi ir tikai mārketinga tekstu rakstīšana latviski.
+
+Svarīgi formulējumi: lieto "personīgā drošība" nevis "pašaizsardzība", "savvaļas dzīvnieku signalizators" nevis "uzbrukuma atturēšana", "drošības rīks" nevis "ierocis", "brīdinājuma skaņa" nevis "atbaidīšana".
+
+Tavs uzdevums: Sagatavot PILNU veikala ierakstu no produkta apraksta vai saites.
+
+Tonis: Profesionāls bet draudzīgs. Latviski. Praktisks — sarunā ar meža cilvēku. Bez pārspīlētiem superlatīviem.
+
+Atgriez TIKAI JSON bez markdown:
+{
+  "name_lv": "Latvisks produkta nosaukums (īss, konkrēts)",
+  "tagline": "Viens teikums — galvenais ieguvums",
+  "description_lv": "Pilns apraksts 3-4 rindkopās.",
+  "features": [{"icon":"🔊","text":"Iezīme"},{"icon":"💡","text":"Iezīme"},{"icon":"🔋","text":"Iezīme"},{"icon":"⚖️","text":"Iezīme"},{"icon":"🌧️","text":"Iezīme"},{"icon":"🎯","text":"Iezīme"}],
+  "slides": [{"num":1,"icon":"❓","title":"Virsraksts","body":"Teksts"},{"num":2,"icon":"✅","title":"...","body":"..."},{"num":3,"icon":"🌲","title":"...","body":"..."},{"num":4,"icon":"📦","title":"...","body":"..."},{"num":5,"icon":"⭐","title":"...","body":"..."}],
+  "image_prompt_en": "Detailed DALL-E/Midjourney prompt in English. Product in Latvian forest/nature setting. Photorealistic.",
+  "image_prompt_lv": "Tāds pats latviski",
+  "tiktok_text": "TikTok apraksts LV. Īss, aizraujošs. Max 150 vārdi.",
+  "tiktok_hashtags": "#MežaTirgus #Mežs ...",
+  "facebook_text": "Facebook teksts LV. 100-200 vārdi.",
+  "facebook_hashtags": "#MežaTirgus ...",
+  "delivery_info": "Piegādes info klientam (7-21 diena, bez minēšanas ka no ārvalstīm)",
+  "seo_keywords": ["atslēgvārds1","atslēgvārds2"]
+}`;
+
+  const userPrompt = `Produkts: ${productUrl}
+Kategorija: ${categoryNames[category]}
+Pirkšanas cena: ${buy}€ · Piegāde: ${delivery}€
+Pārdošanas cena: ${sellPrice}€ · Tīrā peļņa: ${netProfit.toFixed(2)}€/gab
+${extra ? 'Papildu info: ' + extra : ''}
+
+Sagatavo pilnu veikala ierakstu latviski.`;
+
+  const response = await fetch('/api/anthropic/v1/messages', {
+    method: 'POST',
+    headers: acmHeaders(),
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    }),
+  });
+
+  if (!response.ok) throw new Error(`API kļūda: ${response.status}`);
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  const text = data.content.map(i => i.text || '').join('').replace(/```json|```/g, '').trim();
+  return JSON.parse(text);
+}
+
+// ── RENDERĒŠANA ──────────────────────────────────────────────────
+function renderOutput(d, sellPrice, netProfit, buyPrice, delivery) {
+  window._lastResult = { data: d, sellPrice, netProfit, buyPrice, delivery };
+  const panel = document.getElementById('rightPanel');
+
+  const featuresHTML = (d.features || []).map(f => `
+    <div class="feature-item">
+      <span class="feature-icon">${f.icon}</span>
+      <span class="feature-text">${f.text}</span>
+    </div>`).join('');
+
+  const slidesHTML = (d.slides || []).map(s => `
+    <div class="slide">
+      <div class="slide-num">SLAIDS ${s.num}</div>
+      <div class="slide-icon">${s.icon}</div>
+      <div class="slide-title">${s.title}</div>
+      <div class="slide-body">${s.body}</div>
+    </div>`).join('');
+
+  panel.innerHTML = `
+    <div class="output-grid">
+
+      <!-- EXPORT BAR -->
+      <div class="export-bar">
+        <span>✅ Gatavs!</span>
+        <button class="ebtn" id="saveBtn" onclick="saglabatVeikala()">💾 Saglabāt veikalā</button>
+        <button class="ebtn" onclick="exportHTML()">⬇ HTML</button>
+        <button class="ebtn" onclick="copyAll()">📋 JSON</button>
+      </div>
+
+      <!-- PRODUCT HEADER -->
+      <div class="product-header">
+        <div class="product-name">${d.name_lv || '—'}</div>
+        <div class="product-tagline">${d.tagline || ''}</div>
+        <div class="product-price-row">
+          <div class="price-sell">${sellPrice.toFixed(2)} €</div>
+          <div class="price-old">${buyPrice} € (pirkšanas)</div>
+          <div class="profit-badge">Peļņa: ~${netProfit.toFixed(2)} €/gab</div>
+        </div>
+      </div>
+
+      <!-- APRAKSTS -->
+      <div class="section">
+        <div class="section-hdr">
+          <h3>📝 Apraksts latviski</h3>
+          <button class="ebtn" onclick="copyText(document.getElementById('descText').textContent, this)">📋 Kopēt</button>
+        </div>
+        <div class="section-body">
+          <div class="desc-text" id="descText">${d.description_lv || '—'}</div>
+        </div>
+      </div>
+
+      <!-- IEZĪMES -->
+      <div class="section">
+        <div class="section-hdr"><h3>⚡ Galvenās iezīmes</h3></div>
+        <div class="section-body"><div class="features-grid">${featuresHTML}</div></div>
+      </div>
+
+      <!-- SLAIDI -->
+      <div class="section">
+        <div class="section-hdr"><h3>🖼 Slaidi (TikTok/Instagram)</h3></div>
+        <div class="section-body"><div class="slides-grid">${slidesHTML}</div></div>
+      </div>
+
+      <!-- ATTĒLA PROMPTS -->
+      <div class="section">
+        <div class="section-hdr"><h3>✏️ AI Attēla prompts</h3></div>
+        <div class="section-body">
+          <div style="margin-bottom:8px;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;">EN (izmantot AI rīkos):</div>
+          <div class="prompt-box">
+            <span class="prompt-text" id="promptEn">${d.image_prompt_en || '—'}</span>
+            <button class="copy-btn" onclick="copyText(document.getElementById('promptEn').textContent, this)">📋 Kopēt</button>
+          </div>
+          <div style="margin:8px 0;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;">LV:</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.5;">${d.image_prompt_lv || '—'}</div>
+        </div>
+      </div>
+
+      <!-- ĢENERĒTAIS ATTĒLS -->
+      <div class="section">
+        <div class="section-hdr"><h3>🖼 Ģenerētais attēls (AI)</h3></div>
+        <div class="section-body" id="imageSection">
+          <div class="gen-img-loading">
+            <div class="spinner"></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">Ģenerē attēlu...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOC. TĪKLI -->
+      <div class="section">
+        <div class="section-hdr"><h3>📱 Sociālie tīkli</h3></div>
+        <div class="section-body">
+          <div class="social-section">
+            <div class="social-card">
+              <div class="social-platform">🎵 TikTok</div>
+              <div class="social-text">${d.tiktok_text || '—'}</div>
+              <div class="hashtags">${d.tiktok_hashtags || ''}</div>
+              <button class="ebtn" id="copy_tiktok" style="margin-top:8px;width:auto;" onclick="copySocial('tiktok')">📋 Kopēt</button>
+            </div>
+            <div class="social-card">
+              <div class="social-platform">👍 Facebook</div>
+              <div class="social-text">${d.facebook_text || '—'}</div>
+              <div class="hashtags">${d.facebook_hashtags || ''}</div>
+              <button class="ebtn" id="copy_facebook" style="margin-top:8px;width:auto;" onclick="copySocial('facebook')">📋 Kopēt</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIEGĀDE + SEO -->
+      <div class="section">
+        <div class="section-hdr"><h3>📦 Piegāde + SEO</h3></div>
+        <div class="section-body">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">${d.delivery_info || '—'}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${(d.seo_keywords || []).map(k => `<span style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue);">${k}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+
+    </div>`;
+}
+
+function exportHTML() {
+  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `mt_produkts_${Date.now()}.html`; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function copyAll() {
+  if (window._lastResult) {
+    navigator.clipboard.writeText(JSON.stringify(window._lastResult, null, 2));
+    alert('JSON nokopēts!');
+  }
+}
+
+// ── INICIALIZĀCIJA ───────────────────────────────────────────────
+(function init() {
+  // Supabase
+  const sbUrl = localStorage.getItem('mt_sb_url') || 'https://reuyrtiwzcxdknnmycev.supabase.co';
+  const sbKey = localStorage.getItem('mt_sb_key') || 'sb_publishable_CClCjnn03F8gJ_u9T2HalQ_Sq83gU1C';
+  document.getElementById('sbUrl').value = sbUrl;
+  document.getElementById('sbKey').value = sbKey;
+  // Saglabā ja bija noklusējums
+  if (!localStorage.getItem('mt_sb_url')) localStorage.setItem('mt_sb_url', sbUrl);
+  if (!localStorage.getItem('mt_sb_key')) localStorage.setItem('mt_sb_key', sbKey);
+  setSbStatus(true, 'Konfigurēts ✓');
+
+  // OpenAI
+  const oKey = localStorage.getItem('mt_openai_key');
+  if (oKey) document.getElementById('openaiKey').value = oKey;
+
+  // URL parametri (handoff no Bot #1)
+  const p = new URLSearchParams(window.location.search);
+  if (p.get('url'))      document.getElementById('productUrl').value = p.get('url');
+  if (p.get('price'))    document.getElementById('buyPrice').value   = p.get('price');
+  if (p.get('delivery')) document.getElementById('delivery').value   = p.get('delivery');
+  if (p.get('margin'))   document.getElementById('margin').value     = p.get('margin');
+  if (p.get('category')) document.getElementById('category').value   = p.get('category');
+  if (p.get('price') || p.get('delivery')) updateCalc();
+  if (p.get('url')) {
+    const banner = document.createElement('div');
+    banner.style.cssText = 'background:#1a2d1a;border:1px solid #2ea043;border-radius:6px;padding:8px 14px;margin:0 0 4px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:#79c0ff;';
+    banner.textContent = '✅ Dati saņemti no Bota #1 — pārbaudi un nospied RADĪT';
+    document.querySelector('.btn-primary').before(banner);
+  }
+})();
+</script>
+</body>
+</html>
