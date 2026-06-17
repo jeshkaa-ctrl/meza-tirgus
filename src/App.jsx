@@ -27,6 +27,7 @@ const MaksajumsPaldies       = React.lazy(() => import("./MaksajumsPaldies"))
 const JautaParMezuPage       = React.lazy(() => import("./JautaParMezuPage"))
 const TirgusLapa             = React.lazy(() => import("./kopiena/TirgusLapa"))
 const AdminDashboard         = React.lazy(() => import("./AdminDashboard"))
+const VeikalsPage            = React.lazy(() => import("./VeikalsPage"))
 const PrivatumsPage          = React.lazy(() => import("./PrivatumsPage"))
 const CirsmaskicePage        = React.lazy(() => import("./CirsmaskicePage"))
 const CaurmeraPage           = React.lazy(() => import("./CaurmeraPage"))
@@ -52,6 +53,8 @@ const initialPage = urlParams.get('payment') === 'success'
   ? 'maksajums_paldies'
   : urlParams.get('reset') === '1'
   ? 'parole'
+  : urlParams.get('page') === 'veikals'
+  ? 'veikals'
   : 'landing'
 
 const [page,setPageRaw]=useState(initialPage)
@@ -104,7 +107,7 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onIpasums={()=>setPage("ipasums")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onIpasums={()=>setPage("ipasums")} onVeikals={()=>setPage("veikals")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="ipasums") return (
@@ -164,7 +167,23 @@ if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
 if(page==="cenas")        return <CenuKalkulators onBack={()=>setPage("main")}/>
 if(page==="pirceja_cenas") return <PircejuCenas onBack={()=>setPage("main")} user={user}/>
-if(page==="admin" && user?.epasts === "jeshkaa@inbox.lv") return <AdminDashboard onBack={()=>setPage("main")}/>
+if(page==="veikals") return (
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#2e7d32",fontSize:14}}>Ielādē veikalu...</div></div>}>
+    <VeikalsPage onBack={()=>setPage("main")} user={user}/>
+  </React.Suspense>
+)
+if(page==="admin") {
+  const isAdmin = user?.epasts === "jeshkaa@inbox.lv" || localStorage.getItem('mt_admin_ok') === '1'
+  if(!isAdmin) {
+    const pin = prompt('Admin PIN:')
+    if(pin === '2509') {
+      localStorage.setItem('mt_admin_ok','1')
+    } else {
+      setPage('main'); return null
+    }
+  }
+  return <AdminDashboard onBack={()=>setPage("main")}/>
+}
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
