@@ -909,9 +909,12 @@ function copyAll() {
   if (!localStorage.getItem('mt_sb_key')) localStorage.setItem('mt_sb_key', sbKey);
   setSbStatus(true, 'Konfigurēts ✓');
 
-  // OpenAI
-  const oKey = localStorage.getItem('mt_openai_key');
-  if (oKey) document.getElementById('openaiKey').value = oKey;
+  // OpenAI — lasa no abiem iespējamiem nosaukumiem
+  const oKey = localStorage.getItem('mt_openai_key') || localStorage.getItem('openai_api_key') || '';
+  if (oKey) {
+    document.getElementById('openaiKey').value = oKey;
+    localStorage.setItem('mt_openai_key', oKey); // pārsaglabā pareizajā atslēgā
+  }
 
   // URL parametri (handoff no Bot #1)
   const p = new URLSearchParams(window.location.search);
