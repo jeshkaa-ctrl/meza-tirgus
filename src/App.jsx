@@ -176,14 +176,17 @@ if(page==="veikals") return (
 )
 if(page==="admin") {
   const isAdmin = user?.epasts === "jeshkaa@inbox.lv" || localStorage.getItem('mt_admin_ok') === '1'
-  if(!isAdmin) {
-    const pin = prompt('Admin PIN:')
-    if(pin === '2509') {
-      localStorage.setItem('mt_admin_ok','1')
-    } else {
-      setPage('main'); return null
-    }
-  }
+  if(!isAdmin) return (
+    <div style={{minHeight:'100vh',background:'#080f08',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <form onSubmit={e=>{e.preventDefault();const v=e.target.pin.value;if(v==='2509'){localStorage.setItem('mt_admin_ok','1');setPageRaw('admin')}else{alert('Nepareizs PIN');setPage('main')}}}
+        style={{background:'#0f1f0f',border:'1px solid #2d4a2d',borderRadius:12,padding:32,display:'flex',flexDirection:'column',gap:12,minWidth:280}}>
+        <div style={{color:'#4caf50',fontSize:18,fontWeight:700,textAlign:'center'}}>🔒 Admin PIN</div>
+        <input name="pin" type="password" autoFocus placeholder="PIN kods" maxLength={6}
+          style={{padding:'10px 14px',borderRadius:8,border:'1px solid #2d4a2d',background:'#0a150a',color:'#e0e0e0',fontSize:16,textAlign:'center',letterSpacing:8,outline:'none'}}/>
+        <button type="submit" style={{padding:'10px',borderRadius:8,background:'#2e7d32',color:'#fff',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>Ienākt</button>
+      </form>
+    </div>
+  )
   return <AdminDashboard onBack={()=>setPage("main")}/>
 }
 if(page==="main") return <>
