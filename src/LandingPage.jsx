@@ -58,10 +58,22 @@ return(
     background:"transparent", color:"#4caf50",
     border:"2px solid #4caf50", borderRadius:"10px",
     fontSize:"clamp(14px,3.5vw,15px)", fontWeight:700, cursor:"pointer",
-    minHeight:48, marginBottom:16,
+    minHeight:48, marginBottom:12,
     width:"100%", maxWidth:400, boxSizing:"border-box",
   }}>
     ★ Izmēģini Pro →
+  </button>
+
+  {/* Veikals — trešā prioritāte */}
+  <button onClick={onVeikals} style={{
+    padding:"13px 24px",
+    background:"transparent", color:"#81c784",
+    border:"2px solid #388e3c", borderRadius:"10px",
+    fontSize:"clamp(14px,3.5vw,15px)", fontWeight:700, cursor:"pointer",
+    minHeight:48, marginBottom:16,
+    width:"100%", maxWidth:400, boxSizing:"border-box",
+  }}>
+    🛒 Veikals →
   </button>
 
   {/* Sekundārās pogas */}
@@ -81,9 +93,6 @@ return(
     </button>
     <button onClick={onLikumi} style={{padding:"10px 18px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>
       ⚖️ Meža likumi
-    </button>
-    <button onClick={onVeikals} style={{padding:"10px 18px",background:"rgba(46,125,50,0.12)",color:"#4caf50",border:"1px solid #2e7d32",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44,fontWeight:600}}>
-      🛒 Veikals
     </button>
   </div>
   </div>
