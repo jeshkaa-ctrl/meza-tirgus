@@ -342,6 +342,20 @@ Konteksts par Meža Tirgus:
 - Kategorijas: lāču drošība, ērču aizsardzība, mārinstrumenti, novērošana, drošība mežā
 - Pārdošana Latvijā ar piegādi 1-2 darba dienās
 
+CENU LĪMEŅI — vienmēr atrodi TRĪS variantus:
+1. BUDGET (€5-30) — AliExpress, pamata opcijas
+2. MID-RANGE (€30-150) — Amazon, sabalansēta kvalitāte/cena
+3. PREMIUM (€150+) — specializēti zīmoli: Husqvarna, Stihl, Garmin, Leatherman, Arc'teryx, Fjällräven, Helly Hansen, Gore-Tex
+
+Katram līmenim norādi:
+- Produkta nosaukums un zīmols
+- Cena EUR
+- Avots/mazumtirgotājs
+- Galvenās īpašības
+- Aprēķinātā LV pārdošanas cena ar maržu
+
+Vienmēr prioritizē reālus premium zīmolus, nevis tikai lētus alternatīvus.
+
 Atgriez TIKAI JSON (bez markdown) ar šādu struktūru:
 {
   "query_en": "angļu tulkojums",
@@ -419,7 +433,15 @@ function renderResults(data, query) {
   const verdictClass = { GO:'go', WAIT:'wait', NO:'no' }[data.verdict] || 'wait';
   const verdictIcon  = { GO:'✅', WAIT:'⚠️', NO:'❌' }[data.verdict] || '⚠️';
 
-  const productsHTML = (data.products || []).map(p => `
+  const _cat = document.getElementById('category').value;
+  const productsHTML = (data.products || []).map(p => {
+    const makslUrl = '/meza_tirgus_makslinieks.html?' + new URLSearchParams({
+      url:      p.url || query,
+      price:    p.price_eur || '',
+      delivery: 12,
+      category: _cat,
+    }).toString();
+    return `
     <div class="result-card">
       <div class="rc-header">
         <span class="rc-source ${p.source}">${sourceLabel(p.source)}</span>
@@ -445,9 +467,16 @@ function renderResults(data, query) {
         ${p.lv_available ? '<span class="rc-tag warn">⚠️ LV pieejams</span>' : '<span class="rc-tag green">✓ Nav LV</span>'}
         ${p.lv_cheaper ? '<span class="rc-tag red">LV lētāks!</span>' : '<span class="rc-tag blue">Import izdevīgs</span>'}
         <span class="rc-tag blue">📦 ${p.source.toUpperCase()}</span>
+        <a href="${makslUrl}" target="_blank" rel="noopener"
+          style="font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;
+                 background:#1a1a2e;border:1px solid #bc8cff;color:#bc8cff;text-decoration:none;
+                 display:inline-flex;align-items:center;gap:4px;margin-left:auto;"
+          onmouseover="this.style.background='#2a1a3e'" onmouseout="this.style.background='#1a1a2e'">
+          🎨 Nodot Māksliniekam
+        </a>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   const competitionHTML = (data.lv_competition || []).map(c => `
     <div class="lc-item">
@@ -481,6 +510,27 @@ function renderResults(data, query) {
         <div class="v-sub">${data.recommendation || ''}</div>
       </div>
     </div>
+
+    ${(()=>{
+      if (data.verdict === 'NO') return '';
+      const best = (data.products||[]).slice().sort((a,b)=>(b.profit_per_unit||0)-(a.profit_per_unit||0))[0];
+      const cat  = document.getElementById('category').value;
+      const link = '/meza_tirgus_makslinieks.html?' + new URLSearchParams({
+        url:      best?.url || query,
+        price:    best?.price_eur || '',
+        delivery: 12,
+        category: cat,
+      }).toString();
+      return `<a href="${link}" target="_blank" rel="noopener" style="
+        display:inline-flex;align-items:center;gap:10px;margin:4px 0 12px;
+        background:linear-gradient(135deg,#1a1a2e,#1a2d1a);
+        border:1px solid var(--purple);border-radius:8px;padding:12px 20px;
+        color:var(--purple);font-family:'JetBrains Mono',monospace;
+        font-size:12px;font-weight:700;text-decoration:none;
+        transition:opacity .15s;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+        🎨 Nodot Māksliniekam → sagatavot veikala ierakstu
+      </a>`;
+    })()}
 
     <div class="results-grid">${productsHTML}</div>
 
