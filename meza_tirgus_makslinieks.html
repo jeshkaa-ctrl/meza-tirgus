@@ -467,7 +467,7 @@ async function ieladeNoUrl() {
 }
 
 async function generateImage(prompt) {
-  const key = localStorage.getItem('mt_openai_key') || '';
+  const key = localStorage.getItem('mt_openai_key') || localStorage.getItem('openai_api_key') || '';
   if (!key) throw new Error('OpenAI API atslēga nav saglabāta! Ievadi to kreisajā panelī un nospied 💾');
 
   const fileInput = document.getElementById('productImageFile');
