@@ -1,8 +1,9 @@
 {
   "rewrites": [
-    { "source": "/cirsma",   "destination": "/cirsma.html"   },
-    { "source": "/krautuve", "destination": "/krautuve.html" },
-    { "source": "/caurmers", "destination": "/caurmers.html" },
-    { "source": "/(.*)",     "destination": "/index.html"    }
+    { "source": "/cirsma",            "destination": "/cirsma.html"   },
+    { "source": "/krautuve",          "destination": "/krautuve.html" },
+    { "source": "/caurmers",          "destination": "/caurmers.html" },
+    { "source": "/api/anthropic/:path*", "destination": "/api/anthropic" },
+    { "source": "/(.*)",              "destination": "/index.html"    }
   ]
 }
