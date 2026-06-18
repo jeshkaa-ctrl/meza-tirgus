@@ -232,9 +232,14 @@
 
     <div>
       <label>📸 Produkta oriģinālā bilde <span style="color:var(--accent);font-weight:700;">(ieteicams!)</span></label>
-      <input type="file" id="productImageFile" accept="image/*" style="padding:6px 8px;cursor:pointer;" />
+      <input type="file" id="productImageFile" accept="image/*" style="padding:6px 8px;cursor:pointer;" onchange="window._prefetchedImageBlob=null;document.getElementById('urlImgStatus').textContent=''" />
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <input type="text" id="productImageUrl" placeholder="vai ielīmē preces attēla URL no veikala..." style="flex:1;font-size:11px;padding:6px 8px;" />
+        <button type="button" onclick="ieladeNoUrl()" style="padding:6px 12px;background:var(--accent2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;cursor:pointer;white-space:nowrap;">Ielādēt</button>
+      </div>
+      <div id="urlImgStatus" style="font-size:10px;color:var(--accent);margin-top:4px;font-family:'JetBrains Mono',monospace;"></div>
       <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;line-height:1.5;">
-        Augšupielādē piegādātāja bildi → AI veidos mākslas darbu no <i>šīs</i> bildes.<br>
+        Augšupielādē piegādātāja bildi vai ielīmē URL → AI veidos mākslas darbu no <i>šīs</i> bildes.<br>
         Bez bildes — AI fantazē un produkts var izskatīties pavisam savādāk.
       </div>
     </div>
@@ -438,18 +443,43 @@ function getImageContext(category) {
   }[category] || 'A lone person deep in a dark dense forest holding the product, mysterious fog, dramatic cinematic light';
 }
 
+async function ieladeNoUrl() {
+  const url = document.getElementById('productImageUrl').value.trim();
+  const status = document.getElementById('urlImgStatus');
+  if (!url) { status.textContent = 'Nav URL!'; return; }
+  status.textContent = 'Ielādē...';
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const blob = await resp.blob();
+    window._prefetchedImageBlob = blob;
+    // Noskaidro faila tipu
+    const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
+    // Atbilda uz attēlu priekšskatījums
+    const objUrl = URL.createObjectURL(blob);
+    status.innerHTML = `<span style="color:#4caf50">✓ Bilde ielādēta (${Math.round(blob.size/1024)} KB)</span> <img src="${objUrl}" style="display:block;width:80px;height:60px;object-fit:cover;border-radius:4px;margin-top:4px;border:1px solid var(--border);" />`;
+    // Notīrām file input lai nekonfliktē
+    document.getElementById('productImageFile').value = '';
+  } catch(e) {
+    status.textContent = '✗ Neizdevās ielādēt: ' + e.message;
+    window._prefetchedImageBlob = null;
+  }
+}
+
 async function generateImage(prompt) {
   const key = localStorage.getItem('mt_openai_key') || '';
   if (!key) throw new Error('OpenAI API atslēga nav saglabāta! Ievadi to kreisajā panelī un nospied 💾');
 
   const fileInput = document.getElementById('productImageFile');
-  const file = fileInput?.files?.[0];
+  const file = fileInput?.files?.[0] || null;
+  // Izmanto prefetch blob (no URL ielādes) ja nav manuāla faila
+  const imageSource = file || (window._prefetchedImageBlob ? new File([window._prefetchedImageBlob], 'product.jpg', { type: window._prefetchedImageBlob.type }) : null);
 
-  // Ja ir augšupielādēta produkta bilde — izmanto image editing (image-to-image)
-  if (file) {
+  // Ja ir augšupielādēta produkta bilde vai ielādēta no URL — izmanto image editing (image-to-image)
+  if (imageSource) {
     const editPrompt = `Professional product photography. Keep this exact product unchanged — same shape, colors, design, and details. Place it in a dramatic Latvian forest/nature setting with cinematic lighting. The product must be clearly recognizable and identical to the input image. ${prompt}`;
     const form = new FormData();
-    form.append('image', file, file.name);
+    form.append('image', imageSource, imageSource.name);
     form.append('prompt', editPrompt);
     form.append('model', 'gpt-image-1');
     form.append('n', '1');
