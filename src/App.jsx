@@ -200,7 +200,11 @@ if(page==="main") return <>
 </>
 
 
-return null
+return (
+  <div onClick={()=>setPage('admin')} title="Admin" style={{position:'fixed',bottom:16,right:16,width:36,height:36,borderRadius:'50%',background:'rgba(15,31,15,0.85)',border:'1px solid #2d4a2d',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:16,zIndex:9999,backdropFilter:'blur(4px)'}}>
+    🔒
+  </div>
+)
 }
 
 export default App
