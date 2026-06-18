@@ -467,7 +467,11 @@ async function ieladeNoUrl() {
 }
 
 async function generateImage(prompt) {
-  const key = localStorage.getItem('mt_openai_key') || localStorage.getItem('openai_api_key') || '';
+  const key = document.getElementById('openaiKey')?.value?.trim()
+    || localStorage.getItem('mt_openai_key')
+    || localStorage.getItem('openai_api_key')
+    || '';
+  if (key) localStorage.setItem('mt_openai_key', key); // saglabā ja atrasts
   if (!key) throw new Error('OpenAI API atslēga nav saglabāta! Ievadi to kreisajā panelī un nospied 💾');
 
   const fileInput = document.getElementById('productImageFile');
