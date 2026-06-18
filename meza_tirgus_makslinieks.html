@@ -178,9 +178,9 @@
       </div>
       <div style="margin-top:6px;">
         <select id="dalleModel" style="font-size:10px;padding:4px 6px;">
-          <option value="gpt-image-1">gpt-image-1 · jaunākais (2025)</option>
-          <option value="dall-e-3">dall-e-3 · HD (ja pieejams plānā)</option>
-          <option value="dall-e-2">dall-e-2 · lētāks (ja pieejams plānā)</option>
+          <option value="dall-e-3">dall-e-3 · HD</option>
+          <option value="gpt-image-1">gpt-image-1 · jaunākais (prasa īpašu piekļuvi)</option>
+          <option value="dall-e-2">dall-e-2 · lētāks</option>
         </select>
       </div>
       <div style="font-size:10px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace;">platform.openai.com → API Keys</div>
@@ -481,7 +481,7 @@ async function generateImage(prompt) {
     const form = new FormData();
     form.append('image', imageSource, imageSource.name);
     form.append('prompt', editPrompt);
-    form.append('model', 'gpt-image-1');
+    form.append('model', 'dall-e-2');
     form.append('n', '1');
     form.append('size', '1024x1024');
     const resp = await fetch('https://api.openai.com/v1/images/edits', {
@@ -499,7 +499,7 @@ async function generateImage(prompt) {
   }
 
   // Bez bildes — parasta teksta ģenerēšana (mazāk precīza)
-  const model = document.getElementById('dalleModel')?.value || 'gpt-image-1';
+  const model = document.getElementById('dalleModel')?.value || 'dall-e-3';
   const body = { model, prompt, n: 1, size: '1024x1024' };
   if (model === 'dall-e-3') body.quality = 'hd';
   if (model === 'gpt-image-1') body.output_format = 'png';
