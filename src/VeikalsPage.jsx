@@ -951,7 +951,7 @@ export default function VeikalsPage({ onBack, user }) {
   const [pasutVeiksmigi, setPasutVeiksmigi] = useState(false)
   const { groze, pievieno, nonem, mainit, notirit, skaits, kopsumma } = useGroza()
 
-  const isAdmin = user?.epasts === ADMIN_EMAIL
+  const isAdmin = user?.epasts === ADMIN_EMAIL || localStorage.getItem('mt_admin_ok') === '1'
 
   useEffect(() => {
     supabase
@@ -1019,12 +1019,13 @@ export default function VeikalsPage({ onBack, user }) {
 
   async function izņemtApstiprinats() {
     if (!pinTarget) return
-    // Saglabā lokāli — garantēti strādā neatkarīgi no Supabase RLS
-    addHidden(String(pinTarget))
-    // Mēģina dzēst Supabase (best effort)
-    supabase.from('products').delete().eq('id', pinTarget).then(({ error }) => {
-      if (error) console.warn('Supabase delete:', error.message)
-    })
+    // Deaktivē Supabase — veikals nolādē tikai active != false
+    const { error } = await supabase.from('products').update({ active: false }).eq('id', pinTarget)
+    if (error) {
+      console.warn('Supabase deaktivēšana:', error.message)
+      // Ja RLS bloķē — vismaz paslēpj lokāli
+      addHidden(String(pinTarget))
+    }
     setProdukti(prev => prev.filter(p => String(p.id) !== String(pinTarget)))
     if (selectedId === pinTarget) backToGrid()
     setPinTarget(null)
