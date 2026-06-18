@@ -10,6 +10,11 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       proxy: {
+        '/api/omniva': {
+          target: 'https://www.omniva.lv',
+          changeOrigin: true,
+          rewrite: () => '/locations/json',
+        },
         '/api/lvmgeo': {
           target: 'https://lvmgeoserver.lvm.lv',
           changeOrigin: true,
@@ -47,10 +52,12 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
         input: {
-          main:     'index.html',
-          cirsma:   'cirsma.html',
-          krautuve: 'krautuve.html',
-          caurmers: 'caurmers.html',
+          main:        'index.html',
+          cirsma:      'cirsma.html',
+          krautuve:    'krautuve.html',
+          caurmers:    'caurmers.html',
+          product_bot: 'meza_tirgus_product_bot.html',
+          makslinieks: 'meza_tirgus_makslinieks.html',
         },
         output: {
           manualChunks: {
