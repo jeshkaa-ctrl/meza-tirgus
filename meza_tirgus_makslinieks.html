@@ -467,12 +467,7 @@ async function ieladeNoUrl() {
 }
 
 async function generateImage(prompt) {
-  const key = document.getElementById('openaiKey')?.value?.trim()
-    || localStorage.getItem('mt_openai_key')
-    || localStorage.getItem('openai_api_key')
-    || '';
-  if (key) localStorage.setItem('mt_openai_key', key); // saglabā ja atrasts
-  if (!key) throw new Error('OpenAI API atslēga nav saglabāta! Ievadi to kreisajā panelī un nospied 💾');
+  // Atslēga glabājas Vercel env (OPENAI_KEY) — nav vajadzīga browser pusē
 
   const fileInput = document.getElementById('productImageFile');
   const file = fileInput?.files?.[0] || null;
@@ -502,14 +497,14 @@ async function generateImage(prompt) {
     return data.data[0].url;
   }
 
-  // Bez bildes — parasta teksta ģenerēšana (mazāk precīza)
+  // Bez bildes — parasta teksta ģenerēšana caur Vercel proxy
   const model = document.getElementById('dalleModel')?.value || 'dall-e-3';
   const body = { model, prompt, n: 1, size: '1024x1024' };
   if (model === 'dall-e-3') body.quality = 'hd';
   if (model === 'gpt-image-1') body.output_format = 'png';
-  const resp = await fetch('https://api.openai.com/v1/images/generations', {
+  const resp = await fetch('/api/openai-image', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
   const responseText = await resp.text();
