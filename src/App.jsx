@@ -102,6 +102,26 @@ const [dastojumsPdfFile,setDastojumsPdfFile]=useState(null)
 const [cirsmaState,setCirsmaState]=useState(null)
 const [skiceState,setSkiceState]=useState(null)
 const [caurmersState,setCaurmersState]=useState(null)
+if(page==="admin") {
+  const pinOk = localStorage.getItem('mt_admin_ok') === '1'
+  if(!pinOk) return (
+    <div style={{minHeight:'100vh',background:'#080f08',display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <form onSubmit={e=>{e.preventDefault();const v=e.target.pin.value;if(v==='2509'){localStorage.setItem('mt_admin_ok','1');setPageRaw('admin')}else{alert('Nepareizs PIN')}}}
+        style={{background:'#0f1f0f',border:'1px solid #2d4a2d',borderRadius:12,padding:32,display:'flex',flexDirection:'column',gap:12,minWidth:280}}>
+        <div style={{color:'#4caf50',fontSize:18,fontWeight:700,textAlign:'center'}}>🔒 Admin PIN</div>
+        <input name="pin" type="password" autoFocus placeholder="PIN kods" maxLength={6}
+          style={{padding:'10px 14px',borderRadius:8,border:'1px solid #2d4a2d',background:'#0a150a',color:'#e0e0e0',fontSize:16,textAlign:'center',letterSpacing:8,outline:'none'}}/>
+        <button type="submit" style={{padding:'10px',borderRadius:8,background:'#2e7d32',color:'#fff',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>Ienākt</button>
+      </form>
+    </div>
+  )
+  if(authLoading) return <div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}><div style={{width:40,height:40,border:"3px solid #2d4a2d",borderTop:"3px solid #4caf50",borderRadius:"50%",animation:"spin 1s linear infinite"}}/><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style><div style={{color:"#4a7a4a",fontSize:14}}>Ielādē...</div></div>
+  return (
+    <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50"}}>Ielādē...</div></div>}>
+      <AdminDashboard onBack={()=>setPage("main")}/>
+    </React.Suspense>
+  )
+}
 if(authLoading) return <div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16}}><div style={{width:40,height:40,border:"3px solid #2d4a2d",borderTop:"3px solid #4caf50",borderRadius:"50%",animation:"spin 1s linear infinite"}}/><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style><div style={{color:"#4a7a4a",fontSize:14}}>Ielādē...</div></div>
 
 if(page==="sludinajumi") return <>
@@ -109,7 +129,7 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onIpasums={()=>setPage("ipasums")} onVeikals={()=>setPage("veikals")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onIpasums={()=>setPage("ipasums")} onVeikals={()=>setPage("veikals")} onAdmin={()=>setPage("admin")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="ipasums") return (
@@ -174,21 +194,6 @@ if(page==="veikals") return (
     <VeikalsPage onBack={()=>setPage("main")} user={user}/>
   </React.Suspense>
 )
-if(page==="admin") {
-  const isAdmin = user?.epasts === "jeshkaa@inbox.lv" || localStorage.getItem('mt_admin_ok') === '1'
-  if(!isAdmin) return (
-    <div style={{minHeight:'100vh',background:'#080f08',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <form onSubmit={e=>{e.preventDefault();const v=e.target.pin.value;if(v==='2509'){localStorage.setItem('mt_admin_ok','1');setPageRaw('admin')}else{alert('Nepareizs PIN');setPage('main')}}}
-        style={{background:'#0f1f0f',border:'1px solid #2d4a2d',borderRadius:12,padding:32,display:'flex',flexDirection:'column',gap:12,minWidth:280}}>
-        <div style={{color:'#4caf50',fontSize:18,fontWeight:700,textAlign:'center'}}>🔒 Admin PIN</div>
-        <input name="pin" type="password" autoFocus placeholder="PIN kods" maxLength={6}
-          style={{padding:'10px 14px',borderRadius:8,border:'1px solid #2d4a2d',background:'#0a150a',color:'#e0e0e0',fontSize:16,textAlign:'center',letterSpacing:8,outline:'none'}}/>
-        <button type="submit" style={{padding:'10px',borderRadius:8,background:'#2e7d32',color:'#fff',border:'none',fontSize:14,fontWeight:700,cursor:'pointer'}}>Ienākt</button>
-      </form>
-    </div>
-  )
-  return <AdminDashboard onBack={()=>setPage("main")}/>
-}
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}

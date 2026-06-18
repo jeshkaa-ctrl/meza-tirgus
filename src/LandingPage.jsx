@@ -18,7 +18,7 @@ return(
 }
 
 // ========== GALVENA APP ==========
-function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums, onIpasums}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums, onIpasums, onVeikals, onAdmin}){
 return(
 <div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -81,6 +81,9 @@ return(
     </button>
     <button onClick={onLikumi} style={{padding:"10px 18px",background:"transparent",color:"#a8d8a8",border:"1px solid #2d5a2d",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44}}>
       ⚖️ Meža likumi
+    </button>
+    <button onClick={onVeikals} style={{padding:"10px 18px",background:"rgba(46,125,50,0.12)",color:"#4caf50",border:"1px solid #2e7d32",borderRadius:"8px",fontSize:"14px",cursor:"pointer",minHeight:44,fontWeight:600}}>
+      🛒 Veikals
     </button>
   </div>
   </div>
@@ -236,6 +239,10 @@ return(
     <p style={{color:"#666",fontSize:"12px",margin:"0 0 8px"}}>© 2026 Meža tirgus · meža-tirgus.lv · Darbarīks meža speciālistam un meža īpašniekam</p>
     <button onClick={onPrivatums} style={{background:"none",border:"none",color:"#4a6a4a",fontSize:"11px",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
       Privātuma politika
+    </button>
+    {" · "}
+    <button onClick={onAdmin} style={{background:"none",border:"none",color:"#3a4a3a",fontSize:"11px",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
+      🔒
     </button>
   </div>
 
