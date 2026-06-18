@@ -508,11 +508,20 @@ async function generateImage(prompt) {
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
     body: JSON.stringify(body),
   });
+  const responseText = await resp.text();
+  console.log('DALL-E response status:', resp.status);
+  console.log('DALL-E response:', responseText);
   if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err.error?.message || `OpenAI kļūda: ${resp.status}`);
+    let errMsg = `OpenAI kļūda: ${resp.status}`;
+    try { errMsg = JSON.parse(responseText).error?.message || errMsg; } catch {}
+    throw new Error(errMsg);
   }
-  const data = await resp.json();
+  let data;
+  try {
+    data = JSON.parse(responseText);
+  } catch(e) {
+    throw new Error(`JSON parse kļūda. Atbilde: ${responseText.slice(0, 200)}`);
+  }
   if (data.data[0].b64_json) return `data:image/png;base64,${data.data[0].b64_json}`;
   return data.data[0].url;
 }
