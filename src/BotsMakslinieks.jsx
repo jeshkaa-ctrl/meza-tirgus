@@ -114,28 +114,10 @@ export default function BotsMakslinieks({ initialData }) {
       const parsed = JSON.parse(text)
       setAiData(parsed)
 
-      // DALL-E plakāts
-      setGenStatus('DALL-E ģenerē plakātu...')
-      const dalleResp = await fetch('/api/openai-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gpt-image-1',
-          prompt: parsed.dalle_prompt || `Vivid professional outdoor product poster, ${category} theme, dramatic forest lighting`,
-          n: 1,
-          size: '1024x1024',
-          quality: 'medium',
-        }),
-      })
-      if (dalleResp.ok) {
-        const dd = await dalleResp.json()
-        const imgUrl = dd.data?.[0]?.url
-          || (dd.data?.[0]?.b64_json ? `data:image/png;base64,${dd.data[0].b64_json}` : null)
-        if (imgUrl) setPosterUrl(imgUrl)
-      } else {
-        const de = await dalleResp.json().catch(() => ({}))
-        const msg = de.error?.message || de.error || `HTTP ${dalleResp.status}`
-        setError(`DALL-E kļūda: ${msg} — apraksts saglabāts, var saglabāt veikalā bez plakāta`)
+      // Izmanto pirmo reālo preces bildi kā galveno attēlu
+      const firstReal = imageUrls.find(u => u.trim())
+      if (firstReal) {
+        setPosterUrl(firstReal)
       }
     } catch(e) {
       setError(e.message)
@@ -341,26 +323,31 @@ export default function BotsMakslinieks({ initialData }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {posterUrl && (
                 <div>
-                  <img src={posterUrl} alt="AI plakāts"
-                    style={{ width: '100%', borderRadius: 8, border: '1px solid #21262d', display: 'block' }} />
+                  <img src={posterUrl} alt="Preces bilde"
+                    style={{ width: '100%', borderRadius: 8, border: '1px solid #21262d', display: 'block', objectFit: 'contain', maxHeight: 380 }} />
                   <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ color: '#484f58', fontSize: 10, textAlign: 'center', fontStyle: 'italic' }}>
+                      Galvenā preces bilde • vai ģenerē AI plakātu zemāk
+                    </div>
                     <textarea
                       value={customPrompt}
                       onChange={e => setCustomPrompt(e.target.value)}
                       rows={2}
-                      placeholder={`Neobligāti: apraksti vēlamo attēlu...\nPiem: "Stativs mežā ar rieta sauli, tumšs fons, profesionāla foto kvalitāte"`}
+                      placeholder={`AI plakāta apraksts (neobligāti)...\nPiem: "Stativs mežā, rieta saule, dramatisks apgaismojums"`}
                       style={{ ...S.input, resize: 'vertical', fontSize: 11 }}
                     />
                     <button onClick={regenerateImage} disabled={imgRegenLoading}
                       style={{ padding: '8px 14px', borderRadius: 6, border: '1px solid #bc8cff', background: '#1a1a2e', color: imgRegenLoading ? '#484f58' : '#bc8cff', fontSize: 12, fontWeight: 700, cursor: imgRegenLoading ? 'default' : 'pointer', fontFamily: 'inherit' }}>
-                      {imgRegenLoading ? '⏳ Ģenerē...' : '🔄 Pārtaisīt attēlu'}
+                      {imgRegenLoading ? '⏳ Ģenerē...' : '🤖 Ģenerēt AI plakātu'}
                     </button>
                   </div>
                 </div>
               )}
-              {!posterUrl && imageUrls.filter(u => u.trim())[0] && (
-                <img src={imageUrls.filter(u => u.trim())[0]} alt="Preces bilde"
-                  style={{ width: '100%', maxHeight: 260, objectFit: 'contain', borderRadius: 8, border: '1px solid #21262d' }} />
+              {!posterUrl && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 120, background: '#0d1117', borderRadius: 8, border: '1px dashed #30363d', color: '#484f58', fontSize: 12, flexDirection: 'column', gap: 8 }}>
+                  <div>📷</div>
+                  <div>Pievieno preces bildes URL kreisajā pusē</div>
+                </div>
               )}
 
               <div style={{ color: '#e6edf3', fontWeight: 800, fontSize: 18 }}>{aiData.name_lv}</div>
