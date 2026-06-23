@@ -735,12 +735,16 @@ NOSAUKUMA NOTEIKUMI:
 - Nepazīstamu zīmolu NEMIN
 - NEKAD neizmanto modeļu numurus vai oriģinālos nosaukumus
 
-CENU APRĒĶINS (ja dota pirkšanas cena):
-- Muita: ja cena > 150€ → +5%, citādi 0
+CENU NOVĒRTĒŠANA:
+- Ja lietotājs norāda pirkšanas cenu — izmanto to
+- Ja NAV norādīta — novērtē pirkšanas cenu no URL/produkta nosaukuma (AliExpress, Amazon tipiskās cenas)
+- Piegāde: ja nav norādīta, izmanto 12€
+- Muita: ja pirkšanas cena > 150€ → +5%, citādi 0
 - Bāze = pirkšanas cena + piegāde + muita
 - PVN imports = bāze × 21%
 - Pašizmaksa = bāze + PVN
 - Pārdošanas cena = pašizmaksa × 2 (100% marža), noapaļot uz 0.5€
+- VIENMĒR atgriez estimated_buy_price (savu novērtējumu)
 
 Atgriez TIKAI derīgu JSON bez markdown:
 {
@@ -748,8 +752,10 @@ Atgriez TIKAI derīgu JSON bez markdown:
   "tagline": "Viens teikums latviski — galvenais ieguvums",
   "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks.",
   "features": ["iezīme 1", "iezīme 2", "iezīme 3", "iezīme 4", "iezīme 5"],
-  "sell_price": skaitlis_vai_null,
-  "cost_price": skaitlis_vai_null,
+  "estimated_buy_price": skaitlis,
+  "estimated_delivery": skaitlis,
+  "sell_price": skaitlis,
+  "cost_price": skaitlis,
   "brand": "zīmols vai null",
   "dalle_prompt": "DALL-E prompt in English: vivid advertising poster for outdoor/forest product"
 }`;
@@ -778,7 +784,18 @@ Atgriez TIKAI derīgu JSON bez markdown:
     const text = rd.content?.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
     const d    = JSON.parse(text);
 
-    const makslData = { url, price: d.cost_price || price, delivery, category: cat, imageUrls: imgUrls };
+    // Auto-aizpilda cenas laukus ja lietotājs nebija ievadījis
+    if (!price && d.estimated_buy_price) {
+      document.getElementById('analyzePrice').value = d.estimated_buy_price;
+    }
+    if (d.estimated_delivery) {
+      document.getElementById('analyzeDelivery').value = d.estimated_delivery;
+    }
+    updateAnalyzeCalc();
+
+    const finalPrice    = price || d.estimated_buy_price || '';
+    const finalDelivery = delivery || d.estimated_delivery || 12;
+    const makslData = { url, price: d.cost_price || finalPrice, delivery: finalDelivery, category: cat, imageUrls: imgUrls };
 
     const html = `
       <div class="analyze-result">
@@ -789,8 +806,8 @@ Atgriez TIKAI derīgu JSON bez markdown:
           <div class="ar-name">${d.name_lv || '—'}</div>
           <div class="ar-tagline">${d.tagline || ''}</div>
         </div>
-        ${price ? (() => {
-          const p = parseFloat(price), del = parseFloat(delivery)||12;
+        ${finalPrice ? (() => {
+          const p = parseFloat(finalPrice), del = parseFloat(finalDelivery)||12;
           const cust = p>150?p*0.05:0, base=p+del+cust, pvn=base*0.21, cost=base+pvn;
           const sell = Math.ceil((cost*2)/0.5)*0.5, profit = sell-cost-sell*0.21;
           return `<div class="ar-price-box">
