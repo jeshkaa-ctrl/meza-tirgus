@@ -189,6 +189,11 @@ function ProduktaKarte({ p, onView, onPievieno, isAdmin, onIzņemt }) {
 function ProduktaLapa({ p, onAtpakal, onPievieno, isAdmin, onIzņemt }) {
   const [imgErr, setImgErr] = useState(false)
   const [pievienots, setPievienots] = useState(false)
+  const allImages = [
+    ...(p.image_url ? [p.image_url] : []),
+    ...(Array.isArray(p.extra_images) ? p.extra_images.filter(u => u && u !== p.image_url) : []),
+  ]
+  const [activeImg, setActiveImg] = useState(0)
 
   function handlePievieno() {
     onPievieno(p)
@@ -209,10 +214,10 @@ function ProduktaLapa({ p, onAtpakal, onPievieno, isAdmin, onIzņemt }) {
       </button>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 40, alignItems: 'start' }}>
-        {/* Kreisā — bilde */}
-        <div>
-          {p.image_url && !imgErr
-            ? <img src={p.image_url} alt={p.name_lv} onError={() => setImgErr(true)}
+        {/* Kreisā — bilde + galerija */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {allImages.length > 0 && !imgErr
+            ? <img src={allImages[activeImg]} alt={p.name_lv} onError={() => setImgErr(true)}
                 style={{ width: '100%', borderRadius: 14, objectFit: 'cover', aspectRatio: '1/1', display: 'block',
                   boxShadow: '0 4px 24px rgba(0,0,0,0.1)', border: `1px solid ${L.border}` }} />
             : <div style={{ width: '100%', aspectRatio: '1/1', background: L.accentLight, borderRadius: 14,
@@ -220,6 +225,16 @@ function ProduktaLapa({ p, onAtpakal, onPievieno, isAdmin, onIzņemt }) {
                 {KAT_ICON[p.category] || '📦'}
               </div>
           }
+          {allImages.length > 1 && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {allImages.map((src, i) => (
+                <img key={i} src={src} alt="" onClick={() => setActiveImg(i)}
+                  style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, cursor: 'pointer',
+                    border: `2px solid ${i === activeImg ? L.accent : L.border}`,
+                    opacity: i === activeImg ? 1 : 0.6, transition: 'all 0.15s' }} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Labā — info */}
