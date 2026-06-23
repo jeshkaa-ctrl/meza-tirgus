@@ -118,11 +118,10 @@ export default function BotsMakslinieks({ initialData }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'dall-e-3',
-          prompt: parsed.dalle_prompt || `Vivid professional outdoor product poster, ${category} theme, dramatic forest lighting`,
+          model: 'dall-e-2',
+          prompt: (parsed.dalle_prompt || `Vivid professional outdoor product poster, ${category} theme, dramatic forest lighting`).slice(0, 1000),
           n: 1,
           size: '1024x1024',
-          quality: 'hd',
         }),
       })
       if (dalleResp.ok) {
