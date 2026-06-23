@@ -1,12 +1,13 @@
 // OpenAI attēlu ģenerēšanas proxy
 // Vercel env: OPENAI_KEY
-// POST { model, prompt, n, size, quality?, output_format? }
+// POST { model, prompt, n, size, quality }
+// Atbalsta: gpt-image-1 (b64_json), dall-e-2, dall-e-3
 
 export default async function handler(req, res) {
   const apiKey = process.env.OPENAI_KEY
   if (!apiKey) return res.status(500).json({ error: 'OPENAI_KEY nav iestatīts Vercel' })
 
-  // GET — atgriež pieejamos modeļus diagnostikai
+  // GET — diagnostika: kādi attēlu modeļi ir pieejami
   if (req.method === 'GET') {
     const r = await fetch('https://api.openai.com/v1/models', {
       headers: { Authorization: `Bearer ${apiKey}` },
