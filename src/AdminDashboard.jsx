@@ -26,6 +26,7 @@ export default function AdminDashboard({ onBack }) {
   const [pinVal,     setPinVal]     = useState('')
   const [pinAtlasits,setPinAtlasits]= useState(false)
   const [pinErr,     setPinErr]     = useState(false)
+  const [makslInitData, setMakslInitData] = useState(null)
 
   function parbauditPin() {
     if (pinVal === String.fromCharCode(50,53,48,57)) {
@@ -34,6 +35,18 @@ export default function AdminDashboard({ onBack }) {
       setPinErr(true); setPinVal('')
     }
   }
+
+  useEffect(() => {
+    function onMessage(e) {
+      if (e.data?.type === 'nodot_makslinieks') {
+        setMakslInitData(e.data.data)
+        setCilne('makslinieks')
+        setPinAtlasits(true)
+      }
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
 
   useEffect(() => {
     Promise.all([
@@ -344,7 +357,7 @@ CREATE POLICY "admin_lasa" ON app_events
                     style={{ padding: '6px 14px', background: 'none', color: '#8b949e', border: '1px solid #30363d', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
                   >🔒 Bloķēt</button>
                 </div>
-                <BotsMakslinieks />
+                <BotsMakslinieks initialData={makslInitData} />
               </div>
             ) : (
               <div style={{ position: 'relative' }}>

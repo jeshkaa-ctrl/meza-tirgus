@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 import { acmHeaders } from './utils/acm'
 
@@ -49,7 +49,7 @@ Atgriez TIKAI derīgu JSON bez markdown vai komentāriem:
   "dalle_prompt": "DALL-E 3 prompt in English: vivid advertising poster for this product, dramatic outdoor/forest/hunting scene, professional lighting, high contrast colors, cinematic quality, product prominently featured"
 }`
 
-export default function BotsMakslinieks() {
+export default function BotsMakslinieks({ initialData }) {
   const [url,       setUrl]       = useState('')
   const [buyPrice,  setBuyPrice]  = useState('')
   const [delivery,  setDelivery]  = useState('12')
@@ -67,6 +67,14 @@ export default function BotsMakslinieks() {
   const [genStatus,   setGenStatus]   = useState('')
   const [saved,       setSaved]       = useState(false)
   const [error,       setError]       = useState('')
+
+  useEffect(() => {
+    if (!initialData) return
+    if (initialData.url)      setUrl(initialData.url)
+    if (initialData.price)    setBuyPrice(String(initialData.price))
+    if (initialData.delivery) setDelivery(String(initialData.delivery))
+    if (initialData.category) setCategory(initialData.category)
+  }, [initialData])
 
   const prices = calcPrices(parseFloat(buyPrice) || 0, parseFloat(delivery) || 0, margin)
 
