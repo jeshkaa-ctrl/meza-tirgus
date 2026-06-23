@@ -3,7 +3,8 @@ import { supabase } from './supabaseClient'
 import { acmHeaders } from './utils/acm'
 
 const KATEGORIJAS = [
-  { id: 'bears',       label: '🐻 Lāči / Medības' },
+  { id: 'bears',       label: '🐻 Lāču drošība' },
+  { id: 'hunting',     label: '🦌 Medības' },
   { id: 'ticks',       label: '🦟 Ērču aizsardzība' },
   { id: 'boots',       label: '👢 Apavi / Aizsardzība' },
   { id: 'measurement', label: '📏 Mērinstrumenti' },
@@ -72,10 +73,11 @@ export default function BotsMakslinieks({ initialData }) {
 
   useEffect(() => {
     if (!initialData) return
-    if (initialData.url)      setUrl(initialData.url)
-    if (initialData.price)    setBuyPrice(String(initialData.price))
-    if (initialData.delivery) setDelivery(String(initialData.delivery))
-    if (initialData.category) setCategory(initialData.category)
+    if (initialData.url)       setUrl(initialData.url)
+    if (initialData.price)     setBuyPrice(String(initialData.price))
+    if (initialData.delivery)  setDelivery(String(initialData.delivery))
+    if (initialData.category)  setCategory(initialData.category)
+    if (initialData.imageUrls?.length) setImageUrls([...initialData.imageUrls, ''])
   }, [initialData])
 
   const prices = calcPrices(parseFloat(buyPrice) || 0, parseFloat(delivery) || 0, margin)
@@ -261,13 +263,19 @@ export default function BotsMakslinieks({ initialData }) {
           <div>
             <label style={S.label}>Reālās preces bildes (URL)</label>
             {imageUrls.map((u, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                <input value={u} onChange={e => { const a = [...imageUrls]; a[i] = e.target.value; setImageUrls(a) }}
-                  placeholder={`Bilde ${i + 1} URL...`}
-                  style={{ ...S.input, flex: 1 }} />
-                {imageUrls.length > 1 && (
-                  <button onClick={() => setImageUrls(imageUrls.filter((_, j) => j !== i))}
-                    style={{ background: 'none', border: '1px solid #30363d', borderRadius: 6, color: '#f85149', cursor: 'pointer', padding: '0 10px', fontSize: 18, fontFamily: 'inherit' }}>×</button>
+              <div key={i} style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <input value={u} onChange={e => { const a = [...imageUrls]; a[i] = e.target.value; setImageUrls(a) }}
+                    placeholder={`Bilde ${i + 1} URL...`}
+                    style={{ ...S.input, flex: 1 }} />
+                  {imageUrls.length > 1 && (
+                    <button onClick={() => setImageUrls(imageUrls.filter((_, j) => j !== i))}
+                      style={{ background: 'none', border: '1px solid #30363d', borderRadius: 6, color: '#f85149', cursor: 'pointer', padding: '0 10px', fontSize: 18, fontFamily: 'inherit' }}>×</button>
+                  )}
+                </div>
+                {u.trim() && (
+                  <img src={u} alt="" onError={e => e.target.style.display='none'} onLoad={e => e.target.style.display='block'}
+                    style={{ display: 'none', width: '100%', maxHeight: 100, objectFit: 'contain', marginTop: 4, borderRadius: 6, border: '1px solid #21262d', background: '#0d1117' }} />
                 )}
               </div>
             ))}

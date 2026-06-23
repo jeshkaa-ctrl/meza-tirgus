@@ -191,8 +191,8 @@
           <option value="measurement">Mārinstrumenti</option>
           <option value="ticks">Ērču aizsardzība</option>
           <option value="bears">Lāču drošība</option>
+          <option value="hunting">🦌 Medības</option>
           <option value="surveillance">Novērošana</option>
-          <option value="hunting">Medības</option>
         </select>
       </div>
     </div>
@@ -265,8 +265,8 @@
           <option value="measurement">Mārinstrumenti</option>
           <option value="ticks">Ērču aizsardzība</option>
           <option value="bears">Lāču drošība</option>
+          <option value="hunting">🦌 Medības</option>
           <option value="surveillance">Novērošana</option>
-          <option value="hunting">Medības</option>
           <option value="general">Vispārīgs</option>
         </select>
       </div>
@@ -279,6 +279,29 @@
         <div>
           <label>Piegāde (€)</label>
           <input type="number" id="analyzeDelivery" placeholder="12" value="12" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;width:100%;" />
+        </div>
+      </div>
+
+      <div>
+        <label>Preces bildes URL (kopē no preces lapas)</label>
+        <input type="url" id="analyzeImg1" placeholder="https://m.media-amazon.com/images/I/..." oninput="previewImg(this,'prev1')"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:100%;margin-bottom:4px;" />
+        <img id="prev1" src="" alt="" style="display:none;width:100%;max-height:140px;object-fit:contain;border-radius:6px;border:1px solid var(--border);margin-bottom:4px;" onerror="this.style.display='none'" />
+        <input type="url" id="analyzeImg2" placeholder="Bilde 2 URL (neobligāti)..." oninput="previewImg(this,'prev2')"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:100%;margin-bottom:4px;" />
+        <img id="prev2" src="" alt="" style="display:none;width:100%;max-height:100px;object-fit:contain;border-radius:6px;border:1px solid var(--border);" onerror="this.style.display='none'" />
+      </div>
+
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;">Cenu aprēķins</div>
+        <div class="calc-box" id="analyzeCalcBox" style="display:none;">
+          <div class="calc-row"><span>Pirkšanas cena</span><span id="ac1">—</span></div>
+          <div class="calc-row"><span>Piegāde</span><span id="ac2">—</span></div>
+          <div class="calc-row"><span>Muita (5% ja >150€)</span><span id="ac3">—</span></div>
+          <div class="calc-row"><span>PVN imports (21%)</span><span id="ac4">—</span></div>
+          <div class="calc-row"><span>Pašizmaksa</span><span id="ac5">—</span></div>
+          <div class="calc-row" style="color:var(--accent);font-weight:700;font-size:13px;padding:6px 0 2px;border:none;"><span>PĀRDOŠANAS CENA</span><span id="ac6">—</span></div>
+          <div class="calc-row" style="border:none;font-size:10px;"><span>Tīrā peļņa/gab</span><span id="ac7" style="color:var(--warn)">—</span></div>
         </div>
       </div>
 
@@ -631,6 +654,43 @@ document.getElementById('query').addEventListener('keypress', e => {
   if (e.key === 'Enter') runSearch();
 });
 
+function previewImg(input, previewId) {
+  const img = document.getElementById(previewId);
+  const url = input.value.trim();
+  if (url) { img.src = url; img.style.display = 'block'; }
+  else { img.style.display = 'none'; img.src = ''; }
+  updateAnalyzeCalc();
+}
+
+function updateAnalyzeCalc() {
+  const p   = parseFloat(document.getElementById('analyzePrice').value) || 0;
+  const del = parseFloat(document.getElementById('analyzeDelivery').value) || 12;
+  const box = document.getElementById('analyzeCalcBox');
+  if (!p) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const customs = p > 150 ? p * 0.05 : 0;
+  const base    = p + del + customs;
+  const pvn     = base * 0.21;
+  const cost    = base + pvn;
+  const sell    = Math.ceil((cost * 2) / 0.5) * 0.5;
+  const profit  = sell - cost - sell * 0.21;
+  document.getElementById('ac1').textContent = p.toFixed(2) + ' €';
+  document.getElementById('ac2').textContent = del.toFixed(2) + ' €';
+  document.getElementById('ac3').textContent = customs > 0 ? customs.toFixed(2) + ' €' : '0 €';
+  document.getElementById('ac4').textContent = pvn.toFixed(2) + ' €';
+  document.getElementById('ac5').textContent = cost.toFixed(2) + ' €';
+  document.getElementById('ac6').textContent = sell.toFixed(2) + ' €';
+  document.getElementById('ac7').textContent = profit.toFixed(2) + ' €';
+}
+
+// Klausās uz cenas izmaiņām
+document.addEventListener('DOMContentLoaded', () => {
+  ['analyzePrice','analyzeDelivery'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateAnalyzeCalc);
+  });
+});
+
 function switchMode(mode) {
   document.querySelectorAll('.mode-tab').forEach((t, i) => t.classList.toggle('active', (mode === 'search') === (i === 0)));
   document.getElementById('modeSearch').classList.toggle('active', mode === 'search');
@@ -660,6 +720,9 @@ async function runAnalyze() {
   const cat      = document.getElementById('analyzeCategory').value;
   const price    = document.getElementById('analyzePrice').value;
   const delivery = document.getElementById('analyzeDelivery').value || '12';
+  const img1     = document.getElementById('analyzeImg1').value.trim();
+  const img2     = document.getElementById('analyzeImg2').value.trim();
+  const imgUrls  = [img1, img2].filter(Boolean);
 
   const catLabels = { safety:'Drošība mežā', measurement:'Mārinstrumenti', ticks:'Ērču aizsardzība', bears:'Lāču drošība', surveillance:'Novērošana', hunting:'Medības', general:'Vispārīgs' };
 
@@ -715,19 +778,26 @@ Atgriez TIKAI derīgu JSON bez markdown:
     const text = rd.content?.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
     const d    = JSON.parse(text);
 
-    const makslData = { url, price: d.cost_price || price, delivery, category: cat };
+    const makslData = { url, price: d.cost_price || price, delivery, category: cat, imageUrls: imgUrls };
 
     const html = `
       <div class="analyze-result">
+        ${imgUrls.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${imgUrls.map(u => `<img src="${u}" style="height:100px;border-radius:6px;border:1px solid var(--border);object-fit:contain;background:var(--surface2);" onerror="this.style.display='none'" />`).join('')}
+        </div>` : ''}
         <div>
           <div class="ar-name">${d.name_lv || '—'}</div>
           <div class="ar-tagline">${d.tagline || ''}</div>
         </div>
-        ${d.sell_price ? `
-        <div class="ar-price-box">
-          <div class="ar-price-main">${Number(d.sell_price).toFixed(2)} €</div>
-          <div class="ar-price-sub">ieteicamā pārdošanas cena LV</div>
-        </div>` : ''}
+        ${price ? (() => {
+          const p = parseFloat(price), del = parseFloat(delivery)||12;
+          const cust = p>150?p*0.05:0, base=p+del+cust, pvn=base*0.21, cost=base+pvn;
+          const sell = Math.ceil((cost*2)/0.5)*0.5, profit = sell-cost-sell*0.21;
+          return `<div class="ar-price-box">
+            <div class="ar-price-main">${sell.toFixed(2)} €</div>
+            <div class="ar-price-sub">pārdošanas cena LV · peļņa: ${profit.toFixed(2)} € · pašizmaksa: ${cost.toFixed(2)} €</div>
+          </div>`;
+        })() : ''}
         <div>
           <div class="ar-section">Apraksts</div>
           <div class="ar-desc">${d.description_lv || ''}</div>
