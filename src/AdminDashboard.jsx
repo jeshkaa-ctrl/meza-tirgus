@@ -3,6 +3,7 @@ import { supabase } from './supabaseClient'
 import { C, F, R, S } from './ds'
 import BotsPardevejs from './BotsPardevejs'
 import BotsBankieris from './BotsBankieris'
+import BotsMakslinieks from './BotsMakslinieks'
 
 const LAPU_NOSAUKUMI = {
   landing: '🏠 Sākumlapa', main: '🛠 Darba virsma', tirgus: '🌿 Tirgus',
@@ -335,11 +336,21 @@ CREATE POLICY "admin_lasa" ON app_events
                 </div>
                 <BotsPardevejs />
               </div>
+            ) : cilne === 'makslinieks' ? (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 0' }}>
+                  <button
+                    onClick={() => { setPinAtlasits(false); setPinVal('') }}
+                    style={{ padding: '6px 14px', background: 'none', color: '#8b949e', border: '1px solid #30363d', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
+                  >🔒 Bloķēt</button>
+                </div>
+                <BotsMakslinieks />
+              </div>
             ) : (
               <div style={{ position: 'relative' }}>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 0', gap: 8 }}>
                   <button
-                    onClick={() => window.open(cilne === 'makslinieks' ? '/meza_tirgus_makslinieks.html' : '/meza_tirgus_product_bot.html', '_blank', 'noopener')}
+                    onClick={() => window.open('/meza_tirgus_product_bot.html', '_blank', 'noopener')}
                     style={{ padding: '6px 14px', background: '#1c2d3f', color: '#388bfd', border: '1px solid #388bfd', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
                   >↗ Atvērt jaunā cilnē</button>
                   <button
@@ -348,10 +359,9 @@ CREATE POLICY "admin_lasa" ON app_events
                   >🔒 Bloķēt</button>
                 </div>
                 <iframe
-                  key={cilne}
-                  src={cilne === 'makslinieks' ? '/meza_tirgus_makslinieks.html' : '/meza_tirgus_product_bot.html'}
+                  src="/meza_tirgus_product_bot.html"
                   style={{ width: '100%', height: 'calc(100vh - 160px)', border: 'none', borderRadius: 8 }}
-                  title={cilne === 'makslinieks' ? 'Mākslinieks bots' : 'Produktu izpētes bots'}
+                  title="Produktu izpētes bots"
                 />
               </div>
             )}

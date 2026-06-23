@@ -220,18 +220,18 @@ return(
           <td><input value={r.mervieniba} onChange={e=>updateRinda(i,"mervieniba",e.target.value)} style={{width:"40px",border:"none",fontSize:"11px"}}/></td>
           <td><input type="number" value={r.daudzums} onChange={e=>updateRinda(i,"daudzums",e.target.value)} style={{width:"60px",border:"none",fontSize:"11px"}}/></td>
           <td><input type="number" value={r.cena} onChange={e=>updateRinda(i,"cena",e.target.value)} style={{width:"60px",border:"none",fontSize:"11px"}}/></td>
-          <td style={{textAlign:"right"}}>{(r.summa||0).toFixed(2)}</td>
+          <td style={{textAlign:"right", background:"#1a3320", color:"#e8f5e9", fontWeight:"bold"}}>{(r.summa||0).toFixed(2)}</td>
           <td><button onClick={()=>dzestRindu(i)} style={{background:"none",border:"none",color:"#c62828",cursor:"pointer"}}>✕</button></td>
         </tr>
       ))}
     </tbody>
     <tfoot>
-      <tr style={{background:"#f0f8f0",fontWeight:"bold"}}>
+      <tr style={{background:"#1a3320", color:"#e8f5e9", fontWeight:"bold"}}>
         <td colSpan="5">Kopā</td><td style={{textAlign:"right"}}>{kopaa.toFixed(2)}</td><td/>
       </tr>
       {pvnRezims==="pvn21" && <>
-        <tr><td colSpan="5">PVN 21%</td><td style={{textAlign:"right"}}>{pvn.toFixed(2)}</td><td/></tr>
-        <tr style={{background:"#e8f5e9",fontWeight:"bold"}}><td colSpan="5">Kopā apmaksai</td><td style={{textAlign:"right"}}>{kopa_apmaksai.toFixed(2)}</td><td/></tr>
+        <tr style={{background:"#112a11", color:"#c8e6c9"}}><td colSpan="5">PVN 21%</td><td style={{textAlign:"right"}}>{pvn.toFixed(2)}</td><td/></tr>
+        <tr style={{background:"#225522", color:"#fff", fontWeight:"bold"}}><td colSpan="5">Kopā apmaksai</td><td style={{textAlign:"right"}}>{kopa_apmaksai.toFixed(2)}</td><td/></tr>
       </>}
       {pvnRezims==="reversais" && <tr><td colSpan="7" style={{fontStyle:"italic",fontSize:"10px"}}>Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>}
     </tfoot>

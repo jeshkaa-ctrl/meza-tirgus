@@ -51,6 +51,14 @@ const SADAJAS = (isAdmin) => [
     ]
   },
   {
+    title: "Veikals",
+    color: '#66bb6a',
+    ikona: "🛒",
+    riki: [
+      { icon: "🛒", title: "Meža Tirgus Veikals",     desc: "Aprīkojums mežstrādniekiem, medniekiem un meža īpašniekiem",         page: "veikals",    badge: "JAUNS" },
+    ]
+  },
+  {
     title: "VMD & Analīze",
     color: '#4db6ac',
     ikona: "📄",
