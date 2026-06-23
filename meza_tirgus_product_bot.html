@@ -762,26 +762,29 @@ APRĒĶINI (ar faktisko cenu):
 - Pašizmaksa = bāze + PVN
 - Pārdošanas cena = pašizmaksa × 2, noapaļot uz 0.5€
 
-Atgriez TIKAI derīgu JSON bez markdown:
+SVARĪGI: Atgriez TIKAI JSON objektu. Bez teksta pirms vai pēc. Bez markdown. Sāc ar { un beidz ar }.
+
 {
   "name_lv": "Unikāls latviskais nosaukums",
   "tagline": "Viens teikums latviski — galvenais ieguvums",
   "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks. Piemin piegādes laiku un atgriešanas iespēju.",
   "features": ["iezīme 1", "iezīme 2", "iezīme 3", "iezīme 4", "iezīme 5"],
-  "raw_price": skaitlis_vai_null,
-  "raw_delivery_cost": skaitlis,
-  "estimated_buy_price": skaitlis,
-  "estimated_delivery": skaitlis,
-  "sell_price": skaitlis,
-  "cost_price": skaitlis,
-  "delivery_days": "Piegāde 29. jūn. – 1. jūl. vai null",
-  "stock_warning": "Atlicis tikai 1! vai null",
-  "returns_policy": "Atgriešana 30 dienu laikā vai null",
-  "rating": "4.5 ★ (127 atsauksmes) vai null",
+  "raw_price": 493.00,
+  "raw_delivery_cost": 9,
+  "estimated_buy_price": 493.00,
+  "estimated_delivery": 9,
+  "sell_price": 1450.50,
+  "cost_price": 725.30,
+  "delivery_days": "Piegāde 29. jūn. – 1. jūl.",
+  "stock_warning": "Atlicis tikai 1!",
+  "returns_policy": "Atgriešana 30 dienu laikā",
+  "rating": "4.5 ★ (127 atsauksmes)",
   "specs": {"Zīmols": "BOG", "Materiāls": "Alumīnijs", "Svars": "3.9 kg"},
-  "brand": "zīmols vai null",
+  "brand": "BOG",
   "dalle_prompt": "DALL-E prompt in English: vivid advertising poster for outdoor/forest product"
-}`;
+}
+
+Ja kāds lauks nav zināms — izmanto null (nevis tekstu "null").`;
 
   const userMsg = [
     url   ? `Preces URL: ${url}` : '',
@@ -804,8 +807,11 @@ Atgriez TIKAI derīgu JSON bez markdown:
     });
     if (!resp.ok) throw new Error(`API kļūda: ${resp.status}`);
     const rd   = await resp.json();
-    const text = rd.content?.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
-    const d    = JSON.parse(text);
+    let text = rd.content?.map(c => c.text || '').join('') || '';
+    // Izvelk JSON pat ja Claude pievienoja tekstu ap to
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Claude neatgrieza JSON. Atbilde: ' + text.substring(0, 200));
+    const d = JSON.parse(jsonMatch[0]);
 
     // Auto-aizpilda cenas laukus ja lietotājs nebija ievadījis
     if (!price) {
