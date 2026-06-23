@@ -839,7 +839,7 @@ Atgriez TIKAI derīgu JSON bez markdown:
     updateAnalyzeCalc();
 
     const finalPrice    = price || d.raw_price || d.estimated_buy_price || '';
-    const finalDelivery = delivery || d.raw_delivery_cost ?? d.estimated_delivery ?? 12;
+    const finalDelivery = delivery || (d.raw_delivery_cost ?? d.estimated_delivery ?? 12);
     const makslData = { url, price: d.cost_price || finalPrice, delivery: finalDelivery, category: cat, imageUrls: imgUrls };
 
     const logisticsBadges = [
