@@ -132,7 +132,8 @@ export default function BotsMakslinieks({ initialData }) {
         if (imgUrl) setPosterUrl(imgUrl)
       } else {
         const de = await dalleResp.json().catch(() => ({}))
-        setError(`DALL-E: ${de.error?.message || dalleResp.status} (apraksts saglabāts)`)
+        const msg = de.error?.message || de.error || `HTTP ${dalleResp.status}`
+        setError(`DALL-E kļūda: ${msg} — apraksts saglabāts, var saglabāt veikalā bez plakāta`)
       }
     } catch(e) {
       setError(e.message)
