@@ -310,8 +310,11 @@
       </div>
 
       <div>
-        <label>Papildu info (neobligāti)</label>
-        <textarea id="analyzeExtra" rows="2" placeholder="Produkta apraksts, atsauksmes, izmēri..." style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:100%;resize:vertical;"></textarea>
+        <label style="color:var(--accent);font-size:11px;">📋 Ielīmē tekstu no preces lapas</label>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);margin-bottom:4px;line-height:1.5;">
+          Kopē visu svarīgo tekstu no Amazon/AliExpress lapas: cenu, piegādes laiku, krājumus, atgriešanas politiku, specifikācijas, atsauksmes. Jo vairāk — jo precīzāk.
+        </div>
+        <textarea id="analyzeExtra" rows="7" placeholder="€493.00&#10;€9 delivery 29 June - 1 July&#10;Only 1 left in stock.&#10;Returns within 30 days&#10;Brand: BOG&#10;Material: Aluminium&#10;Weight: 8.5 Pounds&#10;4.5 stars, 127 reviews..." style="background:var(--surface2);border:1px solid var(--accent);border-radius:6px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:100%;resize:vertical;"></textarea>
       </div>
 
       <button class="btn-analyze" id="analyzeBtn" onclick="runAnalyze()">🔗 ANALIZĒT PRECI</button>
@@ -731,7 +734,7 @@ async function runAnalyze() {
   const catLabels = { safety:'Drošība mežā', measurement:'Mārinstrumenti', ticks:'Ērču aizsardzība', bears:'Lāču drošība', surveillance:'Novērošana', hunting:'Medības', general:'Vispārīgs' };
 
   const systemPrompt = `Tu esi e-veikala produktu speciālists Latvijā. Meža Tirgus pārdod āra aktivitāšu un meža drošības piederumus.
-Tev tiek dots konkrētas preces URL vai apraksts. Izanalizē šo preci un sagatavo latvisko veikala ierakstu.
+Tev tiek dots konkrētas preces URL un teksts no preces lapas (cena, piegāde, krājumi, specifikācijas, atsauksmes). Izanalizē šo preci.
 
 NOSAUKUMA NOTEIKUMI:
 - Veido UNIKĀLU latvisko nosaukumu ko nevar izsekot pie oriģināla
@@ -739,27 +742,43 @@ NOSAUKUMA NOTEIKUMI:
 - Nepazīstamu zīmolu NEMIN
 - NEKAD neizmanto modeļu numurus vai oriģinālos nosaukumus
 
-CENU NOVĒRTĒŠANA:
-- Ja lietotājs norāda pirkšanas cenu — izmanto to
-- Ja NAV norādīta — novērtē pirkšanas cenu no URL/produkta nosaukuma (AliExpress, Amazon tipiskās cenas)
-- Piegāde: ja nav norādīta, izmanto 12€
+CENU EKSTRAKTĒŠANA (prioritāte):
+1. Meklē cenu lapas tekstā (€493.00, $29.99, utml.) → raw_price
+2. Meklē piegādes izmaksas lapas tekstā (€9 delivery, Free shipping, utml.) → raw_delivery_cost (0 ja bezmaksas)
+3. Meklē piegādes laiku (29 June - 1 July, 3-7 days, utml.) → delivery_days (teksts latviski)
+4. Meklē krājumus (Only 1 left, In stock, Out of stock) → stock_warning (latviski vai null)
+5. Meklē atgriešanas politiku (30 days return, Non-returnable) → returns_policy (latviski)
+6. Meklē atsauksmes (4.5 stars, 127 reviews) → rating (teksts vai null)
+7. Meklē specifikācijas (Brand, Material, Weight, Size) → specs objekts
+
+Ja lietotājs NORĀDĪJA cenu formā — izmanto to, nevis no teksta.
+
+APRĒĶINI (ar faktisko cenu):
+- Pirkšanas cena = raw_price (vai lietotāja ievadītā)
+- Piegāde = raw_delivery_cost (vai lietotāja ievadītā, vai 12€)
 - Muita: ja pirkšanas cena > 150€ → +5%, citādi 0
 - Bāze = pirkšanas cena + piegāde + muita
-- PVN imports = bāze × 21%
+- PVN = bāze × 21%
 - Pašizmaksa = bāze + PVN
-- Pārdošanas cena = pašizmaksa × 2 (100% marža), noapaļot uz 0.5€
-- VIENMĒR atgriez estimated_buy_price (savu novērtējumu)
+- Pārdošanas cena = pašizmaksa × 2, noapaļot uz 0.5€
 
 Atgriez TIKAI derīgu JSON bez markdown:
 {
   "name_lv": "Unikāls latviskais nosaukums",
   "tagline": "Viens teikums latviski — galvenais ieguvums",
-  "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks.",
+  "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks. Piemin piegādes laiku un atgriešanas iespēju.",
   "features": ["iezīme 1", "iezīme 2", "iezīme 3", "iezīme 4", "iezīme 5"],
+  "raw_price": skaitlis_vai_null,
+  "raw_delivery_cost": skaitlis,
   "estimated_buy_price": skaitlis,
   "estimated_delivery": skaitlis,
   "sell_price": skaitlis,
   "cost_price": skaitlis,
+  "delivery_days": "Piegāde 29. jūn. – 1. jūl. vai null",
+  "stock_warning": "Atlicis tikai 1! vai null",
+  "returns_policy": "Atgriešana 30 dienu laikā vai null",
+  "rating": "4.5 ★ (127 atsauksmes) vai null",
+  "specs": {"Zīmols": "BOG", "Materiāls": "Alumīnijs", "Svars": "3.9 kg"},
   "brand": "zīmols vai null",
   "dalle_prompt": "DALL-E prompt in English: vivid advertising poster for outdoor/forest product"
 }`;
@@ -767,9 +786,9 @@ Atgriez TIKAI derīgu JSON bez markdown:
   const userMsg = [
     url   ? `Preces URL: ${url}` : '',
     `Kategorija: ${catLabels[cat] || cat}`,
-    price    ? `Pirkšanas cena: ${price}€` : '',
-    delivery ? `Piegāde: ${delivery}€` : '',
-    extra ? `Papildu info: ${extra}` : '',
+    price    ? `Pirkšanas cena (lietotājs norādīja): ${price}€` : '',
+    delivery ? `Piegāde (lietotājs norādīja): ${delivery}€` : '',
+    extra ? `\n--- TEKSTS NO PRECES LAPAS ---\n${extra}\n--- BEIGAS ---` : '',
   ].filter(Boolean).join('\n');
 
   try {
@@ -789,29 +808,58 @@ Atgriez TIKAI derīgu JSON bez markdown:
     const d    = JSON.parse(text);
 
     // Auto-aizpilda cenas laukus ja lietotājs nebija ievadījis
-    if (!price && d.estimated_buy_price) {
+    if (!price) {
       const priceInput = document.getElementById('analyzePrice');
-      priceInput.value = d.estimated_buy_price;
-      priceInput.style.borderColor = '#e3b341';
-      priceInput.style.background = '#1a1200';
-      priceInput.title = '⚠️ Claude novērtējums — pārbaudi reālo cenu lapā un labō!';
-      let warn = document.getElementById('analyzePriceWarn');
-      if (!warn) {
-        warn = document.createElement('div');
-        warn.id = 'analyzePriceWarn';
-        warn.style.cssText = 'color:#e3b341;font-size:10px;margin-top:3px;font-family:JetBrains Mono,monospace;';
-        priceInput.parentNode.appendChild(warn);
+      const extracted  = d.raw_price || d.estimated_buy_price;
+      if (extracted) {
+        priceInput.value = extracted;
+        const isReal = !!d.raw_price;
+        priceInput.style.borderColor = isReal ? '#3fb950' : '#e3b341';
+        priceInput.style.background  = isReal ? '#0d1f0d' : '#1a1200';
+        let warn = document.getElementById('analyzePriceWarn');
+        if (!warn) {
+          warn = document.createElement('div');
+          warn.id = 'analyzePriceWarn';
+          warn.style.cssText = 'font-size:10px;margin-top:3px;font-family:JetBrains Mono,monospace;';
+          priceInput.parentNode.appendChild(warn);
+        }
+        if (isReal) {
+          warn.style.color = '#3fb950';
+          warn.textContent = '✓ Cena nolasīta no lapas teksta: ' + extracted + '€';
+        } else {
+          warn.style.color = '#e3b341';
+          warn.textContent = '⚠️ Claude minēja ' + extracted + '€ — PĀRBAUDI REĀLO CENU!';
+        }
       }
-      warn.textContent = '⚠️ Claude minēja ' + d.estimated_buy_price + '€ — PĀRBAUDI REĀLO CENU!';
     }
-    if (d.estimated_delivery) {
-      document.getElementById('analyzeDelivery').value = d.estimated_delivery;
+    if (!document.getElementById('analyzeDelivery').value || document.getElementById('analyzeDelivery').value === '12') {
+      const dc = d.raw_delivery_cost ?? d.estimated_delivery;
+      if (dc !== null && dc !== undefined) document.getElementById('analyzeDelivery').value = dc;
     }
     updateAnalyzeCalc();
 
-    const finalPrice    = price || d.estimated_buy_price || '';
-    const finalDelivery = delivery || d.estimated_delivery || 12;
+    const finalPrice    = price || d.raw_price || d.estimated_buy_price || '';
+    const finalDelivery = delivery || d.raw_delivery_cost ?? d.estimated_delivery ?? 12;
     const makslData = { url, price: d.cost_price || finalPrice, delivery: finalDelivery, category: cat, imageUrls: imgUrls };
+
+    const logisticsBadges = [
+      d.delivery_days   ? `🚚 ${d.delivery_days}`              : null,
+      d.stock_warning   ? `⚠️ ${d.stock_warning}`             : null,
+      d.returns_policy  ? `↩️ ${d.returns_policy}`            : null,
+      d.rating          ? `⭐ ${d.rating}`                    : null,
+    ].filter(Boolean);
+
+    const specsHtml = d.specs && Object.keys(d.specs).length
+      ? `<div>
+          <div class="ar-section">Specifikācijas</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;">
+            ${Object.entries(d.specs).map(([k,v]) => `
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)">${k}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">${v}</div>
+            `).join('')}
+          </div>
+        </div>`
+      : '';
 
     const html = `
       <div class="analyze-result">
@@ -822,6 +870,10 @@ Atgriez TIKAI derīgu JSON bez markdown:
           <div class="ar-name">${d.name_lv || '—'}</div>
           <div class="ar-tagline">${d.tagline || ''}</div>
         </div>
+        ${logisticsBadges.length ? `
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:2px 0;">
+          ${logisticsBadges.map(b => `<span style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text)">${b}</span>`).join('')}
+        </div>` : ''}
         ${finalPrice ? (() => {
           const p = parseFloat(finalPrice), del = parseFloat(finalDelivery)||12;
           const cust = p>150?p*0.05:0, base=p+del+cust, pvn=base*0.21, cost=base+pvn;
@@ -829,6 +881,7 @@ Atgriez TIKAI derīgu JSON bez markdown:
           return `<div class="ar-price-box">
             <div class="ar-price-main">${sell.toFixed(2)} €</div>
             <div class="ar-price-sub">pārdošanas cena LV · peļņa: ${profit.toFixed(2)} € · pašizmaksa: ${cost.toFixed(2)} €</div>
+            <div class="ar-price-sub" style="margin-top:2px;color:var(--text3)">Pirkšanas cena: ${p.toFixed(2)}€ + piegāde: ${del.toFixed(2)}€${cust>0?' + muita: '+cust.toFixed(2)+'€':''}</div>
           </div>`;
         })() : ''}
         <div>
@@ -842,6 +895,7 @@ Atgriez TIKAI derīgu JSON bez markdown:
             ${d.features.map(f => `<div class="ar-feature"><span style="color:var(--accent)">✓</span> ${f}</div>`).join('')}
           </div>
         </div>` : ''}
+        ${specsHtml}
         <button class="btn-nodot" onclick='window.parent.postMessage({type:"nodot_makslinieks",data:${JSON.stringify(makslData)}},"*")'>
           🎨 Nodot Māksliniekam → sagatavot veikala ierakstu
         </button>
