@@ -62,11 +62,13 @@ export default function BotsMakslinieks({ initialData }) {
   const [aiData,    setAiData]    = useState(null)
   const [posterUrl, setPosterUrl] = useState(null)
 
-  const [genLoading,  setGenLoading]  = useState(false)
-  const [saveLoading, setSaveLoading] = useState(false)
-  const [genStatus,   setGenStatus]   = useState('')
-  const [saved,       setSaved]       = useState(false)
-  const [error,       setError]       = useState('')
+  const [genLoading,      setGenLoading]      = useState(false)
+  const [imgRegenLoading, setImgRegenLoading] = useState(false)
+  const [saveLoading,     setSaveLoading]     = useState(false)
+  const [genStatus,       setGenStatus]       = useState('')
+  const [saved,           setSaved]           = useState(false)
+  const [error,           setError]           = useState('')
+  const [customPrompt,    setCustomPrompt]    = useState('')
 
   useEffect(() => {
     if (!initialData) return
@@ -139,6 +141,41 @@ export default function BotsMakslinieks({ initialData }) {
       setError(e.message)
     } finally {
       setGenLoading(false); setGenStatus('')
+    }
+  }
+
+  async function regenerateImage() {
+    if (!aiData) return
+    setImgRegenLoading(true); setError('')
+    try {
+      const prompt = customPrompt.trim()
+        || aiData.dalle_prompt
+        || `Vivid professional outdoor product poster, ${category} theme, dramatic forest lighting`
+      const dalleResp = await fetch('/api/openai-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gpt-image-1',
+          prompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'medium',
+        }),
+      })
+      if (dalleResp.ok) {
+        const dd = await dalleResp.json()
+        const imgUrl = dd.data?.[0]?.url
+          || (dd.data?.[0]?.b64_json ? `data:image/png;base64,${dd.data[0].b64_json}` : null)
+        if (imgUrl) { setPosterUrl(imgUrl); setSaved(false) }
+        else setError('Attēls netika saņemts')
+      } else {
+        const de = await dalleResp.json().catch(() => ({}))
+        setError(`DALL-E kļūda: ${de.error?.message || de.error || dalleResp.status}`)
+      }
+    } catch(e) {
+      setError(e.message)
+    } finally {
+      setImgRegenLoading(false)
     }
   }
 
@@ -303,8 +340,23 @@ export default function BotsMakslinieks({ initialData }) {
           {aiData && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {posterUrl && (
-                <img src={posterUrl} alt="AI plakāts"
-                  style={{ width: '100%', borderRadius: 8, border: '1px solid #21262d' }} />
+                <div>
+                  <img src={posterUrl} alt="AI plakāts"
+                    style={{ width: '100%', borderRadius: 8, border: '1px solid #21262d', display: 'block' }} />
+                  <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <textarea
+                      value={customPrompt}
+                      onChange={e => setCustomPrompt(e.target.value)}
+                      rows={2}
+                      placeholder={`Neobligāti: apraksti vēlamo attēlu...\nPiem: "Stativs mežā ar rieta sauli, tumšs fons, profesionāla foto kvalitāte"`}
+                      style={{ ...S.input, resize: 'vertical', fontSize: 11 }}
+                    />
+                    <button onClick={regenerateImage} disabled={imgRegenLoading}
+                      style={{ padding: '8px 14px', borderRadius: 6, border: '1px solid #bc8cff', background: '#1a1a2e', color: imgRegenLoading ? '#484f58' : '#bc8cff', fontSize: 12, fontWeight: 700, cursor: imgRegenLoading ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+                      {imgRegenLoading ? '⏳ Ģenerē...' : '🔄 Pārtaisīt attēlu'}
+                    </button>
+                  </div>
+                </div>
               )}
               {!posterUrl && imageUrls.filter(u => u.trim())[0] && (
                 <img src={imageUrls.filter(u => u.trim())[0]} alt="Preces bilde"
