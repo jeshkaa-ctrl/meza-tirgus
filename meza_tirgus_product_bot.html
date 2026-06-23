@@ -138,6 +138,27 @@
   ::-webkit-scrollbar { width:6px; }
   ::-webkit-scrollbar-track { background:var(--bg); }
   ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+
+  .mode-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:12px; }
+  .mode-tab { flex:1; padding:8px 4px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; cursor:pointer; color:var(--text3); border-bottom:2px solid transparent; transition:all .15s; user-select:none; }
+  .mode-tab.active { color:var(--accent2); border-bottom-color:var(--accent2); }
+  .mode-panel { display:none; flex-direction:column; gap:12px; }
+  .mode-panel.active { display:flex; }
+  .analyze-result { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .ar-name { font-size:16px; font-weight:700; color:var(--text); }
+  .ar-tagline { font-size:12px; color:var(--text2); font-style:italic; }
+  .ar-section { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); font-family:'JetBrains Mono',monospace; margin-bottom:4px; }
+  .ar-desc { font-size:12px; color:var(--text2); line-height:1.75; }
+  .ar-features { display:flex; flex-direction:column; gap:4px; }
+  .ar-feature { font-size:12px; color:var(--text); display:flex; gap:6px; align-items:flex-start; }
+  .ar-price-box { background:var(--green-dim); border:1px solid var(--accent); border-radius:6px; padding:10px 14px; }
+  .ar-price-main { font-size:20px; font-weight:800; color:var(--accent); font-family:'JetBrains Mono',monospace; }
+  .ar-price-sub { font-size:10px; color:var(--text3); margin-top:2px; font-family:'JetBrains Mono',monospace; }
+  .btn-nodot { display:inline-flex; align-items:center; gap:8px; padding:10px 16px; background:linear-gradient(135deg,#1a1a2e,#1a2d1a); border:1px solid var(--purple,#bc8cff); border-radius:6px; color:var(--purple,#bc8cff); font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; cursor:pointer; transition:opacity .15s; width:100%; justify-content:center; }
+  .btn-nodot:hover { opacity:.8; }
+  .btn-analyze { background:var(--accent2); color:white; border:none; border-radius:6px; padding:10px 16px; font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; width:100%; letter-spacing:.05em; transition:opacity .15s; }
+  .btn-analyze:hover { opacity:.85; }
+  .btn-analyze:disabled { opacity:.4; cursor:not-allowed; }
 </style>
 </head>
 <body>
@@ -150,8 +171,13 @@
 
 <div class="layout">
   <div class="left">
-    <div class="panel-title">🔍 Meklēšana</div>
+    <div class="mode-tabs">
+      <div class="mode-tab active" onclick="switchMode('search')">🔍 Meklēt</div>
+      <div class="mode-tab" onclick="switchMode('analyze')">🔗 Analizēt preci</div>
+    </div>
 
+    <!-- MEKLĒŠANAS PANELIS -->
+    <div class="mode-panel active" id="modeSearch">
     <div class="search-box">
       <div>
         <label>Produkts (jebkurā valodā)</label>
@@ -219,6 +245,52 @@
         <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;">Nav meklēšanas vēstures</div>
       </div>
     </div>
+    </div><!-- /modeSearch -->
+
+    <!-- ANALĪZES PANELIS -->
+    <div class="mode-panel" id="modeAnalyze">
+      <div style="font-size:11px;color:var(--text3);line-height:1.6;font-family:'JetBrains Mono',monospace;">
+        Ielīmē konkrētas preces URL (AliExpress, Amazon, Alibaba, jebkurš). Claude analizē preci un sagatavo latvisko aprakstu.
+      </div>
+
+      <div>
+        <label>Preces URL</label>
+        <textarea id="analyzeUrl" rows="3" placeholder="https://www.aliexpress.com/item/..." style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:100%;resize:vertical;"></textarea>
+      </div>
+
+      <div>
+        <label>Kategorija</label>
+        <select id="analyzeCategory" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;width:100%;">
+          <option value="safety">Drošība mežā</option>
+          <option value="measurement">Mārinstrumenti</option>
+          <option value="ticks">Ērču aizsardzība</option>
+          <option value="bears">Lāču drošība</option>
+          <option value="surveillance">Novērošana</option>
+          <option value="hunting">Medības</option>
+          <option value="general">Vispārīgs</option>
+        </select>
+      </div>
+
+      <div class="price-row">
+        <div>
+          <label>Pirkšanas cena (€)</label>
+          <input type="number" id="analyzePrice" placeholder="12.50" step="0.01" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;width:100%;" />
+        </div>
+        <div>
+          <label>Piegāde (€)</label>
+          <input type="number" id="analyzeDelivery" placeholder="12" value="12" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;width:100%;" />
+        </div>
+      </div>
+
+      <div>
+        <label>Papildu info (neobligāti)</label>
+        <textarea id="analyzeExtra" rows="2" placeholder="Produkta apraksts, atsauksmes, izmēri..." style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;outline:none;width:100%;resize:vertical;"></textarea>
+      </div>
+
+      <button class="btn-analyze" id="analyzeBtn" onclick="runAnalyze()">🔗 ANALIZĒT PRECI</button>
+
+      <div id="analyzeResult" style="display:none;"></div>
+    </div><!-- /modeAnalyze -->
   </div>
 
   <div class="right" id="rightPanel">
@@ -558,6 +630,127 @@ function exportResults() {
 document.getElementById('query').addEventListener('keypress', e => {
   if (e.key === 'Enter') runSearch();
 });
+
+function switchMode(mode) {
+  document.querySelectorAll('.mode-tab').forEach((t, i) => t.classList.toggle('active', (mode === 'search') === (i === 0)));
+  document.getElementById('modeSearch').classList.toggle('active', mode === 'search');
+  document.getElementById('modeAnalyze').classList.toggle('active', mode === 'analyze');
+}
+
+async function runAnalyze() {
+  const url   = document.getElementById('analyzeUrl').value.trim();
+  const extra = document.getElementById('analyzeExtra').value.trim();
+  if (!url && !extra) { alert('Ielīmē preces URL vai aprakstu!'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true; btn.textContent = '⏳ Analizē...';
+  document.getElementById('analyzeResult').style.display = 'none';
+  document.getElementById('rightPanel').innerHTML = `
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Analizē preci...</div>
+      <div class="loading-steps">
+        <div class="loading-step active">Nolasa produkta datus</div>
+        <div class="loading-step">Veido latvisko nosaukumu</div>
+        <div class="loading-step">Raksta aprakstu</div>
+        <div class="loading-step">Aprēķina LV cenu</div>
+      </div>
+    </div>`;
+
+  const cat      = document.getElementById('analyzeCategory').value;
+  const price    = document.getElementById('analyzePrice').value;
+  const delivery = document.getElementById('analyzeDelivery').value || '12';
+
+  const catLabels = { safety:'Drošība mežā', measurement:'Mārinstrumenti', ticks:'Ērču aizsardzība', bears:'Lāču drošība', surveillance:'Novērošana', hunting:'Medības', general:'Vispārīgs' };
+
+  const systemPrompt = `Tu esi e-veikala produktu speciālists Latvijā. Meža Tirgus pārdod āra aktivitāšu un meža drošības piederumus.
+Tev tiek dots konkrētas preces URL vai apraksts. Izanalizē šo preci un sagatavo latvisko veikala ierakstu.
+
+NOSAUKUMA NOTEIKUMI:
+- Veido UNIKĀLU latvisko nosaukumu ko nevar izsekot pie oriģināla
+- Ja zīmols ir pazīstams — saglabā zīmolu, veido jaunu nosaukumu
+- Nepazīstamu zīmolu NEMIN
+- NEKAD neizmanto modeļu numurus vai oriģinālos nosaukumus
+
+CENU APRĒĶINS (ja dota pirkšanas cena):
+- Muita: ja cena > 150€ → +5%, citādi 0
+- Bāze = pirkšanas cena + piegāde + muita
+- PVN imports = bāze × 21%
+- Pašizmaksa = bāze + PVN
+- Pārdošanas cena = pašizmaksa × 2 (100% marža), noapaļot uz 0.5€
+
+Atgriez TIKAI derīgu JSON bez markdown:
+{
+  "name_lv": "Unikāls latviskais nosaukums",
+  "tagline": "Viens teikums latviski — galvenais ieguvums",
+  "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks.",
+  "features": ["iezīme 1", "iezīme 2", "iezīme 3", "iezīme 4", "iezīme 5"],
+  "sell_price": skaitlis_vai_null,
+  "cost_price": skaitlis_vai_null,
+  "brand": "zīmols vai null",
+  "dalle_prompt": "DALL-E prompt in English: vivid advertising poster for outdoor/forest product"
+}`;
+
+  const userMsg = [
+    url   ? `Preces URL: ${url}` : '',
+    `Kategorija: ${catLabels[cat] || cat}`,
+    price    ? `Pirkšanas cena: ${price}€` : '',
+    delivery ? `Piegāde: ${delivery}€` : '',
+    extra ? `Papildu info: ${extra}` : '',
+  ].filter(Boolean).join('\n');
+
+  try {
+    const resp = await fetch('/api/anthropic/v1/messages', {
+      method: 'POST',
+      headers: acmHeaders(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+    if (!resp.ok) throw new Error(`API kļūda: ${resp.status}`);
+    const rd   = await resp.json();
+    const text = rd.content?.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
+    const d    = JSON.parse(text);
+
+    const makslData = { url, price: d.cost_price || price, delivery, category: cat };
+
+    const html = `
+      <div class="analyze-result">
+        <div>
+          <div class="ar-name">${d.name_lv || '—'}</div>
+          <div class="ar-tagline">${d.tagline || ''}</div>
+        </div>
+        ${d.sell_price ? `
+        <div class="ar-price-box">
+          <div class="ar-price-main">${Number(d.sell_price).toFixed(2)} €</div>
+          <div class="ar-price-sub">ieteicamā pārdošanas cena LV</div>
+        </div>` : ''}
+        <div>
+          <div class="ar-section">Apraksts</div>
+          <div class="ar-desc">${d.description_lv || ''}</div>
+        </div>
+        ${d.features?.length ? `
+        <div>
+          <div class="ar-section">Galvenās iezīmes</div>
+          <div class="ar-features">
+            ${d.features.map(f => `<div class="ar-feature"><span style="color:var(--accent)">✓</span> ${f}</div>`).join('')}
+          </div>
+        </div>` : ''}
+        <button class="btn-nodot" onclick='window.parent.postMessage({type:"nodot_makslinieks",data:${JSON.stringify(makslData)}},"*")'>
+          🎨 Nodot Māksliniekam → sagatavot veikala ierakstu
+        </button>
+      </div>`;
+
+    document.getElementById('rightPanel').innerHTML = `<div style="padding:20px">${html}</div>`;
+  } catch(e) {
+    document.getElementById('rightPanel').innerHTML = `<div class="empty-state"><div class="big">⚠️</div><h2>Kļūda</h2><p>${e.message}</p></div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = '🔗 ANALIZĒT PRECI';
+  }
+}
 </script>
 </body>
 </html>
