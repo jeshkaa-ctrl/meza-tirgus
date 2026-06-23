@@ -742,49 +742,53 @@ NOSAUKUMA NOTEIKUMI:
 - Nepazīstamu zīmolu NEMIN
 - NEKAD neizmanto modeļu numurus vai oriģinālos nosaukumus
 
-CENU EKSTRAKTĒŠANA (prioritāte):
-1. Meklē cenu lapas tekstā (€493.00, $29.99, utml.) → raw_price
-2. Meklē piegādes izmaksas lapas tekstā (€9 delivery, Free shipping, utml.) → raw_delivery_cost (0 ja bezmaksas)
-3. Meklē piegādes laiku (29 June - 1 July, 3-7 days, utml.) → delivery_days (teksts latviski)
-4. Meklē krājumus (Only 1 left, In stock, Out of stock) → stock_warning (latviski vai null)
-5. Meklē atgriešanas politiku (30 days return, Non-returnable) → returns_policy (latviski)
-6. Meklē atsauksmes (4.5 stars, 127 reviews) → rating (teksts vai null)
-7. Meklē specifikācijas (Brand, Material, Weight, Size) → specs objekts
+DATU EKSTRAKTĒŠANA NO LAPAS TEKSTA:
 
-Ja lietotājs NORĀDĪJA cenu formā — izmanto to, nevis no teksta.
+CENA (raw_price): Atrod pirmo skaitli ar € vai $ simbolu. Piemēri: "€493.00" → 493, "$29.99" → 29.99, "493,00 €" → 493. Ja lapā rakstīts "VAT included" vai "incl. VAT" — tā ir galīgā cena, izmanto to. Ja cena nav tekstā — raw_price = null.
 
-APRĒĶINI (ar faktisko cenu):
-- Pirkšanas cena = raw_price (vai lietotāja ievadītā)
-- Piegāde = raw_delivery_cost (vai lietotāja ievadītā, vai 12€)
-- Muita: ja pirkšanas cena > 150€ → +5%, citādi 0
-- Bāze = pirkšanas cena + piegāde + muita
-- PVN = bāze × 21%
-- Pašizmaksa = bāze + PVN
-- Pārdošanas cena = pašizmaksa × 2, noapaļot uz 0.5€
+PIEGĀDES IZMAKSAS (raw_delivery_cost): Atrod piegādes cenu. "€9 delivery" → 9, "FREE delivery" vai "Free shipping" → 0. Ja nav — null.
+
+PIEGĀDES ILGUMS (delivery_days): NEKAD neliec konkrētus datumus. Aprēķini dienu skaitu no teksta. Piemēri: "29 June - 1 July" → pieskaita dienas → "~3 darba dienas". "3-7 business days" → "3–7 darba dienas". "2-4 weeks" → "2–4 nedēļas". Ja nav info — null.
+
+KRĀJUMI (stock_warning): "Only 1 left" → "Atlicis tikai 1!", "Only 3 left" → "Atlicuši tikai 3!", "In stock" → null (normāli), "Out of stock" → "Nav noliktavā". Ja nav info — null.
+
+ATGRIEŠANA (returns_policy): "30 days return" → "Atgriešana 30 dienu laikā", "Non-returnable" → "Neatgriežams". Ja nav — null.
+
+ATSAUKSMES (rating): "4.5 out of 5 stars, 127 ratings" → "4.5 ★ (127)". Ja nav — null.
+
+SPECIFIKĀCIJAS (specs): Visi Brand/Colour/Material/Weight/Size/Dimensions lauki → objekts latviski.
+
+Ja lietotājs NORĀDĪJA cenu formā — raw_price aizstāj ar to vērtību.
+
+APRĒĶINI:
+- Bāze = raw_price + raw_delivery_cost + (raw_price > 150 ? raw_price*0.05 : 0)
+- PVN = bāze × 0.21
+- cost_price = bāze + PVN
+- sell_price = noapaļot(cost_price × 2, uz tuvāko 0.5)
 
 SVARĪGI: Atgriez TIKAI JSON objektu. Bez teksta pirms vai pēc. Bez markdown. Sāc ar { un beidz ar }.
 
 {
   "name_lv": "Unikāls latviskais nosaukums",
   "tagline": "Viens teikums latviski — galvenais ieguvums",
-  "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks. Piemin piegādes laiku un atgriešanas iespēju.",
+  "description_lv": "Apraksts 2-3 rindkopās latviski. Praktisks.",
   "features": ["iezīme 1", "iezīme 2", "iezīme 3", "iezīme 4", "iezīme 5"],
-  "raw_price": 493.00,
-  "raw_delivery_cost": 9,
-  "estimated_buy_price": 493.00,
-  "estimated_delivery": 9,
-  "sell_price": 1450.50,
-  "cost_price": 725.30,
-  "delivery_days": "Piegāde 29. jūn. – 1. jūl.",
-  "stock_warning": "Atlicis tikai 1!",
+  "raw_price": 29.99,
+  "raw_delivery_cost": 5,
+  "estimated_buy_price": 29.99,
+  "estimated_delivery": 5,
+  "sell_price": 89.50,
+  "cost_price": 44.82,
+  "delivery_days": "~5 darba dienas",
+  "stock_warning": null,
   "returns_policy": "Atgriešana 30 dienu laikā",
-  "rating": "4.5 ★ (127 atsauksmes)",
-  "specs": {"Zīmols": "BOG", "Materiāls": "Alumīnijs", "Svars": "3.9 kg"},
-  "brand": "BOG",
+  "rating": "4.3 ★ (89)",
+  "specs": {"Zīmols": "XYZ", "Materiāls": "Alumīnijs", "Svars": "1.2 kg"},
+  "brand": "XYZ",
   "dalle_prompt": "DALL-E prompt in English: vivid advertising poster for outdoor/forest product"
 }
 
-Ja kāds lauks nav zināms — izmanto null (nevis tekstu "null").`;
+Ja kāds lauks nav zināms — izmanto null (JSON null, nevis tekstu).`;
 
   const userMsg = [
     url   ? `Preces URL: ${url}` : '',
