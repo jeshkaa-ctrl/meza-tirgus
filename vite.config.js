@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         '/api/vzd': {
           target: 'https://geolatvija.lv',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api\/vzd/, '/apis/wfs'),
+          rewrite: (path) => path.replace(/^\/api\/vzd\/wfs/, '/apis/wfs'),
         },
         '/api/anthropic': {
           target: 'https://api.anthropic.com',

@@ -20,7 +20,7 @@ export function buildVzdKadastraWFS(kad) {
     OUTPUTFORMAT: 'application/json',
     SRSNAME:      'EPSG:4326',
   })
-  return `/api/vzd?${p.toString()}`
+  return `/api/vzd/wfs?${p.toString()}`
 }
 
 export function buildWFS(geoPath, typeNames, cqlFilter, count = 100) {
