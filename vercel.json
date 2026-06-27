@@ -4,7 +4,8 @@
     { "source": "/krautuve",          "destination": "/krautuve.html" },
     { "source": "/caurmers",          "destination": "/caurmers.html" },
     { "source": "/api/anthropic/:path*", "destination": "/api/anthropic" },
-    { "source": "/api/lvmgeo/:path*",   "destination": "/api/lvmgeo" },
+    { "source": "/api/lvmgeo/:path*",   "destination": "/api/lvmgeo"   },
+    { "source": "/api/vzd",             "destination": "/api/vzd"      },
     { "source": "/(.*)",              "destination": "/index.html"    }
   ]
 }

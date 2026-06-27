@@ -2,7 +2,7 @@ import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { C as DS, F, spinnerCSS } from './ds'
 import { AIZSARDZIBA, getAizsardzibaStatus, SORT_CENAS } from './ipasums/constants'
-import { buildWFS, apstradatNogabalu, paarrekinatRindu } from './ipasums/engine'
+import { buildWFS, buildVzdKadastraWFS, apstradatNogabalu, paarrekinatRindu } from './ipasums/engine'
 import IpasumKarte      from './ipasums/Karte'
 import IpasumTabula     from './ipasums/Tabula'
 import IpasumDiagrammas from './ipasums/Diagrammas'
@@ -53,12 +53,19 @@ export default function IpasumAnalīze({ onBack }) {
     setKluda(''); setFaze('lade'); setLadeText('Saņem kadastra robežas...')
     let lvmKluda = false
     try {
-      // 1. Kadastra robeža (LVM GEO) — ar 8s timeout
+      // 1. Kadastra robeža — VZD/GeoLatvija (primārais, neatkarīgs no LVM GEO)
       try {
-        const kadData = await lvmWFSTimeout(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
+        const kadData = await lvmWFSTimeout(buildVzdKadastraWFS(kad))
         const kadFeat = kadData?.features?.[0]
         if (kadFeat) setKadGeom(kadFeat)
-      } catch { lvmKluda = true }
+      } catch {
+        // VZD neizdevās — mēģina LVM GEO kā rezervi (kad serviss atgriezīsies)
+        try {
+          const kadData = await lvmWFSTimeout(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
+          const kadFeat = kadData?.features?.[0]
+          if (kadFeat) setKadGeom(kadFeat)
+        } catch { lvmKluda = true }
+      }
 
       // 2. VMD nogabali (LVM GEO) — ar 8s timeout
       setLadeText('Iegūst VMD nogabalu datus...')
