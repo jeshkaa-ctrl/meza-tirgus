@@ -4,7 +4,9 @@
 
 export default async function handler(req, res) {
   const url = new URL(req.url, `https://${req.headers.host}`)
+  // Pārsūta query params tieši uz GeoLatvija — url.search saglabā oriģinālo enkodējumu
   const targetUrl = `https://geolatvija.lv/apis/wfs${url.search}`
+  console.log('[VZD proxy] →', targetUrl)
 
   try {
     const upstream = await fetch(targetUrl, {
@@ -12,11 +14,11 @@ export default async function handler(req, res) {
     })
     const ct = upstream.headers.get('content-type') || ''
     res.setHeader('Cache-Control', 's-maxage=300')
-    if (ct.includes('json')) {
-      const data = await upstream.json()
-      return res.status(upstream.status).json(data)
-    }
     const text = await upstream.text()
+    console.log('[VZD proxy] status:', upstream.status, 'ct:', ct, 'body[:200]:', text.slice(0,200))
+    if (ct.includes('json') || text.trimStart().startsWith('{')) {
+      try { return res.status(upstream.status).json(JSON.parse(text)) } catch {}
+    }
     res.setHeader('Content-Type', ct || 'text/plain')
     return res.status(upstream.status).send(text)
   } catch (e) {
