@@ -3,14 +3,19 @@
 // Prod: šis Vercel handler saņem /api/vzd?... → pārsūta uz geolatvija.lv
 
 export default async function handler(req, res) {
-  const url = new URL(req.url, `https://${req.headers.host}`)
-  // Pārsūta query params tieši uz GeoLatvija — url.search saglabā oriģinālo enkodējumu
-  const targetUrl = `https://geolatvija.lv/apis/wfs${url.search}`
+  // Izvelk query string tieši no req.url — droši pret Vercel URL parsēšanas niansi
+  const qs = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : ''
+  const targetUrl = `https://geolatvija.lv/apis/wfs${qs}`
   console.log('[VZD proxy] →', targetUrl)
 
   try {
     const upstream = await fetch(targetUrl, {
-      headers: { Accept: 'application/json, */*' },
+      headers: {
+        'Accept': 'application/json, application/xml, */*',
+        'User-Agent': 'Mozilla/5.0 (compatible; MezaTirgus/1.0)',
+        'Referer': 'https://geolatvija.lv/',
+      },
+      redirect: 'follow',
     })
     const ct = upstream.headers.get('content-type') || ''
     res.setHeader('Cache-Control', 's-maxage=300')
