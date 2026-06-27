@@ -2,7 +2,7 @@ import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { C as DS, F, spinnerCSS } from './ds'
 import { AIZSARDZIBA, getAizsardzibaStatus, SORT_CENAS } from './ipasums/constants'
-import { buildWFS, lvmWFS, wfsDiagnostika, apstradatNogabalu, paarrekinatRindu } from './ipasums/engine'
+import { buildWFS, apstradatNogabalu, paarrekinatRindu } from './ipasums/engine'
 import IpasumKarte      from './ipasums/Karte'
 import IpasumTabula     from './ipasums/Tabula'
 import IpasumDiagrammas from './ipasums/Diagrammas'
@@ -24,6 +24,25 @@ export default function IpasumAnalīze({ onBack }) {
   const [aizsStatus, setAizsStatus] = useState(AIZSARDZIBA.nav)
   const [cilne,    setCilne]    = useState('karte')
   const [slani,    setSlani]    = useState({ nogabali:true, dap:true, kadastra:true, ortofoto:false })
+  const [lvmGeoNepieejams, setLvmGeoNepieejams] = useState(false)
+  const [bannerisAizverts,  setBannerisAizverts]  = useState(false)
+
+  const lvmWFSTimeout = async (url, ms = 8000) => {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), ms)
+    try {
+      const r = await fetch(url, { signal: ctrl.signal })
+      clearTimeout(timer)
+      if (!r.ok) { const b = await r.text().catch(()=>''); throw new Error(`WFS_${r.status}:${b.slice(0,200)}`) }
+      const data = await r.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    } catch (e) {
+      clearTimeout(timer)
+      if (e.name === 'AbortError') throw new Error('WFS_TIMEOUT')
+      throw e
+    }
+  }
 
   // ── Analīze ─────────────────────────────────────────────────────────────────
   const analizet = async () => {
@@ -32,40 +51,31 @@ export default function IpasumAnalīze({ onBack }) {
       setKluda('Kadastra numuram jābūt 11 cipariem (piemērs: 42820040063)'); return
     }
     setKluda(''); setFaze('lade'); setLadeText('Saņem kadastra robežas...')
+    let lvmKluda = false
     try {
-      // 1. Kadastra robeža
-      const kadUrl = buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`)
-      let kadData
+      // 1. Kadastra robeža (LVM GEO) — ar 8s timeout
       try {
-        kadData = await lvmWFS(kadUrl)
-      } catch (e) {
-        if (e.message.startsWith('WFS_400') || e.message.startsWith('WFS_500')) {
-          setLadeText('Diagnostika...')
-          const info = await wfsDiagnostika('/publicwfs/wfs', 'publicwfs:kkparcel')
-          setFaze('ievads'); setKluda(`LVM GEO kļūda. ${info}`); return
-        }
-        throw e
-      }
-      const kadFeat = kadData?.features?.[0]
-      if (!kadFeat) { setFaze('ievads'); setKluda(`Kadastra '${kad}' nav atrasts LVM GEO.`); return }
-      setKadGeom(kadFeat)
+        const kadData = await lvmWFSTimeout(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
+        const kadFeat = kadData?.features?.[0]
+        if (kadFeat) setKadGeom(kadFeat)
+      } catch { lvmKluda = true }
 
-      // 2. VMD nogabali
+      // 2. VMD nogabali (LVM GEO) — ar 8s timeout
       setLadeText('Iegūst VMD nogabalu datus...')
-      const vmdUrl  = buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500)
-      const vmdRaw  = await fetch(vmdUrl)
-      const vmdText = await vmdRaw.text()
-      let vmdData
-      try { vmdData = JSON.parse(vmdText) } catch { throw new Error('WFS nav JSON: ' + vmdText.slice(0,200)) }
-      if (vmdData.error) throw new Error(vmdData.error)
+      let vmdData = null
+      try {
+        vmdData = await lvmWFSTimeout(buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500))
+      } catch { lvmKluda = true }
 
-      // 3. Egļu aizsardzība
+      // 3. Egļu aizsardzība (LVM GEO) — ar 8s timeout
       setLadeText('Iegūst aizsardzības teritorijas...')
       let dapFeatures = []
       try {
-        const dapData = await lvmWFS(buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', `cadaster='${kad}'`, 20))
+        const dapData = await lvmWFSTimeout(buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', `cadaster='${kad}'`, 20))
         dapFeatures = dapData?.features || []
-      } catch { /* nav kritiski */ }
+      } catch { lvmKluda = true }
+
+      if (lvmKluda) setLvmGeoNepieejams(true)
 
       setLadeText('Aprēķina meža vērtību...')
       const aizsardzibaStatus = getAizsardzibaStatus(dapFeatures)
@@ -107,6 +117,15 @@ export default function IpasumAnalīze({ onBack }) {
   const domSuga  = Object.entries(sugasPaPlat).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—'
   const vidVecums= kopPlatiba>0 ? Math.round(editData.reduce((s,n)=>s+n.vecums*n.platiba,0)/kopPlatiba) : 0
 
+  const LvmBanneris = () => lvmGeoNepieejams && !bannerisAizverts ? (
+    <div style={{ margin:'10px 16px 0', padding:'10px 14px', borderRadius:8, background:'#1f1000', border:'1px solid #e65100', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+      <div style={{ fontSize:12, color:'#ffb74d', lineHeight:1.5 }}>
+        ⚠️ Publiskie meža karšu dati šobrīd nav pieejami tehnisku iemeslu dēļ. Pārējā funkcionalitāte darbojas kā parasti.
+      </div>
+      <button onClick={()=>setBannerisAizverts(true)} style={{ background:'none', border:'none', color:'#ffb74d', fontSize:18, cursor:'pointer', padding:'0 4px', flexShrink:0, lineHeight:1 }}>✕</button>
+    </div>
+  ) : null
+
   const C = { bg:DS.bg, card:DS.bgCard, inner:DS.bgInner, border:DS.greenBdr, text:DS.text, dim:DS.textDim, sec:DS.textSec, green:DS.green }
   const inp = { background:DS.bgDeep, border:`1px solid ${DS.greenBdr}`, color:DS.text, borderRadius:6, padding:'10px 14px', fontSize:16, outline:'none', width:'100%', boxSizing:'border-box', fontFamily:F.family }
   const btnPrimary = { background:`linear-gradient(135deg,${DS.green},${DS.greenDk})`, color:'white', border:'none', borderRadius:8, padding:'13px 28px', fontSize:15, fontWeight:700, cursor:'pointer', minHeight:44 }
@@ -122,6 +141,7 @@ export default function IpasumAnalīze({ onBack }) {
           <div style={{ color:C.dim, fontSize:F.xs }}>LVM GEO automātiskā meža inventarizācija</div>
         </div>
       </div>
+      <LvmBanneris />
       <div style={{ maxWidth:560, margin:'0 auto', padding:'32px 20px 60px' }}>
         <div style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:16, padding:'28px 24px', marginBottom:16 }}>
           <div style={{ fontSize:13, color:C.sec, marginBottom:20, lineHeight:1.6 }}>
@@ -197,6 +217,8 @@ export default function IpasumAnalīze({ onBack }) {
           </div>
         </div>
       </div>
+
+      <LvmBanneris />
 
       {/* Aizsardzības josla */}
       {aizsStatus.cirte !== 'briva' && (
