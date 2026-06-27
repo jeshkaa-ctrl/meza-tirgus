@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     order_id,
     delivery_days = '3–7',
     tracking_code,
+    summa_eur,
   } = req.body
 
   if (!to) return res.status(400).json({ error: 'Nav e-pasta adreses' })
@@ -86,6 +87,37 @@ export default async function handler(req, res) {
 
     const data = await resp.json()
     if (!resp.ok) return res.status(resp.status).json({ error: data.message || 'Resend kļūda' })
+
+    // Automātiski ierakstīt grāmatvedībā ja summa nodota
+    if (summa_eur && process.env.SUPABASE_SERVICE_KEY) {
+      const sbUrl = process.env.SUPABASE_URL || 'https://reuyrtiwzcxdknnmycev.supabase.co'
+      const summa = parseFloat(summa_eur) || 0
+      const pvn   = +(summa / 1.21 * 0.21).toFixed(2)
+      const kat   = (product_name || '').toLowerCase().includes('abonem')
+        ? 'abonements_menesis'
+        : 'dropshipping_prece'
+      await fetch(`${sbUrl}/rest/v1/gramatvedis_darijumi`, {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        process.env.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Prefer':        'return=minimal',
+        },
+        body: JSON.stringify({
+          datums:        new Date().toISOString().slice(0, 10),
+          veids:         'ienemums',
+          summa_eur:     summa,
+          pvn_eur:       pvn,
+          summa_bez_pvn: +(summa / 1.21).toFixed(2),
+          kategorija:    kat,
+          apraksts:      `${product_name || 'Pasūtījums'} — ${customer_name || ''}`,
+          avots:         'montonio',
+          rekina_nr:     String(order_id || ''),
+        }),
+      }).catch(() => {}) // nekad nebloķē e-pasta atbildi
+    }
+
     return res.status(200).json({ ok: true, id: data.id })
   } catch (e) {
     return res.status(502).json({ error: e.message })

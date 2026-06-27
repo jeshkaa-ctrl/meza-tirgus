@@ -38,6 +38,7 @@ const CenuKalkulators        = React.lazy(() => import("./CenuKalkulators"))
 const PircejuCenas           = React.lazy(() => import("./PircejuCenas"))
 const IpasumAnalīze              = React.lazy(() => import("./IpasumAnalīze"))
 const MezaApsaimniekosanasPlans  = React.lazy(() => import("./MezaApsaimniekosanasPlans"))
+const GramatvedisPage            = React.lazy(() => import("./gramatvedis/GramatvedisPage"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -138,11 +139,38 @@ if(page==="ipasums") return (
     <IpasumAnalīze onBack={()=>setPage("main")} user={user} />
   </React.Suspense>
 )
-if(page==="map-plans") return (
-  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50",fontSize:16}}>Ielādē...</div></div>}>
-    <MezaApsaimniekosanasPlans onBack={()=>setPage("main")} />
-  </React.Suspense>
-)
+if(page==="map-plans") {
+  const isAdmin = localStorage.getItem('mt_admin_ok') === '1'
+  if (!isAdmin) return (
+    <div style={{minHeight:'100vh',background:'#080f08',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:'sans-serif',padding:24}}>
+      <div style={{fontSize:52,marginBottom:16}}>🌳</div>
+      <div style={{fontSize:22,fontWeight:700,color:'#4caf50',marginBottom:8,textAlign:'center'}}>Meža apsaimniekošanas plāns</div>
+      <div style={{fontSize:15,color:'#81c784',marginBottom:32,textAlign:'center',maxWidth:340}}>Produkts šobrīd ir izstrādes stadijā un drīzumā būs pieejams.</div>
+      <button onClick={()=>setPage('main')} style={{padding:'10px 28px',borderRadius:8,background:'#2e7d32',color:'#fff',border:'none',fontSize:14,fontWeight:600,cursor:'pointer'}}>← Atpakaļ</button>
+    </div>
+  )
+  return (
+    <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50",fontSize:16}}>Ielādē...</div></div>}>
+      <MezaApsaimniekosanasPlans onBack={()=>setPage("main")} />
+    </React.Suspense>
+  )
+}
+if(page==="gramatvedis") {
+  const isAdmin = localStorage.getItem('mt_admin_ok') === '1'
+  if (!isAdmin) return (
+    <div style={{minHeight:'100vh',background:'#080f08',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:'sans-serif',padding:24}}>
+      <div style={{fontSize:52,marginBottom:16}}>📊</div>
+      <div style={{fontSize:22,fontWeight:700,color:'#4caf50',marginBottom:8,textAlign:'center'}}>Grāmatvedis</div>
+      <div style={{fontSize:15,color:'#81c784',marginBottom:32,textAlign:'center',maxWidth:340}}>Šī sadaļa ir pieejama tikai administratoriem.</div>
+      <button onClick={()=>setPage('main')} style={{padding:'10px 28px',borderRadius:8,background:'#2e7d32',color:'#fff',border:'none',fontSize:14,fontWeight:600,cursor:'pointer'}}>← Atpakaļ</button>
+    </div>
+  )
+  return (
+    <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50",fontSize:16}}>Ielādē...</div></div>}>
+      <GramatvedisPage onBack={()=>setPage("main")} />
+    </React.Suspense>
+  )
+}
 if(page==="standard") return <>
   <StandardPage
     onBack={()=>setPage("main")}
