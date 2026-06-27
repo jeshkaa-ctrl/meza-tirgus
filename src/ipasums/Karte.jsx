@@ -120,6 +120,10 @@ export default function IpasumKarte({ kadGeom, editData, dapTer, slani, setSlani
           }
         ).addTo(map)
       }
+
+      // Ja nav geodatu (LVM GEO nedarbojas) — rāda Latviju lai OSM tiles ielādējas
+      const hasBounds = (slani.kadastra && kadGeom) || (slani.nogabali && editData.length > 0)
+      if (!hasBounds) map.setView([56.88, 24.60], 7)
     }
     init().catch(console.error)
     return () => { if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null } }
