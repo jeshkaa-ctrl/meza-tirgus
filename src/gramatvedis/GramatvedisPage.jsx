@@ -341,7 +341,11 @@ export default function GramatvedisPage({ onBack }) {
           .from('gramatvedis')
           .upload(path, fails, { contentType: fails.type })
         if (upErr) throw upErr
-        dokUrl = supabase.storage.from('gramatvedis').getPublicUrl(up.path).data.publicUrl
+        const { data: signed, error: signErr } = await supabase.storage
+          .from('gramatvedis')
+          .createSignedUrl(up.path, 315360000) // ~10 gadi
+        if (signErr) throw signErr
+        dokUrl = signed.signedUrl
       }
 
       const { error } = await supabase.from('gramatvedis_darijumi').insert({
