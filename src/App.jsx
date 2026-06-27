@@ -36,7 +36,8 @@ const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
 const ParoleLapa             = React.lazy(() => import("./ParoleLapa"))
 const CenuKalkulators        = React.lazy(() => import("./CenuKalkulators"))
 const PircejuCenas           = React.lazy(() => import("./PircejuCenas"))
-const IpasumAnalīze          = React.lazy(() => import("./IpasumAnalīze"))
+const IpasumAnalīze              = React.lazy(() => import("./IpasumAnalīze"))
+const MezaApsaimniekosanasPlans  = React.lazy(() => import("./MezaApsaimniekosanasPlans"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -137,6 +138,11 @@ if(page==="ipasums") return (
     <IpasumAnalīze onBack={()=>setPage("main")} user={user} />
   </React.Suspense>
 )
+if(page==="map-plans") return (
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50",fontSize:16}}>Ielādē...</div></div>}>
+    <MezaApsaimniekosanasPlans onBack={()=>setPage("main")} />
+  </React.Suspense>
+)
 if(page==="standard") return <>
   <StandardPage
     onBack={()=>setPage("main")}
@@ -189,11 +195,23 @@ if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
 if(page==="cenas")        return <CenuKalkulators onBack={()=>setPage("main")}/>
 if(page==="pirceja_cenas") return <PircejuCenas onBack={()=>setPage("main")} user={user}/>
-if(page==="veikals") return (
-  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#2e7d32",fontSize:14}}>Ielādē veikalu...</div></div>}>
-    <VeikalsPage onBack={()=>setPage("main")} user={user}/>
-  </React.Suspense>
-)
+if(page==="veikals") {
+  const isAdmin = localStorage.getItem('mt_admin_ok') === '1'
+  if (!isAdmin) return (
+    <div style={{minHeight:'100vh',background:'#f9f6f1',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontFamily:'Georgia,serif',padding:24}}>
+      <div style={{fontSize:48,marginBottom:16}}>🌲</div>
+      <div style={{fontSize:22,fontWeight:700,color:'#2e4a1e',marginBottom:8,textAlign:'center'}}>Meža Tirgus Veikals</div>
+      <div style={{fontSize:15,color:'#5a7a4a',marginBottom:32,textAlign:'center',maxWidth:340}}>Veikals šobrīd ir izstrādes stadijā un drīzumā tiks atvērts.</div>
+      <div style={{fontSize:13,color:'#8a9a7a',marginBottom:32,textAlign:'center'}}>Sekojiet jaunumiem mūsu mājaslapā.</div>
+      <button onClick={()=>setPage('landing')} style={{padding:'10px 28px',borderRadius:8,background:'#2e7d32',color:'#fff',border:'none',fontSize:14,fontWeight:600,cursor:'pointer'}}>← Atpakaļ</button>
+    </div>
+  )
+  return (
+    <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#2e7d32",fontSize:14}}>Ielādē veikalu...</div></div>}>
+      <VeikalsPage onBack={()=>setPage("main")} user={user}/>
+    </React.Suspense>
+  )
+}
 if(page==="main") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}

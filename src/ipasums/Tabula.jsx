@@ -11,7 +11,7 @@ function calcSortVert(sortimenti, cenas) {
   )
 }
 
-export default function IpasumTabula({ editData, updateRinda, kopPlatiba, kopKubatura }) {
+export default function IpasumTabula({ editData, updateRinda, kopPlatiba, kopKubatura, onMapEdit }) {
   const [editMode,  setEditMode]  = useState(false)
   const [cenas,     setCenas]     = useState({ ...DEFAULT_CENAS })
 
@@ -93,6 +93,7 @@ export default function IpasumTabula({ editData, updateRinda, kopPlatiba, kopKub
               { h: 'Kubatūra',  mw: 80,  right: true  },
               { h: 'Lēmums',    mw: 130, right: false },
               { h: 'Vērtība €', mw: 90,  right: true  },
+              { h: 'MAP',       mw: 60,  right: false },
             ].map(({ h, mw, right }, i) => (
               <th key={i} style={{
                 padding: '8px 10px', textAlign: right ? 'right' : 'left',
@@ -154,6 +155,23 @@ export default function IpasumTabula({ editData, updateRinda, kopPlatiba, kopKub
               <td style={{ padding: '8px 10px', border: `1px solid ${C.border}`, textAlign: 'right', fontWeight: n.sortVert > 0 ? 700 : 400, color: n.sortVert > 0 ? '#4ade80' : C.dim, fontSize: 14 }}>
                 {n.sortVert > 0 ? `${n.sortVert.toLocaleString()} €` : '—'}
               </td>
+
+              <td style={{ padding: '6px 8px', border: `1px solid ${C.border}`, textAlign: 'center' }}>
+                {onMapEdit && (
+                  <button
+                    onClick={() => onMapEdit(n, i)}
+                    style={{
+                      padding: '4px 8px', borderRadius: 6, fontSize: 11, cursor: 'pointer',
+                      background: n.mapManuali ? `${DS.green}22` : 'transparent',
+                      border: `1px solid ${n.mapManuali ? DS.green : C.border}`,
+                      color: n.mapManuali ? DS.green : C.dim, whiteSpace: 'nowrap',
+                    }}
+                    title="Ievadīt MAP datus"
+                  >
+                    {n.mapManuali ? '✓ MAP' : '+ MAP'}
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -165,6 +183,7 @@ export default function IpasumTabula({ editData, updateRinda, kopPlatiba, kopKub
             <td style={{ padding: '8px 10px', border: `1px solid ${C.border}`, textAlign: 'right', fontWeight: 700, color: C.text, fontSize: 14 }}>{kopKubatura.toFixed(0)}</td>
             <td style={{ border: `1px solid ${C.border}` }} />
             <td style={{ padding: '8px 10px', border: `1px solid ${C.border}`, textAlign: 'right', fontWeight: 700, color: '#4ade80', fontSize: 14 }}>{kopSortVert.toLocaleString()} €</td>
+            <td style={{ border: `1px solid ${C.border}` }} />
           </tr>
         </tfoot>
       </table>

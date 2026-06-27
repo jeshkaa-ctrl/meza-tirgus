@@ -11,7 +11,8 @@ const SADAJAS = (isAdmin) => [
     color: C.green,
     ikona: "🪓",
     riki: [
-      { icon: "🗺", title: "Īpašuma analīze",          desc: "Kadastra nr. → LVM GEO automātiska analīze, karte, vērtība",         page: "ipasums",  badge: "JAUNS" },
+      { icon: "🌳", title: "Apsaimniekošanas plāns",   desc: "MAP laukā — nogabali, terēna dati, MK 384 PDF",                       page: "map-plans", badge: "JAUNS" },
+      { icon: "🗺", title: "Īpašuma analīze",          desc: "Kadastra nr. → LVM GEO automātiska analīze, karte, vērtība",         page: "ipasums" },
       { icon: "🗺", title: "Cirsmas skice",           desc: "KML/SHP → skice, koordinātas, PDF VMD iesniegumam",                   page: "skice" },
       { icon: "🌲", title: "Cirsmas novērtēšana",     desc: "PDF no VMD → nogabalu analīze, cirsmas vērtība",                      page: "cirsma" },
       { icon: "📄", title: "VMD PDF analīze",         desc: "Nogabalu aktuālās informācijas analīze no VMD PDF",                   page: "standard" },

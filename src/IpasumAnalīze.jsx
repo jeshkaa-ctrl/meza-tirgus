@@ -6,6 +6,7 @@ import { buildWFS, apstradatNogabalu, paarrekinatRindu } from './ipasums/engine'
 import IpasumKarte      from './ipasums/Karte'
 import IpasumTabula     from './ipasums/Tabula'
 import IpasumDiagrammas from './ipasums/Diagrammas'
+import MapNogabalsModal from './map/MapNogabalsModal'
 
 const CILNES = [
   { id:'karte',      label:'🗺 Karte'      },
@@ -26,6 +27,7 @@ export default function IpasumAnalīze({ onBack }) {
   const [slani,    setSlani]    = useState({ nogabali:true, dap:true, kadastra:true, ortofoto:false })
   const [lvmGeoNepieejams, setLvmGeoNepieejams] = useState(false)
   const [bannerisAizverts,  setBannerisAizverts]  = useState(false)
+  const [mapModal, setMapModal] = useState(null) // { nogabals, index }
 
   const lvmWFSTimeout = async (url, ms = 8000) => {
     const ctrl = new AbortController()
@@ -96,6 +98,18 @@ export default function IpasumAnalīze({ onBack }) {
       setFaze('ievads')
       setKluda(`Kļūda: ${e.message.slice(0, 200)}`)
     }
+  }
+
+  // ── MAP modāla apstrāde ──────────────────────────────────────────────────────
+  const handleMapEdit = (nogabals, index) => setMapModal({ nogabals, index })
+
+  const handleMapSave = (saved) => {
+    setEditData(prev => {
+      const arr = [...prev]
+      arr[mapModal.index] = { ...arr[mapModal.index], ...saved }
+      return arr
+    })
+    setMapModal(null)
   }
 
   // ── Tabulas rediģēšana ───────────────────────────────────────────────────────
@@ -278,12 +292,22 @@ export default function IpasumAnalīze({ onBack }) {
       )}
       {cilne === 'tabula' && (
         <IpasumTabula editData={editData} updateRinda={updateRinda}
-          kopPlatiba={kopPlatiba} kopKubatura={kopKubatura} />
+          kopPlatiba={kopPlatiba} kopKubatura={kopKubatura}
+          onMapEdit={handleMapEdit} />
       )}
       {cilne === 'diagrammas' && (
         <IpasumDiagrammas editData={editData} dapTer={dapTer}
           kopPlatiba={kopPlatiba} kopKubatura={kopKubatura} kopIndVert={kopIndVert}
           domSuga={domSuga} vidVecums={vidVecums} />
+      )}
+
+      {/* MAP nogabala modāls */}
+      {mapModal && (
+        <MapNogabalsModal
+          nogabals={mapModal.nogabals}
+          onSave={handleMapSave}
+          onClose={() => setMapModal(null)}
+        />
       )}
     </div>
   )
