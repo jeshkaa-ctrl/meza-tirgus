@@ -54,18 +54,22 @@ export default function IpasumAnalīze({ onBack }) {
     let lvmKluda = false
     try {
       // 1. Kadastra robeža — VZD/GeoLatvija (primārais, neatkarīgs no LVM GEO)
+      let vzdKluda = null
       try {
         const kadData = await lvmWFSTimeout(buildVzdKadastraWFS(kad))
         const kadFeat = kadData?.features?.[0]
         if (kadFeat) setKadGeom(kadFeat)
-      } catch {
-        // VZD neizdevās — mēģina LVM GEO kā rezervi (kad serviss atgriezīsies)
+        else vzdKluda = 'VZD: 0 features (' + JSON.stringify(kadData).slice(0,100) + ')'
+      } catch (e) {
+        vzdKluda = 'VZD kļūda: ' + e.message.slice(0, 150)
+        // Mēģina LVM GEO kā rezervi (kad serviss atgriezīsies)
         try {
           const kadData = await lvmWFSTimeout(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
           const kadFeat = kadData?.features?.[0]
-          if (kadFeat) setKadGeom(kadFeat)
+          if (kadFeat) { setKadGeom(kadFeat); vzdKluda = null }
         } catch { lvmKluda = true }
       }
+      if (vzdKluda) { console.error(vzdKluda); setLadeText(vzdKluda) }
 
       // 2. VMD nogabali (LVM GEO) — ar 8s timeout
       setLadeText('Iegūst VMD nogabalu datus...')
