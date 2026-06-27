@@ -17,7 +17,7 @@ const LAPU_NOSAUKUMI = {
   pavadzimes: '🪵 Pavadzīmes', mobilie: '📱 Mobilā versija',
 }
 
-export default function AdminDashboard({ onBack }) {
+export default function AdminDashboard({ onBack, onNavigate }) {
   const [cilne,      setCilne]      = useState('lietotaji')
   const [lietotaji,  setLietotaji]  = useState([])
   const [notikumi,   setNotikumi]   = useState([])
@@ -132,6 +132,7 @@ export default function AdminDashboard({ onBack }) {
           { id: 'makslinieks', label: '🎨 Mākslinieks' },
           { id: 'pardevejs',   label: '📦 Pārdevējs' },
           { id: 'bankieris',   label: '💳 Banķieris' },
+          { id: 'gramatvedis', label: '📊 Grāmatvedis' },
         ].map(c => (
           <button key={c.id} onClick={() => setCilne(c.id)} style={{
             background: 'none', border: 'none',
@@ -281,6 +282,27 @@ CREATE POLICY "admin_lasa" ON app_events
             )}
           </div>
         )}
+        {/* ── GRĀMATVEDIS ── */}
+        {cilne === 'gramatvedis' && (
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <div style={{ fontSize: 52, marginBottom: 12 }}>📊</div>
+            <div style={{ color: C.text, fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Grāmatvedis</div>
+            <div style={{ color: C.textMut, fontSize: 13, marginBottom: 24, lineHeight: 1.6 }}>
+              Darījumu uzskaite, PVN termiņi, Montonio auto-integrācija.
+            </div>
+            <button
+              onClick={() => onNavigate?.('gramatvedis')}
+              style={{
+                padding: '12px 28px', borderRadius: 9,
+                background: `linear-gradient(135deg,#2e7d32,#1b5e20)`,
+                color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              Atvērt Grāmatvedi →
+            </button>
+          </div>
+        )}
+
         {/* ── BOTI (meklētājs / mākslinieks / pārdevējs) ── */}
         {(cilne === 'bots' || cilne === 'makslinieks' || cilne === 'pardevejs' || cilne === 'bankieris') && (
           <div>
