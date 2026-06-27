@@ -9,20 +9,6 @@ import {
 
 // ── WFS ──────────────────────────────────────────────────────────────────────
 
-// VZD/GeoLatvija WFS — neatkarīgs no LVM GEO
-export function buildVzdKadastraWFS(kad) {
-  const p = new URLSearchParams({
-    SERVICE:      'WFS',
-    VERSION:      '2.0.0',
-    REQUEST:      'GetFeature',
-    TYPENAMES:    'publicwfs:kkparcel',
-    CQL_FILTER:   `CODE='${kad}'`,
-    OUTPUTFORMAT: 'application/json',
-    SRSNAME:      'EPSG:4326',
-  })
-  return `/api/vzd/wfs?${p.toString()}`
-}
-
 export function buildWFS(geoPath, typeNames, cqlFilter, count = 100) {
   const cqlEnc = cqlFilter
     ? '&CQL_FILTER=' + cqlFilter
