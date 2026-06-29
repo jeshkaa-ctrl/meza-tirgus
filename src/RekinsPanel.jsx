@@ -21,6 +21,14 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
   const [klientuPiedav, setKlientuPiedav] = useState([])
   const [showPiedav,    setShowPiedav]    = useState(false)
 
+  // ── E-pasts ───────────────────────────────────────────────────────────────
+  const [emailModal,      setEmailModal]      = useState(false)
+  const [epastsVal,       setEpastsVal]       = useState('')
+  const [saglabatEpastu,  setSaglabatEpastu]  = useState(true)
+  const [papildusTeksts,  setPapildusTeksts]  = useState('')
+  const [emailLade,       setEmailLade]       = useState(false)
+  const [emailOk,         setEmailOk]         = useState(false)
+
   // ── Rēķins ────────────────────────────────────────────────────────────────
   const [rekinsNr,       setRekinsNr]       = useState(() => Number(localStorage.getItem("rekins_nr") || 0) + 1)
   const [datums,         setDatums]         = useState(new Date().toLocaleDateString("lv-LV"))
@@ -134,6 +142,81 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
     if (v % 100 < 20) s += vien[v % 100] + " "
     else { const t = Math.floor((v % 100) / 10), o = v % 10; if (t) s += des[t] + " "; if (o) s += vien[o] + " " }
     return s.trim() + " euro " + (c > 0 ? `un ${c} centi` : "un 00 centi")
+  }
+
+  // ── E-pasta sūtīšana ──────────────────────────────────────────────────────
+  const atvertEmailModal = async () => {
+    if (!user?.id) { onReg?.(); return }
+    // Meklēt e-pastu mani_klienti tabulā pēc klienta nosaukuma
+    if (sanemejs.nosaukums) {
+      const { data } = await supabase
+        .from('mani_klienti')
+        .select('epasts')
+        .eq('user_id', user.id)
+        .ilike('nosaukums', sanemejs.nosaukums)
+        .maybeSingle()
+      if (data?.epasts) setEpastsVal(data.epasts)
+    }
+    setEmailOk(false)
+    setEmailModal(true)
+  }
+
+  const sūtitEmail = async () => {
+    if (!epastsVal.trim()) return
+    setEmailLade(true)
+    try {
+      // Saglabāt e-pastu klientam ja atzīmēts
+      if (saglabatEpastu && sanemejs.nosaukums && user?.id) {
+        const { data: esošais } = await supabase
+          .from('mani_klienti')
+          .select('id')
+          .eq('user_id', user.id)
+          .ilike('nosaukums', sanemejs.nosaukums)
+          .maybeSingle()
+        if (esošais?.id) {
+          await supabase.from('mani_klienti').update({ epasts: epastsVal.trim() }).eq('id', esošais.id)
+        } else {
+          await supabase.from('mani_klienti').insert({
+            user_id:   user.id,
+            nosaukums: sanemejs.nosaukums,
+            reg_nr:    sanemejs.regNr || null,
+            adrese:    sanemejs.adrese || null,
+            banka:     sanemejs.banka || null,
+            kods:      sanemejs.kods || null,
+            konts:     sanemejs.konts || null,
+            epasts:    epastsVal.trim(),
+          })
+        }
+      }
+
+      const resp = await fetch('/api/rekins-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: epastsVal.trim(),
+          rekins: {
+            nr:             rekinsNr,
+            gads:           new Date().getFullYear(),
+            datums,
+            periods,
+            apmaksa_termins: apmaksaTermins,
+            pvn_rezims:     pvnRezims,
+            sniedzejs:      { ...sniedzejs },
+            sanemejs:       { ...sanemejs },
+            rindas:         [...rindas],
+          },
+          papildus_teksts: papildusTeksts || null,
+        }),
+      })
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data.error || 'Kļūda')
+      setEmailOk(true)
+      setTimeout(() => setEmailModal(false), 2000)
+    } catch (e) {
+      alert('Kļūda sūtot e-pastu: ' + e.message)
+    } finally {
+      setEmailLade(false)
+    }
   }
 
   // ── Saglabāt & drukāt ─────────────────────────────────────────────────────
@@ -383,10 +466,76 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
         <b>Summa vārdiem:</b> {skaitliVardos(kopa_apmaksai)}
       </div>
 
-      {user
-        ? <button onClick={exportRekins} style={{ padding: "8px 24px", background: "#225522", color: "white", border: "1px solid #4caf50", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "bold" }}>🖨 Drukāt / Saglabāt PDF</button>
-        : <button onClick={() => onReg?.()} style={{ padding: "8px 24px", background: "#888", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}>🔒 Reģistrējies lai drukātu PDF</button>
-      }
+      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+        {user
+          ? <button onClick={exportRekins} style={{ padding: "8px 24px", background: "#225522", color: "white", border: "1px solid #4caf50", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "bold" }}>🖨 Drukāt / Saglabāt PDF</button>
+          : <button onClick={() => onReg?.()} style={{ padding: "8px 24px", background: "#888", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}>🔒 Reģistrējies lai drukātu PDF</button>
+        }
+        {user && (
+          <button onClick={atvertEmailModal} style={{ padding: "8px 20px", background: "#1565c0", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "bold" }}>
+            📧 Sūtīt klientam
+          </button>
+        )}
+      </div>
+
+      {/* ── E-PASTA MODĀLS ── */}
+      {emailModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+          onClick={e => e.target === e.currentTarget && setEmailModal(false)}>
+          <div style={{ background: "#fff", borderRadius: 12, padding: 28, width: "100%", maxWidth: 420, fontFamily: "Arial" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#111" }}>📧 Sūtīt rēķinu klientam</div>
+              <button onClick={() => setEmailModal(false)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#888" }}>✕</button>
+            </div>
+
+            {emailOk ? (
+              <div style={{ textAlign: "center", padding: "24px 0" }}>
+                <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
+                <div style={{ color: "#225522", fontWeight: 700 }}>E-pasts veiksmīgi nosūtīts!</div>
+              </div>
+            ) : (
+              <>
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ fontSize: 11, fontWeight: "bold", color: "#555", display: "block", marginBottom: 4 }}>KLIENTA E-PASTA ADRESE</label>
+                  <input
+                    type="email" autoFocus
+                    value={epastsVal} onChange={e => setEpastsVal(e.target.value)}
+                    placeholder="klients@uznemums.lv"
+                    style={{ width: "100%", padding: "9px 12px", border: "1px solid #ccc", borderRadius: 7, fontSize: 14, boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <input type="checkbox" id="saglEp" checked={saglabatEpastu} onChange={e => setSaglabatEpastu(e.target.checked)} style={{ width: 16, height: 16, cursor: "pointer", accentColor: "#225522" }} />
+                  <label htmlFor="saglEp" style={{ fontSize: 12, color: "#555", cursor: "pointer" }}>Saglabāt šo e-pastu klientam ({sanemejs.nosaukums || "—"})</label>
+                </div>
+
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ fontSize: 11, fontWeight: "bold", color: "#555", display: "block", marginBottom: 4 }}>✏️ PAPILDUS TEKSTS (neobligāts)</label>
+                  <textarea
+                    value={papildusTeksts} onChange={e => setPapildusTeksts(e.target.value)}
+                    rows={3} placeholder="Piem. informācija par darbu, termiņiem vai citiem nosacījumiem..."
+                    style={{ width: "100%", padding: "8px 10px", border: "1px solid #ccc", borderRadius: 7, fontSize: 12, resize: "vertical", boxSizing: "border-box", fontFamily: "Arial" }}
+                  />
+                </div>
+
+                <div style={{ background: "#f0f8f0", borderRadius: 8, padding: "10px 14px", marginBottom: 18, fontSize: 12, color: "#374151", lineHeight: 1.6 }}>
+                  <b>Tēma:</b> Rēķins Nr. {rekinsNr} - {new Date().getFullYear()} — {sniedzejs.nosaukums || '—'}<br/>
+                  <b>Saturs:</b> rēķina tabula, bankas rekvizīti, apmaksas termiņš{papildusTeksts ? ', papildus teksts' : ''}
+                </div>
+
+                <button
+                  onClick={sūtitEmail}
+                  disabled={emailLade || !epastsVal.trim()}
+                  style={{ width: "100%", padding: "11px", borderRadius: 8, background: emailLade || !epastsVal.trim() ? "#ccc" : "#1565c0", color: "#fff", border: "none", fontSize: 14, fontWeight: 700, cursor: emailLade || !epastsVal.trim() ? "not-allowed" : "pointer" }}
+                >
+                  {emailLade ? "⏳ Sūta..." : "📧 Sūtīt e-pastu"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
