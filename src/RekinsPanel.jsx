@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { getKlienti, saveKlients } from "./CaurmeraPanel"
+import { supabase } from "./supabaseClient"
 
 function RekinsPanel({kadastrs, saimnieciba, platiba, onClose, user, onReg}){
 const [sniedzejs, setSniedzejs] = useState(()=>JSON.parse(localStorage.getItem("rekins_sniedzejs")||"{}"))
@@ -58,27 +59,47 @@ const skaitliVardos = (n) => {
   return s.trim()+" euro "+(c>0?`un ${c} centi`:"un 00 centi")
 }
 
-const exportRekins = () => {
+const exportRekins = async () => {
+  if (!user?.id) { onReg?.(); return }
   localStorage.setItem("rekins_nr", rekinsNr)
-const saglabataisRekinis = {
-  id: Date.now(),
-  nr: rekinsNr,
-  gads: new Date().getFullYear(),
-  datums,
-  klients: sanemejs.nosaukums || "—",
-  summa: kopa_apmaksai.toFixed(2),
-  pvnRezims,
-  sniedzejs: {...sniedzejs},
-  sanemejs: {...sanemejs},
-  rindas: [...rindas],
-  periods,
-  apmaksaTermins,
-  izrakstija
-}
-saveKlients({...sanemejs})
-localStorage.setItem("rekins_sanemejs_pedejais", JSON.stringify(sanemejs))
-const esosie = JSON.parse(localStorage.getItem("rekinu_kratuve") || "[]")
-localStorage.setItem("rekinu_kratuve", JSON.stringify([saglabataisRekinis, ...esosie]))
+
+  saveKlients({...sanemejs})
+  localStorage.setItem("rekins_sanemejs_pedejais", JSON.stringify(sanemejs))
+
+  const { error } = await supabase.from('rekini').insert({
+    user_id:       user.id,
+    nr:            Number(rekinsNr),
+    gads:          new Date().getFullYear(),
+    datums,
+    klients:       sanemejs.nosaukums || "—",
+    summa:         parseFloat(kopa_apmaksai.toFixed(2)),
+    pvn_rezims:    pvnRezims,
+    sniedzejs:     {...sniedzejs},
+    sanemejs:      {...sanemejs},
+    rindas:        [...rindas],
+    periods,
+    apmaksa_termins: apmaksaTermins,
+    izrakstija,
+  })
+  if (error) { alert('Kļūda saglabājot rēķinu: ' + error.message); return }
+
+  // Admins — auto-ieraksts grāmatvedībā
+  const isAdmin = localStorage.getItem('mt_admin_ok') === '1'
+  if (isAdmin && kopa_apmaksai > 0) {
+    const pvnSumma  = pvnRezims === 'pvn21' ? parseFloat(pvn.toFixed(2)) : 0
+    const datumsISO = datums.split('.').reverse().join('-')
+    supabase.from('gramatvedis_darijumi').insert({
+      datums:        datumsISO,
+      veids:         'ienemums',
+      summa_eur:     parseFloat(kopa_apmaksai.toFixed(2)),
+      pvn_eur:       pvnSumma,
+      summa_bez_pvn: parseFloat(kopaa.toFixed(2)),
+      kategorija:    'map_pakalpojums',
+      apraksts:      `Rēķins Nr.${rekinsNr} — ${sanemejs.nosaukums || ''}`,
+      avots:         'manuali',
+      rekina_nr:     String(rekinsNr),
+    }).then(() => {}).catch(() => {})
+  }
   const gads = new Date().getFullYear()
   const html = `<html><head><meta charset="UTF-8">
 <style>
@@ -135,7 +156,7 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
   win.document.write(html)
   win.document.close()
   win.print()
-  alert("✅ Rēķins Nr. " + rekinsNr + " saglabāts rēķinu krātuvē!")
+  alert("✅ Rēķins Nr. " + rekinsNr + " saglabāts!")
 }
 
 return(
