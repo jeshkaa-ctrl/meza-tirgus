@@ -12,6 +12,7 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
   const [showProfilPiedav, setShowProfilPiedav] = useState(false)
   const [saglLade,         setSaglLade]         = useState(false)
   const [isPro,            setIsPro]            = useState(false)
+  const [maniKlienti,      setManiKlienti]      = useState([])
 
   // ── Saņēmējs ──────────────────────────────────────────────────────────────
   const [sanemejs,      setSanemejs]      = useState(() => {
@@ -53,8 +54,12 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
 
   const ielādetProfilus = async () => {
     if (!user?.id) return
-    const { data } = await supabase.from('sniedzeja_profili').select('*').eq('user_id', user.id).order('nosaukums')
-    setProfili(data || [])
+    const [{ data: pr }, { data: kl }] = await Promise.all([
+      supabase.from('sniedzeja_profili').select('*').eq('user_id', user.id).order('nosaukums'),
+      supabase.from('mani_klienti').select('*').eq('user_id', user.id).order('nosaukums'),
+    ])
+    setProfili(pr || [])
+    setManiKlienti(kl || [])
   }
 
   // ── Sniedzējs helpers ─────────────────────────────────────────────────────
@@ -366,6 +371,36 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
         {/* ── SAŅĒMĒJS ── */}
         <div style={{ padding: "12px", background: "#e8f5e9", borderRadius: "6px", border: "1px solid #4caf50" }}>
           <b style={{ color: "#225522" }}>Pakalpojumu saņēmējs</b>
+
+          {/* Klientu ātrās pogas */}
+          {maniKlienti.length > 0 && (
+            <div style={{ marginTop: "8px", display: "flex", flexWrap: "wrap", gap: "4px" }}>
+              {maniKlienti.map(k => (
+                <button
+                  key={k.id}
+                  onClick={() => setSanemejs({
+                    nosaukums: k.nosaukums || '',
+                    regNr:     k.reg_nr   || '',
+                    adrese:    k.adrese   || '',
+                    banka:     k.banka    || '',
+                    kods:      k.kods     || '',
+                    konts:     k.konts    || '',
+                  })}
+                  title={k.reg_nr || ''}
+                  style={{
+                    padding: "3px 8px", fontSize: "10px", borderRadius: "4px", cursor: "pointer",
+                    background: sanemejs.nosaukums === k.nosaukums ? "#225522" : "#fff",
+                    color:      sanemejs.nosaukums === k.nosaukums ? "#fff"    : "#225522",
+                    border:     "1px solid #4caf50", fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {k.nosaukums}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div style={{ marginTop: "6px", position: "relative" }}>
             <label style={{ fontSize: "10px", fontWeight: "bold" }}>Nosaukums:</label><br />
             <input
