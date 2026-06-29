@@ -1,13 +1,12 @@
 import { useState, useCallback } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { PDFDocument } from "pdf-lib"
+import { acmHeaders } from "./utils/acm"
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
 ).toString()
-
-const API_KEY = import.meta.env.VITE_ANTHROPIC_KEY || ""
 
 // Konvertē PDF lapu uz base64 bildi
 async function lapaUzBase64(pdfDoc, lapaNr) {
@@ -23,13 +22,11 @@ async function lapaUzBase64(pdfDoc, lapaNr) {
 
 // AI analizē vienu lapu
 async function aiAnalizeLapu(base64, lapaNr) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/anthropic/v1/messages", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      ...acmHeaders(),
       "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true"
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
