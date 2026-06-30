@@ -41,7 +41,14 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
     { apraksts: kadastrs ? `Meža inventarizācija, kad.Nr. ${kadastrs}` : "", mervieniba: "ha", daudzums: platiba > 0 ? platiba.toFixed(2) : "", cena: "", summa: 0 }
   ])
 
-  // ── Ielādēt Pro statusu + profilus ────────────────────────────────────────
+  // ── Ielādēt klientus (visi lietotāji) ────────────────────────────────────
+  useEffect(() => {
+    if (!user?.id) return
+    supabase.from('mani_klienti').select('*').eq('user_id', user.id).order('nosaukums')
+      .then(({ data }) => setManiKlienti(data || []))
+  }, [user?.id])
+
+  // ── Ielādēt Pro statusu + sniedzēja profilus ──────────────────────────────
   useEffect(() => {
     if (!user?.id) return
     const adminOk = localStorage.getItem('mt_admin_ok') === '1'
@@ -54,12 +61,8 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
 
   const ielādetProfilus = async () => {
     if (!user?.id) return
-    const [{ data: pr }, { data: kl }] = await Promise.all([
-      supabase.from('sniedzeja_profili').select('*').eq('user_id', user.id).order('nosaukums'),
-      supabase.from('mani_klienti').select('*').eq('user_id', user.id).order('nosaukums'),
-    ])
-    setProfili(pr || [])
-    setManiKlienti(kl || [])
+    const { data } = await supabase.from('sniedzeja_profili').select('*').eq('user_id', user.id).order('nosaukums')
+    setProfili(data || [])
   }
 
   // ── Sniedzējs helpers ─────────────────────────────────────────────────────
