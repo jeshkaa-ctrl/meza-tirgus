@@ -326,6 +326,28 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
             )}
           </div>
 
+          {/* Sniedzēja ātrās pogas */}
+          {isPro && profili.length > 0 && (
+            <div style={{ marginBottom: "8px", display: "flex", flexWrap: "wrap", gap: "4px" }}>
+              {profili.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => izveletisProfils(p)}
+                  title={p.reg_nr || ''}
+                  style={{
+                    padding: "3px 8px", fontSize: "10px", borderRadius: "4px", cursor: "pointer",
+                    background: aktivaisProfilsId === p.id ? "#14532d" : "#fff",
+                    color:      aktivaisProfilsId === p.id ? "#fff"    : "#225522",
+                    border:     "1px solid #225522", fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {p.nosaukums}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Nosaukums ar autocomplete */}
           <div style={{ position: "relative", marginBottom: "6px" }}>
             <label style={{ fontSize: "10px", fontWeight: "bold" }}>Nosaukums:</label><br />
