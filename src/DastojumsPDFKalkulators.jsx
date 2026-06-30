@@ -453,11 +453,11 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
               <span style={{fontSize:11, color:"#81c784", fontWeight:400}}>| {n.platiba} ha</span>
             </div>
             <div style={{overflowX:"auto"}}>
-              <table style={{width:"100%", borderCollapse:"collapse", fontSize:11}}>
+              <table style={{width:"100%", minWidth:820, borderCollapse:"collapse", fontSize:11}}>
                 <thead>
                   <tr style={{borderBottom:"1px solid #2d5a2d"}}>
-                    {["Suga","Likvīdā m³","Vid.koks m³","Resnā","Vidējā","Tievā","P.malka","Malka","Atlikumi"].map(h => (
-                      <th key={h} style={{padding:"4px 6px", color:"#4caf50", fontWeight:600, textAlign:"center", fontSize:10}}>{h}</th>
+                    {[["Suga",130],["Likvīdā m³",85],["Vid.koks m³",85],["Resnā",80],["Vidējā",80],["Tievā",80],["P.malka",80],["Malka",80],["Atlikumi",80]].map(([h,w]) => (
+                      <th key={h} style={{padding:"4px 6px", color:"#4caf50", fontWeight:600, textAlign:"center", fontSize:10, minWidth:w}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -474,7 +474,7 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
                           <input type="number" step="0.01"
                             value={sg[f] ?? ""}
                             onChange={e => updateSuga(ni, si, f, e.target.value)}
-                            style={{...s.inputSm, width:70, background: sg[f]===null?"#1a0a00":"#070d07"}}
+                            style={{...s.inputSm, width:"100%", minWidth:68, background: sg[f]===null?"#1a0a00":"#070d07"}}
                             placeholder={sg[f]===null?"—":"0"}/>
                         </td>
                       ))}
