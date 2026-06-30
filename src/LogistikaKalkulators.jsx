@@ -61,7 +61,11 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
 
   // Izstrādes izmaksas
   const [izstrade, setIzstrade] = useState(18)
-  const [kravasIetilpiba, setKravasIetilpiba] = useState(35)
+  const [kravasIetilpibas, setKravasIetilpibas] = useState({
+    balki_P: 30, balki_E: 30, balki_M: 30,
+    sikbalki: 32, finieris: 25, zagbalki: 28,
+    tara: 35, papirmalka: 35, malka: 28, skelda: 42,
+  })
 
   // Dinamiskās pircēju vietas no Supabase
   const [dinamiskasVietas, setDinamiskasVietas] = useState([])
@@ -188,8 +192,9 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
         const iepirkumsCena = parseFloat(cenas[vieta.id]?.[sort]) || 0
         const neto = iepirkumsCena - transportsCena
 
-        const braucieni = Math.ceil(m3 / kravasIetilpiba)
-        const atlikums = Math.round((m3 % kravasIetilpiba) * 100) / 100
+        const iet = kravasIetilpibas[sort] || 30
+        const braucieni = Math.ceil(m3 / iet)
+        const atlikums = Math.round((m3 % iet) * 100) / 100
 
         opcijas.push({
           vieta,
@@ -219,7 +224,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
     Object.entries(sortRez).forEach(([sort, opcijas]) => {
       if (opcijas.length === 0) return
       const labakais = opcijas[0]
-      if (labakais.atlikums > 0 && labakais.atlikums < kravasIetilpiba) {
+      if (labakais.atlikums > 0 && labakais.atlikums < (kravasIetilpibas[sort] || 30)) {
         // Meklē citus sortimentus kas varētu iet uz to pašu vietu
         const papildSortimenti = Object.entries(apjomi)
           .filter(([s, m]) => s !== sort && m > 0)
@@ -326,17 +331,10 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
 
         <div style={s.card}>
           <div style={s.cardTitle}>⚙ Parametri</div>
-          <div style={s.grid2}>
-            <div>
-              <label style={s.label}>Izstrādes izmaksas (€/m³)</label>
-              <input type="number" style={s.input} value={izstrade}
-                onChange={e => setIzstrade(parseFloat(e.target.value) || 0)} />
-            </div>
-            <div>
-              <label style={s.label}>Kravas ietilpība (m³)</label>
-              <input type="number" style={s.input} value={kravasIetilpiba}
-                onChange={e => setKravasIetilpiba(parseFloat(e.target.value) || 35)} />
-            </div>
+          <div>
+            <label style={s.label}>Izstrādes izmaksas (€/m³)</label>
+            <input type="number" style={s.input} value={izstrade}
+              onChange={e => setIzstrade(parseFloat(e.target.value) || 0)} />
           </div>
         </div>
 
@@ -358,17 +356,29 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
       <Hdr />
       <div style={s.body}>
         <div style={s.card}>
-          <div style={s.cardTitle}>📦 Sortimentu apjomi (m³)</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12 }}>
+          <div style={s.cardTitle}>📦 Sortimentu apjomi un kravas ietilpība</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
             {Object.keys(SORT_NOSAUKUMI).map(sort => (
-              <div key={sort}>
-                <label style={{ ...s.label, color: SORT_KRASA[sort] || "#81c784" }}>
+              <div key={sort} style={{ background: "#070d07", border: `1px solid ${SORT_KRASA[sort] || "#2d5a2d"}22`, borderRadius: 8, padding: "10px 12px" }}>
+                <label style={{ ...s.label, color: SORT_KRASA[sort] || "#81c784", marginBottom: 6 }}>
                   {SORT_NOSAUKUMI[sort]}
                 </label>
-                <input type="number" step="0.1" style={s.input}
-                  value={apjomi[sort] || ""}
-                  onChange={e => setApjomi(prev => ({ ...prev, [sort]: parseFloat(e.target.value) || 0 }))}
-                  placeholder="0" />
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 9, color: "#558b2f", marginBottom: 2 }}>APJOMS m³</div>
+                    <input type="number" step="0.1" style={{ ...s.input, padding: "7px 8px", fontSize: 14 }}
+                      value={apjomi[sort] || ""}
+                      onChange={e => setApjomi(prev => ({ ...prev, [sort]: parseFloat(e.target.value) || 0 }))}
+                      placeholder="0" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 9, color: "#558b2f", marginBottom: 2 }}>KRAVA m³</div>
+                    <input type="number" step="1" style={{ ...s.input, padding: "7px 8px", fontSize: 14 }}
+                      value={kravasIetilpibas[sort] || ""}
+                      onChange={e => setKravasIetilpibas(prev => ({ ...prev, [sort]: parseFloat(e.target.value) || 30 }))}
+                      placeholder="30" />
+                  </div>
+                </div>
               </div>
             ))}
           </div>
