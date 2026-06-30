@@ -29,6 +29,7 @@ function RekinuKratuve({ onBack, user, onReg }) {
   const [lade,            setLade]            = useState(false)
   const [kluda,           setKluda]           = useState('')
   const [filtrGads,       setFiltrGads]       = useState("")
+  const [pdfLadeId,       setPdfLadeId]       = useState(null)
   const [filtrKlients,    setFiltrKlients]    = useState("")
   const [showJaunsRekins, setShowJaunsRekins] = useState(false)
 
@@ -54,50 +55,88 @@ function RekinuKratuve({ onBack, user, onReg }) {
     setRekini(p => p.filter(r => r.id !== id))
   }
 
-  const drukāt = (r) => {
-    const skaitliVardos = (n) => {
-      const v = Math.floor(n), c = Math.round((n - v) * 100)
-      const vien = ["","viens","divi","trīs","četri","pieci","seši","septiņi","astoņi","deviņi","desmit","vienpadsmit","divpadsmit","trīspadsmit","četrpadsmit","piecpadsmit","sešpadsmit","septiņpadsmit","astoņpadsmit","deviņpadsmit"]
-      const des  = ["","","divdesmit","trīsdesmit","četrdesmit","piecdesmit","sešdesmit","septiņdesmit","astoņdesmit","deviņdesmit"]
-      const sim  = ["","simts","divi simti","trīs simti","četri simti","pieci simti","seši simti","septiņi simti","astoņi simti","deviņi simti"]
-      let s = ""
-      if (v >= 1000) s += (v >= 2000 ? vien[Math.floor(v / 1000)] + " " : "") + "tūkstoši "
-      const h = Math.floor((v % 1000) / 100)
-      if (h) s += sim[h] + " "
-      if (v % 100 < 20) s += vien[v % 100] + " "
-      else { const t = Math.floor((v % 100) / 10), o = v % 10; if (t) s += des[t] + " "; if (o) s += vien[o] + " " }
-      return s.trim() + " euro " + (c > 0 ? `un ${c} centi` : "un 00 centi")
-    }
-    const kopaa       = (r.rindas || []).reduce((s, l) => s + (l.summa || 0), 0)
-    const pvn         = r.pvn_rezims === "pvn21" ? kopaa * 0.21 : 0
-    const kopaApmaksai = kopaa + pvn
-    const html = `<html><head><meta charset="UTF-8">
-<style>body{font-family:Arial;font-size:11px;padding:24px;max-width:850px;margin:0 auto}table{border-collapse:collapse;width:100%;margin:8px 0}th{background:#225522;color:white;padding:4px 8px;font-size:10px;text-align:left}td{border:1px solid #ccc;padding:3px 8px;font-size:10px}.info td{border:none;padding:2px 4px}.total{font-weight:bold;background:#f0f8f0}</style>
-</head><body>
-<p style="text-align:right;font-size:11px">${r.datums} &nbsp;&nbsp;&nbsp; <b>Rēķins Nr. ${r.nr} - ${r.gads}</b></p>
-<table class="info"><tbody><tr>
-<td style="width:50%;vertical-align:top"><b>Pakalpojumu sniedzējs:</b><br/>${r.sniedzejs?.nosaukums||"—"}<br/>Reģ.Nr. ${r.sniedzejs?.regNr||"—"}<br/>${r.sniedzejs?.adrese||"—"}<br/>Banka: ${r.sniedzejs?.banka||"—"}<br/>Kods: ${r.sniedzejs?.kods||"—"}<br/>Konts: ${r.sniedzejs?.konts||"—"}</td>
-<td style="vertical-align:top"><b>Pakalpojumu saņēmējs:</b><br/>${r.sanemejs?.nosaukums||"—"}<br/>Reģ.Nr. ${r.sanemejs?.regNr||"—"}<br/>${r.sanemejs?.adrese||"—"}<br/>Banka: ${r.sanemejs?.banka||"—"}<br/>Kods: ${r.sanemejs?.kods||"—"}<br/>Konts: ${r.sanemejs?.konts||"—"}</td>
+  const lejupieladetPdf = async (r) => {
+    setPdfLadeId(r.id)
+    try {
+      const skaitliVardos = (n) => {
+        const v = Math.floor(n), c = Math.round((n - v) * 100)
+        const vien = ["","viens","divi","trīs","četri","pieci","seši","septiņi","astoņi","deviņi","desmit","vienpadsmit","divpadsmit","trīspadsmit","četrpadsmit","piecpadsmit","sešpadsmit","septiņpadsmit","astoņpadsmit","deviņpadsmit"]
+        const des  = ["","","divdesmit","trīsdesmit","četrdesmit","piecdesmit","sešdesmit","septiņdesmit","astoņdesmit","deviņdesmit"]
+        const sim  = ["","simts","divi simti","trīs simti","četri simti","pieci simti","seši simti","septiņi simti","astoņi simti","deviņi simti"]
+        let s = ""
+        if (v >= 1000) s += (v >= 2000 ? vien[Math.floor(v / 1000)] + " " : "") + "tūkstoši "
+        const h = Math.floor((v % 1000) / 100)
+        if (h) s += sim[h] + " "
+        if (v % 100 < 20) s += vien[v % 100] + " "
+        else { const t = Math.floor((v % 100) / 10), o = v % 10; if (t) s += des[t] + " "; if (o) s += vien[o] + " " }
+        return s.trim() + " euro " + (c > 0 ? `un ${c} centi` : "un 00 centi")
+      }
+      const kopaa        = (r.rindas || []).reduce((s, l) => s + (l.summa || 0), 0)
+      const pvn          = r.pvn_rezims === "pvn21" ? kopaa * 0.21 : 0
+      const kopaApmaksai = kopaa + pvn
+
+      const bodyHTML = `
+<p style="text-align:right;font-size:11px;margin:0 0 8px">${r.datums} &nbsp;&nbsp;&nbsp; <b>Rēķins Nr. ${r.nr} - ${r.gads}</b></p>
+<table style="border-collapse:collapse;width:100%;margin-bottom:8px"><tbody><tr>
+<td style="width:50%;vertical-align:top;border:none;padding:2px 4px;font-size:10px"><b>Pakalpojumu sniedzējs:</b><br/>${r.sniedzejs?.nosaukums||"—"}<br/>Reģ.Nr. ${r.sniedzejs?.regNr||"—"}<br/>${r.sniedzejs?.adrese||"—"}<br/>Banka: ${r.sniedzejs?.banka||"—"}<br/>Kods: ${r.sniedzejs?.kods||"—"}<br/>Konts: ${r.sniedzejs?.konts||"—"}</td>
+<td style="vertical-align:top;border:none;padding:2px 4px;font-size:10px"><b>Pakalpojumu saņēmējs:</b><br/>${r.sanemejs?.nosaukums||"—"}<br/>Reģ.Nr. ${r.sanemejs?.regNr||"—"}<br/>${r.sanemejs?.adrese||"—"}<br/>Banka: ${r.sanemejs?.banka||"—"}<br/>Kods: ${r.sanemejs?.kods||"—"}<br/>Konts: ${r.sanemejs?.konts||"—"}</td>
 </tr></tbody></table>
-${r.periods ? `<p><b>Pakalpojumu sniegšanas periods:</b> ${r.periods}</p>` : ""}
-<p><b>Apmaksāt:</b> Līdz ${r.apmaksa_termins}</p>
-<table><thead><tr><th>Nr.</th><th>Pakalpojuma nosaukums</th><th>Mērv.</th><th>Daudzums</th><th>Cena</th><th>Summa, EUR</th></tr></thead>
-<tbody>${(r.rindas||[]).map((l,i) => `<tr><td>${i+1}</td><td>${l.apraksts}</td><td>${l.mervieniba}</td><td>${l.daudzums}</td><td>${parseFloat(l.cena||0).toFixed(2)}</td><td>${(l.summa||0).toFixed(2)}</td></tr>`).join("")}</tbody>
+${r.periods ? `<p style="font-size:10px;margin:4px 0"><b>Pakalpojumu sniegšanas periods:</b> ${r.periods}</p>` : ""}
+<p style="font-size:10px;margin:4px 0"><b>Apmaksāt:</b> Līdz ${r.apmaksa_termins}</p>
+<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:10px"><thead><tr>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Nr.</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Pakalpojuma nosaukums</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Mērv.</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Daudzums</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Cena</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Summa, EUR</th>
+</tr></thead>
+<tbody>${(r.rindas||[]).map((l,i) => `<tr><td style="border:1px solid #ccc;padding:3px 8px">${i+1}</td><td style="border:1px solid #ccc;padding:3px 8px">${l.apraksts}</td><td style="border:1px solid #ccc;padding:3px 8px">${l.mervieniba}</td><td style="border:1px solid #ccc;padding:3px 8px">${l.daudzums}</td><td style="border:1px solid #ccc;padding:3px 8px">${parseFloat(l.cena||0).toFixed(2)}</td><td style="border:1px solid #ccc;padding:3px 8px">${(l.summa||0).toFixed(2)}</td></tr>`).join("")}</tbody>
 <tfoot>
-<tr class="total"><td colspan="5">Kopā</td><td>${kopaa.toFixed(2)}</td></tr>
-${r.pvn_rezims === "pvn21" ? `<tr><td colspan="5">PVN 21%</td><td>${pvn.toFixed(2)}</td></tr><tr class="total"><td colspan="5">Kopā apmaksai</td><td>${kopaApmaksai.toFixed(2)}</td></tr>` : ""}
-${r.pvn_rezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>` : ""}
+<tr style="font-weight:bold;background:#f0f8f0"><td colspan="5" style="border:1px solid #ccc;padding:3px 8px">Kopā</td><td style="border:1px solid #ccc;padding:3px 8px">${kopaa.toFixed(2)}</td></tr>
+${r.pvn_rezims==="pvn21"?`<tr><td colspan="5" style="border:1px solid #ccc;padding:3px 8px">PVN 21%</td><td style="border:1px solid #ccc;padding:3px 8px">${pvn.toFixed(2)}</td></tr><tr style="font-weight:bold;background:#f0f8f0"><td colspan="5" style="border:1px solid #ccc;padding:3px 8px">Kopā apmaksai</td><td style="border:1px solid #ccc;padding:3px 8px">${kopaApmaksai.toFixed(2)}</td></tr>`:""}
+${r.pvn_rezims==="reversais"?`<tr><td colspan="6" style="border:1px solid #ccc;padding:3px 8px;font-style:italic">Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>`:""}
 </tfoot></table>
-<p>Summa apmaksai vārdiem: <b>${skaitliVardos(kopaApmaksai)}</b></p>
+<p style="font-size:10px;margin:8px 0">Summa apmaksai vārdiem: <b>${skaitliVardos(kopaApmaksai)}</b></p>
 <div style="display:flex;justify-content:space-between;margin-top:30px;font-size:11px">
-<div>Rēķinu izrakstīja: <b>${r.izrakstija||"—"}</b> ___________________________</div>
-<div>${r.datums}</div></div>
+  <div>Rēķinu izrakstīja: <b>${r.izrakstija||"—"}</b> ___________________________</div>
+  <div>${r.datums}</div>
+</div>
 <p style="font-size:9px;color:#888;margin-top:16px">Dokuments sagatavots elektroniski un derīgs bez paraksta.</p>
-</body></html>`
-    const win = window.open("", "_blank")
-    win.document.write(html)
-    win.document.close()
-    win.print()
+<div style="margin-top:20px;padding-top:10px;border-top:1px solid #e0e0e0;display:flex;align-items:center;gap:8px">
+  <span style="font-size:13px">🌲</span>
+  <span style="font-size:9px;color:#aaa">Rēķins sagatavots platformā <b style="color:#225522">Meža Tirgus</b> — <span style="color:#225522">meza-tirgus.lv</span></span>
+</div>`
+
+      const { jsPDF: JSPDF } = await import('jspdf')
+      const { default: html2canvas } = await import('html2canvas')
+
+      const wrapper = document.createElement('div')
+      wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:40px 48px;box-sizing:border-box;font-family:Arial,sans-serif'
+      wrapper.innerHTML = bodyHTML
+      document.body.appendChild(wrapper)
+
+      const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
+      document.body.removeChild(wrapper)
+
+      const pdf   = new JSPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pW    = pdf.internal.pageSize.getWidth()
+      const pH    = pdf.internal.pageSize.getHeight()
+      const imgH  = (canvas.height * pW) / canvas.width
+      const imgData = canvas.toDataURL('image/jpeg', 0.95)
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, pW, imgH)
+      let remaining = imgH - pH
+      while (remaining > 0) {
+        pdf.addPage()
+        pdf.addImage(imgData, 'JPEG', 0, -(imgH - remaining), pW, imgH)
+        remaining -= pH
+      }
+
+      pdf.save(`Rekins_Nr${r.nr}-${r.gads}.pdf`)
+    } finally {
+      setPdfLadeId(null)
+    }
   }
 
   const gadi       = [...new Set(rekini.map(r => r.gads))].sort((a, b) => b - a)
@@ -220,7 +259,7 @@ ${r.pvn_rezims === "reversais" ? `<tr><td colspan="6" style="font-style:italic">
                         <td style={{ textAlign: "right", color: pvn > 0 ? "#c62828" : "#888" }}>{pvn.toFixed(2)}</td>
                         <td style={{ textAlign: "right", fontWeight: "bold" }}>{kopa.toFixed(2)}</td>
                         <td>
-                          <button onClick={() => drukāt(r)} style={{ padding: "3px 10px", background: "#225522", color: "white", border: "none", borderRadius: "3px", cursor: "pointer", marginRight: "4px" }}>🖨 Drukāt</button>
+                          <button onClick={() => lejupieladetPdf(r)} disabled={pdfLadeId === r.id} style={{ padding: "3px 10px", background: pdfLadeId === r.id ? "#555" : "#225522", color: "white", border: "none", borderRadius: "3px", cursor: pdfLadeId === r.id ? "not-allowed" : "pointer", marginRight: "4px" }}>{pdfLadeId === r.id ? "⏳..." : "⬇️ PDF"}</button>
                           <button onClick={() => dzest(r.id)} style={{ padding: "3px 10px", background: "#c62828", color: "white", border: "none", borderRadius: "3px", cursor: "pointer" }}>✕</button>
                         </td>
                       </tr>
