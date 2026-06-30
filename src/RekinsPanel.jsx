@@ -29,6 +29,7 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
   const [papildusTeksts,  setPapildusTeksts]  = useState('')
   const [emailLade,       setEmailLade]       = useState(false)
   const [emailOk,         setEmailOk]         = useState(false)
+  const [pdfLade,         setPdfLade]         = useState(false)
 
   // ── Rēķins ────────────────────────────────────────────────────────────────
   const [rekinsNr,       setRekinsNr]       = useState(() => Number(localStorage.getItem("rekins_nr") || 0) + 1)
@@ -268,38 +269,73 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
       }).then(() => {}).catch(() => {})
     }
 
+    // ── PDF ģenerēšana ar html2canvas + jsPDF ────────────────────────────────
     const gads = new Date().getFullYear()
-    const html = `<html><head><meta charset="UTF-8">
-<style>body{font-family:Arial;font-size:11px;padding:24px;max-width:850px;margin:0 auto}h2{text-align:center;font-size:13px;margin:4px 0}table{border-collapse:collapse;width:100%;margin:8px 0}th{background:#225522;color:white;padding:4px 8px;font-size:10px;text-align:left}td{border:1px solid #ccc;padding:3px 8px;font-size:10px}.info td{border:none;padding:2px 4px}.label{font-weight:bold}.total{font-weight:bold;background:#f0f8f0}</style>
-</head><body>
-<p style="text-align:right;font-size:11px">${datums} &nbsp;&nbsp;&nbsp; <b>Rēķins Nr. ${rekinsNr} - ${gads}</b></p>
-<table class="info"><tbody><tr>
-<td style="width:50%;vertical-align:top"><b>Pakalpojumu sniedzējs:</b><br/>${sniedzejs.nosaukums||"___________________"}<br/>Reģ.Nr. ${sniedzejs.regNr||"___________________"}<br/>${sniedzejs.adrese||"___________________"}<br/>Banka: ${sniedzejs.banka||"___________________"}<br/>Kods: ${sniedzejs.kods||"___________________"}<br/>Konts: ${sniedzejs.konts||"___________________"}</td>
-<td style="vertical-align:top"><b>Pakalpojumu saņēmējs:</b><br/>${sanemejs.nosaukums||"___________________"}<br/>Reģ.Nr. ${sanemejs.regNr||"___________________"}<br/>${sanemejs.adrese||"___________________"}<br/>Banka: ${sanemejs.banka||"___________________"}<br/>Kods: ${sanemejs.kods||"___________________"}<br/>Konts: ${sanemejs.konts||"___________________"}</td>
+    const bodyHTML = `
+<p style="text-align:right;font-size:11px;margin:0 0 8px">${datums} &nbsp;&nbsp;&nbsp; <b>Rēķins Nr. ${rekinsNr} - ${gads}</b></p>
+<table style="border-collapse:collapse;width:100%;margin-bottom:8px"><tbody><tr>
+<td style="width:50%;vertical-align:top;border:none;padding:2px 4px;font-size:10px"><b>Pakalpojumu sniedzējs:</b><br/>${sniedzejs.nosaukums||"___________________"}<br/>Reģ.Nr. ${sniedzejs.regNr||"___________________"}<br/>${sniedzejs.adrese||"___________________"}<br/>Banka: ${sniedzejs.banka||"___________________"}<br/>Kods: ${sniedzejs.kods||"___________________"}<br/>Konts: ${sniedzejs.konts||"___________________"}</td>
+<td style="vertical-align:top;border:none;padding:2px 4px;font-size:10px"><b>Pakalpojumu saņēmējs:</b><br/>${sanemejs.nosaukums||"___________________"}<br/>Reģ.Nr. ${sanemejs.regNr||"___________________"}<br/>${sanemejs.adrese||"___________________"}<br/>Banka: ${sanemejs.banka||"___________________"}<br/>Kods: ${sanemejs.kods||"___________________"}<br/>Konts: ${sanemejs.konts||"___________________"}</td>
 </tr></tbody></table>
-${periods ? `<p><b>Pakalpojumu sniegšanas periods:</b> ${periods}</p>` : ""}
-<p><b>Apmaksāt:</b> Līdz ${apmaksaTermins}</p>
-<table><thead><tr><th>Nr.</th><th>Pakalpojuma nosaukums</th><th>Mērv.</th><th>Daudzums</th><th>Cena</th><th>Summa, EUR</th></tr></thead>
-<tbody>${rindas.map((r, i) => `<tr><td>${i+1}</td><td>${r.apraksts}</td><td>${r.mervieniba}</td><td>${r.daudzums}</td><td>${parseFloat(r.cena||0).toFixed(2)}</td><td>${(r.summa||0).toFixed(2)}</td></tr>`).join("")}</tbody>
-<tfoot><tr class="total"><td colspan="5">Kopā</td><td>${kopaa.toFixed(2)}</td></tr>
-${pvnRezims==="pvn21"?`<tr><td colspan="5">PVN 21%</td><td>${pvn.toFixed(2)}</td></tr><tr class="total"><td colspan="5">Kopā apmaksai</td><td>${kopa_apmaksai.toFixed(2)}</td></tr>`:""}
-${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>`:""}
+${periods ? `<p style="font-size:10px;margin:4px 0"><b>Pakalpojumu sniegšanas periods:</b> ${periods}</p>` : ""}
+<p style="font-size:10px;margin:4px 0"><b>Apmaksāt:</b> Līdz ${apmaksaTermins}</p>
+<table style="border-collapse:collapse;width:100%;margin:8px 0;font-size:10px"><thead><tr>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Nr.</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Pakalpojuma nosaukums</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Mērv.</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Daudzums</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Cena</th>
+<th style="background:#225522;color:white;padding:4px 8px;text-align:left">Summa, EUR</th>
+</tr></thead>
+<tbody>${rindas.map((r, i) => `<tr><td style="border:1px solid #ccc;padding:3px 8px">${i+1}</td><td style="border:1px solid #ccc;padding:3px 8px">${r.apraksts}</td><td style="border:1px solid #ccc;padding:3px 8px">${r.mervieniba}</td><td style="border:1px solid #ccc;padding:3px 8px">${r.daudzums}</td><td style="border:1px solid #ccc;padding:3px 8px">${parseFloat(r.cena||0).toFixed(2)}</td><td style="border:1px solid #ccc;padding:3px 8px">${(r.summa||0).toFixed(2)}</td></tr>`).join("")}</tbody>
+<tfoot>
+<tr style="font-weight:bold;background:#f0f8f0"><td colspan="5" style="border:1px solid #ccc;padding:3px 8px">Kopā</td><td style="border:1px solid #ccc;padding:3px 8px">${kopaa.toFixed(2)}</td></tr>
+${pvnRezims==="pvn21"?`<tr><td colspan="5" style="border:1px solid #ccc;padding:3px 8px">PVN 21%</td><td style="border:1px solid #ccc;padding:3px 8px">${pvn.toFixed(2)}</td></tr><tr style="font-weight:bold;background:#f0f8f0"><td colspan="5" style="border:1px solid #ccc;padding:3px 8px">Kopā apmaksai</td><td style="border:1px solid #ccc;padding:3px 8px">${kopa_apmaksai.toFixed(2)}</td></tr>`:""}
+${pvnRezims==="reversais"?`<tr><td colspan="6" style="border:1px solid #ccc;padding:3px 8px;font-style:italic">Reversa PVN piemērošana saskaņā ar PVN likuma 142. pantu</td></tr>`:""}
 </tfoot></table>
-<p>Summa apmaksai vārdiem: <b>${skaitliVardos(kopa_apmaksai)}</b></p>
+<p style="font-size:10px;margin:8px 0">Summa apmaksai vārdiem: <b>${skaitliVardos(kopa_apmaksai)}</b></p>
 <div style="display:flex;justify-content:space-between;margin-top:30px;font-size:11px">
-<div>Rēķinu izrakstīja: <b>${izrakstija||"___________________"}</b> ___________________________</div>
-<div>${datums}</div></div>
-<p style="font-size:9px;color:#888;margin-top:16px">Dokuments sagatavots elektroniski un derīgs bez paraksta.</p>
-<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e0e0e0;display:flex;align-items:center;gap:8px">
-  <span style="font-size:14px">🌲</span>
-  <span style="font-size:9px;color:#aaa">Rēķins sagatavots platformā <b style="color:#225522">Meža Tirgus</b> — <span style="color:#225522">meza-tirgus.lv</span></span>
+  <div>Rēķinu izrakstīja: <b>${izrakstija||"___________________"}</b> ___________________________</div>
+  <div>${datums}</div>
 </div>
-</body></html>`
-    const win = window.open("", "_blank")
-    win.document.write(html)
-    win.document.close()
-    win.print()
-    alert("✅ Rēķins Nr. " + rekinsNr + " saglabāts!")
+<p style="font-size:9px;color:#888;margin-top:16px">Dokuments sagatavots elektroniski un derīgs bez paraksta.</p>
+<div style="margin-top:20px;padding-top:10px;border-top:1px solid #e0e0e0;display:flex;align-items:center;gap:8px">
+  <span style="font-size:13px">🌲</span>
+  <span style="font-size:9px;color:#aaa">Rēķins sagatavots platformā <b style="color:#225522">Meža Tirgus</b> — <span style="color:#225522">meza-tirgus.lv</span></span>
+</div>`
+
+    setPdfLade(true)
+    try {
+      const { jsPDF: JSPDF } = await import('jspdf')
+      const { default: html2canvas } = await import('html2canvas')
+
+      const wrapper = document.createElement('div')
+      wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:40px 48px;box-sizing:border-box;font-family:Arial,sans-serif'
+      wrapper.innerHTML = bodyHTML
+      document.body.appendChild(wrapper)
+
+      const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
+      document.body.removeChild(wrapper)
+
+      const pdf    = new JSPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pW     = pdf.internal.pageSize.getWidth()
+      const pH     = pdf.internal.pageSize.getHeight()
+      const imgH   = (canvas.height * pW) / canvas.width
+      const imgData = canvas.toDataURL('image/jpeg', 0.95)
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, pW, imgH)
+      let remaining = imgH - pH
+      while (remaining > 0) {
+        pdf.addPage()
+        pdf.addImage(imgData, 'JPEG', 0, -(imgH - remaining), pW, imgH)
+        remaining -= pH
+      }
+
+      pdf.save(`Rekins_Nr${rekinsNr}-${gads}.pdf`)
+      alert("✅ Rēķins Nr. " + rekinsNr + " lejupielādēts un saglabāts krātuvē!")
+    } finally {
+      setPdfLade(false)
+    }
   }
 
   // ── Kopīgi stili ──────────────────────────────────────────────────────────
@@ -532,7 +568,7 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
 
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
         {user
-          ? <button onClick={exportRekins} style={{ padding: "8px 24px", background: "#225522", color: "white", border: "1px solid #4caf50", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "bold" }}>🖨 Drukāt / Saglabāt PDF</button>
+          ? <button onClick={exportRekins} disabled={pdfLade} style={{ padding: "8px 24px", background: pdfLade ? "#555" : "#225522", color: "white", border: "1px solid #4caf50", borderRadius: "6px", cursor: pdfLade ? "not-allowed" : "pointer", fontSize: "13px", fontWeight: "bold" }}>{pdfLade ? "⏳ Gatavo PDF..." : "⬇️ Lejupielādēt PDF"}</button>
           : <button onClick={() => onReg?.()} style={{ padding: "8px 24px", background: "#888", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "13px" }}>🔒 Reģistrējies lai drukātu PDF</button>
         }
         {user && (
