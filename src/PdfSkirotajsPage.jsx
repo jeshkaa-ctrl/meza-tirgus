@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { PDFDocument } from "pdf-lib"
 import { acmHeaders } from "./utils/acm"
@@ -84,16 +84,23 @@ async function lejupieladetLapas(pdfBytes, lapas, faila_nosaukums) {
   URL.revokeObjectURL(url)
 }
 
-export default function PdfSkirotajsPage({ onBack, onOpenDastojums }) {
-  const [stadija, setStadija] = useState("upload") // upload | analize | rezultati
-  const [progress, setProgress] = useState("")
-  const [progressPct, setProgressPct] = useState(0)
-  const [lapuAnalizes, setLapuAnalizes] = useState([])
-  const [pdfBytes, setPdfBytes] = useState(null)
-  const [kopejaisLapuSkaits, setKopejaisLapuSkaits] = useState(0)
-  const [skirosanaVeriba, setSkirosanaVeriba] = useState("nogabals") // nogabals | veids | lapas
-  const [grupas, setGrupas] = useState([])
-  const [skirotasGrupas, setSkirotasGrupas] = useState(false)
+export default function PdfSkirotajsPage({ onBack, onOpenDastojums, savedState, onSaveState }) {
+  const s = savedState || {}
+  const [stadija,           setStadija]           = useState(s.stadija           || "upload")
+  const [progress,          setProgress]          = useState("")
+  const [progressPct,       setProgressPct]       = useState(0)
+  const [lapuAnalizes,      setLapuAnalizes]      = useState(s.lapuAnalizes      || [])
+  const [pdfBytes,          setPdfBytes]          = useState(s.pdfBytes          || null)
+  const [kopejaisLapuSkaits,setKopejaisLapuSkaits]= useState(s.kopejaisLapuSkaits|| 0)
+  const [skirosanaVeriba,   setSkirosanaVeriba]   = useState(s.skirosanaVeriba   || "nogabals")
+  const [grupas,            setGrupas]            = useState(s.grupas            || [])
+  const [skirotasGrupas,    setSkirotasGrupas]    = useState(s.skirotasGrupas    || false)
+
+  // Saglabā stāvokli App.jsx kad mainās svarīgie dati
+  useEffect(() => {
+    if (!onSaveState || stadija === "upload") return
+    onSaveState({ stadija, lapuAnalizes, pdfBytes, kopejaisLapuSkaits, skirosanaVeriba, grupas, skirotasGrupas })
+  }, [stadija, lapuAnalizes, grupas, skirosanaVeriba])
 
   const handlePDF = useCallback(async (file) => {
     if (!file) return
@@ -363,6 +370,9 @@ export default function PdfSkirotajsPage({ onBack, onOpenDastojums }) {
                 setLapuAnalizes([])
                 setGrupas([])
                 setPdfBytes(null)
+                setSkirotasGrupas(false)
+                setKopejaisLapuSkaits(0)
+                onSaveState?.(null)
               }} style={{ padding: "10px 20px", background: "transparent", border: "1px solid #2d5a2d", borderRadius: "8px", color: "#4a7a4a", fontSize: "13px", cursor: "pointer" }}>
                 🗑 Sākt no jauna
               </button>
