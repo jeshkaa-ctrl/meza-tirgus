@@ -201,7 +201,7 @@ return(
             <span style={{fontSize:"14px"}}>{t.icon}</span>{t.text}
           </div>
         ))}
-        <a href="mailto:jeshkaa@inbox.lv" style={{marginTop:"auto",paddingTop:"16px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#fbbf24,#e65100)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px",textDecoration:"none",textAlign:"center",boxSizing:"border-box",display:"block"}}>
+        <a href="mailto:mezatirgus.info@gmail.com" style={{marginTop:"auto",paddingTop:"16px",width:"100%",padding:"12px",background:"linear-gradient(135deg,#fbbf24,#e65100)",color:"white",border:"none",borderRadius:"8px",cursor:"pointer",fontWeight:700,fontSize:"14px",textDecoration:"none",textAlign:"center",boxSizing:"border-box",display:"block"}}>
           Sazināties →
         </a>
       </div>

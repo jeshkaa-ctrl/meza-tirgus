@@ -260,8 +260,8 @@ setSaving(true); setError(null);
               Šis pavadzīmju reģistrs tiek personalizēts katram klientam.<br/>
               Sazinieties ar mums lai iestatītu šoferus, piegādes vietas un uzņēmuma profilu.
             </div>
-            <a href="mailto:jeshkaa@inbox.lv" style={{display:"inline-block",background:"#225522",border:"1px solid #4caf50",borderRadius:8,padding:"12px 24px",color:"#4caf50",fontSize:14,fontWeight:700,textDecoration:"none"}}>
-              ✉️ Sazināties — jeshkaa@inbox.lv
+            <a href="mailto:mezatirgus.info@gmail.com" style={{display:"inline-block",background:"#225522",border:"1px solid #4caf50",borderRadius:8,padding:"12px 24px",color:"#4caf50",fontSize:14,fontWeight:700,textDecoration:"none"}}>
+              ✉️ Sazināties — mezatirgus.info@gmail.com
             </a>
           </div>
         )}

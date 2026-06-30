@@ -3,7 +3,7 @@ import PavadzimesRegistrs from './PavadzimesRegistrs'
 import RpAndrasPortals from './RpAndrasPortals'
 import { C, F, R, S, btn, spinnerCSS } from './ds'
 
-const ADMIN_EMAIL = 'jeshkaa@inbox.lv'
+const ADMIN_EMAIL = 'arsasmezi@inbox.lv'
 
 // ─── Publiskā info lapa ────────────────────────────────────────────────────────
 function PubliskaInfoLapa({ onBack, onReg }) {
@@ -142,7 +142,7 @@ function PubliskaInfoLapa({ onBack, onReg }) {
             Katra sistēma tiek personalizēta tieši jūsu uzņēmumam.
           </p>
           <div style={{ display: 'flex', gap: S.sm, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="mailto:jeshkaa@inbox.lv" style={{
+            <a href="mailto:mezatirgus.info@gmail.com" style={{
               ...btn.primary, textDecoration: 'none',
               background: C.green, color: C.bg,
             }}>

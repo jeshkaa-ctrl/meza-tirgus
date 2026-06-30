@@ -23,7 +23,7 @@ export default function PrivatumsPage({ onBack }) {
         {[
           {
             virsraksts: '1. Pārzinis',
-            teksts: 'Meža tirgus platformas pārzinis ir Artijs Ješkins (jeshkaa@inbox.lv). Platforma pieejama vietnē meza-tirgus.lv.',
+            teksts: 'Meža tirgus platformas pārzinis ir Artijs Ješkins (mezatirgus.info@gmail.com). Platforma pieejama vietnē meza-tirgus.lv.',
           },
           {
             virsraksts: '2. Kādi dati tiek vākti',
@@ -43,7 +43,7 @@ export default function PrivatumsPage({ onBack }) {
           },
           {
             virsraksts: '6. Jūsu tiesības',
-            teksts: 'Jums ir tiesības: piekļūt saviem datiem, labot neprecīzus datus, dzēst savu kontu un datus, ierobežot apstrādi, iesniegt sūdzību Datu valsts inspekcijā (dvi.gov.lv). Pieprasījumus sūtiet uz jeshkaa@inbox.lv.',
+            teksts: 'Jums ir tiesības: piekļūt saviem datiem, labot neprecīzus datus, dzēst savu kontu un datus, ierobežot apstrādi, iesniegt sūdzību Datu valsts inspekcijā (dvi.gov.lv). Pieprasījumus sūtiet uz mezatirgus.info@gmail.com.',
           },
           {
             virsraksts: '7. Sīkdatnes',
@@ -51,7 +51,7 @@ export default function PrivatumsPage({ onBack }) {
           },
           {
             virsraksts: '8. Kontakti',
-            teksts: 'Jautājumu gadījumā sazinieties: jeshkaa@inbox.lv',
+            teksts: 'Jautājumu gadījumā sazinieties: mezatirgus.info@gmail.com',
           },
         ].map((s, i) => (
           <section key={i} style={{ marginBottom: 28 }}>

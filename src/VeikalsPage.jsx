@@ -5,7 +5,7 @@ import { OMNIVA_PAKOMATI } from './omnivaData'
 import { DPD_PAKOMATI } from './dpdData'
 import { LP_PAKOMATI } from './lpData'
 
-const ADMIN_EMAIL = 'jeshkaa@inbox.lv'
+const ADMIN_EMAIL = 'arsasmezi@inbox.lv'
 const ADMIN_PIN   = '2509'
 
 function PinModal({ onConfirm, onClose }) {

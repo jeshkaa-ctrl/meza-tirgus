@@ -137,7 +137,7 @@ export default function MaksajumsPaldies({ onTurpina }) {
             </h2>
             <p style={{ color: C.textMut, fontSize: F.sm, lineHeight: 1.6, margin: `0 0 ${S.xl}` }}>
               Ja nauda tika norakstīta — sazinieties ar mums:{' '}
-              <a href="mailto:jeshkaa@inbox.lv" style={{ color: C.green }}>jeshkaa@inbox.lv</a>
+              <a href="mailto:mezatirgus.info@gmail.com" style={{ color: C.green }}>mezatirgus.info@gmail.com</a>
             </p>
             <button onClick={onTurpina} style={{ ...btn.secondary, justifyContent: 'center', width: '100%' }}>
               Atpakaļ

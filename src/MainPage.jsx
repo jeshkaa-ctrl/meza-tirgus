@@ -3,7 +3,7 @@ import JautaParMezuWidget from './components/JautaParMezuWidget'
 import PwaInstalModal from './PwaInstalModal'
 import { C, F, R, S, spinnerCSS } from './ds'
 
-const ADMIN_EMAIL = 'jeshkaa@inbox.lv'
+const ADMIN_EMAIL = 'arsasmezi@inbox.lv'
 
 const SADAJAS = (isAdmin) => [
   {
