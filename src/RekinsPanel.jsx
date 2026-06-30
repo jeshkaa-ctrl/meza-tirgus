@@ -290,6 +290,10 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="font-style:italic">Reversa
 <div>Rēķinu izrakstīja: <b>${izrakstija||"___________________"}</b> ___________________________</div>
 <div>${datums}</div></div>
 <p style="font-size:9px;color:#888;margin-top:16px">Dokuments sagatavots elektroniski un derīgs bez paraksta.</p>
+<div style="margin-top:24px;padding-top:12px;border-top:1px solid #e0e0e0;display:flex;align-items:center;gap:8px">
+  <span style="font-size:14px">🌲</span>
+  <span style="font-size:9px;color:#aaa">Rēķins sagatavots platformā <b style="color:#225522">Meža Tirgus</b> — <span style="color:#225522">meza-tirgus.lv</span></span>
+</div>
 </body></html>`
     const win = window.open("", "_blank")
     win.document.write(html)
