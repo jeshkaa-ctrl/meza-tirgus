@@ -104,7 +104,7 @@ ${r.pvn_rezims==="reversais"?`<tr><td colspan="6" style="border:1px solid #ccc;p
 </div>
 <p style="font-size:9px;color:#888;margin-top:16px">Dokuments sagatavots elektroniski un derīgs bez paraksta.</p>
 <div style="margin-top:20px;padding-top:10px;border-top:1px solid #e0e0e0;display:flex;align-items:center;gap:8px">
-  <span style="font-size:13px">🌲</span>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" style="flex-shrink:0"><rect width="32" height="32" rx="6" fill="#0f1a0f"/><polygon points="16,4 24,22 8,22" fill="#2e7d32"/><polygon points="16,2 26,21 6,21" fill="#1b5e20" opacity="0.5"/><rect x="14" y="22" width="4" height="6" rx="1" fill="#1b5e20"/><circle cx="26" cy="6" r="3" fill="#4caf50"/></svg>
   <span style="font-size:9px;color:#aaa">Rēķins sagatavots platformā <b style="color:#225522">Meža Tirgus</b> — <span style="color:#225522">meza-tirgus.lv</span></span>
 </div>`
 
