@@ -192,7 +192,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
         const iepirkumsCena = parseFloat(cenas[vieta.id]?.[sort]) || 0
         const neto = iepirkumsCena - transportsCena
 
-        const iet = kravasIetilpibas[sort] || 30
+        const iet = parseFloat(kravasIetilpibas[sort]) || 30
         const braucieni = Math.ceil(m3 / iet)
         const atlikums = Math.round((m3 % iet) * 100) / 100
 
@@ -224,7 +224,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
     Object.entries(sortRez).forEach(([sort, opcijas]) => {
       if (opcijas.length === 0) return
       const labakais = opcijas[0]
-      if (labakais.atlikums > 0 && labakais.atlikums < (kravasIetilpibas[sort] || 30)) {
+      if (labakais.atlikums > 0 && labakais.atlikums < (parseFloat(kravasIetilpibas[sort]) || 30)) {
         // Meklē citus sortimentus kas varētu iet uz to pašu vietu
         const papildSortimenti = Object.entries(apjomi)
           .filter(([s, m]) => s !== sort && m > 0)
@@ -366,16 +366,30 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                 <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 9, color: "#558b2f", marginBottom: 2 }}>APJOMS m³</div>
-                    <input type="number" step="0.1" style={{ ...s.input, padding: "7px 8px", fontSize: 14 }}
-                      value={apjomi[sort] || ""}
-                      onChange={e => setApjomi(prev => ({ ...prev, [sort]: parseFloat(e.target.value) || 0 }))}
+                    <input type="text" inputMode="decimal" style={{ ...s.input, padding: "7px 8px", fontSize: 14 }}
+                      value={apjomi[sort] === 0 ? "" : (apjomi[sort] ?? "")}
+                      onChange={e => {
+                        const v = e.target.value.replace(",", ".")
+                        setApjomi(prev => ({ ...prev, [sort]: v === "" ? 0 : (parseFloat(v) || prev[sort]) }))
+                      }}
+                      onBlur={e => {
+                        const v = parseFloat(e.target.value.replace(",", "."))
+                        if (!isNaN(v)) setApjomi(prev => ({ ...prev, [sort]: v }))
+                      }}
                       placeholder="0" />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 9, color: "#558b2f", marginBottom: 2 }}>KRAVA m³</div>
-                    <input type="number" step="1" style={{ ...s.input, padding: "7px 8px", fontSize: 14 }}
-                      value={kravasIetilpibas[sort] || ""}
-                      onChange={e => setKravasIetilpibas(prev => ({ ...prev, [sort]: parseFloat(e.target.value) || 30 }))}
+                    <input type="text" inputMode="numeric" style={{ ...s.input, padding: "7px 8px", fontSize: 14 }}
+                      value={kravasIetilpibas[sort] ?? ""}
+                      onChange={e => {
+                        const v = e.target.value.replace(/[^0-9.]/g, "")
+                        setKravasIetilpibas(prev => ({ ...prev, [sort]: v }))
+                      }}
+                      onBlur={e => {
+                        const v = parseFloat(e.target.value)
+                        setKravasIetilpibas(prev => ({ ...prev, [sort]: isNaN(v) ? 30 : v }))
+                      }}
                       placeholder="30" />
                   </div>
                 </div>
