@@ -282,7 +282,7 @@ const s = {
 
 // ─── GALVENAIS KOMPONENTS ─────────────────────────────────────────────────────
 
-export default function DastojumsKalkulators({ onBack, initialFile }) {
+export default function DastojumsKalkulators({ onBack, initialFile, onNavigateLogistika }) {
   const [solis, setSolis] = useState(0) // 0=ielāde, 1=pārbaude, 2=cenas, 3=rezultāts
   const [loading, setLoading] = useState(false)
   const [kļūda, setKļūda] = useState("")
@@ -661,8 +661,30 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
           </div>
         )}
 
-        <div style={{display:"flex", gap:10}}>
+        <div style={{display:"flex", gap:10, flexWrap:"wrap"}}>
           <button style={s.btn} onClick={exportPDF}>🖨 Drukāt / Saglabāt PDF</button>
+          {onNavigateLogistika && rez.kopaM3 > 0 && (
+            <button style={{...s.btn, background:"linear-gradient(135deg,#1565c0,#0d47a1)"}} onClick={() => {
+              sessionStorage.setItem("dastojuma_sortimenti", JSON.stringify({
+                apjomi: {
+                  balki_P:    parseFloat((balkiPaSugam.P || 0).toFixed(2)),
+                  balki_E:    parseFloat((balkiPaSugam.E || 0).toFixed(2)),
+                  balki_M:    parseFloat(((balkiPaSugam.M||0)+(balkiPaSugam.B||0)+(balkiPaSugam.A||0)).toFixed(2)),
+                  sikbalki:   parseFloat(kop.sikbalki.toFixed(2)),
+                  finieris:   0,
+                  zagbalki:   0,
+                  tara:       parseFloat(kop.tara.toFixed(2)),
+                  papirmalka: parseFloat(kop.papirmalka.toFixed(2)),
+                  malka:      parseFloat(kop.malka.toFixed(2)),
+                  skelda:     parseFloat(kop.skelda.toFixed(2)),
+                },
+                kadastrs,
+              }))
+              onNavigateLogistika()
+            }}>
+              🚚 Aprēķināt transportu
+            </button>
+          )}
           <button style={s.btnSm} onClick={()=>setSolis(2)}>← Labot cenas</button>
           <button style={s.btnSm} onClick={()=>{ setSolis(0); setNogabali([]); setAiDati(null); setSaimnieciba(""); setKadastrs("") }}>
             📁 Jauns PDF

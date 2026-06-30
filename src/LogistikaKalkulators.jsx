@@ -78,6 +78,19 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
     return c
   })
 
+  // Ielādē datus no Dastojuma kalkulatora (ja nāk caur pogu "Aprēķināt transportu")
+  useEffect(() => {
+    const saglabati = sessionStorage.getItem("dastojuma_sortimenti")
+    if (saglabati) {
+      try {
+        const { apjomi: a, kadastrs: k } = JSON.parse(saglabati)
+        if (a) setApjomi(a)
+        if (k) setKadastrs(k)
+      } catch {}
+      sessionStorage.removeItem("dastojuma_sortimenti")
+    }
+  }, [])
+
   // Ielādē pircēju cenas no Supabase
   useEffect(() => {
     setCenasLade(true)

@@ -205,7 +205,7 @@ if(page==="rekini") return <>
 if(showChat) return <ChatPage user={user} onBack={()=>setShowChat(false)}/>
 if(page==="caurmers_mobile") return <CaurmeraMobile onBack={()=>setPage("main")}/>
 if(page==="cirsma_mobile") return <CirsmaNovertesanaMobile onBack={()=>setPage("main")}/>
-if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")}/>
+if(page==="dastojums_pdf") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} onNavigateLogistika={()=>setPage("logistika")}/>
 if(page==="kubi") return <KubiKalkulators onBack={()=>setPage("main")}/>
 if(page==="krautuves_meritajs")  return <KrautuvesMeritajsPage  onBack={()=>setPage("main")}/>
 if(page==="dastojums_meritajs") return <DastojumsMeritajsPage onBack={()=>setPage("main")}/>
@@ -214,7 +214,7 @@ if(page==="maksajums_paldies") return <MaksajumsPaldies onTurpina={()=>setPage("
 if(page==="tirgus") return <TirgusLapa user={user} onNavigate={setPage} onReg={()=>atvertReg("tirgus")}/>
 if(page==="jautaparmezu")     return <JautaParMezuPage onBack={()=>setPage("main")}/>
 if(page==="mobilie") return <MobilajiRiki onBack={()=>setPage("main")} onNavigate={(p)=>setPage(p)}/>
-if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile}/>
+if(page==="dastojumsPDF") return <DastojumsPDFKalkulators onBack={()=>setPage("main")} initialFile={dastojumsPdfFile} onNavigateLogistika={()=>setPage("logistika")}/>
 if(page==="pavadzimes") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("pavadzimes")}/>
 if(page==="rpandras") return <DastojumuRegistrsPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("rpandras")}/>
 if(page==="logistika") return <LogistikaKalkulators onBack={()=>setPage("main")}/>
