@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { acmHeaders } from "./utils/acm"
 
@@ -282,7 +282,7 @@ const s = {
 
 // ─── GALVENAIS KOMPONENTS ─────────────────────────────────────────────────────
 
-export default function DastojumsKalkulators({ onBack }) {
+export default function DastojumsKalkulators({ onBack, initialFile }) {
   const [solis, setSolis] = useState(0) // 0=ielāde, 1=pārbaude, 2=cenas, 3=rezultāts
   const [loading, setLoading] = useState(false)
   const [kļūda, setKļūda] = useState("")
@@ -292,6 +292,8 @@ export default function DastojumsKalkulators({ onBack }) {
   const [nogabali, setNogabali] = useState([])
   const [prices, setPrices] = useState({...DEFAULT_PRICES})
   const [izmaksas, setIzmaksas] = useState({...DEFAULT_IZMAKSAS})
+
+  useEffect(() => { if (initialFile) handleFile(initialFile) }, [])
 
   // Aprēķini
   const { kop, balkiPaSugam } = nogabali.length ? aprēķinātSortimentus(nogabali) : { kop:{balki:0,sikbalki:0,tara:0,papirmalka:0,malka:0,skelda:0}, balkiPaSugam:{} }
