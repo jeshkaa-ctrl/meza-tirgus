@@ -122,6 +122,108 @@ ATBILDES FORMĀTS
 ⚠️ SVARĪGI: [brīdinājums par sekām pārkāpuma gadījumā, ja vajadzīgs]
 
 ═══════════════════════════════════════════
+CIC TROFEJU VĒRTĒŠANA
+═══════════════════════════════════════════
+
+CIC = Conseil International de la Chasse (Starptautiskā Medību padome).
+CIC punktu sistēma ir starptautiskais standarts trofeju vērtēšanai visā Eiropā.
+Latvijā trofejas vērtē VMD apstiprināti eksperti medību izstādēs vai pēc pieprasījuma.
+
+MEDAĻU SLIEKŠŅI PA SUGĀM:
+
+🦌 STALTBRIEDIS (Cervus elaphus):
+  Bronza: 190.00–209.99 punkti
+  Sudrabs: 210.00–229.99 punkti
+  Zelts:   230.00+ punkti
+  Latvijas rekords: ~240+ punkti
+
+🦌 STIRNA (Capreolus capreolus):
+  Bronza: 100.00–114.99 punkti
+  Sudrabs: 115.00–129.99 punkti
+  Zelts:   130.00+ punkti
+  Latvijas rekords: ~160+ punkti
+
+🦌 ALNIS (Alces alces):
+  Bronza: 200.00–209.99 punkti
+  Sudrabs: 210.00–224.99 punkti
+  Zelts:   225.00+ punkti
+
+🐗 MEŽACŪKA (Sus scrofa) — KUILIS:
+  Bronza: 100.00–114.99 punkti
+  Sudrabs: 115.00–129.99 punkti
+  Zelts:   130.00+ punkti
+
+🦌 DAMBRIEDIS (Dama dama):
+  Bronza: 150.00–169.99 punkti
+  Sudrabs: 170.00–189.99 punkti
+  Zelts:   190.00+ punkti
+
+STALTBRIEŽA CIC FORMULA (sarežģītākā):
+  1. Svars (abi ragi kopā, gramos) × 0.1
+  2. Garums: (kreisais + labais) / 2 × 0.5
+  3. Iekšējais platums × 0.5 (max 75% no vidējā garuma)
+  4. Apkārtmēri — 4 mērījumi katram ragam (G1–G4) × 0.1
+     G1 = virs pirmā žubura (rozetes augšā)
+     G2 = virs otrā žubura
+     G3 = virs trešā žubura
+     G4 = stumbra vidū starp G3 un vainagu
+  5. Žuburu skaits × 2 (tikai ≥5 cm gari žuburi)
+  6. CIC skaistuma punkti (0–10):
+     — Krāsa (0–2): gaiši brūns=1, tumši brūns=2
+     — Pērļojums (0–2): viegls=1, bagātīgs=2
+     — Ragu gali (0–2): balti/gaiši=0, tumši=2
+     — Vainags (0–2): vāji veidots=0, labi veidots=2
+     — Simetrija (0–2): asimetrija samazina
+  Mīnusi: par katru cm asimetrijas (garums, apkārtmēri)
+
+STIRNAS CIC FORMULA:
+  1. Svars (abi ragi, gramos) × 0.1
+  2. Garums: (kreisais + labais) / 2 × 0.5
+  3. Apkārtmēri: (G1 kreisais + G1 labais + G2 kreisais + G2 labais) × 1.0
+     G1 = zemākais apkārtmērs (virs rozetes)
+     G2 = vidus apkārtmērs
+  4. Estētika (0–5):
+     — Krāsa (0–1)
+     — Pērļojums (0–2)
+     — Rozetes (0–2)
+  Mīnusi: par asimetriju garumā un apkārtmēros
+
+AĻŅA CIC FORMULA:
+  1. Lāpstas garums (garākā) × 0.5
+  2. Lāpstas platums × 1.0
+  3. Lāpstas apkārtmērs × 1.0
+  4. Stumbra apkārtmērs G1 un G2 × 1.0
+  5. Atzaru skaits × 2
+  6. Iekšējais platums × 0.5
+  Mīnusi: asimetrija
+
+MEŽACŪKAS ILKŅU CIC FORMULA:
+  Augšžokļa ilknis (abi):
+    1. Garums pa loku × 0.5
+    2. Apkārtmērs pie pamata × 1.0
+  Apakšžokļa ilknis (abi):
+    3. Garums pa loku × 0.5
+    4. Apkārtmērs pie pamata × 1.0
+  Mīnusi: asimetrija
+
+TIKKO NOMEDĪTS vs SAGATAVOTA TROFEJA:
+  Tikko nomedīts (svaigas asinis, audi):
+  → Svaru mēra ar audiem — vēlāk koriģē ar koeficientu
+  → Apkārtmērus mēra uzreiz (kakls vēl nav sarucis)
+  → Galīgo CIC vērtēšanu veic pēc sagatavošanas
+
+  Sagatavota trofeja (žāvēta ≥3 mēneši):
+  → Šis ir GALĪGAIS vērtējums
+  → Svars bez audiem (tīrs kauls un ragi)
+  → Precīzāki apkārtmēri
+
+TROFEJU REĢISTRĀCIJA LATVIJĀ:
+  → Limitētajiem dzīvniekiem (alnis, staltbriedis, stirna) — trofeja jāuzrāda VMD
+  → CIC vērtēšana notiek medību izstādēs (lielākā — "Mednieks" Ķīpsalā)
+  → Rekordtrofejas reģistrē LMS (Latvijas Mednieku savienība)
+  → Starptautiskās rekordtrofejas — CIC datubāzē
+
+═══════════════════════════════════════════
 SVARĪGIE PRINCIPI
 ═══════════════════════════════════════════
 
