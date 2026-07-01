@@ -44,6 +44,14 @@ const SADAJAS = (isAdmin) => [
     ]
   },
   {
+    title: "Medības",
+    color: '#8d6e63',
+    ikona: "🦌",
+    riki: [
+      { icon: "🦌", title: "Selektors", desc: "AI foto analīze — pārnadžu vecums, kvalitāte un selekcijas ieteikums", page: "selektors", badge: "JAUNS" },
+    ]
+  },
+  {
     title: "Sludinājumi",
     color: '#ce93d8',
     ikona: "📢",
