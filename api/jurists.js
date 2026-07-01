@@ -125,100 +125,81 @@ ATBILDES FORMĀTS
 CIC TROFEJU VĒRTĒŠANA
 ═══════════════════════════════════════════
 
-CIC = Conseil International de la Chasse (Starptautiskā Medību padome).
-CIC punktu sistēma ir starptautiskais standarts trofeju vērtēšanai visā Eiropā.
-Latvijā trofejas vērtē VMD apstiprināti eksperti medību izstādēs vai pēc pieprasījuma.
+CIC = Starptautiskā medību un medījamo dzīvnieku aizsardzības komiteja.
+Sistēma izstrādāta 1937. gadā. Latvijā — oficiālā trofeju vērtēšanas sistēma.
 
-MEDAĻU SLIEKŠŅI PA SUGĀM:
+LATVIJĀ PĒC CIC VĒRTĒ:
+→ Aļņu, staltbriežu, stirnāžu, dambriežu ragi
+→ Meža kuiļu ilkņi
+→ Vilku un lūšu ādas (Latvijā vēl vērtē, lai gan CIC izņēmis no saraksta)
+→ Vilku, lūšu, lapsu, āpšu, jenotsuņu galvaskausi
+
+VISPĀRĪGIE NOTEIKUMI VISĀM TROFEJĀM:
+→ Ragi jāžūst min. 90 dienas (stirnāžiem — 60 dienas; dambriežiem — 30 dienas!)
+→ Jānotīra no gaļas un mīkstumiem
+→ Zelta medaļas trofejām — vajadzīga mednieka un platības īpašnieka zvēresta liecība
+→ Mērī 3 cilvēku komisija, vismaz viens CIC sertificēts eksperts
+→ Līmēt vai piestiprināt iztrūkstošās detaļas — AIZLIEGTS
 
 🦌 STALTBRIEDIS (Cervus elaphus):
-  Bronza: 190.00–209.99 punkti
-  Sudrabs: 210.00–229.99 punkti
-  Zelts:   230.00+ punkti
-  Latvijas rekords: ~240+ punkti
+  Ko mēra: raga garums (pa ārējo liekumu, roze→gals), apkārtmērs 3 vietās,
+  ragu platums, žuburu skaits, ragu svars
+  Bonifikācijas: pērļojums (līdz 4p), krāsa (līdz 4p), vainags (līdz 4p)
+  Atskaitījumi: defekti, asimetrija
+  🥉 Bronza: 190.00–209.99p
+  🥈 Sudrabs: 210.00–224.99p
+  🥇 Zelts: 225.00+p
+  Latvijas rekords: 247 punkti (1967.g.)
+  Labākās Latvijas trofejas: 6 trofeja pārsniedz 240p
 
-🦌 STIRNA (Capreolus capreolus):
-  Bronza: 100.00–114.99 punkti
-  Sudrabs: 115.00–129.99 punkti
-  Zelts:   130.00+ punkti
-  Latvijas rekords: ~160+ punkti
+🦌 STIRNĀZIS (Capreolus capreolus):
+  Ko mēra: raga garums (K+L), apkārtmērs pie rozes un vidū,
+  ragu svars (atlaide −90g par galvaskausu ar augšžokli),
+  ragu TILPUMS cm³ — hidrostatiskā metode (iegremdē ūdenī)
+  Bonifikācijas: simetrija un skaistums (līdz 5p), pērļojums (līdz 4p)
+  🥉 Bronza: 105.00–114.99p
+  🥈 Sudrabs: 115.00–129.99p
+  🥇 Zelts: 130.00+p
+  Optimālais vecums trofejai: 6–9 gadi
 
 🦌 ALNIS (Alces alces):
-  Bronza: 200.00–209.99 punkti
-  Sudrabs: 210.00–224.99 punkti
-  Zelts:   225.00+ punkti
-
-🐗 MEŽACŪKA (Sus scrofa) — KUILIS:
-  Bronza: 100.00–114.99 punkti
-  Sudrabs: 115.00–129.99 punkti
-  Zelts:   130.00+ punkti
+  Ko mēra: ragu platums, lāpstas garums (K+L), lāpstas platums (K+L),
+  atzaru skaits uz abām lāpstām, ragu svars
+  🥉 Bronza: 280.00–299.99p
+  🥈 Sudrabs: 300.00–349.99p
+  🥇 Zelts: 350.00+p
 
 🦌 DAMBRIEDIS (Dama dama):
-  Bronza: 150.00–169.99 punkti
-  Sudrabs: 170.00–189.99 punkti
-  Zelts:   190.00+ punkti
+  Ko mēra: raga garums (K+L, min.60cm bronzai),
+  lāpstas garums (K+L, min.30cm), lāpstas platums (K+L, min.14cm),
+  acu žuburi (K+L, min.16cm), rozešu apkārtmērs (~20cm bronzai),
+  ragu svars (min.3kg bronzai, žāvēti min. 30 dienas!)
+  🥉 Bronza: 160.00–169.99p
+  🥈 Sudrabs: 170.00–179.99p
+  🥇 Zelts: 180.00+p
+  Optimālais vecums trofejai: 8–10 gadi
+  Pasaules rekords: 217.25p (Ungārija)
 
-STALTBRIEŽA CIC FORMULA (sarežģītākā):
-  1. Svars (abi ragi kopā, gramos) × 0.1
-  2. Garums: (kreisais + labais) / 2 × 0.5
-  3. Iekšējais platums × 0.5 (max 75% no vidējā garuma)
-  4. Apkārtmēri — 4 mērījumi katram ragam (G1–G4) × 0.1
-     G1 = virs pirmā žubura (rozetes augšā)
-     G2 = virs otrā žubura
-     G3 = virs trešā žubura
-     G4 = stumbra vidū starp G3 un vainagu
-  5. Žuburu skaits × 2 (tikai ≥5 cm gari žuburi)
-  6. CIC skaistuma punkti (0–10):
-     — Krāsa (0–2): gaiši brūns=1, tumši brūns=2
-     — Pērļojums (0–2): viegls=1, bagātīgs=2
-     — Ragu gali (0–2): balti/gaiši=0, tumši=2
-     — Vainags (0–2): vāji veidots=0, labi veidots=2
-     — Simetrija (0–2): asimetrija samazina
-  Mīnusi: par katru cm asimetrijas (garums, apkārtmēri)
-
-STIRNAS CIC FORMULA:
-  1. Svars (abi ragi, gramos) × 0.1
-  2. Garums: (kreisais + labais) / 2 × 0.5
-  3. Apkārtmēri: (G1 kreisais + G1 labais + G2 kreisais + G2 labais) × 1.0
-     G1 = zemākais apkārtmērs (virs rozetes)
-     G2 = vidus apkārtmērs
-  4. Estētika (0–5):
-     — Krāsa (0–1)
-     — Pērļojums (0–2)
-     — Rozetes (0–2)
-  Mīnusi: par asimetriju garumā un apkārtmēros
-
-AĻŅA CIC FORMULA:
-  1. Lāpstas garums (garākā) × 0.5
-  2. Lāpstas platums × 1.0
-  3. Lāpstas apkārtmērs × 1.0
-  4. Stumbra apkārtmērs G1 un G2 × 1.0
-  5. Atzaru skaits × 2
-  6. Iekšējais platums × 0.5
-  Mīnusi: asimetrija
-
-MEŽACŪKAS ILKŅU CIC FORMULA:
-  Augšžokļa ilknis (abi):
-    1. Garums pa loku × 0.5
-    2. Apkārtmērs pie pamata × 1.0
-  Apakšžokļa ilknis (abi):
-    3. Garums pa loku × 0.5
-    4. Apkārtmērs pie pamata × 1.0
-  Mīnusi: asimetrija
+🐗 MEŽA KUILIS (Sus scrofa):
+  Ko mēra: ilkņu garums pa ārējo liekumu,
+  ilkņu apkārtmērs vidū, šķelšanās leņķis starp ilkņiem
+  🥉 Bronza: 100.00–114.99p
+  🥈 Sudrabs: 115.00–129.99p
+  🥇 Zelts: 130.00+p
 
 TIKKO NOMEDĪTS vs SAGATAVOTA TROFEJA:
-  Tikko nomedīts (svaigas asinis, audi):
-  → Svaru mēra ar audiem — vēlāk koriģē ar koeficientu
-  → Apkārtmērus mēra uzreiz (kakls vēl nav sarucis)
-  → Galīgo CIC vērtēšanu veic pēc sagatavošanas
+  Tikko nomedīts: svaru mēra ar audiem — galīgo CIC veic pēc sagatavošanas.
+  Apkārtmērus var mērīt uzreiz (vēl nav sarukuši).
+  Sagatavota trofeja (žāvēta pietiekami ilgi — atkarīgs no sugas):
+  → Galīgais vērtējums. Tīrs kauls un ragi, bez audiem.
 
-  Sagatavota trofeja (žāvēta ≥3 mēneši):
-  → Šis ir GALĪGAIS vērtējums
-  → Svars bez audiem (tīrs kauls un ragi)
-  → Precīzāki apkārtmēri
+PRAKTISKS PADOMS:
+  Svars pievieno aptuveni 15–25% no kopvērtējuma.
+  Staltbriedis: 5 gadi ≈ 190p, katru gadu +7–10p, maksimums pie 10–12 gadiem.
+  Tāpēc perspektīvu jaunu bulli labāk nespert — ļauj sasniegt potenciālu!
 
 TROFEJU REĢISTRĀCIJA LATVIJĀ:
-  → Limitētajiem dzīvniekiem (alnis, staltbriedis, stirna) — trofeja jāuzrāda VMD
+  → Limitētajiem (alnis, staltbriedis, stirna) — trofeja jāuzrāda VMD
   → CIC vērtēšana notiek medību izstādēs (lielākā — "Mednieks" Ķīpsalā)
   → Rekordtrofejas reģistrē LMS (Latvijas Mednieku savienība)
   → Starptautiskās rekordtrofejas — CIC datubāzē
