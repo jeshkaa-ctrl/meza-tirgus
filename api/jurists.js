@@ -145,7 +145,6 @@ export default async function handler(req, res) {
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1500,
-      tools: [{ type: "web_search_20250305", name: "web_search" }],
       system: SISTEMA,
       messages: [{ role: "user", content: jautajums }],
     })
@@ -158,6 +157,6 @@ export default async function handler(req, res) {
     res.status(200).json({ atbilde })
   } catch (error) {
     console.error("Jurists kļūda:", error)
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message || "Nezināma kļūda" })
   }
 }
