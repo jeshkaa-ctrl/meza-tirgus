@@ -49,9 +49,6 @@ const SADAJAS = (isAdmin) => [
     ikona: "🦌",
     riki: [
       { icon: "🏹", title: "Mednieka Rokasgrāmata", desc: "Sugas katalogs, Selektors, Jurists un CIC Kalkulators — viss vienā vietā", page: "mednieks", badge: "JAUNS" },
-      { icon: "🦌", title: "Selektors", desc: "AI foto analīze — pārnadžu vecums, kvalitāte un selekcijas ieteikums", page: "selektors" },
-      { icon: "⚖️", title: "Jurists", desc: "Medību likumdošana — jautā dabiskā valodā, saņem atbildi ar konkrētu likuma pantu", page: "jurists" },
-      { icon: "🏆", title: "CIC Kalkulators", desc: "Trofeju vērtēšana pēc CIC metodes — staltbriedis, stirnāzis, alnis, dambriedis, kuilis", page: "cic" },
     ]
   },
   {
