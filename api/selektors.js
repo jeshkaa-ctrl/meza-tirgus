@@ -293,6 +293,85 @@ Liela, ar GARU KNĀBI. Meža putns.
 Aizsargājamas sugas nomedīšana = kriminālatbildība.
 
 ═══════════════════════════════════════════
+🐦 MEDĪJAMIE SAUSZEMES PUTNI
+═══════════════════════════════════════════
+
+⚠️ Medību laiks: stundu pirms saullēkta līdz stundu pēc saulrieta (izņēmumi zemāk)
+⚠️ Termiņi mainās — pārbaudi: vmd.gov.lv
+
+── LIMITĒTIE (vajag atļauju) ──
+
+🦚 MEDNIS (Tetrao urogallus)
+Statuss: Limitēts | Termiņš: 1.sept–31.dec | TIKAI TĒVIŅI!
+Lielākais Latvijas medījamais putns.
+Tēviņam: MELNS ar sarkanu uzaci, zaļa spīdoša krūts, bārdains.
+Mātītei: brūnplankumaina — NEDRĪKST medīt!
+Biotops: veci skuju meži. Populācija samazinās — rūpīgi saudzēt.
+⚠️ Pavasarī rūšana — tolaik medības AIZLIEGTAS.
+
+🐦 RUBENIS (Tetrao tetrix)
+Statuss: Limitēts | Termiņš: 1.sept–31.dec | TIKAI TĒVIŅI!
+Tēviņam: MELNS ar BALTU APAKŠASTI, raksturīga LIRAS FORME ASTE.
+Mātītei: brūnplankumaina — NEDRĪKST medīt!
+Biotops: meža malas, purvāji.
+⚠️ Pavasarī lekstes — tolaik medības AIZLIEGTAS.
+
+🐦 MEŽIRBE (Bonasia bonasia)
+Statuss: Limitēts (kopš 2024.g.) | Termiņš: 1.sept–31.dec
+Maza, raibi pelēkbrūna. Grūti pamanāma.
+Biotops: jaukti bērzu-egļu meži. Raksturīga svilpjoša balss.
+⚠️ Tagad LIMITĒTA — vajag medību atļauju!
+
+🐦 SLOKA (Scolopax rusticola)
+Statuss: Limitēts | Termiņš: 1.sept–31.janv
+Tautas nosaukums: šņepis. GARS TAISNS KNĀBIS, brūnplankumains — izcils maskējums.
+Biotops: mitri jaukti meži. Aktīvs krēslā un rītausmā.
+⚠️ Pavasara kvortošanas medības AIZLIEGTAS pēc ES putnu direktīvas — tikai rudenī!
+
+── NELIMITĒTIE ──
+
+🐦 FAZĀNS (Phasianus colchicus)
+Statuss: Nelimitēts | Termiņš: pārbaudi VMD
+Tēviņam: KOŠA KRĀSAINA APSPALVOJUMS, gara aste, sarkans plankums ap aci.
+Mātītei: pelēkbrūna.
+Latvijā nav stabila savvaļas populācija — izbēdzis no nebrīves, nespēj pārdzīvot bargās ziemas.
+
+🐦 RAĶELIS (Tetrao × Lyrurus)
+Statuss: Nelimitēts | Termiņš: pārbaudi VMD
+Medņa un rubeņa dabisks hibrīds — izskatās kā starpposms starp abiem.
+Reti sastopams.
+
+🐦 PELĒKĀ VĀRNA (Corvus cornix)
+Statuss: Nelimitēts | Termiņš: Visu gadu
+PELĒKS ķermenis, MELNA galva, spārni un aste. Labi atpazīstama.
+⚠️ Drīkst medīt arī NAKTĪ no paaugstinājuma — izņēmums!
+Bīstama mazputnu ligzdām — aktīvi nomedīt ieteicams.
+
+🐦 ŽAGATA (Pica pica)
+Statuss: Nelimitēts | Termiņš: Visu gadu
+MELNA ar BALTU, raksturīga GARA ASTE. Viegli atpazīstama.
+Bīstama mazputnu ligzdām.
+
+═══════════════════════════════════════════
+🚫 NEMEDĪJAMIE PUTNI — OBLIGĀTI ATPAZĪT!
+═══════════════════════════════════════════
+
+🚫 KRAUKLIS (Corvus corax) — AIZSARGĀJAMS!
+  Melns, liels (daudz lielāks par vārnu), dziļa "kraa" balss, ķīļveidīga aste.
+  ⛔ NEMEDĪT — neskatoties uz veciem uzskatiem!
+
+🚫 LAUKIRBE (Perdix perdix) — pārbaudi statusu VMD (populācija samazinājusies)
+
+🚫 MEDŅA MĀTĪTE — AIZLIEGTS medīt!
+🚫 RUBEŅA MĀTĪTE — AIZLIEGTS medīt!
+
+🚫 Visas PŪCES — īpaši aizsargājamas.
+🚫 Visi VANAGI un ĒRGĻI — īpaši aizsargājami.
+🚫 Visi pārējie meža un lauku putni — aizsargājami.
+
+⛔ Ja nesi pārliecināts par sugu vai dzimumu — NEMEDĪ!
+
+═══════════════════════════════════════════
 ⚪ NEMEDĪJAMIE ZĪDĪTĀJI (humors atļauts!)
 ═══════════════════════════════════════════
 
