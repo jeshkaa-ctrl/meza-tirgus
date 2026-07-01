@@ -5,7 +5,7 @@ export const PIEGADES_VIETAS = [
   { id: "gaizins",         nosaukums: "Gaiziņš",           lat: 56.8101, lng: 26.0258, pienem: ["balki_P","balki_E","tara"] },
   { id: "moon_wood",       nosaukums: "Moon Wood",         lat: 56.9098, lng: 25.6229, pienem: ["balki_P","balki_E","tara"] },
   { id: "vms_timber",      nosaukums: "VMS Timber",        lat: 56.9190, lng: 26.3190, pienem: ["balki_P","balki_E","tara"] },
-  { id: "stora_enso_lv",   nosaukums: "Stora Enso Latvija",lat: 57.3403, lng: 25.8461, pienem: ["balki_P","balki_E","papirmalka"] },
+  { id: "stora_enso_lv",   nosaukums: "Stora Enso Latvija",lat: 57.3403, lng: 25.8461, pienem: ["balki_P","balki_E","papirmalka_S","papirmalka_B"] },
   { id: "vudlande",        nosaukums: "Vudlande",          lat: 57.3512, lng: 25.8973, pienem: ["balki_P","balki_E","tara"] },
   { id: "timbro",          nosaukums: "SIA Timbro",        lat: 57.3098, lng: 25.2658, pienem: ["balki_P","balki_E","tara"] },
   { id: "pb_koksne",       nosaukums: "PB Koksne",         lat: 57.4510, lng: 26.0981, pienem: ["balki_P","balki_E","tara"] },
@@ -18,9 +18,9 @@ export const PIEGADES_VIETAS = [
   { id: "v55",             nosaukums: "V55",               lat: 56.6163, lng: 26.7249, pienem: ["balki_P","balki_E","tara"] },
 
   // LATVIJA — PAPĪRMALKA / SĪKBAĻĶI
-  { id: "stora_enso_sm",   nosaukums: "Stora Enso (sīkb.)",lat: 57.3403, lng: 25.8461, pienem: ["sikbalki","papirmalka"] },
-  { id: "billerud",        nosaukums: "Billerud Latgale",  lat: 56.5300, lng: 27.3500, pienem: ["sikbalki","papirmalka","balki_M"] },
-  { id: "rpc_paper",       nosaukums: "RPC (papīrmalka)",  lat: 56.6800, lng: 24.3600, pienem: ["papirmalka","sikbalki"] },
+  { id: "stora_enso_sm",   nosaukums: "Stora Enso (sīkb.)",lat: 57.3403, lng: 25.8461, pienem: ["sikbalki","papirmalka_S","papirmalka_B"] },
+  { id: "billerud",        nosaukums: "Billerud Latgale",  lat: 56.5300, lng: 27.3500, pienem: ["sikbalki","papirmalka_S","papirmalka_B","balki_M"] },
+  { id: "rpc_paper",       nosaukums: "RPC (papīrmalka)",  lat: 56.6800, lng: 24.3600, pienem: ["papirmalka_S","papirmalka_B","papirmalka_A","sikbalki"] },
 
   // LATVIJA — FINIERIS
   { id: "lv_finieris",     nosaukums: "AS Latvijas Finieris", lat: 56.5432, lng: 27.3403, pienem: ["finieris"] },
@@ -53,8 +53,10 @@ export const SORT_NOSAUKUMI = {
   sikbalki:   "Sīkbaļķis",
   finieris:   "Finieris",
   zagbalki:   "Zāģbaļķis Apse",
-  tara:       "Tara",
-  papirmalka: "Papīrmalka",
-  malka:      "Malka",
+  tara:         "Tara",
+  papirmalka_S: "Skujkoku papīrmalka",
+  papirmalka_B: "Bērza papīrmalka",
+  papirmalka_A: "Apses papīrmalka",
+  malka:        "Malka",
   skelda:     "Šķelda",
 }

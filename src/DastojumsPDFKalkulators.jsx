@@ -18,19 +18,21 @@ const SUGAS_LV = {
 // Papīrmalku var dot tikai šīs sugas
 const PAPIRMALKA_SUGAS = ["P","E","B","A"]
 
-const SORT_KEYS = ["balki","sikbalki","tara","papirmalka","malka","skelda"]
+const SORT_KEYS = ["balki","sikbalki","tara","papirmalka_S","papirmalka_B","papirmalka_A","malka","skelda"]
 const SORT_NAMES = {
   balki:"Baļķis", sikbalki:"Sīkbaļķis", tara:"Tara",
-  papirmalka:"Papīrmalka", malka:"Malka", skelda:"Šķelda (bonuss)"
+  papirmalka_S:"Skujkoku papīrmalka", papirmalka_B:"Bērza papīrmalka", papirmalka_A:"Apses papīrmalka",
+  malka:"Malka", skelda:"Šķelda (bonuss)"
 }
 const SORT_COLORS = {
   balki:"#1b5e20", sikbalki:"#2e7d32", tara:"#1565c0",
-  papirmalka:"#6a1b9a", malka:"#e65100", skelda:"#795548"
+  papirmalka_S:"#6a1b9a", papirmalka_B:"#7b1fa2", papirmalka_A:"#8e24aa",
+  malka:"#e65100", skelda:"#795548"
 }
 
 const DEFAULT_PRICES = {
   balki_P:80, balki_E:80, balki_B:80, balki_M:65, balki_A:70,
-  sikbalki:70, tara:45, papirmalka:35, malka:33, skelda:8
+  sikbalki:70, tara:45, papirmalka_S:35, papirmalka_B:40, papirmalka_A:28, malka:33, skelda:8
 }
 
 const DEFAULT_IZMAKSAS = { izstrade: 19, skelda_izvesana: 5 }
@@ -41,73 +43,70 @@ const DEFAULT_IZMAKSAS = { izstrade: 19, skelda_izvesana: 5 }
 // Ja nav precīzu kolonnu, aprēķina no vidējā koka
 
 function getSortimenti(suga, vidKoks, resna, videja, tieva, pmalka, malka, atlik) {
-  const sort = { balki:0, sikbalki:0, tara:0, papirmalka:0, malka:0, skelda:0 }
-  const kanPapirmalka = PAPIRMALKA_SUGAS.includes(suga)
+  const sort = { balki:0, sikbalki:0, tara:0, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0 }
 
   // Ja ir precīzas kolonnas no Mežvērtes (InterReg formāts)
   if (resna !== null && videja !== null) {
     sort.skelda = atlik || 0
 
     if (suga === "P") {
-      sort.balki     = resna
-      sort.sikbalki  = videja
-      sort.papirmalka = tieva + pmalka
-      sort.malka     = malka
+      sort.balki       = resna
+      sort.sikbalki    = videja
+      sort.papirmalka_S = tieva + pmalka
+      sort.malka       = malka
     } else if (suga === "E") {
-      sort.sikbalki  = videja
-      sort.papirmalka = tieva + pmalka
-      sort.malka     = malka
+      sort.sikbalki    = videja
+      sort.papirmalka_S = tieva + pmalka
+      sort.malka       = malka
     } else if (suga === "B") {
-      sort.tara      = videja + tieva
-      sort.papirmalka = pmalka
-      sort.malka     = malka
+      sort.tara        = videja + tieva
+      sort.papirmalka_B = pmalka
+      sort.malka       = malka
     } else if (suga === "A") {
-      sort.balki     = videja   // vid koks >0.4 = baļķis
-      sort.tara      = tieva
-      sort.papirmalka = pmalka
-      sort.malka     = malka
+      sort.balki       = videja
+      sort.tara        = tieva
+      sort.papirmalka_A = pmalka
+      sort.malka       = malka
     } else if (suga === "M") {
-      sort.balki     = videja
-      sort.tara      = tieva
-      sort.malka     = pmalka + malka
+      sort.balki       = videja
+      sort.tara        = tieva
+      sort.malka       = pmalka + malka
     } else {
-      // Ba, Bl, Lapukoki, Kl, Os — nav papīrmalkas
-      sort.tara      = videja + tieva
-      sort.malka     = pmalka + malka
+      sort.tara        = videja + tieva
+      sort.malka       = pmalka + malka
     }
     return sort
   }
 
   // Ja NAV precīzu kolonnu — aprēķina no vidējā koka (Södra formāts)
   if (suga === "P") {
-    if (vidKoks >= 0.5)      return { balki:0.65, sikbalki:0.15, tara:0, papirmalka:0.10, malka:0, skelda:0.10 }
-    else if (vidKoks >= 0.25) return { balki:0.45, sikbalki:0.20, tara:0, papirmalka:0.25, malka:0, skelda:0.10 }
-    else                      return { balki:0, sikbalki:0.25, tara:0, papirmalka:0.50, malka:0, skelda:0.25 }
+    if (vidKoks >= 0.5)       return { balki:0.65, sikbalki:0.15, tara:0, papirmalka_S:0.10, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0.10 }
+    else if (vidKoks >= 0.25) return { balki:0.45, sikbalki:0.20, tara:0, papirmalka_S:0.25, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0.10 }
+    else                      return { balki:0, sikbalki:0.25, tara:0, papirmalka_S:0.50, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0.25 }
   } else if (suga === "E") {
-    if (vidKoks >= 0.5)      return { balki:0, sikbalki:0.55, tara:0, papirmalka:0.35, malka:0, skelda:0.10 }
-    else if (vidKoks >= 0.2)  return { balki:0, sikbalki:0.30, tara:0, papirmalka:0.60, malka:0, skelda:0.10 }
-    else                      return { balki:0, sikbalki:0, tara:0, papirmalka:0.65, malka:0, skelda:0.35 }
+    if (vidKoks >= 0.5)       return { balki:0, sikbalki:0.55, tara:0, papirmalka_S:0.35, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0.10 }
+    else if (vidKoks >= 0.2)  return { balki:0, sikbalki:0.30, tara:0, papirmalka_S:0.60, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0.10 }
+    else                      return { balki:0, sikbalki:0, tara:0, papirmalka_S:0.65, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0.35 }
   } else if (suga === "B") {
-    if (vidKoks >= 0.5)      return { balki:0.25, sikbalki:0, tara:0.35, papirmalka:0.25, malka:0, skelda:0.15 }
-    else if (vidKoks >= 0.25) return { balki:0, sikbalki:0, tara:0.40, papirmalka:0.35, malka:0, skelda:0.25 }
-    else                      return { balki:0, sikbalki:0, tara:0.20, papirmalka:0.55, malka:0, skelda:0.25 }
+    if (vidKoks >= 0.5)       return { balki:0.25, sikbalki:0, tara:0.35, papirmalka_S:0, papirmalka_B:0.25, papirmalka_A:0, malka:0, skelda:0.15 }
+    else if (vidKoks >= 0.25) return { balki:0, sikbalki:0, tara:0.40, papirmalka_S:0, papirmalka_B:0.35, papirmalka_A:0, malka:0, skelda:0.25 }
+    else                      return { balki:0, sikbalki:0, tara:0.20, papirmalka_S:0, papirmalka_B:0.55, papirmalka_A:0, malka:0, skelda:0.25 }
   } else if (suga === "A") {
-    if (vidKoks >= 0.8)      return { balki:0.45, sikbalki:0, tara:0.20, papirmalka:0.20, malka:0, skelda:0.15 }
-    else if (vidKoks >= 0.4)  return { balki:0.25, sikbalki:0, tara:0.20, papirmalka:0.40, malka:0, skelda:0.15 }
-    else                      return { balki:0, sikbalki:0, tara:0.15, papirmalka:0.55, malka:0, skelda:0.30 }
+    if (vidKoks >= 0.8)       return { balki:0.45, sikbalki:0, tara:0.20, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0.20, malka:0, skelda:0.15 }
+    else if (vidKoks >= 0.4)  return { balki:0.25, sikbalki:0, tara:0.20, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0.40, malka:0, skelda:0.15 }
+    else                      return { balki:0, sikbalki:0, tara:0.15, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0.55, malka:0, skelda:0.30 }
   } else if (suga === "M") {
-    if (vidKoks >= 0.4)      return { balki:0.35, sikbalki:0, tara:0.30, papirmalka:0, malka:0.20, skelda:0.15 }
-    else if (vidKoks >= 0.25) return { balki:0.20, sikbalki:0, tara:0.25, papirmalka:0, malka:0.35, skelda:0.20 }
-    else                      return { balki:0, sikbalki:0, tara:0.15, papirmalka:0, malka:0.55, skelda:0.30 }
+    if (vidKoks >= 0.4)       return { balki:0.35, sikbalki:0, tara:0.30, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0.20, skelda:0.15 }
+    else if (vidKoks >= 0.25) return { balki:0.20, sikbalki:0, tara:0.25, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0.35, skelda:0.20 }
+    else                      return { balki:0, sikbalki:0, tara:0.15, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0.55, skelda:0.30 }
   } else {
-    // Ba, Bl, Lapukoki utt — nav papīrmalkas
-    if (vidKoks >= 0.25)     return { balki:0, sikbalki:0, tara:0.35, papirmalka:0, malka:0.45, skelda:0.20 }
-    else                      return { balki:0, sikbalki:0, tara:0.15, papirmalka:0, malka:0.60, skelda:0.25 }
+    if (vidKoks >= 0.25)      return { balki:0, sikbalki:0, tara:0.35, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0.45, skelda:0.20 }
+    else                      return { balki:0, sikbalki:0, tara:0.15, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0.60, skelda:0.25 }
   }
 }
 
 function aprēķinātSortimentus(nogabali) {
-  const kop = { balki:0, sikbalki:0, tara:0, papirmalka:0, malka:0, skelda:0 }
+  const kop = { balki:0, sikbalki:0, tara:0, papirmalka_S:0, papirmalka_B:0, papirmalka_A:0, malka:0, skelda:0 }
   const balkiPaSugam = { P:0, E:0, B:0, A:0, M:0 }
 
   nogabali.forEach(n => {
@@ -146,7 +145,9 @@ function aprēķinātVērtību(kop, balkiPaSugam, prices, izmaksas) {
     kop.balki    * vidBalkasCena +
     kop.sikbalki * (prices.sikbalki||70) +
     kop.tara     * (prices.tara||45) +
-    kop.papirmalka*(prices.papirmalka||35) +
+    kop.papirmalka_S*(prices.papirmalka_S||35) +
+    kop.papirmalka_B*(prices.papirmalka_B||40) +
+    kop.papirmalka_A*(prices.papirmalka_A||28) +
     kop.malka    * (prices.malka||33)
     // skelda nav bruto aprēķinā
 
@@ -296,7 +297,7 @@ export default function DastojumsKalkulators({ onBack, initialFile, onNavigateLo
   useEffect(() => { if (initialFile) handleFile(initialFile) }, [])
 
   // Aprēķini
-  const { kop, balkiPaSugam } = nogabali.length ? aprēķinātSortimentus(nogabali) : { kop:{balki:0,sikbalki:0,tara:0,papirmalka:0,malka:0,skelda:0}, balkiPaSugam:{} }
+  const { kop, balkiPaSugam } = nogabali.length ? aprēķinātSortimentus(nogabali) : { kop:{balki:0,sikbalki:0,tara:0,papirmalka_S:0,papirmalka_B:0,papirmalka_A:0,malka:0,skelda:0}, balkiPaSugam:{} }
   const rez = aprēķinātVērtību(kop, balkiPaSugam, prices, izmaksas)
 
   const handleFile = async (file) => {
@@ -349,7 +350,9 @@ tr:nth-child(even){background:#f4faf4}
 ${kop.balki>0.01?`<tr><td>Baļķis (vid. ${balkiCena} €/m³)</td><td>${kop.balki.toFixed(1)}</td><td>${balkiCena}</td><td class="r">${(kop.balki*rez.vidBalkasCena).toFixed(0)}</td></tr>`:''}
 ${kop.sikbalki>0.01?`<tr><td>Sīkbaļķis</td><td>${kop.sikbalki.toFixed(1)}</td><td>${prices.sikbalki}</td><td class="r">${(kop.sikbalki*prices.sikbalki).toFixed(0)}</td></tr>`:''}
 ${kop.tara>0.01?`<tr><td>Tara</td><td>${kop.tara.toFixed(1)}</td><td>${prices.tara}</td><td class="r">${(kop.tara*prices.tara).toFixed(0)}</td></tr>`:''}
-${kop.papirmalka>0.01?`<tr><td>Papīrmalka</td><td>${kop.papirmalka.toFixed(1)}</td><td>${prices.papirmalka}</td><td class="r">${(kop.papirmalka*prices.papirmalka).toFixed(0)}</td></tr>`:''}
+${kop.papirmalka_S>0.01?`<tr><td>Skujkoku papīrmalka</td><td>${kop.papirmalka_S.toFixed(1)}</td><td>${prices.papirmalka_S}</td><td class="r">${(kop.papirmalka_S*prices.papirmalka_S).toFixed(0)}</td></tr>`:''}
+${kop.papirmalka_B>0.01?`<tr><td>Bērza papīrmalka</td><td>${kop.papirmalka_B.toFixed(1)}</td><td>${prices.papirmalka_B}</td><td class="r">${(kop.papirmalka_B*prices.papirmalka_B).toFixed(0)}</td></tr>`:''}
+${kop.papirmalka_A>0.01?`<tr><td>Apses papīrmalka</td><td>${kop.papirmalka_A.toFixed(1)}</td><td>${prices.papirmalka_A}</td><td class="r">${(kop.papirmalka_A*prices.papirmalka_A).toFixed(0)}</td></tr>`:''}
 ${kop.malka>0.01?`<tr><td>Malka</td><td>${kop.malka.toFixed(1)}</td><td>${prices.malka}</td><td class="r">${(kop.malka*prices.malka).toFixed(0)}</td></tr>`:''}
 <tr class="total"><td colspan="3">BRUTO vērtība</td><td class="r">${rez.bruto.toFixed(0)} €</td></tr>
 </tbody></table>
@@ -509,7 +512,7 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
             {[
               ["balki_P","Baļķis Priede"],["balki_E","Baļķis Egle"],["balki_B","Finieris"],
               ["balki_A","Zāģbaļķis Apse"],["balki_M","Baļķis Melnalksnis"],["sikbalki","Sīkbaļķis"],
-              ["tara","Tara"],["papirmalka","Papīrmalka"],["malka","Malka"],
+              ["tara","Tara"],["papirmalka_S","Skujkoku papīrmalka"],["papirmalka_B","Bērza papīrmalka"],["papirmalka_A","Apses papīrmalka"],["malka","Malka"],
               ["skelda","Šķelda (krautuvē)"]
             ].map(([k,lb]) => (
               <div key={k}>
@@ -608,7 +611,7 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
                   <td style={{padding:"4px 8px",textAlign:"right",fontWeight:700,color:"#4caf50"}}>{(kop.balki*rez.vidBalkasCena).toFixed(0)}</td>
                 </tr>
               )}
-              {["sikbalki","tara","papirmalka","malka"].map(k => kop[k]>0.01 && (
+              {["sikbalki","tara","papirmalka_S","papirmalka_B","papirmalka_A","malka"].map(k => kop[k]>0.01 && (
                 <tr key={k} style={{borderBottom:"1px solid #1e3a1e"}}>
                   <td style={{padding:"4px 8px",color:"#a5d6a7"}}>{SORT_NAMES[k]}</td>
                   <td style={{padding:"4px 8px",textAlign:"right"}}>{kop[k].toFixed(1)}</td>
@@ -687,9 +690,11 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
                   sikbalki:   parseFloat(kop.sikbalki.toFixed(2)),
                   finieris:   0,
                   zagbalki:   0,
-                  tara:       parseFloat(kop.tara.toFixed(2)),
-                  papirmalka: parseFloat(kop.papirmalka.toFixed(2)),
-                  malka:      parseFloat(kop.malka.toFixed(2)),
+                  tara:         parseFloat(kop.tara.toFixed(2)),
+                  papirmalka_S: parseFloat(kop.papirmalka_S.toFixed(2)),
+                  papirmalka_B: parseFloat(kop.papirmalka_B.toFixed(2)),
+                  papirmalka_A: parseFloat(kop.papirmalka_A.toFixed(2)),
+                  malka:        parseFloat(kop.malka.toFixed(2)),
                   skelda:     parseFloat(kop.skelda.toFixed(2)),
                 },
                 kadastrs,

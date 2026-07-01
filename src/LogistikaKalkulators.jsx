@@ -8,7 +8,7 @@ import { C as DS, F, spinnerCSS } from "./ds"
 const CENU_KOLS = {
   balki_P: 'cena_balki_p', balki_E: 'cena_balki_e', balki_M: 'cena_balki_m',
   sikbalki: 'cena_sikbalki', finieris: 'cena_finieris', zagbalki: 'cena_zagbalki',
-  tara: 'cena_tara', papirmalka: 'cena_papirmalka', malka: 'cena_malka', skelda: 'cena_skelda',
+  tara: 'cena_tara', papirmalka_S: 'cena_papirmalka_s', papirmalka_B: 'cena_papirmalka_b', papirmalka_A: 'cena_papirmalka_a', malka: 'cena_malka', skelda: 'cena_skelda',
 }
 
 // ─── STILI ───────────────────────────────────────────────────────────────────
@@ -37,7 +37,7 @@ const s = {
 const SORT_KRASA = {
   balki_P: "#2e7d32", balki_E: "#1565c0", balki_M: "#4a148c",
   sikbalki: "#0d47a1", finieris: "#e65100", zagbalki: "#6a1b9a",
-  tara: "#1565c0", papirmalka: "#6a1b9a", malka: "#c62828", skelda: "#795548"
+  tara: "#1565c0", papirmalka_S: "#6a1b9a", papirmalka_B: "#7b1fa2", papirmalka_A: "#8e24aa", malka: "#c62828", skelda: "#795548"
 }
 
 // ─── GALVENAIS KOMPONENTS ─────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
     if (sortimenti) return sortimenti
     return {
       balki_P: 0, balki_E: 0, balki_M: 0, sikbalki: 0,
-      finieris: 0, zagbalki: 0, tara: 0, papirmalka: 0, malka: 0, skelda: 0
+      finieris: 0, zagbalki: 0, tara: 0, papirmalka_S: 0, papirmalka_B: 0, papirmalka_A: 0, malka: 0, skelda: 0
     }
   })
 
@@ -64,7 +64,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
   const [kravasIetilpibas, setKravasIetilpibas] = useState({
     balki_P: 30, balki_E: 30, balki_M: 30,
     sikbalki: 32, finieris: 25, zagbalki: 28,
-    tara: 35, papirmalka: 35, malka: 28, skelda: 42,
+    tara: 35, papirmalka_S: 35, papirmalka_B: 35, papirmalka_A: 32, malka: 28, skelda: 42,
   })
 
   // Dinamiskās pircēju vietas no Supabase
