@@ -399,6 +399,66 @@ Nav balta laukuma uz spārna, nav balta plankuma uz kakla.
 Dabas aizsardzības pārvaldes aizsargājamo sugu sarakstā.
 
 ═══════════════════════════════════════════
+🚨 INVAZĪVĀS UN FAUNAI NERAKSTURĪGĀS SUGAS
+═══════════════════════════════════════════
+
+⚠️ Medī bez limita un bez atļaujas (ja nav norādīts citādi)
+⚠️ Mērķis: apturēt izplatību, aizsargāt vietējo faunu
+
+🦌 DAMBRIEDIS (Dama dama)
+Statuss: Bez limita | Termiņš: Visu gadu
+Svars: līdz 100 kg (bullis), 50 kg (govs) | Mūžs: 12–16 g.
+Galvenā pazīme: LĀPSTVEIDA RAGI (plati kā lāpsta) — parādās 3. gadā.
+Pirmie 2 gadi: stieņveidīgi ragi (kā staltbriežim).
+Latvijā neiedzīvojas stabili — galvenokārt izbēg no briežu dārziem.
+⚠️ Dambriedis vs Staltbriedis:
+  Dambriedis — lāpstveida ragi, mazāks ķermenis
+  Staltbriedis — žuburotie ragi bez lāpstas, lielāks
+
+🦌 SIKA BRIEDIS (Cervus nippon)
+Statuss: Bez limita | Termiņš: Visu gadu
+Āzijas izcelsmes briedis. Mazāks par staltbriedi.
+Vasarā: BALTI PLANKUMI uz muguras — galvenā pazīme.
+Latvijā ļoti reti — parasti izbēdzis no Lietuvas nebrīves.
+⚠️ Bīstams — var krustoties ar staltbriedi (sajauktas populācijas nevēlamas).
+⚠️ Sika vs Staltbriedis: Sika — mazāks, vasarā plankumi; Staltbriedis — lielāks, bez plankumiem.
+Ja šaubies — NEŠAUJ, piezvani VMD!
+
+🐑 MUFLONS (Ovis orientalis)
+Statuss: Bez limita | Termiņš: Visu gadu
+Savvaļas aita ar LIEKTIEM RAGIEM — tikai tēviņiem.
+Brūns ar gaišāku sānu laukumu. Latvijā neiedzīvojas — plēsēji ātri nokopj.
+Izbēg no nebrīves.
+
+🐺 ZELTAINAIS ŠAKĀLIS (Canis aureus)
+Statuss: Medījams | Termiņš: 15.jūl–31.marts | Nav vajadzīga īpaša atļauja
+Mazāks par vilku, lielāks par lapsu. DZELTENĪGI BRŪNS, garākas ausis.
+Latvijā ienācis no dienvidaustrumiem (Ukraina, Baltkrievija).
+Pirmoreiz nomedīts 2013. gadā pie Jelgavas. Medī zaķus, grauzējus, mazuļus.
+⚠️ Šakālis vs Vilks vs Lapsa:
+  Šakālis — dzeltenīgi brūns, vidēja izmēra, garākas ausis
+  Vilks — pelēks, liels, masīvs
+  Lapsa — sarkanbrūna, mazāka, gara krūšata aste
+  Ja šaubies — NEŠAUJ! Vilks ir limitēts!
+
+🦝 JENOTS (Procyon lotor)
+Statuss: Bez limita | Termiņš: Visu gadu
+Ziemeļamerikas suga. Raksturīga MELNA "MASKA" AP ACĪM — viegli atpazīstams.
+Izbēdzis no kažokzvēru fermām. Izplatās Latvijā.
+Nedrīkst sajaukt ar jenotsuni (Nyctereutes) — tas ir suņu dzimtas pārstāvis.
+
+🌊 NUTRIJA (Myocastor coypus)
+Statuss: Bez limita | Termiņš: Visu gadu
+Liels grauzējs no Dienvidamerikas. ORANŽS KNĀBIS — galvenā atpazīšanas pazīme.
+Ūdens dzīvnieks. Izbēdzis no kažokzvēru fermām.
+Biotops: upes, kanāli, ezeri.
+
+🐾 BAIBAKS (Marmota bobak)
+Statuss: Bez limita | Termiņš: Visu gadu
+Liels stepju murkšķis no Austrumeiropas. Latvijā ļoti reti.
+Pārbaudi VMD pirms medībām.
+
+═══════════════════════════════════════════
 ⚪ NEMEDĪJAMIE ZĪDĪTĀJI (humors atļauts!)
 ═══════════════════════════════════════════
 
