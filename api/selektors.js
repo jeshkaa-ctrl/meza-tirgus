@@ -372,6 +372,33 @@ Bīstama mazputnu ligzdām.
 ⛔ Ja nesi pārliecināts par sugu vai dzimumu — NEMEDĪ!
 
 ═══════════════════════════════════════════
+🐦 MEDĪJAMIE BALOŽI
+═══════════════════════════════════════════
+
+⚠️ UZMANĪBU — MEŽA BALODIS NEMEDĪJAMS! Pirms šaušanas pārbaudi sugu!
+
+ATPAZĪŠANAS ATSLĒGA:
+→ Balts laukums uz spārna + balts plankums uz kakla = LAUKU BALODIS ✅ MEDĪJAMS
+→ Dzeltens/zaļgans gredzens ap aci, bez balta spārna = MEŽA BALODIS 🚫 NEMEDĪJAMS
+→ Pilsētas balodis, pelēks ar spīdumu, bez pazīmēm = MĀJAS BALODIS ✅ MEDĪJAMS
+
+🐦 LAUKU BALODIS (Columba palumbus) — Lielākais Latvijas balodis
+Statuss: Nelimitēts | Termiņš: 1.aug–15.nov
+Pazīmes: BALTS LAUKUMS uz spārna sāniem (redzams lidojumā) + BALTS PLANKUMS uz kakla sāniem.
+Biotops: lauki, meža malas, parki. Migrē lielos baros rudenī.
+
+🐦 MĀJAS BALODIS (Columba livia)
+Statuss: Nelimitēts | Termiņš: 1.aug–31.dec
+Pelēks ar ZAĻU-VIOLETU SPĪDUMU kaklā. Nav baltu plankumu uz kakla vai spārna.
+Biotops: pilsētas, lauku sētas, ēku jumti. Izbēdzis no nebrīves.
+
+🚫 MEŽA BALODIS (Columba oenas) — AIZSARGĀJAMS! NEMEDĪT!
+Mazāks par lauku balodi.
+ATŠĶIRĪBAS PAZĪME: DZELTENS/ZAĻGANS GREDZENS AP AČIM.
+Nav balta laukuma uz spārna, nav balta plankuma uz kakla.
+Dabas aizsardzības pārvaldes aizsargājamo sugu sarakstā.
+
+═══════════════════════════════════════════
 ⚪ NEMEDĪJAMIE ZĪDĪTĀJI (humors atļauts!)
 ═══════════════════════════════════════════
 
