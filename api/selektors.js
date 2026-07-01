@@ -157,7 +157,143 @@ Ja attēlā redzama aizsargājama suga — NEKAVĒJOTIES informē mednieku
 par aizsardzības statusu. Skaidri, konkrēti, bez mulsinājuma.
 
 ═══════════════════════════════════════════
-⚪ NEMEDĪJAMIE (humors atļauts!)
+🦆 MEDĪJAMIE ŪDENSPUTNI
+═══════════════════════════════════════════
+
+⚠️ SEZONA: 12.augusts pl.16:00 — 30.novembris
+Nedēļas ierobežojums 12.aug–14.sept: TIKAI trešdienās, sestdienās, svētdienās
+No 15.sept–30.nov: katru dienu | Visi nelimitēti — nav skaita limits
+⚠️ KOPŠ 2024/2025: katrs nomedīts ūdensputns jāreģistrē lietotnē "Mednis" ar foto!
+⚠️ Sezona mainās katru gadu — pārbaudi: vmd.gov.lv vai nomeditie.org
+
+GALVENĀS ATPAZĪŠANAS PAZĪMES PĪLĒM:
+→ Spārna spogulītis (krāsa uz spārna) — galvenā pazīme
+→ Knābja forma un krāsa
+→ Astes spalvas: smailas = vecs putns; ar robiņu = jauns putns (izņemot lauci)
+→ Fabrīcija soma (sezonas beigās) — droša jauna putna pazīme
+
+── PĪLES (Anatidae) ──
+
+🦆 MEŽA PĪLE (Anas platyrhynchos) — Visizplatītākā
+Tēviņam: zaļa galva, balts gredzens ap kaklu, pelēks ķermenis.
+Mātītei: brūnplankumaina. Spārna spogulītis ZILS ar baltu apmali.
+Biotops: visi ūdeņi.
+
+🦆 PELĒKĀ PĪLE (Anas strepera)
+Tēviņam: pelēks ķermenis, melna astes daļa.
+Spārna spogulītis BALTS — galvenā atpazīšanas pazīme!
+Arvien biežāk ligzdo Latvijā.
+
+🦆 GARKAKLIS (Anas acuta)
+Eleganta, ar garu asti tēviņam.
+Tēviņam: brūna galva, balts kakls. Rets, bet medījams.
+
+🦆 PLATKNĀBIS (Anas clypeata)
+Liels, plats KAROTES VEIDA KNĀBIS — galvenā pazīme.
+Tēviņam: zaļa galva, brūns vēders, balts krūts.
+Biotops: sekli ūdeņi.
+
+🦆 BALTVĒDERIS (Anas penelope)
+Tēviņam: sarkanbrūna galva, KRĒMKRĀSAS PIERES LAUKUMS, pelēks ķermenis.
+Bieži lielos baros. Migrējošs.
+
+🦆 KRĪKLIS (Anas crecca) — Mazākā medījamā pīle
+Tēviņam: zaļi sāni uz brūnas galvas. Ātrs lidojums.
+Biotops: niedrāji, purvi.
+
+🦆 PRĪKŠĶE (Anas querquedula)
+Tēviņam: BALTA UZACS SVĪTRA uz brūnas galvas.
+Pavasara migrante — medī tikai rudenī (ligzdošanas sezonā aizsargājama).
+
+🦆 CEKULPĪLE (Aythya fuligula) — Niršanas pīle
+Tēviņam: MELNS ar BALTIEM SĀNIEM, cekuliņš pakausnī.
+Mātītei: brūna. Biotops: dziļāki ezeri.
+⚠️ Nesajaukt ar Lielgalvi (Aythya marila) — tas NEMEDĪJAMS!
+
+🦆 ĶERRA (Aythya ferina) — Niršanas pīle
+Tēviņam: SARKANBRŪNA GALVA, pelēks ķermenis, melna krūts.
+Biotops: ezeri.
+
+🦆 GAIGALA (Bucephala clangula)
+Tēviņam: MELNA GALVA ar zaļu spīdumu, BALTS PLANKUMS PIE KNĀBJA.
+Mātītei: brūna galva. Lidojumā spārni svilpo.
+Ligzdo koku dobumos.
+
+🦆 MELNĀ PĪLE (Melanitta nigra)
+Tēviņam: PILNĪGI MELNS ar dzeltenu knābi.
+Migrējošs. Jūras pīle, Latvijā galvenokārt migrācijā.
+⚠️ Nesajaukt ar Tumšo pīli (Melanitta fusca) — balta spārna plankums = NEMEDĪJAMA!
+
+── ZOSIS ──
+
+🪿 BALTPIERES ZOSS (Anser albifrons)
+BALTS LAUKUMS uz pieres, MELNI PLANKUMI uz vēdera.
+Migrē lielos baros. Termiņš: 15.sept–15.nov (pārbaudi aktuālo!).
+
+🪿 SĒJAS ZOSS (Anser fabalis) — Galvenā medījamā zoss
+Lielāka par baltpieres. ORANŽS KNĀBIS ar melnu galu.
+Termiņš: 15.sept–15.nov.
+
+🪿 MEŽA ZOSS (Anser fabalis fabalis)
+Sējas zoss apakšsuga — tas pats taksons.
+
+🪿 KANĀDAS ZOSS (Branta canadensis)
+Liela. MELNS KAKLS UN GALVA, balts plankums uz vaiga.
+Invazīva suga — medījama.
+
+── CITI ──
+
+🦅 LAUCIS (Fulica atra)
+MELNS putns ar BALTU KNĀBI un pieres laukumu.
+Nav pīle — ir dumpju dzimta (Rallidae).
+Termiņš: 12.aug–30.nov.
+Vecuma noteikšana pēc astes spalvām — NE, laucim cits princips.
+
+🐦 MĒRKAZIŅA (Gallinago gallinago)
+GARA TAISNA KNĀBIS, brūnplankumains.
+Ātrs līkumains lidojums — atpazīšanas pazīme.
+Biotops: mitras pļavas, purvi.
+
+🐦 MEŽIRBE (Scolopax rusticola)
+Liela, ar GARU KNĀBI. Meža putns.
+⚠️ Termiņš: 1.sept–31.janv — ATŠĶIRĪGS no pārējiem ūdensputniem!
+
+═══════════════════════════════════════════
+🔴 NEMEDĪJAMIE ŪDENSPUTNI — SVARĪGI ATPAZĪT!
+═══════════════════════════════════════════
+
+🚫 BALTVAIGU ZOSS (Branta leucopsis) — AIZSARGĀJAMA
+  Balta seja, melns kakls — ja redzi, NEMEDĪT!
+
+🚫 MELNGALVAS ZOSS (Branta bernicla) — AIZSARGĀJAMA
+  Maza, tumša, balts plankums kaklā.
+
+🚫 SĀMSALAS DIŽPĪLE (Somateria mollissima) — AIZSARGĀJAMA
+  Liela jūras pīle.
+
+🚫 BRŪNKAKLIS (Netta rufina) — VAIRS NEMEDĪJAMS
+  Sarkana galva, sarkans knābis.
+
+🚫 LIELGALVIS (Aythya marila) — NEMEDĪJAMS
+  Līdzīgs cekulpīlei — svarīgi atšķirt!
+
+🚫 KĀKAULIS (Clangula hyemalis) — NEMEDĪJAMS
+  Gara aste tēviņam.
+
+🚫 TUMŠĀ PĪLE (Melanitta fusca) — NEMEDĪJAMA
+  Kā melnā pīle, bet ar BALTU SPĀRNA PLANKUMU.
+
+🚫 CEKULDŪKURIS (Podiceps cristatus) — AIZSARGĀJAMS
+  Nav pīle — dūkuris.
+
+🚫 GAURAS (Mergus spp.) — NEMEDĪJAMAS
+  Zobainais knābis.
+
+⛔ Ja nesi 100% pārliecināts par sugu — NEMEDĪ!
+Aizsargājamas sugas nomedīšana = kriminālatbildība.
+
+═══════════════════════════════════════════
+⚪ NEMEDĪJAMIE ZĪDĪTĀJI (humors atļauts!)
 ═══════════════════════════════════════════
 
 Ezis, Kurmis, Vāvere, Zebiekste, Ūdensžurka, Pelēm, Sikspārņi u.c.
