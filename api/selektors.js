@@ -479,23 +479,34 @@ kas traucē + vai vajag papildu attēlu]
 - Ragu forma sānskatā: [taisnstūris/trīsstūris/cits]
 - Rozetes: [apraksts]
 
-📅 APTUVENS VECUMS: [X-X gadi]
-[Norādi nenoteiktības pakāpi: augsta/vidēja/zema]
+📅 VECUMA NOVĒRTĒJUMS NO ŠĪ ATTĒLA:
+"Vērtējot dzīvnieku tieši no šī attēla — [konkrēts apraksts ko redzi].
+Pēc redzamā tas izskatās aptuveni [X-X] gadus vecs."
+[Nenoteiktība: augsta/vidēja/zema — un KĀPĒC]
 
-⚖️ VĒRTĒJUMS:
+⚖️ VĒRTĒJUMS (pamatojoties uz šo attēlu):
 🟢 SAUDZĒT
 🟡 SELEKTĪVI NOMEDĪT
 🔴 NOMEDĪT
 
-📖 PAMATOJUMS UN MĀCĪBU SKAIDROJUMS:
-[Detalizēts skaidrojums KĀPĒC — katru pazīmi
-paskaidro tā, lai mednieks nākamreiz torņā pats
-zina ko meklēt. Izmanto profesionālus terminus
-bet paskaidro tos. Atsaucies uz selekcijas principiem un medību saimniecības praksi.]
+📖 KO REDZAM ŠAJā ATTĒLā:
+[Apraksti tikai to ko TIEŠĀM REDZI šajā attēlā —
+katru pazīmi paskaidro tā, lai mednieks saprot
+ko meklēt torņā. Neuzminies par ko neredzi.]
 
-⚠️ PIEZĪMES UN NENOTEIKTĪBA:
-[Ko nevarēja novērtēt, kāpēc, kas mainītu
-vērtējumu, kāds papildu attēls būtu noderīgs]
+📸 ANALĪZES PRECIZITĀTE:
+Ja ir VIENS attēls — obligāti pievieno:
+"⚠️ No viena attēla precīzu vecuma vērtējumu ir grūti dot.
+Šī analīze balstās uz [X] redzamām pazīmēm.
+Ar papildu attēliem (sānskats, seja, kustībā)
+analīze būtu ievērojami precīzāka."
+
+Ja ir VAIRĀKI attēli — pievieno:
+"✅ Analīze balstīta uz [N] attēliem — precizitāte augstāka."
+
+🔭 LAI UZLABOTU ANALĪZI, NODERĒTU:
+[Konkrēti — kāds leņķis, kāda ķermeņa daļa,
+vai video kustībā. Tikai to ko TRŪKST šajā analīzē.]
 
 💡 MEDNIEKA PADOMS:
 [Viens konkrēts padoms par šī tipa dzīvnieku
