@@ -521,8 +521,8 @@ SVARĪGIE PRINCIPI
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const apiKey = process.env.OPENAI_KEY
-  if (!apiKey) return res.status(500).json({ error: 'OPENAI_KEY nav iestatīts Vercel' })
+  const apiKey = process.env.OPENAI_KEY_SELEKTORS
+  if (!apiKey) return res.status(500).json({ error: 'OPENAI_KEY_SELEKTORS nav iestatīts Vercel' })
 
   const { image, mimeType = 'image/jpeg', images } = req.body || {}
 
@@ -546,7 +546,7 @@ export default async function handler(req, res) {
       'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-4-turbo',
+      model: 'gpt-4o',
       max_tokens: 2000,
       messages: [
         { role: 'system', content: SISTEMA },
