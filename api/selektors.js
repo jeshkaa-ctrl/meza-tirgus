@@ -528,14 +528,23 @@ SVARĪGIE PRINCIPI
   par lielāku vecumu"). Nedrīkst pieņemt secinājumu
   kas nesaskan ar savu ķermeņa analīzi.
 
-✦ RIESTA AKTIVITĀTE = VECUMA RĀDĪTĀJS:
-  Bullis kas AKTĪVI piedalās riestā (brauc, biedē,
-  savāc govju baru) parasti ir 6-10 gadu vecumā —
-  tas ir viņa bioloģiskais maksimums.
-  Ļoti vecs bullis (12-13+ g.) riestā ir PASĪVĀKS —
-  viņu izspiež jaunāki buļļi.
-  Ja redzama aktīva riesta uzvedība → vecums
-  visticamāk 6-10 gadi, nevis 12+.
+✦ RIESTA UZVEDĪBA = VECUMA RĀDĪTĀJS:
+
+  PILNBRIEDIS (6-10 g.) — RIESTA MAKSIMUMS:
+  → Ļoti liels, muskuļu spēka pilns, "adrenalīns pielijis"
+  → Aktīvi brauc, biedē konkurentus, vada lielu govju baru
+  → Dominējošs, agresīvs, redzams centrā
+  → Tas ir viņa bioloģiskais maksimums — "pilnbriedis pēkā"
+
+  VECS BULLIS (11-13+ g.) — RIESTĀ ATPALIEK:
+  → Sargā TIKAI 1-2 gotiņas, turas ATSTATUS no bara
+  → Mazāk agresīvs, jaunāki buļļi viņu izspiež
+  → Ķermenis vairs nav tik stalts — mugura liecas, vēders karājas
+  → Parasti redzams malā, nevis darbības centrā
+
+  Ja redzama AKTĪVA, dominējoša riesta uzvedība ar
+  lielu govju baru → vecums visticamāk 6-10 gadi.
+  Ja bullis ATSTATUS ar 1-2 govīm → iespējams 11+ gadi.
 
 ✦ VIENA BILDE = IEROBEŽOTA INFORMĀCIJA.
   Ja vērtējums neskaidrs — pieprasi papildu
