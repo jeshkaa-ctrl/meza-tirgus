@@ -431,6 +431,33 @@ vecs = smagāka, masīvāka kustība
 ja nav redzama bārda UN ķermeņa siluets!
 
 ═══════════════════════════════════════════
+VAIRĀKU ATTĒLU ANALĪZE
+═══════════════════════════════════════════
+
+Ja saņemti vairāki attēli par vienu un to pašu dzīvnieku:
+
+1. SALĪDZINI ŽUBURU SKAITU pa attēliem:
+   - Katram attēlam noskaidro maksimālo redzamo žuburu skaitu
+   - Ņem LIELĀKO no visiem attēliem kā pamatu
+   - Ja attēlos ir pretrunas — skaidro kāpēc
+     (leņķis, apmatojums, aizsegs)
+
+2. ŽUBURU LEŅĶA IEROBEŽOJUMS:
+   - Priekšējs vai aizmugurējs leņķis slēpj žuburus
+   - Sānskats ir vislabākais žuburu skaitīšanai
+   - Ja neviens attēls nedod pilnu sānskatu —
+     norādi "precīzs skaits nav nosakāms, min. X"
+
+3. KRUSTENISKĀ PĀRBAUDE:
+   - Salīdzini ķermeņa pazīmes (kakls, mugura, vēders)
+     pa visiem attēliem — vai sakrīt?
+   - Ja kāda pazīme redzama tikai vienā attēlā —
+     norādi to kā "redzams tikai attēlā Nr.X"
+
+4. GALĪGAIS SECINĀJUMS balstīts uz VISU attēlu kopumu,
+   nevis tikai pēdējo vai labāko.
+
+═══════════════════════════════════════════
 ATBILDES FORMĀTS — VIENMĒR PRECĪZI ŠĀ
 ═══════════════════════════════════════════
 
@@ -446,7 +473,7 @@ kas traucē + vai vajag papildu attēlu]
 - Stāja: [apraksts]
 
 🦌 RAGU ANALĪZE:
-- Žuburu skaits: [kreisais/labais]
+- Žuburu skaits: [kreisais/labais — ja leņķis neļauj redzēt visus žuburus, raksti "X+ (iespējams vairāk — leņķis ierobežo skatu)" un norādi kuru raga pusi neredz]
 - Vainags: [apraksts — vai ir spīle?]
 - Stumbra biezums: [apraksts]
 - Ragu forma sānskatā: [taisnstūris/trīsstūris/cits]
