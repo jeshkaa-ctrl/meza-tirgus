@@ -1,4 +1,15 @@
 import React, { useState, useRef, useCallback } from "react"
+import EtikasTeksts from "./EtikasTeksts"
+import { ETIKAS_TEKSTI } from "./data/etika"
+
+function selekcijasEtika(teksts) {
+  const t = (teksts || "").toUpperCase()
+  if (/IEVAINOT|UZIET|ATRAST|SUNIS/.test(t))      return ETIKAS_TEKSTI.selektors.ievainots
+  if (/NOMEDĪT|IZŅEMT|IETEICAMS NOMEDĪT/.test(t)) return ETIKAS_TEKSTI.selektors["nomedīt"]
+  if (/SAUDZĒT|PAGAIDIET|ATSTĀT/.test(t))         return ETIKAS_TEKSTI.selektors.saudzet
+  if (/NEPIETIEK|NESKAIDRS|GRŪTI NOTEIKT/.test(t)) return ETIKAS_TEKSTI.selektors.nepietiekInfo
+  return ETIKAS_TEKSTI.selektors.saudzet
+}
 
 const MAX_ATTELI = 3
 
@@ -275,6 +286,7 @@ export default function SelekcijasKalkulators({ onBack }) {
               {rezims === "foto" && atteli.length > 1 && <span style={{ fontSize: 10, color: "#558b2f", fontWeight: 400 }}>({atteli.length} attēli)</span>}
             </div>
             <FormatetsRezultats teksts={rezultats} />
+            {rezims === "foto" && <EtikasTeksts teksts={selekcijasEtika(rezultats)} style={{ borderTopColor: "#1e3a1e" }} />}
             <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid #1e3a1e", display: "flex", gap: 10, flexWrap: "wrap" }}>
               {rezims === "foto"
                 ? <button style={s.btn} onClick={jauns}>📷 Jauns dzīvnieks</button>

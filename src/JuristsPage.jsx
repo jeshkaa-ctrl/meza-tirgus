@@ -1,4 +1,15 @@
 import React, { useState, useRef } from "react"
+import EtikasTeksts from "./EtikasTeksts"
+import { ETIKAS_TEKSTI } from "./data/etika"
+
+function juristsEtika(jautajums) {
+  const q = (jautajums || "").toLowerCase()
+  if (/nelikumīg|sods|bargs|noziegum|pārkāp/.test(q)) return ETIKAS_TEKSTI.jurists.nelikumigi
+  if (/aizliegt|drīkst|drīkstē/.test(q))               return ETIKAS_TEKSTI.jurists.aizliegumi
+  if (/droš|ieroc|glabā|šauj/.test(q))                  return ETIKAS_TEKSTI.jurists.drosiba
+  if (/sezon|termiņ|datums|kad |līdz|no /.test(q))      return ETIKAS_TEKSTI.jurists.termini
+  return ETIKAS_TEKSTI.jurists.vispareji
+}
 
 const s = {
   app:    { minHeight: "100vh", background: "#050a14", color: "#e0e8f0", fontFamily: "'Inter',sans-serif" },
@@ -146,6 +157,7 @@ export default function JuristsPage({ onBack }) {
             <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid #1a2d4a", fontSize: 11, color: "#3a5a7a" }}>
               ⚠️ Vienmēr pārbaudi aktuālos likumus: likumi.lv → "Medību likums" vai "Medību noteikumi"
             </div>
+            <EtikasTeksts teksts={juristsEtika(jautajums)} style={{ borderTopColor: "#1a2d4a" }} />
           </div>
         )}
 

@@ -1,5 +1,7 @@
 import React, { useState } from "react"
 import { SUGAS, MEDALAS, getMedala, aprKin } from "./cicEngine"
+import EtikasTeksts from "./EtikasTeksts"
+import { ETIKAS_TEKSTI } from "./data/etika"
 
 // ─── Stils ───────────────────────────────────────────────────────────────────
 const s = {
@@ -366,6 +368,12 @@ function Rezultats({ suga, rez, rezims, onAtpakal }) {
         <div style={{ fontSize: 11, color: "#5a7a5a", lineHeight: 1.6 }}>
           ⚠️ Šis aprēķins ir aptuvens un informatīvs. Oficiālo CIC vērtējumu veic 3 cilvēku komisija ar vismaz 1 sertificētu CIC ekspertu. Zelta medaļas trofejām nepieciešama mednieka un platības īpašnieka zvēresta liecība. Latvijā lielākā CIC trofeja vērtēšanas izstāde — "Mednieks" Ķīpsalā.
         </div>
+        <EtikasTeksts teksts={
+          m.tips === 'zelts'   ? ETIKAS_TEKSTI.cic.zelts :
+          m.tips === 'sudrabs' ? ETIKAS_TEKSTI.cic.sudrabs :
+          m.tips === 'bronza'  ? ETIKAS_TEKSTI.cic.bronza :
+                                 ETIKAS_TEKSTI.cic.bezMedalas
+        } />
       </div>
 
       <div style={{ display: "flex", gap: 10 }}>
