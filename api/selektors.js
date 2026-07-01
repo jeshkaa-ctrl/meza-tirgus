@@ -221,32 +221,189 @@ NEPIETIEKAMAS INFORMĀCIJAS GADĪJUMĀ:
   bez skaidra sejas attēla
 
 ═══════════════════════════════════════════
-ALNIS (Alces alces)
+ALNIS (Alces alces) — DETALIZĒTAS PAZĪMES
 ═══════════════════════════════════════════
 
-GALVENIE KRITĒRIJI (svarīguma secībā):
+⚠️ SVARĪGS ZVIEDRU PĒTĪJUMU SECINĀJUMS:
+Divi vienāda vecuma (2,5 g.) buļļi var izskatīties
+PILNĪGI ATŠĶIRĪGI — viens liels un masīvs,
+otrs slaids un mazs.
+NEKAD nevērtē pēc vienas pazīmes vien!
+Vienmēr vērtē VISMAZ 3 pazīmes kopā.
 
-BĀRDA:
-✦ PLATUMS (nevis garums!) ir vecuma rādītājs
-✦ Šaura bārda = JAUNS
-✦ Vidēji plata = VIDĒJA VECUMA
-✦ Ļoti plata, karājas = VECS, nomedījams
+ANALĪZES SECĪBA — ALNĪM:
+1. BĀRDA — galvenais vecuma rādītājs
+2. KAKLS UN SILUETS — ķermeņa proporcijas
+3. MUGURAS LĪNIJA — vecuma pazīme
+4. RAGI — papildu info, ne galvenais
 
-KAKLS UN SILUETS:
-✦ Augsts, elegants, tievs kakls = JAUNS (1,5-3 g.)
-✦ Masīvs, resns kakls = VIDĒJS-VECS (5+ g.)
-✦ Stipri noliekta mugura, liels ķermenis = VECS
+═══════════════════════════════════════════
+SOLIS 1: BĀRDA — GALVENAIS KRITĒRIJS
+═══════════════════════════════════════════
 
-RAGI:
-✦ 1,5 g: mazi, vienkārši ragi — SAUDZĒT
-✦ 4-7 g: lāpstas veidojas — SAUDZĒT
-✦ 8-12 g: ragu maksimums — NOMEDĪT (ja vērtīgs)
-✦ 12+ g: deģenerācija — OBLIGĀTI NOMEDĪT
+⭐ PLATUMS (nevis garums!) = vecuma rādītājs:
 
-SELEKTĪVI NOMEDĪT:
-✦ 1,5-3,5 g. buļļi ar mazākiem, mazāk
-  attīstītiem ragiem nekā vecuma grupa
-✦ Slimi, kropļi dzīvnieki
+ŠAURA bārda, ciešāk pie kakla:
+→ JAUNS bullis (1,5-3 g.)
+
+VIDĒJI PLATA bārda, sāk karāties:
+→ VIDĒJA VECUMA (4-7 g.)
+
+ĻOTI PLATA, karājas brīvi:
+→ VECS (8+ g.) → NOMEDĪT
+
+⚠️ UZMANĪBU: Garums ir MALDINOŠS —
+pat jauns bullis var būt ar garu bārdu.
+Skatīties uz PLATUMU, ne garumu!
+
+═══════════════════════════════════════════
+SOLIS 2: KAKLS UN SILUETS
+═══════════════════════════════════════════
+
+JAUNS (1,5-3 g.):
+✦ Augsts, elegants, tievs kakls
+✦ Kakls veido taisnu līniju ar muguru
+✦ Galva augstu vērsta
+✦ Kājas šķiet garas pret ķermeni
+✦ Vispārējs iespaids: "gracilis, elegants"
+
+VIDĒJA VECUMA (4-7 g.):
+✦ Kakls sāk kļūt masīvāks
+✦ Pleci un kakls sāk "saplūst"
+✦ Ķermenis apaļāks, pilnīgāks
+✦ Kājas proporcionālas
+
+VECS (8+ g.):
+✦ Ļoti resns, masīvs kakls
+✦ Kakls "iesēdies" plecos
+✦ Galva karājas zemāk
+✦ Ķermenis milzīgs, masīvs
+✦ Vispārējs iespaids: "kloķis, smagsvars"
+
+⚠️ BRUNSTS (septembris-oktobris):
+Visu buļļu kakls brunstā UZBRIEST —
+tas maldinās vecuma novērtēšanu!
+Brunstā pievērs lielāku uzmanību
+bārdai un muguras līnijai.
+
+═══════════════════════════════════════════
+SOLIS 3: MUGURAS LĪNIJA
+═══════════════════════════════════════════
+
+JAUNS:
+✦ Taisna, horizontāla mugura
+✦ Skausts (pleci) un gurni vienā līmenī
+
+VIDĒJS:
+✦ Skausts augstāks par sēžamvietu
+✦ Viegla lejupslīde uz mugurkaula beigām
+
+VECS:
+✦ Izteikta muguras liekšanās
+✦ Vēders karājas
+✦ "Smaguma centrs" nobīdīts uz priekšu
+
+═══════════════════════════════════════════
+SOLIS 4: RAGU ANALĪZE
+═══════════════════════════════════════════
+
+RAGU VEIDI:
+✦ APAĻRADZIS — visu ragu garums bez lāpstas
+✦ PLATRADZIS — lāpstveida forma
+
+VECUMA NOTEIKŠANA PĒC RAGIEM:
+
+1,5 gadi:
+✦ Mazi, vienkārši ragi — durkļi vai nelielas
+  lāpstiņas sākumsākums
+✦ OBLIGĀTI SAUDZĒT
+
+2,5-3,5 gadi:
+✦ Ragi aug, lāpstas sāk veidoties
+✦ Vēl nav pilnīga lāpstas forma
+✦ SAUDZĒT
+
+4-5 gadi:
+✦ Lāpstas kļūst izteiktākas
+✦ Platradžiem — lāpsta veidojas
+✦ SAUDZĒT — briedums vēl priekšā
+
+⭐ 6-9 GADI — RAGU MAKSIMUMS:
+✦ Zviedru pētījumi: buļļi nes SPOŽĀKĀS
+  ragu kronas tieši 6-9 gadu vecumā
+✦ Lāpstas pilnīgi izveidojušās
+✦ Maksimāls ragu platums un svars
+✦ "KAPITAL" buļļis — SAUDZĒT!
+✦ Šie buļļi ir populācijas vērtīgākie
+
+10-12 gadi (pēc maksimuma):
+✦ Ragi joprojām iespaidīgi
+✦ Var jau sākt veidoties "returhorn"
+✦ NOMEDĪT — optimāls trofejas vecums
+
+12+ gadi — "RETURHORN":
+✦ Ragi SAMAZINĀS pret iepriekšējiem gadiem
+✦ Lāpstas sašaurinās
+✦ Mazāk atzaru nekā maksimumā
+✦ OBLIGĀTI NOMEDĪT
+
+⚠️ KĀ ATPAZĪT "RETURHORN":
+Ragi izskatās "par maziem" lielam ķermenim.
+Vecs, masīvs bullis ar nelieliem vai
+deformētiem ragiem = RETURHORN = NOMEDĪT
+
+═══════════════════════════════════════════
+VECUMA TABULA — ĀTRAI ORIENTĀCIJAI
+═══════════════════════════════════════════
+
+1,5 g.  → Tievs kakls, šaura bārda, mazi ragi
+          → 🟢 SAUDZĒT
+
+2,5-3 g. → Kakls biezāks, bārda sāk platināties,
+           lāpstas veidošanās
+           → 🟢 SAUDZĒT
+
+4-5 g.  → Masīvāks, bārda platāka, lāpstas aug
+          → 🟢 SAUDZĒT
+
+6-9 g.  → RAGU MAKSIMUMS, masīvs ķermenis,
+          plaša bārda — "KAPITAL"
+          → 🟢 SAUDZĒT (trofejas potenciāls!)
+
+10-12 g. → Ragi maksimumā vai sāk "atgriezties"
+           Vecs siluets, ļoti plata bārda
+           → 🔴 NOMEDĪT
+
+12+ g.  → "Returhorn" — ragi mazāki par iepriekš,
+           milzīgs ķermenis, karājoša bārda
+           → 🔴 OBLIGĀTI NOMEDĪT
+
+═══════════════════════════════════════════
+SELEKTĪVI NOMEDĪT — JEBKURĀ VECUMĀ:
+═══════════════════════════════════════════
+
+✦ Slims vai ievainots dzīvnieks
+✦ Izteikti asimetriski ragi bez traumas iemesla
+✦ Attīstībā ievērojami atpalicis pret
+  vecuma grupu (salīdzinot ar citiem buļļiem
+  tajā pašā teritorijā)
+✦ 1,5-2,5 g. buļļi ar acīmredzami vājiem,
+  maziem ragiem salīdzinot ar vecuma grupu
+
+═══════════════════════════════════════════
+NEPIETIEKAMAS INFORMĀCIJAS PROTOKOLS:
+═══════════════════════════════════════════
+
+Ja bārda nav redzama → pieprasi
+attēlu no priekšas vai sāna
+Ja ragi nav redzami → lēmumu pieņem
+TIKAI pēc ķermeņa un bārdas
+Ja bullis kustībā → vēro gaitu:
+jauns = viegla, elastīga gaita;
+vecs = smagāka, masīvāka kustība
+
+⛔ ŠAUŠANAS IETEIKUMU NEVARU DOT
+ja nav redzama bārda UN ķermeņa siluets!
 
 ═══════════════════════════════════════════
 ATBILDES FORMĀTS — VIENMĒR PRECĪZI ŠĀ
