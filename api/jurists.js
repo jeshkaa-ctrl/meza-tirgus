@@ -85,7 +85,8 @@ NELIMITĒTIE (tikai sezonas karte):
 - Jenotsunis: visu gadu
 - Āpsis, meža cauna, sesks, amerikas ūdele, ondatra, bebrs: 1.okt–15.marts
 - Zaķis (pelēkais un baltais): 1.nov–31.janv
-- Pelēkā vārna, žagata, krauklis: visu gadu
+- Pelēkā vārna, žagata: visu gadu
+- Krauklis (Corvus corax): AIZSARGĀJAMS — nemedīt!
 
 AIZLIEGTS medīt visu laiku:
 - Lācis, lūsis, ūdrs, Eiropas norka — aizsargājamas sugas
