@@ -507,15 +507,23 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
           <div style={s.cardTitle}>💶 Materiālu cenas (€/m³)</div>
           <div style={s.grid3}>
             {[
-              ["balki_P","Baļķis Priede"],["balki_E","Baļķis Egle"],["balki_B","Baļķis Bērzs"],
-              ["balki_A","Baļķis Apse"],["balki_M","Baļķis Melnalksnis"],["sikbalki","Sīkbaļķis"],
+              ["balki_P","Baļķis Priede"],["balki_E","Baļķis Egle"],["balki_B","Finieris"],
+              ["balki_A","Zāģbaļķis Apse"],["balki_M","Baļķis Melnalksnis"],["sikbalki","Sīkbaļķis"],
               ["tara","Tara"],["papirmalka","Papīrmalka"],["malka","Malka"],
               ["skelda","Šķelda (krautuvē)"]
             ].map(([k,lb]) => (
               <div key={k}>
                 <label style={s.label}>{lb}</label>
-                <input type="number" style={s.input} value={prices[k]}
-                  onChange={e=>setPrices({...prices,[k]:parseFloat(e.target.value)||0})}/>
+                <input type="text" inputMode="decimal" style={s.input} value={prices[k] === 0 ? "" : prices[k]}
+                  onChange={e => {
+                    const v = e.target.value.replace(",", ".")
+                    setPrices({...prices, [k]: v})
+                  }}
+                  onBlur={e => {
+                    const v = parseFloat(e.target.value.replace(",", "."))
+                    setPrices({...prices, [k]: isNaN(v) ? 0 : v})
+                  }}
+                  placeholder="0"/>
               </div>
             ))}
           </div>
@@ -526,13 +534,19 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
           <div style={s.grid2}>
             <div>
               <label style={s.label}>Izstrāde (harvesteris + pievešana) €/m³</label>
-              <input type="number" style={s.input} value={izmaksas.izstrade}
-                onChange={e=>setIzmaksas({...izmaksas,izstrade:parseFloat(e.target.value)||0})}/>
+              <input type="text" inputMode="decimal" style={s.input}
+                value={izmaksas.izstrade === 0 ? "" : izmaksas.izstrade}
+                onChange={e => setIzmaksas({...izmaksas, izstrade: e.target.value.replace(",",".")})}
+                onBlur={e => { const v=parseFloat(e.target.value); setIzmaksas({...izmaksas, izstrade: isNaN(v)?0:v}) }}
+                placeholder="0"/>
             </div>
             <div>
               <label style={s.label}>Šķeldas izvešana €/m³</label>
-              <input type="number" style={s.input} value={izmaksas.skelda_izvesana}
-                onChange={e=>setIzmaksas({...izmaksas,skelda_izvesana:parseFloat(e.target.value)||0})}/>
+              <input type="text" inputMode="decimal" style={s.input}
+                value={izmaksas.skelda_izvesana === 0 ? "" : izmaksas.skelda_izvesana}
+                onChange={e => setIzmaksas({...izmaksas, skelda_izvesana: e.target.value.replace(",",".")})}
+                onBlur={e => { const v=parseFloat(e.target.value); setIzmaksas({...izmaksas, skelda_izvesana: isNaN(v)?0:v}) }}
+                placeholder="0"/>
               <div style={{fontSize:10,color:"#558b2f",marginTop:3}}>
                 Šķelda neto: {Math.max(0,(prices.skelda||8)-(izmaksas.skelda_izvesana||5))} €/m³
               </div>
