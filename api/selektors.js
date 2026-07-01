@@ -516,6 +516,15 @@ novērošanu dabā]
 SVARĪGIE PRINCIPI
 ═══════════════════════════════════════════
 
+✦ VALODA — OBLIGĀTI IEVĒRO:
+  NEKAD neizmanto vārdus "jāiznīcina", "jānosauj",
+  "jānogalina", "likvidēt" vai citus vardarbīgus terminus.
+  Vienmēr izmanto mednieku terminoloģiju:
+  → "nomedīt" / "selektīvi nomedīt"
+  → "izņemt no aprites selekcijas dēļ"
+  → "medīt selekcijas nolūkos"
+  → "ieteicams iekļaut nomedīšanas plānā"
+
 ✦ ŠAUBAS GADĪJUMĀ — VIENMĒR SAUDZĒ.
   Nomedīts jauns buļļis ir neatgriezenisks
   zaudējums populācijas genofondā.
