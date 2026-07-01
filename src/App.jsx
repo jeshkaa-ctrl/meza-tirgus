@@ -41,6 +41,7 @@ const MezaApsaimniekosanasPlans  = React.lazy(() => import("./MezaApsaimniekosan
 const GramatvedisPage            = React.lazy(() => import("./gramatvedis/GramatvedisPage"))
 const SelekcijasKalkulators      = React.lazy(() => import("./SelekcijasKalkulators"))
 const JuristsPage                = React.lazy(() => import("./JuristsPage"))
+const CICKalkulatorsPage         = React.lazy(() => import("./CICKalkulatorsPage"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -224,6 +225,11 @@ if(page==="selektors") return <SelekcijasKalkulators onBack={()=>setPage("main")
 if(page==="jurists") return (
   <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#050a14",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#42a5f5"}}>Ielādē...</div></div>}>
     <JuristsPage onBack={()=>setPage("main")}/>
+  </React.Suspense>
+)
+if(page==="cic") return (
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#060d06",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50"}}>Ielādē...</div></div>}>
+    <CICKalkulatorsPage onBack={()=>setPage("main")}/>
   </React.Suspense>
 )
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
