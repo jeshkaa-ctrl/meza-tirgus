@@ -40,6 +40,44 @@ const SORT_KRASA = {
   tara: "#1565c0", papirmalka_S: "#6a1b9a", papirmalka_B: "#7b1fa2", papirmalka_A: "#8e24aa", malka: "#c62828", skelda: "#795548"
 }
 
+// ─── VIETAS KARTĪTE (ārpus galvenā komponenta lai React nezaudē fokus) ────────
+function VietasKarte({ vieta, isPircejs, lat, lng, cenas, aktivaisSortiments, setCena, s }) {
+  const km = lat && lng ? aprekinattalumu(lat, lng, vieta.lat, vieta.lng) : "?"
+  const trans = typeof km === "number" ? getTransportsCena(km).toFixed(2) : "?"
+  const cena = parseFloat(cenas[vieta.id]?.[aktivaisSortiments]) || 0
+  const neto = cena > 0 ? (cena - parseFloat(trans)).toFixed(2) : null
+  return (
+    <div style={{
+      background: isPircejs ? "#0a1a0a" : "#070d07",
+      border: `1px solid ${isPircejs ? "#2e7d32" : cena > 0 ? "#2d5a2d" : "#1a1a1a"}`,
+      borderRadius: 8, padding: 10,
+    }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: isPircejs ? "#4caf50" : "#a5d6a7", marginBottom: 2, display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+        {vieta.nosaukums}
+        {isPircejs && <span style={{ ...s.tag("#4caf50") }}>✓ Dzīva cena</span>}
+        {vieta.lat > 57.5 && <span style={{ ...s.tag("#e65100") }}>EE</span>}
+        {vieta.novads && <span style={{ fontSize: 9, color: "#4a7a4a" }}>📍 {vieta.novads}</span>}
+      </div>
+      <div style={{ fontSize: 10, color: "#558b2f", marginBottom: 6 }}>
+        ~{km} km | Trans: {trans} €/m³
+      </div>
+      <input type="text" inputMode="decimal"
+        style={{ ...s.input, fontSize: 13, padding: "5px 8px", borderColor: isPircejs && cena > 0 ? "#2e7d32" : undefined }}
+        value={cenas[vieta.id]?.[aktivaisSortiments] || ""}
+        onChange={e => setCena(vieta.id, aktivaisSortiments, e.target.value.replace(",", "."))}
+        placeholder="€/m³" />
+      {neto && (
+        <div style={{ marginTop: 4, fontSize: 11, color: parseFloat(neto) > 0 ? "#4caf50" : "#ef5350", fontWeight: 700 }}>
+          Neto: {neto} €/m³
+        </div>
+      )}
+      {isPircejs && vieta.talrunis && (
+        <div style={{ marginTop: 4, fontSize: 10, color: "#4a7a4a" }}>📞 {vieta.talrunis}</div>
+      )}
+    </div>
+  )
+}
+
 // ─── GALVENAIS KOMPONENTS ─────────────────────────────────────────────────────
 export default function LogistikaKalkulators({ onBack, sortimenti = null, kadastra = "" }) {
 
@@ -448,44 +486,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
             const pircejuVietas = vietasPienemSort.filter(v => v.noSupabase)
             const statiski = vietasPienemSort.filter(v => !v.noSupabase)
             const lat = parseFloat(krautuveLat), lng = parseFloat(krautuveLng)
-
-            const VietasKarte = ({ vieta, isPircejs }) => {
-              const km = lat && lng ? aprekinattalumu(lat, lng, vieta.lat, vieta.lng) : "?"
-              const trans = typeof km === "number" ? getTransportsCena(km).toFixed(2) : "?"
-              const cena = parseFloat(cenas[vieta.id]?.[aktivaisSortiments]) || 0
-              const neto = cena > 0 ? (cena - parseFloat(trans)).toFixed(2) : null
-              return (
-                <div key={vieta.id} style={{
-                  background: isPircejs ? "#0a1a0a" : "#070d07",
-                  border: `1px solid ${isPircejs ? "#2e7d32" : cena > 0 ? "#2d5a2d" : "#1a1a1a"}`,
-                  borderRadius: 8, padding: 10,
-                }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: isPircejs ? "#4caf50" : "#a5d6a7", marginBottom: 2, display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-                    {vieta.nosaukums}
-                    {isPircejs && <span style={{ ...s.tag("#4caf50") }}>✓ Dzīva cena</span>}
-                    {vieta.lat > 57.5 && <span style={{ ...s.tag("#e65100") }}>EE</span>}
-                    {vieta.novads && <span style={{ fontSize: 9, color: "#4a7a4a" }}>📍 {vieta.novads}</span>}
-                  </div>
-                  <div style={{ fontSize: 10, color: "#558b2f", marginBottom: 6 }}>
-                    ~{km} km | Trans: {trans} €/m³
-                  </div>
-                  <input type="text" inputMode="decimal"
-                    style={{ ...s.input, fontSize: 13, padding: "5px 8px", borderColor: isPircejs && cena > 0 ? "#2e7d32" : undefined }}
-                    value={cenas[vieta.id]?.[aktivaisSortiments] || ""}
-                    onChange={e => setCena(vieta.id, aktivaisSortiments, e.target.value.replace(",", "."))}
-                    placeholder="€/m³" />
-                  {neto && (
-                    <div style={{ marginTop: 4, fontSize: 11, color: parseFloat(neto) > 0 ? "#4caf50" : "#ef5350", fontWeight: 700 }}>
-                      Neto: {neto} €/m³
-                    </div>
-                  )}
-                  {isPircejs && vieta.talrunis && (
-                    <div style={{ marginTop: 4, fontSize: 10, color: "#4a7a4a" }}>📞 {vieta.talrunis}</div>
-                  )}
-                </div>
-              )
-            }
-
+            const kProps = { lat, lng, cenas, aktivaisSortiments, setCena, s }
             return (
               <>
                 {pircejuVietas.length > 0 && (
@@ -494,7 +495,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                       ✓ Reģistrētie pircēji — aktuālās cenas
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8, marginBottom: 16 }}>
-                      {pircejuVietas.map(v => <VietasKarte key={v.id} vieta={v} isPircejs />)}
+                      {pircejuVietas.map(v => <VietasKarte key={v.id} vieta={v} isPircejs {...kProps} />)}
                     </div>
                     <div style={{ fontSize: 11, color: "#4a7a4a", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                       Pārējie uzņēmumi — ievadi manuāli
@@ -502,7 +503,7 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                   </>
                 )}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 8 }}>
-                  {statiski.map(v => <VietasKarte key={v.id} vieta={v} isPircejs={false} />)}
+                  {statiski.map(v => <VietasKarte key={v.id} vieta={v} isPircejs={false} {...kProps} />)}
                 </div>
               </>
             )
