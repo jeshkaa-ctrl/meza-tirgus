@@ -2,7 +2,7 @@
 // Vercel env: ANTHROPIC_KEY
 // POST { jautajums: "teksts" }
 
-import Anthropic from "@anthropic-ai/sdk"
+// Anthropic API caur fetch (nevis SDK) — tāpat kā api/selektors.js
 
 const SISTEMA = `Tu esi JURISTS — Latvijas medību likumdošanas eksperts Mednieka Rokasgrāmatas platformā.
 Tu palīdzi medniekiem saprast medību likumdošanu — gan eksāmena sagatavošanai, gan praktiskās lauka situācijās.
@@ -140,16 +140,25 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_KEY nav iestatīts Vercel" })
 
   try {
-    const client = new Anthropic({ apiKey })
-
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1500,
-      system: SISTEMA,
-      messages: [{ role: "user", content: jautajums }],
+    const upstream = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type":      "application/json",
+        "x-api-key":         apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1500,
+        system: SISTEMA,
+        messages: [{ role: "user", content: jautajums }],
+      }),
     })
 
-    const atbilde = response.content
+    const data = await upstream.json()
+    if (!upstream.ok) return res.status(upstream.status).json({ error: data.error?.message || "Anthropic kļūda" })
+
+    const atbilde = data.content
       .filter(b => b.type === "text")
       .map(b => b.text)
       .join("\n")
