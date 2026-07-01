@@ -469,10 +469,10 @@ export default function LogistikaKalkulators({ onBack, sortimenti = null, kadast
                   <div style={{ fontSize: 10, color: "#558b2f", marginBottom: 6 }}>
                     ~{km} km | Trans: {trans} €/m³
                   </div>
-                  <input type="number" step="0.5"
+                  <input type="text" inputMode="decimal"
                     style={{ ...s.input, fontSize: 13, padding: "5px 8px", borderColor: isPircejs && cena > 0 ? "#2e7d32" : undefined }}
                     value={cenas[vieta.id]?.[aktivaisSortiments] || ""}
-                    onChange={e => setCena(vieta.id, aktivaisSortiments, e.target.value)}
+                    onChange={e => setCena(vieta.id, aktivaisSortiments, e.target.value.replace(",", "."))}
                     placeholder="€/m³" />
                   {neto && (
                     <div style={{ marginTop: 4, fontSize: 11, color: parseFloat(neto) > 0 ? "#4caf50" : "#ef5350", fontWeight: 700 }}>

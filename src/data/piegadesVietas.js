@@ -51,7 +51,7 @@ export const SORT_NOSAUKUMI = {
   balki_E:    "Baļķis Egle",
   balki_M:    "Baļķis Melnalksnis",
   sikbalki:   "Sīkbaļķis",
-  finieris:   "Finieris Bērzs",
+  finieris:   "Finieris",
   zagbalki:   "Zāģbaļķis Apse",
   tara:       "Tara",
   papirmalka: "Papīrmalka",
