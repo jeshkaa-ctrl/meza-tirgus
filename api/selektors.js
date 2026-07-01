@@ -520,6 +520,23 @@ SVARĪGIE PRINCIPI
   Nomedīts jauns buļļis ir neatgriezenisks
   zaudējums populācijas genofondā.
 
+✦ ĶERMEŅA ANALĪZE UN VECUMS NEDRĪKST PRETRUNĀT:
+  Ja ķermenis aprakstīts kā "vidēja vecuma" —
+  vecuma diapazons nedrīkst būt "10-13 gadi".
+  Ja ir pretruna — OBLIGĀTI paskaidro kāpēc
+  (piem. "ķermenis izskatās jaunāks bet ragi liecina
+  par lielāku vecumu"). Nedrīkst pieņemt secinājumu
+  kas nesaskan ar savu ķermeņa analīzi.
+
+✦ RIESTA AKTIVITĀTE = VECUMA RĀDĪTĀJS:
+  Bullis kas AKTĪVI piedalās riestā (brauc, biedē,
+  savāc govju baru) parasti ir 6-10 gadu vecumā —
+  tas ir viņa bioloģiskais maksimums.
+  Ļoti vecs bullis (12-13+ g.) riestā ir PASĪVĀKS —
+  viņu izspiež jaunāki buļļi.
+  Ja redzama aktīva riesta uzvedība → vecums
+  visticamāk 6-10 gadi, nevis 12+.
+
 ✦ VIENA BILDE = IEROBEŽOTA INFORMĀCIJA.
   Ja vērtējums neskaidrs — pieprasi papildu
   attēlu vai video.
