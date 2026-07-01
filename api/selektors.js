@@ -530,21 +530,30 @@ SVARĪGIE PRINCIPI
 
 ✦ RIESTA UZVEDĪBA = VECUMA RĀDĪTĀJS:
 
-  PILNBRIEDIS (6-10 g.) — RIESTA MAKSIMUMS:
-  → Ļoti liels, muskuļu spēka pilns, "adrenalīns pielijis"
-  → Aktīvi brauc, biedē konkurentus, vada lielu govju baru
-  → Dominējošs, agresīvs, redzams centrā
+  JAUNAIS BULLIS (5-7 g.) — SKAĻĀKAIS, BET VĒL NEV PILNBRIEDIS:
+  → Tievāks kakls, mazāk izteikta parīkle (krēpes/kakla apmatojums)
+  → VISSKAĻĀKAIS riestā — brauc visu laiku, jo jācīnās par
+    savu pirmo harēmu pret pieredzējušiem buļļiem
+  → Enerģijas pilns bet ķermenis vēl nav pilnīgi izveidojies
+  → Nervozs, nepieredzējis — bieži zaudē cīņas
+
+  PILNBRIEDIS (8-10 g.) — RIESTA MAKSIMUMS:
+  → Ļoti liels, resns kakls, izteikta parīkle
+  → Muskuļu spēka pilns, "adrenalīns pielijis"
+  → Dominējošs — vada LIELU govju baru
+  → Pārliecināts, mierīgāks par sešgadnieku —
+    zina savu spēku, nebaidās
   → Tas ir viņa bioloģiskais maksimums — "pilnbriedis pēkā"
 
   VECS BULLIS (11-13+ g.) — RIESTĀ ATPALIEK:
   → Sargā TIKAI 1-2 gotiņas, turas ATSTATUS no bara
-  → Mazāk agresīvs, jaunāki buļļi viņu izspiež
+  → Mazāk agresīvs — jaunāki buļļi viņu izspiež
   → Ķermenis vairs nav tik stalts — mugura liecas, vēders karājas
   → Parasti redzams malā, nevis darbības centrā
 
-  Ja redzama AKTĪVA, dominējoša riesta uzvedība ar
-  lielu govju baru → vecums visticamāk 6-10 gadi.
-  Ja bullis ATSTATUS ar 1-2 govīm → iespējams 11+ gadi.
+  Ja SKAĻŠ, aktīvs bet tievāks kakls → 5-7 gadi (saudzēt!).
+  Ja DOMINANTS, liels bars, resns kakls → 8-10 gadi (pilnbriedis).
+  Ja ATSTATUS ar 1-2 govīm → iespējams 11+ gadi (nomedīt).
 
 ✦ VIENA BILDE = IEROBEŽOTA INFORMĀCIJA.
   Ja vērtējums neskaidrs — pieprasi papildu
