@@ -205,6 +205,64 @@ TROFEJU REĢISTRĀCIJA LATVIJĀ:
   → Starptautiskās rekordtrofejas — CIC datubāzē
 
 ═══════════════════════════════════════════
+LATVIJAS MEDNIEKU ĒTIKAS KODEKSS
+═══════════════════════════════════════════
+
+Izstrādāts Latvijas Mednieku savienības darba grupā.
+Pamats: cieņa, zināšanas, atbildība, ilgtspējība un tradīcijas.
+
+KAS IR MEDNIECĪBA:
+Medniecība ir medījamo dzīvnieku ilgtspējīgas apsaimniekošanas veids, kas balstīts tradīcijās un sabiedrības interesēs palīdz saglabāt savvaļas dzīvniekus, to apdzīvoto vidi un dabas daudzveidību.
+
+5 PAMATPRINCIPI:
+1. CIEŅA — pret dabu, medījumu, citiem medniekiem un sabiedrību
+2. ZINĀŠANAS — pastāvīga izglītošanās un prasmju pilnveide
+3. ATBILDĪBA — par savu rīcību medībās un ārpus tām
+4. ILGTSPĒJĪBA — resursu saglabāšana nākamajām paaudzēm
+5. TRADĪCIJAS — medību kultūras kopšana un nodošana tālāk
+
+MEDNIEKA PIENĀKUMI:
+
+Likumi un drošība:
+- Vienmēr ievēro normatīvo aktu, drošības tehnikas un ētikas normu prasības
+- Pieprasa to arī no citiem medniekiem un medību dalībniekiem
+- Nepiedalās medībās kopā ar personām kas rīkojas neētiski vai kaitē mednieku tēlam
+
+Cieņa pret medījumu:
+- Nomedī dzīvnieku iespējami ātri un nesāpīgi — nerada nevajadzīgas ciešanas
+- Izmanto tikai ētiskus un likumīgus medību rīkus un aprīkojumu
+- Ja dzīvnieks ievainots — dara visu iespējamo lai to atrastu un pēc iespējas ātrāk izbeigtu ciešanas — ieskaitot apmācīta medību suņa izmantošanu
+- Iespēju robežās dalās ar medījumu ar citiem sabiedrības locekļiem
+
+Daba un vide:
+- Medī tikai tik daudz cik atļauts un nepieciešams
+- Apzinās ka mednieks ir atbildīgs par medījamo dzīvnieku populācijas kvalitāti — piekopj selektīvas medības
+- Veicina ilgtspējīgu medību resursu apsaimniekošanu
+
+Zināšanas un prasmes:
+- Regulāri izkopj un pilnveido zināšanas par: vides un dabas aizsardzību, procesiem dabā, medījamo dzīvnieku bioloģiju, šaušanas prasmēm
+- Pārvalda izmantojamos medību rīkus un metodes
+- Apzinās savu prasmju un ekipējuma robežas — pārbauda pirms medībām
+- Dalās zināšanās un pieredzē ar citiem medniekiem
+
+Sabiedrība:
+- Respektē citu sabiedrības locekļu viedokļus
+- Komunicē pieklājīgi un izglīto par medību nozīmi
+- Veido pozitīvu iespaidu par medībām un mednieku saimi
+- Ar individuālo rīcību ir atbildīgs par visu mednieku reputāciju
+- Iesaistās sabiedriski nozīmīgās aktivitātēs: dzīvnieku slimību novēršana, pazudušu cilvēku meklēšana, meža ugunsgrēku dzēšana
+- Piedalās mednieku sabiedrību saliedējošos pasākumos, festivālos, izstādēs
+- Aktīvi iesaistās mednieku organizāciju darbībā
+
+ĒTIKAS UN LIKUMA ROBEŽA:
+Ētikas kodekss ir zemāk par likumu hierarhijā — bet nosaka kā uzvesties situācijās ko likums neregulē.
+Piemērs 1: Likums atļauj nomedīt jaunu perspektīvu staltbrieža bulli. Ētika saka — saudzē, lai populācija attīstītos. Ētika uzvar morāli, bet likums netiek pārkāpts.
+Piemērs 2: Lapsa drīkst medīt visu gadu. Ētika saka — nemedī ligzdošanas laikā ja tas nav nepieciešams.
+
+BŪTISKĀKAIS PRINCIPS:
+"Mednieks medī ne tikai sev — bet visai sabiedrībai un nākamajām paaudzēm."
+
+═══════════════════════════════════════════
 SVARĪGIE PRINCIPI
 ═══════════════════════════════════════════
 
