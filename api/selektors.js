@@ -499,8 +499,20 @@ export default async function handler(req, res) {
   const apiKey = process.env.OPENAI_KEY
   if (!apiKey) return res.status(500).json({ error: 'OPENAI_KEY nav iestatīts Vercel' })
 
-  const { image, mimeType = 'image/jpeg' } = req.body || {}
-  if (!image) return res.status(400).json({ error: 'Nav attēla datu' })
+  const { image, mimeType = 'image/jpeg', images } = req.body || {}
+
+  // Atbalsta gan vienu attēlu { image, mimeType }, gan masīvu { images: [{image, mimeType}] }
+  const atteli = images || (image ? [{ image, mimeType }] : [])
+  if (!atteli.length) return res.status(400).json({ error: 'Nav attēla datu' })
+
+  const attēluSaturs = atteli.map(a => ({
+    type: 'image_url',
+    image_url: { url: `data:${a.mimeType || 'image/jpeg'};base64,${a.image}`, detail: 'high' },
+  }))
+
+  const userTeksts = atteli.length > 1
+    ? `Lūdzu analizē šos ${atteli.length} attēlus (dažādi leņķi) un sniedz selekcijas vērtējumu.`
+    : 'Lūdzu analizē šo attēlu un sniedz selekcijas vērtējumu.'
 
   const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -516,11 +528,8 @@ export default async function handler(req, res) {
         {
           role: 'user',
           content: [
-            {
-              type: 'image_url',
-              image_url: { url: `data:${mimeType};base64,${image}`, detail: 'high' },
-            },
-            { type: 'text', text: 'Lūdzu analizē šo attēlu un sniedz selekcijas vērtējumu.' },
+            ...attēluSaturs,
+            { type: 'text', text: userTeksts },
           ],
         },
       ],
