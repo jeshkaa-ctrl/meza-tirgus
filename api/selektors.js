@@ -1,6 +1,7 @@
-// Selektors — GPT-4o Vision + teksta jautājumi
-// Vercel env: OPENAI_KEY_SELEKTORS
-// POST { images: [{image, mimeType}] } vai { jautajums: "teksts" }
+import { createClient } from '@supabase/supabase-js'
+// Selektors — GPT-4o Vision + teksta jautājumi + diskusija ar atziņu mācīšanos
+// Vercel env: OPENAI_KEY_SELEKTORS, VITE_SUPABASE_URL, SUPABASE_SERVICE_KEY
+// POST { images: [{image, mimeType}] } vai { jautajums } vai { zinojumi, suga }
 
 const SISTEMA = `Tu esi SELEKTORS — pieredzējis Latvijas mednieks un dabas eksperts
 ar dziļu zināšanu bāzi par visiem Latvijā medījamajiem dzīvniekiem,
@@ -785,61 +786,144 @@ SVARĪGIE PRINCIPI
 ✦ POPULĀCIJAS DOMĀŠANA: Katrs lēmums ietekmē populācijas nākotni.
   Baumanis: "Ragu vein, nezinot dzīvnieka vecumu, nenozīmē neko."`
 
+// ── Diskusijas papildinājums sistēmas promptam ──
+const DISKUSIJAS_INST = `
+
+═══════════════════════════════════════════
+DISKUSIJA — JAUNU ATZIŅU REĢISTRĀCIJA
+═══════════════════════════════════════════
+
+Ja mednieks šajā diskusijā koriģē vai papildina tavu vērtējumu ar lauka pieredzi,
+aiz parastās atbildes pievieno šādu bloku:
+
+---JAUNĀ ATZIŅA---
+SUGA: [sugas nosaukums]
+SITUĀCIJA: [situācija vai pazīme]
+ATZIŅA: [ko uzzināji no mednieka]
+---BEIGAS---
+
+Pievieno TIKAI ja mednieks sniedz JAUNU, KORIĢĒJOŠU vai PRAKTISKI vērtīgu informāciju.
+NELIETO ja mednieks vienkārši piekrīt vai uzdod vispārīgu jautājumu.`
+
+function veidotSistemu(atzinas) {
+  let papildinajums = ''
+  if (atzinas && atzinas.length) {
+    papildinajums = '\n\n═══════════════════════════════════════════\nMEDNIEKU APSTIPRINĀTĀS ATZIŅAS\n═══════════════════════════════════════════\n\n' +
+      'Šīs atziņas ir apstiprinājuši pieredzējuši mednieki — izmanto kā papildinājumu savām zināšanām:\n\n' +
+      atzinas.map(a => `[${a.suga}] Situācija: ${a.situacija}\nAtziņa: ${a.atzina}`).join('\n\n')
+  }
+  return SISTEMA + papildinajums + DISKUSIJAS_INST
+}
+
+function iegutAtzinasBlokkus(teksts) {
+  const bloki = []
+  const re = /---JAUNĀ ATZIŅA---\s*([\s\S]*?)---BEIGAS---/g
+  let m
+  while ((m = re.exec(teksts)) !== null) {
+    const b = m[1]
+    const suga      = (b.match(/SUGA:\s*(.+)/)?.[1] || '').trim()
+    const situacija = (b.match(/SITUĀCIJA:\s*(.+)/)?.[1] || '').trim()
+    const atzina    = (b.match(/ATZIŅA:\s*([\s\S]+?)(?:\nSUGA:|\nSITUĀCIJA:|$)/)?.[1] || '').trim()
+    if (situacija && atzina) bloki.push({ suga, situacija, atzina })
+  }
+  return bloki
+}
+
+function tiritAtbildi(teksts) {
+  return teksts.replace(/---JAUNĀ ATZIŅA---[\s\S]*?---BEIGAS---/g, '').trim()
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const apiKey = process.env.OPENAI_KEY_SELEKTORS
   if (!apiKey) return res.status(500).json({ error: 'OPENAI_KEY_SELEKTORS nav iestatīts Vercel' })
 
-  const { image, mimeType = 'image/jpeg', images, jautajums } = req.body || {}
+  const { image, mimeType = 'image/jpeg', images, jautajums, zinojumi, suga, medniekaVards, medniekaEpasts } = req.body || {}
 
+  // ── JAUNAIS FORMĀTS: zinojumi masīvs (multi-turn diskusija) ──
+  if (zinojumi && Array.isArray(zinojumi)) {
+    const sbUrl = process.env.VITE_SUPABASE_URL
+    const sbKey = process.env.SUPABASE_SERVICE_KEY
+
+    // Ielādē apstiprinātās atziņas no Supabase
+    let atzinas = []
+    if (sbUrl && sbKey) {
+      try {
+        const sb = createClient(sbUrl, sbKey)
+        let q = sb.from('selektors_atzinas').select('suga,situacija,atzina').eq('statuss', 'apstiprina').limit(10)
+        if (suga) q = q.eq('suga', suga)
+        const { data } = await q
+        if (data) atzinas = data
+      } catch (_) {}
+    }
+
+    const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        max_tokens: 2000,
+        messages: [{ role: 'system', content: veidotSistemu(atzinas) }, ...zinojumi],
+      }),
+    })
+    const data = await upstream.json()
+    if (!upstream.ok) return res.status(upstream.status).json({ error: data.error?.message || 'OpenAI kļūda' })
+
+    const pilnaAtbilde = data.choices?.[0]?.message?.content || ''
+    const jaunasAtzinas = iegutAtzinasBlokkus(pilnaAtbilde)
+    const tiritaAtbilde = tiritAtbildi(pilnaAtbilde)
+
+    // Saglabā jaunās atziņas Supabase
+    let jauna = false
+    if (jaunasAtzinas.length && sbUrl && sbKey) {
+      try {
+        const sb = createClient(sbUrl, sbKey)
+        for (const a of jaunasAtzinas) {
+          await sb.from('selektors_atzinas').insert({
+            suga: suga || a.suga || 'nezinams',
+            situacija: a.situacija,
+            atzina: a.atzina,
+            statuss: 'gaida',
+            mednieka_vards: medniekaVards || null,
+            mednieka_epasts: medniekaEpasts || null,
+          })
+        }
+        jauna = true
+      } catch (_) {}
+    }
+
+    return res.status(200).json({ atbilde: tiritaAtbilde, jauna, teksts: tiritaAtbilde })
+  }
+
+  // ── VECAIS FORMĀTS (atpakaļsaderība) ──
   let messages
-
   if (jautajums) {
-    // Teksta jautājumu režīms
     messages = [
       { role: 'system', content: SISTEMA },
       { role: 'user', content: jautajums },
     ]
   } else {
-    // Foto analīzes režīms
     const atteli = images || (image ? [{ image, mimeType }] : [])
     if (!atteli.length) return res.status(400).json({ error: 'Nav attēla datu vai jautājuma' })
-
     const attēluSaturs = atteli.map(a => ({
       type: 'image_url',
       image_url: { url: `data:${a.mimeType || 'image/jpeg'};base64,${a.image}`, detail: 'high' },
     }))
-
     const userTeksts = atteli.length > 1
       ? `Lūdzu analizē šos ${atteli.length} attēlus (dažādi leņķi) un sniedz selekcijas vērtējumu.`
       : 'Lūdzu analizē šo attēlu un sniedz selekcijas vērtējumu.'
-
     messages = [
       { role: 'system', content: SISTEMA },
-      {
-        role: 'user',
-        content: [
-          ...attēluSaturs,
-          { type: 'text', text: userTeksts },
-        ],
-      },
+      { role: 'user', content: [...attēluSaturs, { type: 'text', text: userTeksts }] },
     ]
   }
 
   const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o',
-      max_tokens: 2000,
-      messages,
-    }),
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: 'gpt-4o', max_tokens: 2000, messages }),
   })
-
   const data = await upstream.json()
   if (!upstream.ok) return res.status(upstream.status).json({ error: data.error?.message || 'OpenAI kļūda' })
 

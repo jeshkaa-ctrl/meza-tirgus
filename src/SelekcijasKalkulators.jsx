@@ -92,6 +92,12 @@ export default function SelekcijasKalkulators({ onBack }) {
   const [kļūda, setKļūda]           = useState("")
   const [velk, setVelk]             = useState(false)
   const [jautajums, setJautajums]   = useState("")
+  const [zinojumi, setZinojumi]     = useState([])       // vēsture OpenAI formātā
+  const [konvThread, setKonvThread] = useState([])       // displeja pavediens
+  const [detektSuga, setDetektSuga] = useState("")       // atpazītā suga
+  const [komentars, setKomentars]   = useState("")       // turpinājuma ievade
+  const [diskuteLade, setDiskuteLade] = useState(false)  // diskusijas ielāde
+  const [atzinaZinoj, setAtzinaZinoj] = useState(false)  // jauna atziņa saglabāta
 
   const kameraRef  = useRef()
   const galerijRef = useRef()
@@ -114,12 +120,36 @@ export default function SelekcijasKalkulators({ onBack }) {
   const analizet = async () => {
     if (!atteli.length) return
     setLade(true); setKļūda(""); setRezultats("")
+    setZinojumi([]); setKonvThread([]); setDetektSuga(""); setAtzinaZinoj(false)
     try {
-      const images = await Promise.all(atteli.map(async a => ({ image: await fileToBase64(a.file), mimeType: a.file.type })))
-      const r = await fetch("/api/selektors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ images }) })
+      const imgs = await Promise.all(atteli.map(async a => ({ image: await fileToBase64(a.file), mimeType: a.file.type })))
+      const bildeSaturs = imgs.map(img => ({
+        type: 'image_url',
+        image_url: { url: `data:${img.mimeType};base64,${img.image}`, detail: 'high' }
+      }))
+      const userTeksts = imgs.length > 1
+        ? `Lūdzu analizē šos ${imgs.length} attēlus (dažādi leņķi) un sniedz selekcijas vērtējumu.`
+        : 'Lūdzu analizē šo attēlu un sniedz selekcijas vērtējumu.'
+
+      const r = await fetch("/api/selektors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zinojumi: [{ role: 'user', content: [...bildeSaturs, { type: 'text', text: userTeksts }] }] })
+      })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || "Servera kļūda")
-      setRezultats(d.teksts)
+
+      const atbilde = d.atbilde || d.teksts || ""
+      // Atpazīst sugu no atbildes (izmanto tālākās diskusijās)
+      const sugaMatch = atbilde.match(/🦌 SUGA:\s*([^\n(]+)|SUGA:\s*([^\n(]+)/)
+      const suga = ((sugaMatch?.[1] || sugaMatch?.[2] || '')).split('(')[0].trim().toLowerCase()
+      setDetektSuga(suga)
+      setRezultats(atbilde)
+      // Saglabā vēsturi BEZ attēliem (ietaupa joslu platumu turpinājuma ziņojumos)
+      setZinojumi([
+        { role: 'user', content: `[Augšupielādēts ${imgs.length === 1 ? 'attēls' : `${imgs.length} attēli`} selekcijas analīzei.]` },
+        { role: 'assistant', content: atbilde },
+      ])
     } catch (e) { setKļūda("Kļūda: " + e.message) }
     finally { setLade(false) }
   }
@@ -136,9 +166,41 @@ export default function SelekcijasKalkulators({ onBack }) {
     finally { setLade(false) }
   }
 
+  const turpinatDiskusiju = async () => {
+    if (!komentars.trim() || diskuteLade) return
+    setDiskuteLade(true)
+    const teksts = komentars.trim()
+    setKomentars("")
+
+    const jaunaisUser = { role: 'user', content: teksts }
+    const jaunasZinojumi = [...zinojumi, jaunaisUser]
+    setKonvThread(prev => [...prev, { role: 'user', teksts }])
+
+    try {
+      const r = await fetch("/api/selektors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zinojumi: jaunasZinojumi, suga: detektSuga })
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || "Kļūda")
+      const atbilde = d.atbilde || d.teksts || ""
+      setZinojumi([...jaunasZinojumi, { role: 'assistant', content: atbilde }])
+      setKonvThread(prev => [...prev, { role: 'assistant', teksts: atbilde }])
+      if (d.jauna) {
+        setAtzinaZinoj(true)
+        setTimeout(() => setAtzinaZinoj(false), 5000)
+      }
+    } catch (e) {
+      setKonvThread(prev => [...prev, { role: 'kludas', teksts: "Kļūda: " + e.message }])
+    }
+    finally { setDiskuteLade(false) }
+  }
+
   const jauns = () => {
     atteli.forEach(a => URL.revokeObjectURL(a.preview))
     setAtteli([]); setRezultats(""); setKļūda(""); setJautajums("")
+    setZinojumi([]); setKonvThread([]); setDetektSuga(""); setKomentars(""); setAtzinaZinoj(false)
   }
 
   const mainRezims = (r) => { jauns(); setRezims(r) }
@@ -292,6 +354,67 @@ export default function SelekcijasKalkulators({ onBack }) {
                 ? <button style={s.btn} onClick={jauns}>📷 Jauns dzīvnieks</button>
                 : <button style={{ ...s.btn, background: "linear-gradient(135deg,#1565c0,#0d47a1)" }} onClick={jauns}>💬 Jauns jautājums</button>
               }
+            </div>
+          </div>
+        )}
+
+        {/* ── DISKUSIJA ── redzama pēc foto analīzes */}
+        {rezims === "foto" && rezultats && zinojumi.length > 0 && (
+          <div style={{ ...s.card, borderColor: "#1a3a1a", marginTop: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#4caf50", marginBottom: 12, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              💬 Turpināt diskusiju
+              {atzinaZinoj && (
+                <span style={{ fontSize: 11, fontWeight: 400, color: "#81c784", background: "#0a2a0a", border: "1px solid #2e7d32", borderRadius: 4, padding: "2px 8px" }}>
+                  ✓ Atziņa saglabāta — gaida apstiprināšanu
+                </span>
+              )}
+            </div>
+
+            {/* Iepriekšējo diskusiju pavediens */}
+            {konvThread.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                {konvThread.map((z, i) => (
+                  <div key={i} style={{ marginBottom: 8 }}>
+                    {z.role === 'user' ? (
+                      <div style={{ background: "#0a1a0a", border: "1px solid #2d4a2d", borderRadius: 8, padding: "10px 12px" }}>
+                        <div style={{ fontSize: 11, color: "#558b2f", marginBottom: 3, fontWeight: 700 }}>Tu:</div>
+                        <div style={{ fontSize: 13, color: "#c8e6c9", lineHeight: 1.6 }}>{z.teksts}</div>
+                      </div>
+                    ) : z.role === 'kludas' ? (
+                      <div style={{ color: "#ef5350", fontSize: 13, padding: "6px 0" }}>{z.teksts}</div>
+                    ) : (
+                      <div style={{ background: "#060e06", border: "1px solid #1a3a1a", borderRadius: 8, padding: "10px 12px" }}>
+                        <div style={{ fontSize: 11, color: "#4caf50", marginBottom: 3, fontWeight: 700 }}>Selektors:</div>
+                        <FormatetsRezultats teksts={z.teksts} />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Ievades lauks */}
+            <textarea
+              value={komentars}
+              onChange={e => setKomentars(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); turpinatDiskusiju() } }}
+              placeholder="Uzdod papildjautājumu vai koriģē vērtējumu... (Enter = sūtīt)"
+              style={{ width: "100%", minHeight: 68, background: "#070d07", border: "1px solid #2d5a2d", borderRadius: 8,
+                color: "#e0ede0", fontSize: 13, padding: "10px 12px", resize: "vertical", outline: "none",
+                fontFamily: "'Inter',sans-serif", boxSizing: "border-box" }}
+            />
+            <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center", flexWrap: "wrap" }}>
+              {!diskuteLade ? (
+                <button style={{ ...s.btn, padding: "10px 20px", fontSize: 13 }}
+                  onClick={turpinatDiskusiju} disabled={!komentars.trim()}>
+                  💬 Sūtīt
+                </button>
+              ) : (
+                <button style={{ ...s.btn, padding: "10px 20px", fontSize: 13, opacity: 0.6, cursor: "not-allowed" }} disabled>
+                  ⏳ Atbild...
+                </button>
+              )}
+              <span style={{ fontSize: 11, color: "#2d5a2d" }}>Tava korekcija var kļūt par apstiprinātajām atziņām</span>
             </div>
           </div>
         )}

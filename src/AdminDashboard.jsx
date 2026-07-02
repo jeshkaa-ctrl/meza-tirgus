@@ -5,6 +5,108 @@ import BotsPardevejs from './BotsPardevejs'
 import BotsBankieris from './BotsBankieris'
 import BotsMakslinieks from './BotsMakslinieks'
 
+// ── Selektora atziņu pārvaldības panelis ──
+function AtzinasPanelis() {
+  const [atzinas, setAtzinas]   = useState([])
+  const [filtrs,  setFiltrs]    = useState('gaida')
+  const [lade,    setLade]      = useState(true)
+
+  useEffect(() => { ieladeAtzinas() }, [filtrs])
+
+  async function ieladeAtzinas() {
+    setLade(true)
+    const { data } = await supabase
+      .from('selektors_atzinas')
+      .select('*')
+      .eq('statuss', filtrs)
+      .order('radita_datums', { ascending: false })
+    setAtzinas(data || [])
+    setLade(false)
+  }
+
+  async function mainStatus(id, jaunaisStatus) {
+    await supabase.from('selektors_atzinas').update({
+      statuss: jaunaisStatus,
+      apstiprinata_datums: jaunaisStatus === 'apstiprina' ? new Date().toISOString() : null,
+    }).eq('id', id)
+    setAtzinas(prev => prev.filter(a => a.id !== id))
+  }
+
+  const filtriArr = [
+    { id: 'gaida',      nos: '⏳ Gaida' },
+    { id: 'apstiprina', nos: '✅ Apstiprinātas' },
+    { id: 'noraida',    nos: '❌ Noraidītas' },
+  ]
+
+  return (
+    <div>
+      <div style={{ color: C.textMut, fontSize: F.xs, marginBottom: 16, lineHeight: 1.6 }}>
+        Mednieku korekcijas un lauka atziņas no Selektora diskusijām.<br />
+        Apstiprinātas atziņas tiek automātiski iekļautas nākotnes AI atbildēs.
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {filtriArr.map(f => (
+          <button key={f.id} onClick={() => setFiltrs(f.id)} style={{
+            padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontFamily: F.family,
+            fontSize: F.xs, fontWeight: filtrs === f.id ? 700 : 400, border: 'none',
+            background: filtrs === f.id ? C.green : C.bgCard,
+            color: filtrs === f.id ? '#fff' : C.textMut,
+            outline: filtrs === f.id ? 'none' : `1px solid ${C.greenBdr}`,
+          }}>{f.nos}</button>
+        ))}
+      </div>
+
+      {lade && <div style={{ textAlign: 'center', padding: 40, color: C.textDim }}>Ielādē...</div>}
+
+      {!lade && atzinas.length === 0 && (
+        <div style={{ textAlign: 'center', padding: 40, color: C.textDim }}>
+          {filtrs === 'gaida' ? 'Nav jaunu atziņu — labs darbs!' : 'Nav ierakstu šajā kategorijā'}
+        </div>
+      )}
+
+      {!lade && atzinas.map(a => (
+        <div key={a.id} style={{
+          background: C.bgCard, border: `1px solid ${C.greenBdr}`,
+          borderRadius: 8, padding: 16, marginBottom: 12,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <span style={{ fontSize: F.xs, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {a.suga || 'nezinams'}
+              </span>
+              {a.mednieka_vards && (
+                <span style={{ fontSize: F.xs, color: C.textDim }}>no: {a.mednieka_vards}</span>
+              )}
+            </div>
+            <span style={{ fontSize: 11, color: C.textDim, flexShrink: 0 }}>
+              {new Date(a.radita_datums).toLocaleDateString('lv-LV')}
+            </span>
+          </div>
+          <div style={{ fontSize: F.sm, color: C.textSec, marginBottom: 4 }}>
+            <strong style={{ color: C.textPri }}>Situācija:</strong> {a.situacija}
+          </div>
+          <div style={{ fontSize: F.sm, color: C.textSec, marginBottom: filtrs === 'gaida' ? 14 : 0, lineHeight: 1.6 }}>
+            <strong style={{ color: C.textPri }}>Atziņa:</strong> {a.atzina}
+          </div>
+          {filtrs === 'gaida' && (
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => mainStatus(a.id, 'apstiprina')} style={{
+                padding: '8px 20px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                background: '#1b5e20', color: '#fff', fontSize: F.xs, fontWeight: 700, fontFamily: F.family,
+              }}>✅ Apstiprināt</button>
+              <button onClick={() => mainStatus(a.id, 'noraida')} style={{
+                padding: '8px 20px', borderRadius: 6, cursor: 'pointer', fontFamily: F.family,
+                border: '1px solid #c62828', background: 'transparent', color: '#ef5350',
+                fontSize: F.xs, fontWeight: 700,
+              }}>❌ Noraidīt</button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const LAPU_NOSAUKUMI = {
   landing: '🏠 Sākumlapa', main: '🛠 Darba virsma', tirgus: '🌿 Tirgus',
   standard: '📄 VMD PDF analīze', cirsma: '🌲 Cirsmas novērtēšana',
@@ -133,6 +235,7 @@ export default function AdminDashboard({ onBack, onNavigate }) {
           { id: 'pardevejs',   label: '📦 Pārdevējs' },
           { id: 'bankieris',   label: '💳 Banķieris' },
           { id: 'gramatvedis', label: '📊 Grāmatvedis' },
+          { id: 'atzinas',    label: '🧠 Atziņas' },
         ].map(c => (
           <button key={c.id} onClick={() => setCilne(c.id)} style={{
             background: 'none', border: 'none',
@@ -302,6 +405,9 @@ CREATE POLICY "admin_lasa" ON app_events
             </button>
           </div>
         )}
+
+        {/* ── SELEKTORA ATZIŅAS ── */}
+        {cilne === 'atzinas' && <AtzinasPanelis />}
 
         {/* ── BOTI (meklētājs / mākslinieks / pārdevējs) ── */}
         {(cilne === 'bots' || cilne === 'makslinieks' || cilne === 'pardevejs' || cilne === 'bankieris') && (
