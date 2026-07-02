@@ -814,6 +814,96 @@ RAGU ANALĪZE:
 ⛔ ŠAUŠANAS IETEIKUMU NEVARU DOT bez skaidra sejas attēla!
 
 ═══════════════════════════════════════════
+STIRNA — ĀZIS: PADZIĻINĀTĀ SELEKCIJA
+(medibam.lv, tvnet.lv, taurs.lv — Linda Dombrovska)
+═══════════════════════════════════════════
+
+⚠️ Nav 100% precīzas metodes — jāvērtē AINA KOPUMĀ!
+Visprecīzāk vecumu nosaka PĒC nomedīšanas — pēc zobiem.
+
+── SEJAS PAZĪMES PĒC VECUMA ──
+
+KAZLĒNS: Pelēkbrūna galva, izteikti gaišāks kakls, redzami radziņu aizmetņi (nov/dec).
+
+1. RAGI (viengadīgs buciņš):
+✦ Seja vienkrāsaini TUMŠA — galvenā pazīme
+✦ Stieņveidīgi ragi bez žuburiem (lielākajai daļai)
+✦ Purns pilnībā gaiši pelēks
+
+2.5 GADI:
+✦ Izteikts PUSMĒNESS formas gaišs laukums ap degunu — spilgti izceļas
+✦ Tumšs plankums uz sejas
+
+3–4 GADI:
+✦ Gaišais plankums ap degunu vairs nav spilgts — pelēcīgs
+✦ Sāk veidoties "brilles" — blāvi loki AP ACĪM
+
+4–6 GADI — SPĒKA GADI (labākā trofeja):
+✦ Lāsums "netīrāks", brilles ap acīm izteiktas
+✦ Kakls BŪTISKI masīvāks par kazas kaklu (labākā pazīme!)
+✦ Plankums uz sejas blāvāks
+
+7+ GADI (vecs):
+✦ Robeža starp deguna un sejas plankumiem IZZUDUSI
+✦ Galva vienkrāsaini GAIŠA vai gaiši pelēka
+✦ Galvu tur ZEMU — zudusi graciozitāte
+
+── RAGU PAZĪMES PĒC VECUMA ──
+
+RAGU VIRZIENA EVOLŪCIJA:
+✦ Vērsti uz VIDU → jauns
+✦ PARALĒLI → vidēja vecuma
+✦ Vērsti uz MALĀM → vecs
+
+ROZES UN STUMBRI:
+✦ Rozešu malas uz AUGŠU → līdz 6 gadiem
+✦ Rozešu malas uz LEJU → vecāks par 6 gadiem
+✦ TIEVI ragi → jauns; RESNI ragi → pieaudzis
+
+BERZŠANAS LAIKS:
+✦ Jūnijā ragi pilnībā noberzti = VESELS āzis
+✦ Augustā ragi vēl neberzti → veselības problēma → NOMEDĪT!
+  (Pamata kritērijs pēc jūnija datuma)
+
+RAGU DEFEKTI — NOMEDĪT vienmēr:
+✦ "PERUKA" — ragi nenomet = hormonāla patoloģija
+✦ Vienas puses rags (monorāgs) = patoloģija
+✦ Anomālijas, asimetrija ar vāju otro pusi
+
+── SELEKCIJAS LĒMUMU KOKS ──
+
+NOMEDĪT:
+✦ 1. ragi — stieņveidīgi, īsāki par ausīm (neperspektīvs)
+✦ Ragi neberzti augustā (slimība)
+✦ Spēka gadu āzis (4–8g) ar labu trofejformu → trofejnieks!
+✦ 8+ gadi — sirma galva, galvu tur zemu (bioloģiski norakstīts)
+✦ Slims vai ievainots jebkurā vecumā
+
+SAUDZĒT:
+✦ 1. ragi — žuburu aizmetņi, garāki par ausīm (perspektīvs!)
+✦ 3–4 gadi ar labu ragu attīstību (vēl nav trofejā)
+✦ Ragi vēl augšanas fāzē (balts velvet) → nevar novērtēt
+
+── POPULĀCIJAS APSAIMNIEKOŠANA ──
+
+✦ Ideāli: 1 āzis : 1 kaza : 1 kazlēns nomedīšanā
+✦ Latvijā bieži medī pārāk daudz āžu (~46–61% no kopējā) — nepareizi!
+✦ Pareizi: ne vairāk par 1/3 āžu no kopējā nomedījuma
+✦ Lielākais "selekcionārs" Latvijā ir ZIEMA
+  → Pēc bargas ziemas — 5–6 gadus vēlāk var cerēt uz vērtīgām trofejām
+
+── CIC TROFEJAS ROBEŽAS ──
+🥉 Bronza: 105–114.99 | 🥈 Sudrabs: 115–129.99 | 🥇 Zelts: 130+
+Latvijas rekords: 188.70 CIC punkti (1991.g., Bauskas vbā)
+
+── UZVEDĪBAS PAZĪMES PĒC VECUMA ──
+✦ Jauns buciņš — ātri aizskrien riedams (nobijies)
+✦ Vecs āzis — riešana sākas vēlāk, ļoti piesardzīgs, iznāk baroties tikai tumsā
+✦ Riests ~25.jūlijs–10.augusts — svilpīte efektīva!
+
+⛔ ŠAUŠANAS IETEIKUMU NEVARU DOT bez skaidra sejas attēla!
+
+═══════════════════════════════════════════
 ALNIS (Alces alces) — SELEKCIJA
 ═══════════════════════════════════════════
 
