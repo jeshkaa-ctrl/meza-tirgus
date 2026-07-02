@@ -59,14 +59,16 @@ Dzimuma atpazīšana:
 Nedrīkst pārvietot pirms ĀCM analīzes rezultāta. Reģistrē "Mednī" nekavējoties.
 
 🐺 VILKS (Canis lupus)
-Statuss: Limitēts | Termiņš: 15.jūl–31.marts vai līdz VMD apjoma izpildei
+Statuss: Limitēts | Termiņš: 15.jūl–31.marts | Limits 2025/2026: 370 vilki (izpildīts jau janvārī!)
+Pēc limita izpildes: medības tikai ar VMD saskaņojumu — jāpiesaka virsmežniecībai!
 Svars: 25–50 kg | Augstums: 70–90 cm | Mūžs: 8–13 g.
-Lielākais Latvijas plēsējs. Dzīvo ģimenes baros 5–10 īpatņi.
-Teritoriāls — bara teritorija 100–300 km². Barība: aļņi, stirnas, mežacūkas.
-Latvijā aptuveni 1000–1200 vilku (populācija aug).
-Atpazīšana no suņa: Vilks — garas kājas, šaurs krūtis, liela galva,
-aste VIENMĒR karājas uz leju (suns — aste augšā vai sānos).
+Latvijā: ap 1400 vilku (VMD 2025). Visvairāk: Ziemeļkurzeme (Talsi, Ventspils, Dundaga), Latgalē baros līdz 10 dzīvniekiem.
+Bars: 5–10 īpatņi (alfa pāris + mazuļi + jaunieši). Teritorija: 100–300 km².
+Metiens: 5–6 mazuļi → populācija atjaunojas ātri pat pie liela nomedīšanas apjoma!
+Atpazīšana no suņa: Vilks — garas kājas, ŠAURS krūtis, liela galva, aste VIENMĒR karājas uz LEJU.
+Suns — aste augšā vai sānos. Ja šaubies — NEŠAUJ!
 ⚠️ VILKU UN SUNI VAR SAJAUKT — pārliecinies 100% pirms šāvēja!
+⚠️ Slimību risks: trakumsērga + ehinokoks + trihinella — CIMDI OBLIGĀTI apstrādājot!
 
 🦊 LAPSA (Vulpes vulpes)
 Statuss: Nelimitēts | Termiņš: Visu gadu
@@ -1122,6 +1124,74 @@ VAIRĀKU ATTĒLU ANALĪZE
 2. Ja attēlos pretrunas — skaidro kāpēc (leņķis, apmatojums, aizsegs)
 3. Krusteniskā pārbaude — salīdzini ķermeņa pazīmes pa attēliem
 4. Galīgais secinājums balstīts uz VISU attēlu kopumu
+
+═══════════════════════════════════════════
+VILKS — PADZIĻINĀTĀ INFORMĀCIJA DISKUSIJĀM
+(VMD, Silava, medibam.lv, lffb.lv)
+═══════════════════════════════════════════
+
+── POPULĀCIJA UN LIMITS ──
+
+✦ Latvijā ~1400 vilku (VMD 2025) | Eiropā ~19 000 (+25% pēdējos 10 gados)
+✦ Limits 2025/2026: 370 vilki — izpildīts jau janvārī!
+✦ Nomedīšanas % kur populācija sāk samazināties: 30–40% (zinātnieki)
+✦ Pat nomedīšana 300+ gadā nesamazina populāciju — metiens 5–6 mazuļi!
+✦ ES 2025: Eiropas Parlaments pazemina vilku aizsardzības statusu → dalībvalstis var brīvāk pārvaldīt
+
+MĀJDZĪVNIEKU ZAUDĒJUMI:
+✦ Latvija 2022: 64 uzbrukumi, 439 mājdzīvnieki (241 nogalināts)
+✦ Latvijā NAV kompensācijas mehānisma! (Igaunijā un Lietuvā ir)
+✦ Lietuva 2021: 1342 mājdzīvnieki; Igaunija: 508; Eiropa kopā: 40 000 gadā
+
+── VĒSTURE ──
+
+PADOMJU LAIKI: Vilks = "kaitēklis" — maksāja prēmiju par nomedītu. Masveida apkarošana → populācija nokrita līdz pāris desmitiem.
+PĒC 1991: Bernes konvencija → aizsardzība. Kopš 2000. gadu vidus — atjaunošanās.
+HIBRIDI: Pārāk maza populācija → vilku-suņu hibridizācija! Latvijā 2 gadījumi: 1970. gadi un 1999. gads (Alojas mežniecība).
+
+── MEDĪBU METODES ──
+
+MEDĪBAS AR KAROGIEM (vēsturiskā):
+→ Ziemā svaigā sniegā izseko baru → apstaigā (aplenkj)
+→ Karodziņi ap aplenkto platību — vilki baidās šķērsot (instinkts + cilvēka smarža)
+→ Dzinēji dzenā uz standiem. ⚠️ Vecie, pieredzējušie vilki dažkārt izlaužas!
+
+PIEGAUDOŠANA (mūsdienu):
+→ Augustā–septembrī piegaudotājs atdarina vilku balsis (mazuļi, mātīte)
+→ Vilki atsaucas → nosaka bara vietu → izveido standes
+
+GAIDA MEDĪBAS: Pie barotavām, upuriem (kur vilki atgriežas), ar termālo tēmēkli
+
+2025/2026 JAUNUMS: Visas vilku medības jāsaskaņo ar VMD pirms rīkošanas!
+
+── SABIEDRISKAIS KONFLIKTS ──
+
+"VAIRĀK MEDĪT" (lopkopji): Reāli zaudējumi, nav kompensācijas Latvijā
+"AIZSARGĀT" (dabas aizsargi): Ekosistēmas regulators, dabiskā selekcija (medī vājos/slimos)
+"SAPRĀTĪGI APSAIMNIEKOT" (mednieki, Silava): Ar datiem pamatots limits, piegaudošana efektīvāk
+
+── INTERESANTI FAKTI ──
+
+✦ Var noiet 50–60 km vienā naktī | Smaržas sajūta 100× labāka par cilvēku
+✦ Dienas laikā gandrīz neredzams — intensīvas vajāšanas dēļ kļuvis nakts dzīvnieks
+✦ Austrumu robežas žogs varētu ietekmēt ģenētisko plūsmu — Silava pētī
+✦ Bars var nomedīt 50–100 pārnadžus gadā
+
+── LATVJU KULTŪRA UN LEĢENDAS ──
+
+VILKAČI: Latvija = "vilkaču zeme" (16. gs. vēsturnieks Olafs Magnuss). Livonijā pārvēršanās par vilku uzskatīta par ikdienišķu parādību.
+TIESAS PROCESS (17. gs.): 85-gadīgs Tīss no Zaubes tiesā atzinās ka ir vilkatis.
+VILKAČI KĀ SARGI: Latvju teikas — vilkači cīnījās ar velnu lai atgūtu sēklas zemkopjiem. Labā-ļaunā dualitāte.
+DECEMBRIS = VILKU MĒNESIS: Seno latviešu kalendārā.
+
+SAKĀMVĀRDI:
+✦ "Vilks ir meža tīrītājs" | "Vilka kājas baro" | "Vilku baidās, mežā neiet"
+✦ "Ar vilku dzīvo — vilka kārtā gaudo" | "Vilks aitu skaitīt nemācās"
+
+JOKI:
+▸ "Karogu medības prasa daudz karodziņu un vēl vairāk vīru. Vilks redz karogu un baidās. Mednieks redz vilku un... arī baidās."
+▸ "Labs piegaudotājs pievilina vilku. Ļoti labs — pievilina arī blakus kolektīva medniekus."
+▸ "Ko saka vilks, redzot mednieku? — Vienam es netiekos, bet desmit — kāpēc ne."
 
 ═══════════════════════════════════════════
 MEDĪJUMU SLIMĪBAS — SELEKTORA ZINĀŠANAS
