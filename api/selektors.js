@@ -682,6 +682,81 @@ GOVJU medībās — prioritāte:
 ✦ "Trīsstūra siluets" = sānskats: īsi vidusžuburi + plakans kronis
 
 ═══════════════════════════════════════════
+STALTBRIEDIS — PAPILDU PRECIZĒJUMI
+(Māris Bērziņš, Gints Kaktiņš — LMS Dienvidkurzeme)
+═══════════════════════════════════════════
+
+── TERMINOLOĢIJA — KRITISKI SVARĪGI ──
+
+TEĻŠ = dzīvnieks līdz 1 gada vecumam → Staltbriežu TEĻIEM RAGI NEAUG!
+Pirmie ragi sāk augt NĀKAMAJĀ gadā pēc dzimšanas (marts–aprīlis).
+Augšana beidzas: oktobra vidus → pilnīgi pārkaulojušies.
+
+⚠️ Ja ragi vēl aug (pirms oktobra vidus) → NAV iespējams novērtēt selekciju!
+
+── PIRMIE RAGI — LIELĀKĀ SELEKCIJAS VĒRTĪBA ──
+
+Vācu speciālisti (Wagenkneht, Fišers, Šūmanis):
+→ 1.5 gadu vecuma bullīši ar PIRMAJIEM ragiem — medīt SELEKTĪVI PIRMKĀRT!
+Iemesls:
+✦ Pirmie ragi VISLABĀK raksturo iedzimtību — vienkāršāk novērtēt
+✦ Vismazākā iespēja kļūdīties salīdzinot ar vēlākiem gadiem
+
+── SPĪLES UN DAKŠAS — STINGRĀ LOĢIKA ──
+
+SVARĪGI: Spīle/dakša uz VECĀKA buļļa (4+ ragi, vecāks par 3.5g) = OBLIGĀTI NOMEDĪT!
+
+Iemesls — ģenētiskā draude:
+✦ Spīles forma ir ĢENĒTISKI NOSACĪTA
+✦ Vecāks par 3.5g + spīle → forma VAIRS NEMAINĪSIES, brīnums nenotiks!
+✦ Bullis jau reproduktīvajā vecumā → nodod sliktos gēnus
+✦ "Dakšinieki" bieži ir RIESTA VADOŠIE buļļi!
+
+⚠️ FIZISKĀ BĪSTAMĪBA: Spīle nesaķeras ar pretinieka kroni, bet IZIET CAURI →
+savainojot vai NOGALINOT pretinieku. Žuburotie buļļi atkāpjas pašsaglabāšanās
+instinkta dēļ — tāpēc "dakšinieks" var dominēt riestā!
+
+AI BRĪDINĀJUMS: "Spīle var sasniegt zelta medaļas novērtējumu,
+bet genofondu pasliktinās daudziem pēcnācējiem! Atbrīvoties no 'dakšiniekiem'
+populācijā var prasīt daudzus gadus."
+
+IZŅĒMUMS (saskaņā ar LMS):
+✦ 2.–3. ragi + spīles → SAUDZĒT (kronis vēl var veidoties)
+✦ Tikai 4+ ragi, vecāks par 3.5g → OBLIGĀTI NOMEDĪT
+
+── OPTIMĀLAIS TROFEJAS VECUMS LATVIJĀ ──
+
+Centrāleiropa: labākie ragi 11–13 gadu vecumā.
+Latvijā: TIKPAT ILGI VAI ILGĀK!
+Iemesls:
+✦ Latvijas ziemas bargākas, barošanās apstākļi nelabvēlīgāki
+✦ Skeleta kaulu pilnīga izaugšana: 7 gadi
+✦ Tikai PĒC 7 gadiem visi ķīmiskie elementi pilnībā novirzīti ragu augšanai
+→ Nav pamata medīt "veco" bulli 10–11 gados — tas vēl tikai sasniedz maksimumu!
+
+── PRIORITĀŠU SECĪBA — SELEKCIJAS TAKTIKA ──
+
+NEPAREIZI (biežs mīts): "Medī jaunos vispirms, medaļniekus pēc tam"
+
+PAREIZI:
+1. PIRMKĀRT: Vecie buļļi ar SLIKTU ragu kvalitāti
+   → Aktīvi piedalās riestā!
+   → Atstāj daudz sliktas kvalitātes pēcnācēju!
+   → Ātri pazemina populācijas kvalitāti!
+2. PĒC TAM: Jaunie neperspektīvie (līdz 3.5g)
+   → Pie normālas struktūras pie govīm netiek
+   → Nespēj būtiski pasliktināt kvalitāti pat ja netiek nomedīti
+
+── RIESTA BIOLOĢIJA — PRECIZĒJUMI ──
+
+NEPAREIZI: "Visas govis tiek aplektas 3–4 dienās"
+PAREIZI:
+✦ Govij olšūna nogatavojas reizi 18 dienās; meklēšanās ilgst 2 dienas
+✦ Ja neaplekta → atkārtoti pēc 18 dienām (augusts → sept. vidus → okt. sākums)
+✦ Ļoti maza varbūtība ka visas govis ovulāciju piedzīvo vienlaicīgi!
+→ Riests var ilgt daudz ilgāk nekā 3–4 dienas!
+
+═══════════════════════════════════════════
 STIRNA — ĀZIS (Capreolus capreolus) — SELEKCIJA
 ═══════════════════════════════════════════
 
