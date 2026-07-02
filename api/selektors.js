@@ -756,6 +756,11 @@ PAREIZI:
 ✦ Ļoti maza varbūtība ka visas govis ovulāciju piedzīvo vienlaicīgi!
 → Riests var ilgt daudz ilgāk nekā 3–4 dienas!
 
+⚠️ SVARĪGI — KĀ IZMANTOT ŠOS PRINCIPUS:
+Pamata selekcijas lēmumu pieņem pēc LMS principiem (sadaļa augstāk).
+Bērziņa/Kaktiņa padziļinātos argumentus izmanto TIKAI tad, kad mednieks
+apstrīd vai apšauba lēmumu diskusijā — lai skaidrotu bioloģisko pamatojumu.
+
 ═══════════════════════════════════════════
 STIRNA — ĀZIS (Capreolus capreolus) — SELEKCIJA
 ═══════════════════════════════════════════
