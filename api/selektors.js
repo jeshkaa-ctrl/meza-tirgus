@@ -611,6 +611,77 @@ IETEIKUMS: [atbilstošs no lēmumu koka]
 ⚠️ SVARĪGI: Pieaugušs bullis ar dūreja ragu riesta laikā var nopietni ievainot vai nogalināt citus buļļus!"
 
 ═══════════════════════════════════════════
+STALTBRIEDIS — LMS OFICIĀLIE SELEKCIJAS PRINCIPI
+(Latvijas Mednieku savienība — obligāti ievērojami)
+═══════════════════════════════════════════
+
+── 1. ŠPĪSERIS (1. ragi) ──
+
+NOMEDĪT ja:
+✦ Ragi ausu garumā VAI īsāki + smaili gali
+✦ Tumši/apdeguši/nodrupuši ragu gali + ausu garumā
+  (liecina par nerealizētu potenciālu — minerālvielu trūkums)
+⚠️ Labāk nomedīt bulli ar SMAILIEM ragiem pusotru ausu garumā
+   nekā ar NODRUPUŠIEM ragiem ausu garumā!
+
+SAUDZĒT ja:
+✦ Ragu galos veidojas 2–3 žuburi vai žuburu aizmetņi
+  → SEVIŠĶI SAUDZĒJAMI — visperspektīvākie špīseri!
+
+── 2./3. RAGS (dabā praktiski neatšķirami) ──
+
+NOMEDĪT ja:
+✦ Ne vairāk kā 7 žuburi (parasti 3+3)
+
+SAUDZĒT OBLIGĀTI ja:
+✦ Spīles (4+4 žuburi) — NEAIZTIKT!
+  Iemesls: ja tie ir otrais rags → kronis var sākt veidoties trešajā gadā!
+
+⚠️ SEZONAS BEIGAS:
+Otro/trešo ragu novērtēšana apgrūtināta — žuburi var būt NOLAUZTI
+→ Brīdini mednieku: žuburu skaits var šķist mazāks nekā patiesībā!
+
+── 4. RAGS VAI VECĀKS ──
+
+NOMEDĪT ja:
+✦ 8–10 žuburi + spīles vainaga vietā
+  (piedalās riestā, rada līdzīgus pēcnācējus!)
+✦ Buļļi ar 3+2 žuburiem vainagā (ja populācijā nav spīļu)
+✦ Ragi sānskatā veido TRĪSSTŪRI (īsi vidusžuburi + neizteiksmīgs kronis)
+
+── ANOMĀLIJAS — JEBKURĀ VECUMĀ ──
+
+NOMEDĪT jebkurā vecumā ja:
+✦ Ragu anomālijas
+✦ Trūkst ≥2 ragu pamatelementi (piem. abi vidusžuburi)
+✦ Nepārprotami IEVAINOTS
+✦ SLIMS — nespodra, savēlusies spalva
+✦ Attīstībā ATPALIKUŠI dzīvnieki
+
+── TROFEJAS MĒRĶA VECUMS ──
+
+✦ 10–12 gadu vecums → NOMEDĪT (trofejas maksimums)
+✦ Pēc silueta VECS (12+ gadi) → NOMEDĪT JEBKURĀ GADĪJUMĀ neskatoties uz ragiem!
+
+── GOVJU UN TEĻU MEDĪBAS ──
+
+BUĻĻUS → censties medīt INDIVIDUĀLAJĀS medībās!
+
+GOVJU medībās — prioritāte:
+1. PIRMKĀRT — teļi
+2. Priekšroka: dvīņu teļš + govs kopā
+3. DZINĒJMEDĪBĀS → NEMEDĪT bara vadošās govis!
+   (nāk pirmās — nedrīkst sajaukt ar medību mērķi)
+
+── TERMINOLOĢIJA (LMS) ──
+✦ "Vainags"/"kronis" = ragu augšdaļa, grozveidīga forma
+✦ "Spīle" = vainaga vietā šķelts/dakšveida gals (nevis grozveidīgs kronis)
+✦ "Acu žuburi" = pirmie žuburi no rozes augšup
+✦ "Vidusžuburi" = žuburi raga vidū
+✦ "Nodrupuši gali" = apdrupausi, nespodri, minerālu trūkuma pazīme
+✦ "Trīsstūra siluets" = sānskats: īsi vidusžuburi + plakans kronis
+
+═══════════════════════════════════════════
 STIRNA — ĀZIS (Capreolus capreolus) — SELEKCIJA
 ═══════════════════════════════════════════
 
