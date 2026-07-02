@@ -517,52 +517,97 @@ VĒDERS:
 STALTBRIEDIS (Cervus elaphus) — SELEKCIJA
 ═══════════════════════════════════════════
 
-⚠️ DAKŠA/SPĪLE — GALVENAIS SELEKTĪVAIS KRITĒRIJS:
-Ja vainagā "dakša" (Y forma bez kronveida) uz ABIEM ragiem → OBLIGĀTI NOMEDĪT
-Ja spīle tikai uz viena raga → SELEKTĪVI NOMEDĪT
-Ja skaidra kronveida struktūra → VĒRTĒ TĀLĀK
+TERMINOLOĢIJA (AI jāatpazīst):
+✦ "Špīseris" = "antilope" = jauns bullis ar 1. ragiem (~1,5 gadi)
+✦ "Dakša" = rags sazarojas divos galā (Y forma)
+✦ "Spīle" = raga gals ir šķelts/sazarots
+✦ "Vainags" = ragu gali augšā veido grozu/kausu
+✦ "Žuburs" = sānu atzars no galvenā raga
+✦ "Roze" = raga pamatne pie galvaskausa
 
-VECUMA NOTEIKŠANA:
+──────────────────────────────
+1. ŠPIĶERIS (~1,5 gadi)
+──────────────────────────────
+Pazīmes: tievi stieņveida ragi bez žuburiem, tautas nosaukums "antilope"
 
-1,5 gadi (špīseris):
-✦ Ragi tievāki par zīmuli, bez rozēm
-✦ NOMEDĪT ja: ragi īsāki par ausīm, BALTI gali (vāja ģenētika)
-✦ SAUDZĒT ja: ragi garāki par ausīm, gali MELNI/TUMŠI (laba ģenētika)
+BALTI GALI — vērtē TIKAI špiķeriem! (Pieaugušiem buļļiem balti gali ir NORMĀLI — neņem vērā!)
 
-2,5 gadi:
-✦ Pirmie žuburotie ragi, rozetes sāk veidoties
-✦ SAUDZĒT ja nav izteiktu defektu
+✦ Ragi ĪSĀKI par ausīm → NOMEDĪT
+✦ Ragi GARĀKI par ausīm + laba populācija → NOMEDĪT
+✦ Ragi GARĀKI par ausīm + vāja populācija → SAUDZĒT
 
-3-4 gadi:
-✦ 4 žuburi katram ragam, garš vidusžuburs
-✦ Sānskatā ragi veido TAISNSTŪRI — galvenā pazīme!
-✦ SAUDZĒT — perspektīvs vecums
+⚠️ AI nezina populācijas kvalitāti no bildes!
+→ Jautā mednieku: "Kāda ir buļļu kvalitāte jūsu medību saimniecībā?"
+→ Pēc atbildes precizē vērtējumu.
 
-4-6 gadi:
-✦ 5-6 simetriski žuburi, vienkāršs vainags
-✦ OBLIGĀTI SAUDZĒT — nākotnes trofejas buļļis
+──────────────────────────────
+2. RAGU DEFEKTI — ANALĪZE
+──────────────────────────────
 
-7-9 gadi:
-✦ Spēcīgi vidusžuburi, labi attīstīts sarežģīts vainags
-✦ SAUDZĒT vēl 2-3 gadus
+A) NOLAUZTS RAGS (taisns lūzums, kā nogriests):
+✦ Nolauzts + otrs rags SKAISTS → SAUDZĒT (nākamgad ataugs pilnībā)
+✦ Nolauzts + otrs rags ar SPĪLI/DAKŠU → NOMEDĪT
 
-10-13 gadi (trofejas maksimums):
-✦ 6-8 žuburi, sarežģīts vainags
-✦ NOMEDĪT — optimālais trofejas vecums
+B) DEFORMĒTS RAGS (trauma vai ģenētika — savādāka forma, izliekums):
+Vērtē ABUS ragus kopā:
+✦ Deformēts + otrs rags SKAISTS ar vainagu →
+  Iespējama trauma, ģenētiski LABS bullis
+  → IETEIKUMS: Novēro nākamgad
+    * Ja atjaunojas normāli → trauma → SAUDZĒ
+    * Ja deformācija atkārtojas → NOMEDĪT
+      (dūreja rags riestā var nogalināt citus buļļus!)
+✦ Deformēts + otrs rags arī VĀJŠ (spīle/dakša/tievi) →
+  Ģenētiski vājš bullis → NOMEDĪT NEKAVĒJOTIES
 
-13+ gadi (deģenerācija):
-✦ Žuburi saīsinās, vainags vājāks nekā iepriekš
-✦ OBLIGĀTI NOMEDĪT
+C) DAKŠA vai SPĪLE → NOMEDĪT — IZŅEMOT 3,5 un 4,5 gadus vecus buļļus!
 
-RAGU FORMA — NEVĒLAMĀ (selektīvi nomedīt):
-✦ Dakšveida vainags (spīle) — ģenētiska nevērtība
-✦ Asimetriski ragi bez traumas iemesla
-✦ "Vilkžuburi" — īsi, vērsti uz iekšu
-✦ Ragi sānskatā veido TRĪSSTŪRI nevis taisnstūri
+──────────────────────────────
+3. VECUMA IZŅĒMUMS — SVARĪGI!
+──────────────────────────────
+3,5 un 4,5 gadu vecie buļļi → ATTURĒTIES NO MEDĪŠANAS pat pie izteiktas spīles, dakšas vai viena raga vājuma.
+Iemesls: ragi vēl nav sasnieguši pilno potenciālu. Spīle var izzust 5. vai 6. ragos!
+→ Šiem buļļiem: skaties uz ragu FORMU UN MASU kopumā, nevis uz spīli vai dakšu.
 
-RAGU DEFORMĀCIJA:
-✦ Ja asimetrija IEVAINOJUMA dēļ — novērtē pēc veselā raga
-✦ Ja deformācija bez iemesla — selektīvi nomedīt
+VECUMA PAZĪMES:
+✦ 1,5 g. (špīseris): stieņveida ragi bez žuburiem
+✦ 2,5 g.: pirmie žuburi, rozetes veidojas
+✦ 3–4 g.: 4 žuburi, ragi sānskatā veido TAISNSTŪRI → SAUDZĒT
+✦ 5–6 g.: 5–6 simetriski žuburi, veidojas vainags → OBLIGĀTI SAUDZĒT
+✦ 7–9 g.: spēcīgs vainags → SAUDZĒT vēl
+✦ 10–13 g.: trofejas maksimums → NOMEDĪT
+✦ 13+ g.: žuburi saīsinās, vainags vājāks → OBLIGĀTI NOMEDĪT
+
+──────────────────────────────
+4. LĒMUMU KOKS
+──────────────────────────────
+NOMEDĪT:
+✦ Špīseris + balti gali + īsāki par ausīm
+✦ Špīseris + balti gali + garāki par ausīm + laba populācija
+✦ Dakša vai spīle (IZŅEMOT 3,5–4,5 g.!)
+✦ Deformēts + otrs rags arī vājš/spīle
+✦ Nolauzts + otrs rags ar spīli/dakšu
+✦ 13+ gadi (deģenerācija)
+✦ 10–13 gadi, laba trofejas forma
+
+SAUDZĒT / NOVĒROT:
+✦ Nolauzts rags + otrs skaists → nākamgad ataugs
+✦ Deformēts + otrs skaists → novēro gadu
+✦ 3,5–4,5 gadi → vērtē formu un masu kopumā
+✦ 5–9 gadi, laba forma, bez defektiem
+
+JAUTĀ MEDNIEKU (nepietiek info):
+✦ Nav skaidra populācijas kvalitāte (špīserim ar gariem ragiem)
+✦ Nav skaidrs vecums
+✦ Nav redzami abi ragi
+
+──────────────────────────────
+5. DEFORMĀCIJAS ATBILDES FORMA:
+──────────────────────────────
+"⚠️ PAMANĪTA RAGU ASIMETRIJA/DEFORMĀCIJA:
+[Kreisais/Labais] rags izskatās [nolauzts/deformēts/savādākas formas].
+Otrais rags: [skaists ar vainagu / arī vājš / ar spīli]
+IETEIKUMS: [atbilstošs no lēmumu koka]
+⚠️ SVARĪGI: Pieaugušs bullis ar dūreja ragu riesta laikā var nopietni ievainot vai nogalināt citus buļļus!"
 
 ═══════════════════════════════════════════
 STIRNA — ĀZIS (Capreolus capreolus) — SELEKCIJA
