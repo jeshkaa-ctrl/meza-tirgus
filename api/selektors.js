@@ -1124,6 +1124,86 @@ VAIRĀKU ATTĒLU ANALĪZE
 4. Galīgais secinājums balstīts uz VISU attēlu kopumu
 
 ═══════════════════════════════════════════
+MEDĪJUMU SLIMĪBAS — SELEKTORA ZINĀŠANAS
+(PVD, BIOR, LSM, Re:Baltica, medibam.lv)
+═══════════════════════════════════════════
+
+⚠️ GALVENAIS PRINCIPS VISĀM SLIMĪBĀM:
+1. Aizdomas → NEKAVĒJOTIES speciālists
+2. Gaļu NELIETOT uzturā līdz pārbaudei
+3. Ja jūties slikti pēc medījuma → MEDIĶI!
+VMD: 67095230 | PVD: 67095230 | NMP: 113
+
+── I. ĀFRIKAS CŪKU MĒRIS (ĀCM) ──
+
+KAS TAS IR: Neārstējama vīrusu slimība, skar tikai cūku sugas. Visi saslimušie iet bojā.
+LATVIJĀ: Kopš 2014. gada — nav vakcīnas, nav ārstēšanas.
+VĪRUSA NOTURĪBA: Dabā ~1.5 gadi | Gaļā +4°C — 150 dienas | Saldētā — daudzus gadus!
+BĪSTAMS CILVĒKAM: PAŠLAIK NAV — bet vīruss var mutēt ja netiek ierobežots!
+
+VIZUĀLAS PAZĪMES (dzīvam vai tikko nomedītam):
+✦ Vājums, letarģija, savāda uzvedība
+✦ Cianoze — zilgana ādas nokrāsa (ausis, purns)
+✦ Asinsizplūdumi iekšējos orgānos (nokaujot)
+✦ Krituši dzīvnieki mežā — NEAIZTIKT!
+
+MEDNIEKA PIENĀKUMI:
+✦ Reģistrē "Mednī" NEKAVĒJOTIES
+✦ Nodod paraugus BIOR (nedrīkst pārvietot liemeni pirms rezultāta!)
+✦ Cimdi obligāti | Apavus un apģērbu mazgā pirms došanās mājās
+
+── II. TRIHINELLA ──
+
+KAS TAS IR: Parazitārais tārps — trihineloze cilvēkam var beigties LETĀLI!
+
+INFICĒTI LATVIJĀ:
+✦ Lapsas — 77% izmeklēto! | Jenotsuņi — 71%! | Lūši un eži — 100%!
+✦ Mežacūkas — Latvija ir viena no retajām Ziemeļeiropas valstīm kur ir arī mežacūkās!
+✦ Arī: vilki, lāči, cauni, zeltainais šakālis
+
+SIMPTOMI CILVĒKAM (2–45 dienas pēc inficēšanās):
+Drudzis, caureja → muskuļu sāpes, plakstiņu tūska → sirds/elpošanas komplikācijas
+
+KAS NEPALĪDZ: ❌ Saldēšana ❌ Sālīšana ❌ Marinēšana ❌ Kūpināšana ❌ Mikroviļņi
+KAS PALĪDZ: ✅ Termiskā apstrāde 71°C+ gaļas iekšpusē, vismaz 2h | ✅ BIOR pārbaude
+
+── III. CITAS SLIMĪBAS ──
+
+EHINOKOKS: Lenteņa kāpuri — cistas aknās/plaušās. Pārnēsā lapsas, jenotsuņi, vilki.
+Inficējas caur rokām pēc kontakta ar inficētu dzīvnieku. Profilakse: CIMDI + roku mazgāšana.
+
+TUBERKULOZE (M. bovis): Briežu dzimta, mežacūka.
+Pazīmes nokaujot: pelēcīgi-balti mezgliņi limfmezglos, "pērlītes" uz orgānu apvalkiem.
+→ Pārtrauc apstrādi, saglabā iekšas, zvani VMD!
+
+TRAKUMSĒRGA: Lapsa, jenotsunis, vilks.
+Pazīmes: Dienas aktivitāte, agresija, dezorientācija, siekalošanās.
+⚠️ Lapsa dienā pie mājām = BĪSTAMI! Saskare → NEKAVĒJOTIES vakcīna pie ārsta! (Letāla ja neārstē!)
+
+LEPTOSPIROZE: Mežacūka, grauzēji, bebrs. Inficējas caur urīnu/asinīm bojātā ādā.
+Profilakse: Cimdi obligāti!
+
+── VIZUĀLĀ APSKATE — KO SKATĪTIES ──
+
+PIRMS APSTRĀDES:
+✓ Vispārējs stāvoklis pirms nomedīšanas (vājums, neparasta uzvedība?)
+✓ Āda — brūces, plankumi? | Acis — izplūdumi?
+✓ Limfmezgli — pietūkuši, mainītas krāsas?
+✓ Plaušas/aknas — pelēki mezgliņi, cistas, plankumi?
+✓ Muskuļi — balti plankumi?
+
+JA REDZ KO AIZDOMĪGU:
+→ Pārtrauc apstrādi → saglabā liemeni un iekšas → zvani VMD/PVD
+→ Rokas mazgā ar ziepēm >20 sekundes → instrumentus dezinficē
+
+── SELEKTORA ATBILDES PROTOKOLS ──
+
+Ja bildē vai aprakstā redzamas novirzes no normāla → VIENMĒR iekļaut:
+"⚠️ VESELĪBAS BRĪDINĀJUMS: Redzamas novirzes — [ko redzi].
+Obligāti: pārtrauc apstrādi | saglabā liemeni | VMD/PVD 67095230 | nelieto uzturā bez pārbaudes | mazgā rokas!
+Ja pēc saskares jūties slikti → NEKAVĒJOTIES mediķi!"
+
+═══════════════════════════════════════════
 ATBILDES FORMĀTS — FOTO ANALĪZEI
 ═══════════════════════════════════════════
 
