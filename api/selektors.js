@@ -936,6 +936,81 @@ RAGU MAKSIMUMS 6-9 GADI — "KAPITAL" → OBLIGĀTI SAUDZĒT
 ⛔ ŠAUŠANAS IETEIKUMU NEVARU DOT ja nav redzama bārda UN ķermeņa siluets!
 
 ═══════════════════════════════════════════
+ALNIS — PADZIĻINĀTĀ SELEKCIJA
+(latforin.info, medibam.lv + Skandināvijas pētījumi)
+═══════════════════════════════════════════
+
+── RAGU ATTĪSTĪBAS CIKLS ──
+
+1. gads: pūkaini, samtaini ragu aizmetņi — nav īstu ragu
+2. gads: pavasarī mīksti/samtaini, rudenī noberzti, ziemas sākumā nomesti
+3.+ gads: ragi sāk veidoties MARTĀ, notīrīti JŪLIJA BEIGĀS / AUGUSTA SĀKUMĀ
+⚠️ JAUNI tēviņi ragus saglabā VISU ZIEMU — pieaugušie nomet tūlīt pēc brunsta
+
+── VIZUĀLĀ ANALĪZE PĒC VECUMA ──
+
+JAUNS BULLIS (1–3 g.):
+✦ Stieņveidīgi vai vāji attīstīti ragi bez lāpstas
+✦ Kakls tievs, galva proporcionāli liela
+✦ Kājas šķietami garākas nekā ķermenis "pieprasa"
+
+VIDĒJA VECUMA (4–7 g.):
+✦ Lāpstveida ragi sāk veidoties
+✦ Ķermenis masīvāks, kakls biezāks
+✦ Bārda lielāka — bet skatīties uz PLATUMU, nevis garumu!
+
+SPĒKA GАДИ (8–10 g.) — TROFEJNIEKS:
+✦ Platas lāpstas ar daudziem atzariem, platums 1.5–1.8 m
+✦ Masīvs ķermenis, biezs kakls, plaša bārda
+✦ Ragi svērt var 20–23 kg
+
+VECS BULLIS (12+ g.):
+✦ Ragi sāk regresēt — "returhorn" bīstamākais variants
+✦ Mugura var būt "noliekusies", kakls tievāks
+✦ → NOMEDĪT — trofejas maksimums sasniegts
+
+── SELEKCIJAS LĒMUMU KOKS ──
+
+NOMEDĪT:
+✦ 12+ gadi (ragu regresija)
+✦ "Returhorn" — rags aug atpakaļ/iekšā → BĪSTAMS riestā, OBLIGĀTI nomedīt!
+✦ Slimi, ievainoti, nīkulīgi
+✦ Nepareizas formas ragi (ģenētiski defekti)
+
+SAUDZĒT:
+✦ Jauni buļļi līdz 4 gadiem (ragi vēl attīstās)
+✦ 5–9 gadi ar labiem ragiem — ļauj piedalīties riestā! ("Kapital" bullis)
+
+GOVIS UN TEĻI:
+✦ Medī: dvīņu teļš + govs kopā; teļus — sezonas sākumā
+✦ NEMEDĪ bara vadošo govi (dzinējmedībās nāk pirmā!)
+
+── SKANDINĀVIJAS ATZIŅAS ──
+
+ZVIEDRIJA (Kalén 2018):
+⚠️ Aizsargājot buļļus ar <5 atzariem → vidējais vecums SAMAZINĀS!
+✦ Efektīvāk: skatīties uz VECUMU un DZIMUMU proporciju, nevis atzaru skaitu
+✦ Mērķis: pietiekami daudz PIEAUGUŠU BUĻĻU kvalitatīvam riestu procesam
+
+SOMIJA — ģenētiskais brīdinājums:
+⚠️ Pārāk intensīva buļļu medīšana → maina ragu tipu
+✦ Lāpstveida ragi (palmate) → stieņveida ragi (cervina)
+✦ Ja vienmēr medī lielākos → populācija pamazām kļūst ar mazākiem ragiem!
+✦ Optimālā blīvums: 20–50 aļņi / 100 km² | Riestam vajag: 1 bullis uz 2–3 govīm
+
+KOPĪGAIS PRINCIPS:
+→ Spēka gadu bullis (8–10g) ar vidējiem ragiem ir VĒRTĪGĀKS populācijai
+   nekā 4g bullis ar iespaidīgiem ragiem — viņš vēl nav bioloģiski gatavs!
+
+── TERMINOLOĢIJA ──
+✦ "Returhorn" = rags kas aug atpakaļ vai iekšā (bīstams, obligāti nomedīt)
+✦ "Bauri" = aļņu riests (augusts–septembris)
+✦ "Zvans/bārda" = ādas kušķis zem zoda (PLATUMS = vecuma rādītājs)
+✦ "Lāpsta" = plakana raga daļa (tipiska pieaugušiem aļņiem)
+✦ "Kapital" bullis = spēka gadu bullis ar maksimāliem ragiem
+✦ "Palmate" = lāpstveida ragu tips | "Cervina" = stieņveida ragu tips
+
+═══════════════════════════════════════════
 RIESTA/BRUNSTA UZVEDĪBA — VECUMA RĀDĪTĀJS
 (Staltbriedim)
 ═══════════════════════════════════════════
