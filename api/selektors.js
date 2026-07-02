@@ -1034,6 +1034,87 @@ VECS BULLIS (11+ g.) — RIESTĀ ATPALIEK:
 → NOMEDĪT
 
 ═══════════════════════════════════════════
+MEŽACŪKA — MEŽA KUILIS: SELEKCIJA
+(Latvija + Vācija DJV/PIRSCH + Rumānija)
+═══════════════════════════════════════════
+
+── TERMINOLOĢIJA ──
+✦ "Keiler/Basse" = pieaugušais/vecs kuilis (Vācijā)
+✦ "Gewaff/Waffen" = apakšžokļa ilkņi — redzamā trofeja
+✦ "Haderer" = augšžokļa ilkņi (slīpētāji) — LABĀKS vecuma rādītājs
+✦ "Schild" = bieza ādas/saistaudu plāksne uz kuiļa krūtīm (aizsardzībai cīņās)
+✦ "Leitbache" = bara vadošā sivēnmāte → NEMEDĪT!
+✦ "Rotte" = mežacūku bars | "Rausche" = pārošanās laiks (nov–dec)
+✦ "Frischling" = mazulis līdz 1g | "Überläufer" = gada vecs (no 1.apr.)
+
+── VECUMA ANALĪZE PĒC SILUETA ──
+
+FRISCHLING (0–1 g.):
+✦ Svītraini (līdz ~4 mēn.), tad vienmērīgi brūni
+✦ Apaļš, kompakts, galva proporcionāli liela
+
+ÜBERLÄUFER (1–2 g.):
+✦ Ķermenis gandrīz CILINDRISKS sānskatā — galvenā pazīme!
+✦ Svars var sasniegt 100+ kg — NEPAĻAUTIES uz svaru!
+✦ Ilkņi tikko sāk veidoties
+
+JAUNS KUILIS (2–4 g.):
+✦ Ķermenis sāk iegūt "ķīļa" formu, priekšdaļa smagāka
+✦ Ilkņi aug ātri — var izskatīties iespaidīgi!
+⚠️ VĀCIJAS BRĪDINĀJUMS: Gari, spīdīgi ilkņi ≠ vecs kuilis!
+   Ilkņi 1–3g laikā aug ĻOTI ātri. "Jauns kuilis ar gariem ilkņiem
+   bieži kļūst par kļūdainu trofejnieku" — tas ir izplatīts pārkāpums!
+
+VIDĒJA VECUMA (4–6 g.):
+✦ Ķermeņa masa koncentrējas PRIEKŠĀ, pakaļdaļa "sabrūk"
+✦ Schild uz krūtīm sāk būt labi redzams
+✦ Haderer forma svarīgāka par Gewaff garumu!
+
+VECS KUILIS — BASSE (5+ g.):
+✦ Galvā redzams "Stopp" — asi izteikts lūzums starp degunu un pieri
+  (Überläuferim šā nav!)
+✦ Masīva priekšdaļa, pakaļkājas "īsas" salīdzinājumā
+✦ Aste ar izteiktu pušķi (bieži sasniedz potīti)
+✦ Schild biezums var sasniegt 4–6 cm
+
+── ILKŅU ANALĪZE — KRITISKS ──
+
+⚠️ ATMESTS MĪTS: "1 cm noslīpējums = 1 gads"
+Kļūdu biežums: 80%! Vācijas biologi ar marķētiem dzīvniekiem pierādīja —
+ar šo metodi kuiļi tiek novērtēti par 1–3 gadiem pārāk veci!
+
+KAS TIEŠĀM NORĀDA UZ VECUMU:
+✦ HADERER FORMA (augšžokļa ilkņi):
+   - Jauns kuilis → Haderer taisni vai nedaudz liekti, izkliedēts leņķis pret Gewaff
+   - Vecs kuilis → Haderer stipri izliekti, CIEŠI pieguļ Gewaff = ass slīpēšanas efekts
+   → Šaurs leņķis + cieša pieguļšana = VECĀKS kuilis (labākā pazīme bildē!)
+✦ GEWAFF GARUMS vien nepietiek — apliekoša metode bez Haderer analīzes!
+
+RUMĀNIJAS TROFEJAS SKALA (CIC):
+🥉 12–14 cm | 🥈 16–18 cm | 🥇 20+ cm | Pasaule 25+ cm
+Pasaules rekords: 144.00 CIC punkti (1978, Rumānija)
+
+── SELEKCIJAS LĒMUMU KOKS ──
+
+NOMEDĪT:
+✦ Slimi, ievainoti, nīkulīgi jebkurā vecumā
+✦ ĀCM riska zona → BIOR paraugi OBLIGĀTI (pārvietot aizliegts pirms rezultāta)
+✦ Trofeja: Basse 5+ g. ar Haderer ciešu pieguļšanu Gewaff
+✦ Sivēni — selektīvi, ĀCM kontrolei
+
+SAUDZĒT:
+✦ Sivēnmātes ar sivēniem — Rotte izjūk → sivēni aiziet bojā!
+✦ LEITBACHE — bara vadošā sivēnmāte! Dzinējmedībās nāk PIRMĀ — pazīt un nemedīt!
+✦ Jauni kuiļi 2–3g ar perspektīviem ilkņiem (izkliedēts Haderer leņķis = jaunums)
+
+── BILDĒ SKATĀS SECĪBĀ ──
+
+1. DZIMUMS: Schild uz krūtīm + lielāki ilkņi = kuilis | bez Schild + maza galva = sivēnmāte
+2. VECUMS: Cilindrisks = Überläufer | Priekšdaļa dominē + Schild = 5+ gadi | "Stopp" galvā = Basse
+3. ILKŅI: Haderer leņķis — šaurs + cieša pieguļšana = vecāks | garums vien nemaldina!
+4. LEITBACHE: Lielāka mātīte kas nāk pirmā, ap viņu jaunie → NEMEDĪT!
+
+═══════════════════════════════════════════
 VAIRĀKU ATTĒLU ANALĪZE
 ═══════════════════════════════════════════
 
