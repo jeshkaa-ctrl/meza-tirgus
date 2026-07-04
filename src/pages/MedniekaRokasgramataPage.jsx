@@ -22,6 +22,12 @@ export default function MedniekaRokasgramataPage({ onBack }) {
 
   useEffect(() => {
     if (window.matchMedia('(display-mode: standalone)').matches) return
+    // Mēģina nolasīt no window (MainPage to saglabā tur)
+    if (window.deferredInstallPrompt) {
+      setInstallPrompt(window.deferredInstallPrompt)
+      setVarInstalet(true)
+    }
+    // Arī klausās nākamajiem (ja MainPage vēl nav ielādēts)
     const handler = (e) => { e.preventDefault(); setInstallPrompt(e); setVarInstalet(true) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)

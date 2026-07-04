@@ -48,7 +48,7 @@ const SADAJAS = (isAdmin) => [
     color: '#8d6e63',
     ikona: "🦌",
     riki: [
-      { icon: "🏹", title: "Mednieka Rokasgrāmata", desc: "Sugas katalogs, Selektors, Jurists un CIC Kalkulators — viss vienā vietā", page: "mednieks", badge: "JAUNS" },
+      { icon: "🏹", logo: "/pwa-192x192.png", title: "Mednieka Rokasgrāmata", desc: "Sugas katalogs, Selektors, Jurists un CIC Kalkulators — viss vienā vietā", page: "mednieks", badge: "JAUNS" },
     ]
   },
   {
@@ -93,7 +93,7 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
       setPwaInstallets(true)
       return
     }
-    const handler = (e) => { e.preventDefault(); setDeferredPrompt(e) }
+    const handler = (e) => { e.preventDefault(); setDeferredPrompt(e); window.deferredInstallPrompt = e }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
@@ -324,7 +324,10 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
                       padding: '10px 14px', cursor: 'pointer',
                       display: 'flex', alignItems: 'center', gap: 12,
                     }}>
-                      <span style={{ fontSize: 22, minWidth: 28, textAlign: 'center' }}>{r.icon}</span>
+                      {r.logo
+                        ? <img src={r.logo} alt="" style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                        : <span style={{ fontSize: 22, minWidth: 28, textAlign: 'center' }}>{r.icon}</span>
+                      }
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: S.sm, marginBottom: 2, flexWrap: 'wrap' }}>
                           <span style={{ color: C.text, fontSize: F.base, fontWeight: F.weightBold }}>{r.title}</span>
