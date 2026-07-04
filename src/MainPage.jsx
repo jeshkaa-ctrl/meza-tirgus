@@ -188,10 +188,11 @@ export default function MainPage({ onNavigate, user, onReg, onIziet }) {
             )}
             {user
               ? <div style={{ display: 'flex', gap: S.sm, alignItems: 'center' }}>
-                  <span style={{
+                  <button onClick={() => onNavigate('profils')} style={{
                     color: C.textSec, fontSize: F.sm, padding: '7px 12px',
                     background: `${C.green}11`, borderRadius: R.md, border: `1px solid ${C.greenBdr}`,
-                  }}>👤 {user.vards || user.epasts}</span>
+                    cursor: 'pointer',
+                  }}>👤 {user.vards || user.epasts}</button>
                   <button onClick={onIziet} style={{
                     padding: '7px 14px', background: 'transparent', color: C.textMut,
                     border: `1px solid ${C.greenBdr}`, borderRadius: R.md, fontSize: F.sm, cursor: 'pointer',

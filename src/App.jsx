@@ -34,6 +34,7 @@ const CaurmeraPage           = React.lazy(() => import("./CaurmeraPage"))
 const AtjaunosanaPage        = React.lazy(() => import("./AtjaunosanaPage"))
 const RekinuKratuve          = React.lazy(() => import("./RekinuKratuve"))
 const ParoleLapa             = React.lazy(() => import("./ParoleLapa"))
+const ProfilsPage            = React.lazy(() => import("./ProfilsPage"))
 const CenuKalkulators        = React.lazy(() => import("./CenuKalkulators"))
 const PircejuCenas           = React.lazy(() => import("./PircejuCenas"))
 const IpasumAnalīze              = React.lazy(() => import("./IpasumAnalīze"))
@@ -247,6 +248,11 @@ if(page==="mednieks") return <>
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
 if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
+if(page==="profils") return (
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#060d06"}}/>}>
+    <ProfilsPage user={user} onBack={()=>setPage("main")} mainitParoli={mainitParoli} iziet={iziet}/>
+  </React.Suspense>
+)
 if(page==="cenas")        return <CenuKalkulators onBack={()=>setPage("main")}/>
 if(page==="pirceja_cenas") return <PircejuCenas onBack={()=>setPage("main")} user={user}/>
 if(page==="veikals") {
