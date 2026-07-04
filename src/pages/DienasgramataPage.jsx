@@ -81,6 +81,7 @@ export default function DienasgramataPage() {
 
   // GPS
   const [gpsStatus, setGpsStatus] = useState('idle')
+  const [forecast,  setForecast]  = useState(null)
 
   // AI jautājumi
   const [laiks,     setLaiks]     = useState('')
@@ -121,13 +122,15 @@ export default function DienasgramataPage() {
         const { latitude: lat, longitude: lng } = pos.coords
         const r = await fetch(
           `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
-          `&current=temperature_2m,winddirection_10m,weathercode&timezone=Europe/Riga`
+          `&current=temperature_2m,winddirection_10m,weathercode` +
+          `&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max,weathercode` +
+          `&timezone=Europe/Riga&forecast_days=4`
         )
         const d = await r.json()
-        const c = d.current
-        setTemp(Math.round(c.temperature_2m).toString())
-        setVejs(virziensNoGradiem(c.winddirection_10m))
-        setNokrisni(laiksNoKoda(c.weathercode))
+        setTemp(Math.round(d.current.temperature_2m).toString())
+        setVejs(virziensNoGradiem(d.current.winddirection_10m))
+        setNokrisni(laiksNoKoda(d.current.weathercode))
+        setForecast(d.daily)
         setGpsStatus('done')
       } catch {
         setGpsStatus('error')
@@ -153,6 +156,17 @@ export default function DienasgramataPage() {
     if (k <= 67)  return 'lietus'
     if (k <= 77)  return 'sniegs'
     return 'lietus'
+  }
+
+  function laiksEmoji(k) {
+    if (k === 0)  return '☀️'
+    if (k <= 2)   return '🌤️'
+    if (k === 3)  return '☁️'
+    if (k <= 49)  return '🌫️'
+    if (k <= 67)  return '🌧️'
+    if (k <= 77)  return '❄️'
+    if (k <= 82)  return '🌦️'
+    return '⛈️'
   }
 
   // ── Datu ielāde ──
@@ -290,6 +304,43 @@ export default function DienasgramataPage() {
           {prognozeLade ? '⏳ Analizē...' : (prognoze || '—')}
         </p>
       </div>
+
+      {/* LAIKAZIŅAS PROGNOZE */}
+      {forecast && (
+        <div style={{ background: C.surface2, border: `0.5px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: C.camoLight, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            🌤️ Laikaziņas — 4 dienas
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+            {forecast.time.map((datums, i) => {
+              const d = new Date(datums)
+              const diena = i === 0 ? 'Šodien' : d.toLocaleDateString('lv-LV', { weekday: 'short' })
+              const emoji = laiksEmoji(forecast.weathercode[i])
+              const tMax  = Math.round(forecast.temperature_2m_max[i])
+              const tMin  = Math.round(forecast.temperature_2m_min[i])
+              const lietus = forecast.precipitation_probability_max[i]
+              const vejs  = Math.round(forecast.windspeed_10m_max[i])
+              return (
+                <div key={datums} style={{
+                  background: i === 0 ? C.camoBg : C.surface1,
+                  border: `0.5px solid ${i === 0 ? C.camoBdr : C.border}`,
+                  borderRadius: 8, padding: '8px 6px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                }}>
+                  <div style={{ fontSize: 10, color: C.camoMuted, fontWeight: i === 0 ? 600 : 400 }}>{diena}</div>
+                  <div style={{ fontSize: 22 }}>{emoji}</div>
+                  <div style={{ fontSize: 12, color: C.camoText, fontWeight: 600 }}>{tMax}°</div>
+                  <div style={{ fontSize: 10, color: C.camoMuted }}>{tMin}°</div>
+                  {lietus > 0 && (
+                    <div style={{ fontSize: 10, color: '#7ab8e8' }}>💧{lietus}%</div>
+                  )}
+                  <div style={{ fontSize: 10, color: C.camoMuted }}>💨{vejs}km/h</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* JAUNS IERAKSTS */}
       <div style={{ background: C.surface2, border: `0.5px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
