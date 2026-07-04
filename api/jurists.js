@@ -213,6 +213,40 @@ MEDĪBU SUŅI (MK 95.–100. punkts):
 - Gaļu nedrīkst lietot vai pārdot pirms abu analīžu rezultātiem
 - Liemeni var pārvietot (mednieku māja, nodīrāt) — ierobežojums attiecas uz gaļas lietošanu
 
+MEDĪJUMA GAĻAS PĀRDOŠANA GALAPATĒRĒTĀJAM — MK higiēnas noteikumi:
+
+MAZS DAUDZUMS (tiesības pārdot bez uzņēmuma atzīšanas):
+- Lielie medījumi (savvaļas zīdītāji, izņemot zaķveidīgos): ≤ 500 kg nedēļā
+- Mazie medījumi (zaķi, putni): ≤ 100 kg nedēļā
+
+KAS JĀDARA NOMEDĪŠANAS VIETĀ:
+- Lielie dzīvnieki: pēc iespējas ĀTRĀK atasiņo un izņem kuņģi + zarnu traktu (daļēja eviscerācija)
+- Mazie dzīvnieki (zaķi, putni): daļēja eviscerācija ja nepieciešams
+- Jāsaglabā krūšu un vēdera orgānu piederība konkrētam liemenim!
+
+POST MORTEM APSKATE — OBLIGĀTA:
+- Jāveic NEKAVĒJOTIES, bet ne vēlāk kā 24 stundu laikā pēc nomedīšanas
+- Veic: valsts pilnvarots veterinārārsts VAI apmācīta persona (vet. uzraudzībā)
+- Ja apskates veicēja nav vietā → mednieks uzrāda dzīvnieku ar neatdalītu galvu un orgāniem veterinārārstam
+- Ja dzīvnieks pirms nomedīšanas uzvedies netipiskā veidā → obligāta vet. ekspertīze ar galvu un orgāniem
+- Galvas drīkst atdalīt TIKAI pēc veterinārās ekspertīzes
+
+TRIHINELOZEI UZŅĒMĪGĀS SUGAS — LABORATORIJA OBLIGĀTA:
+- Mežacūka un nepārnadži (arī laistīti, jo ir savvaļā dzīvojošu dzīvnieku klase)
+- Gaļu AIZLIEGTS pārdot vai lietot pirms trihinelozei negatīvs rezultāts
+
+TEMPERATŪRAS PRASĪBAS uzglabāšanā, pārvadāšanā un realizācijā:
+- Lielie medījumi: ≤ 7°C
+- Mazie medījumi (zaķi, putni): ≤ 4°C
+- Subprodukti: ≤ 3°C
+
+REALIZĀCIJA:
+- Pārdot drīkst 7 dienu laikā pēc nomedīšanas (ja pareizi atvēsināts)
+- Vajadzīgs PAVADDOKUMENTS — 3 eksemplāri: galapatērētājam, vet./apmācītajai personai, apstrādes vietā
+- Pavaddokumentu glabā 3 gadus
+- Limitētajiem dzīvniekiem pavaddokumentam pievieno medību atļauju vai tās kopiju
+- Pārvadāšanai: tīrs, mazgājams transportlīdzeklis
+
 ═══════════════════════════════════════════
 IEROČU APRITES LIKUMS — MEDĪBĀM SVARĪGAIS
 ═══════════════════════════════════════════
