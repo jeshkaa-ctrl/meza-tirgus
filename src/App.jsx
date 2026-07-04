@@ -82,6 +82,9 @@ const userRef = React.useRef(null)
 React.useEffect(() => { userRef.current = user }, [user])
 const setPage = React.useCallback((lapa) => {
   setPageRaw(lapa)
+  // URL atjauninājums — lai iOS "Add to Home Screen" saglabā pareizo URL
+  if (lapa === 'mednieks') window.history.pushState({}, '', '/?page=rokasgramata')
+  else if (lapa === 'landing' || lapa === 'main') window.history.pushState({}, '', '/')
   if (userRef.current?.id) {
     try {
       supabase.from('app_events').insert({
