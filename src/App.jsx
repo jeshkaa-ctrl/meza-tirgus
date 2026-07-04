@@ -238,11 +238,12 @@ if(page==="cic") return (
     <CICKalkulatorsPage onBack={()=>setPage("main")}/>
   </React.Suspense>
 )
-if(page==="mednieks") return (
+if(page==="mednieks") return <>
   <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#060d06",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50"}}>Ielādē...</div></div>}>
-    <MedniekaRokasgramataPage onBack={()=>setPage("main")}/>
+    <MedniekaRokasgramataPage onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("mednieks")}/>
   </React.Suspense>
-)
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
+</>
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
 if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>

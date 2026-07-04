@@ -15,7 +15,7 @@ const TABS = [
   { id: 'dienasgramata', nos: '📖 Dienasgrāmata' },
 ]
 
-export default function MedniekaRokasgramataPage({ onBack }) {
+export default function MedniekaRokasgramataPage({ onBack, user, onReg }) {
   const [aktiva, setAktiva] = useState('sugas')
   const [installPrompt, setInstallPrompt] = useState(null)
   const [varInstalet, setVarInstalet] = useState(false)
@@ -55,6 +55,29 @@ export default function MedniekaRokasgramataPage({ onBack }) {
     back: { background: 'transparent', border: 'none', color: '#4caf50', fontSize: 22, cursor: 'pointer',
             padding: '0 4px', minWidth: 36, minHeight: 44 },
   }
+
+  // Gate — tikai reģistrētiem lietotājiem
+  if (!user) return (
+    <div style={{ minHeight: '100vh', background: '#060d06', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, gap: 20 }}>
+      <img src="/pwa-192x192.png" alt="Mednieka Rokasgrāmata" style={{ width: 96, height: 96, borderRadius: 20 }} />
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ color: '#4caf50', fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Mednieka Rokasgrāmata</div>
+        <div style={{ color: '#5a8a5a', fontSize: 14, lineHeight: 1.6, maxWidth: 300 }}>
+          Pieejama tikai reģistrētiem lietotājiem. Reģistrācija ir bezmaksas.
+        </div>
+      </div>
+      <button onClick={onReg} style={{
+        background: '#e8720c', color: '#fff', border: 'none',
+        borderRadius: 10, padding: '14px 32px', fontSize: 15,
+        fontWeight: 700, cursor: 'pointer', width: '100%', maxWidth: 300,
+      }}>Reģistrēties / Pieteikties</button>
+      <button onClick={onBack} style={{
+        background: 'transparent', color: '#5a8a5a', border: '1px solid #1a3a1a',
+        borderRadius: 10, padding: '12px 32px', fontSize: 14,
+        cursor: 'pointer', width: '100%', maxWidth: 300,
+      }}>← Atpakaļ</button>
+    </div>
+  )
 
   return (
     <div style={s.app}>
