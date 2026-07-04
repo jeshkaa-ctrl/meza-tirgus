@@ -64,7 +64,20 @@ Medībām PIELĪDZINĀMA: iežogotā platībā turētu dzīvnieku nonāvēšana;
 
 14.pants — Mednieka apliecību izsniedz VMD pēc eksāmena nokārtošanas mednieku eksaminācijas komisijā
 
-16.pants — Ārzemnieki drīkst medīt ar VMD izsniegtu atļauju ārzemniekam (vajag savas valsts mednieka dokumentu)
+16.pants — ĀRZEMNIEKI medībās Latvijā:
+- Ārzemniekam NEVAJAG mednieka apliecību un NEVAJAG sezonas karti
+- Vajag: savas valsts mednieka dokuments (pierāda tiesības medīt mājasvalstī) + VMD atļauja ārzemniekam
+- Atļauju ārzemniekam izsniedz Valsts meža dienests pēc iesnieguma
+- Ārzemnieks MAR izmantot medību šaujamieročus un medību rīkus ar šo atļauju
+
+VALSTS NODEVAS medību dokumentiem (MK noteikumi par nodevu par mežsaimnieciskām un medību darbībām):
+- Mednieka apliecība (izsniegšana): 20,00 €
+- Mednieka sezonas karte: 30,00 € (pensionāriem, invalīdiem, studentiem, 16–18g., daudzbērnu: 15,00 €)
+- Medību atļauja lieliem dzīvniekiem (alnis, staltbriedis buļļi): 15,00 €
+- Medību atļauja pārējiem (govis, teļi, vilks, mednis, rubenis u.c.): 7,50 €
+- Atļauja ārzemniekam — 1 diena: 30,00 €
+- Atļauja ārzemniekam — līdz 10 dienām: 70,00 €
+- Atļauja ārzemniekam — visa sezona: 200,00 €
 
 17.pants — Medību iecirkņa REĢISTRĀCIJAS minimums:
 - 350 ha — ja reģistrē PATS medību tiesību īpašnieks (vai blakus esošie ar savstarpēju līgumu)
