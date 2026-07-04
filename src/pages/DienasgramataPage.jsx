@@ -83,6 +83,7 @@ export default function DienasgramataPage() {
   const [gpsStatus, setGpsStatus] = useState('idle')
 
   // AI jautājumi
+  const [laiks,     setLaiks]     = useState('')
   const [jautajums, setJautajums] = useState('')
   const [atbilde,   setAtbilde]   = useState('')
   const [jautaLade, setJautaLade] = useState(false)
@@ -199,12 +200,18 @@ export default function DienasgramataPage() {
       vejs:           vejs || null,
       temperatura:    temp ? parseFloat(temp) : null,
       nokrisni:       nokrisni || null,
+      laiks:          laiks || null,
     })
     setTeksts('')
     setNomedits(false)
     setSvars('')
     setSkaits('')
     setDzimums('')
+    setLaiks('')
+    setVejs('')
+    setNokrisni('')
+    setTemp('')
+    setGpsStatus('idle')
     setSaglaba(false)
     ieladeIerakstus(user.id, aktivitate)
   }
@@ -339,7 +346,7 @@ export default function DienasgramataPage() {
         />
 
         {/* Apstākļi */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6, marginBottom: 8 }}>
           <div>
             <div style={etiketite}>Vējš</div>
             <select value={vejs} onChange={e => setVejs(e.target.value)} style={lauks}>
@@ -350,7 +357,7 @@ export default function DienasgramataPage() {
             </select>
           </div>
           <div>
-            <div style={etiketite}>Laiks</div>
+            <div style={etiketite}>Nokrišņi</div>
             <select value={nokrisni} onChange={e => setNokrisni(e.target.value)} style={lauks}>
               <option value="">—</option>
               {['sauss','mākoņains','lietus','sniegs','migla'].map(o => (
@@ -362,6 +369,11 @@ export default function DienasgramataPage() {
             <div style={etiketite}>Temp °C</div>
             <input type="number" value={temp} onChange={e => setTemp(e.target.value)}
               placeholder="°C" style={lauks} />
+          </div>
+          <div>
+            <div style={etiketite}>Pulkstenis</div>
+            <input type="time" value={laiks} onChange={e => setLaiks(e.target.value)}
+              style={lauks} />
           </div>
         </div>
 
@@ -466,6 +478,9 @@ export default function DienasgramataPage() {
                 {new Date(i.created_at).toLocaleString('lv-LV', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </span>
               <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                {i.laiks && (
+                  <span style={zime(C.surface1, C.border, C.camoMuted)}>🕐 {i.laiks}</span>
+                )}
                 {i.meness_faze && (
                   <span style={zime(C.greenBg, C.greenBdr, C.camoDark)}>
                     {menessFazeEmoji(i.meness_faze)} {i.meness_faze}
@@ -476,6 +491,9 @@ export default function DienasgramataPage() {
                 )}
                 {i.vejs && (
                   <span style={zime(C.surface1, C.border, C.camoMuted)}>💨 {i.vejs}</span>
+                )}
+                {i.nokrisni && (
+                  <span style={zime(C.surface1, C.border, C.camoMuted)}>🌦️ {i.nokrisni}</span>
                 )}
                 {i.nomedits && (
                   <span style={zime(C.orangeBg, C.orangeBdr, C.orangeTxt)}>
