@@ -146,6 +146,36 @@ ADMINISTRATĪVIE SODI (32.pants) — 1 naudas soda vienība (NSV) = 5 EUR:
 - Vispārbīstami rīki (inde, gāze, sprāgstvielas, elektroierīces): 8–140 NSV + medību tiesību ATŅEMŠANA līdz 3 gadiem
 - Neuzrāda ieročus/dokumentus/produkciju kontrolieriem: brīdinājums vai līdz 50 NSV (250 €)
 
+KRIMINĀLATBILDĪBA — Krimināllikums 112.pants "Nelikumīgas medības":
+  PAMATSODS (nelikumīga medīšana): brīvības atņemšana līdz 2 gadiem, piespiedu darbs vai naudas sods
+  SMAGĀKS SODS (līdz 2 gadiem) ja:
+    - Grupā ar iepriekšēju vienošanos
+    - Īpaši aizsargājamā dabas teritorijā (ĪADT)
+    - Radīts būtisks kaitējums (lācis, lūsis u.c. aizsargājamas sugas!)
+  VISSMAGĀKAIS SODS (līdz 4 gadiem) ja izmantoti aizliegti līdzekļi:
+    - Cilpas, ķerambedres, āķi, elektroierīces, sprāgstvielas, indes, gāze
+  SVARĪGI: Aizsargājamas sugas (lācis, lūsis, ūdrs, kormorāns, zivjugarnis) = automātiski "būtisks kaitējums" → KL 112.pants!
+
+ZAUDĒJUMU ATLĪDZĪBA — MK Noteikumi Nr.1482 (papildus sodiem!):
+  Formula: Z = minimālā alga × K (minimālā alga 2024.g. = 700€)
+  NELIKUMĪGI NOMEDĪTU DZĪVNIEKU ATLĪDZĪBA:
+    - Alnis, staltbriedis: K=7 → ~4900€
+    - Lūsis: K=5 → ~3500€
+    - Vilks: K=4 → ~2800€
+    - Stirna, mežacūka: K=3 → ~2100€
+    - Mednis, rubenis: K=2 → ~1400€
+    - Āpsis, cauna, zaķis, ondatra, zoss, bebrs: K=0.5 → ~350€
+    - Pīle, fazāns, laucis, sloka, balodis: K=0.2 → ~140€
+  ATLĪDZĪBA DUBULTOJAS ja nomedīts ĀRPUS SEZONAS (piemēram, sloka ārpus termiņa = 280€)
+  50% atlīdzība ja dzīvnieks tikai IEVAINOTS (netika atrasts)
+  LĀCIS nav atlīdzību tabulā — aizsargājamā suga, uz to attiecas Dabas aizsardzības likums + KL 112.pants pilnā apmērā
+
+SODU KUMULĀCIJA — viena pārkāpuma gadījumā var piemērot VISU REIZĒ:
+  1. Administratīvais sods (Medību likums 32.pants) — naudas sods + medību tiesību atņemšana
+  2. Kriminālatbildība (KL 112.pants) — brīvības atņemšana vai papildu naudas sods
+  3. Civiltiesiskā atlīdzība (MK Nr.1482) — kompensācija par katru nomedīto dzīvnieku
+  Kopā var sanākt tūkstošiem eiro + kriminālsodāmība!
+
 ═══════════════════════════════════════════
 MK MEDĪBU NOTEIKUMI — GALVENIE PUNKTI
 ═══════════════════════════════════════════
