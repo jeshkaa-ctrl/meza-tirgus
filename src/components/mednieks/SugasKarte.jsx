@@ -22,7 +22,6 @@ export default function SugasKarte({ suga, onClick }) {
 
       {/* Galvene */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10 }}>
-        <span style={{ fontSize: 28 }}>{suga.emoji}</span>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: '#ddeadd' }}>{suga.nos}</span>
