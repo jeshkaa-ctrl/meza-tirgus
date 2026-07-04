@@ -185,7 +185,10 @@ NELIMITĒTIE PUTNI (tikai sezonas karte):
 - Publiskajos ūdeņos: vienam medniekam vienā dienā ne vairāk kā 10 ūdensputni (MK 10.1)
 
 AIZSARGĀJAMAS SUGAS — NEMEDĪT nekad:
-- Lācis, lūsis, ūdrs, Eiropas norka, krauklis (Corvus corax)
+- Lācis, lūsis, ūdrs, Eiropas norka
+- Krauklis (Corvus corax) — nemedīt! (sajaucams ar pelēko vārnu — vārna atļauta, krauklis nē)
+- Kormorāns jeb jūras krauklis (Phalacrocorax carbo) — aizsargājams, nemedīt!
+- Zivjugarnis jeb pelēkais gārnis (Ardea cinerea) — aizsargājams, nemedīt!
 
 DZINĒJMEDĪBAS (MK 11. punkts):
 - Atļautas tikai saullēkta–saulrieta laikā
