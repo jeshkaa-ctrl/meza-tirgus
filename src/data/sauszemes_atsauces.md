@@ -64,6 +64,91 @@
 
 ---
 
+## S7. BALOŽI — VISI TRĪS (Columba spp.)
+⚠️ Svarīgi atšķirt — divi medājami, viens aizsargājams!
+
+### LAUKU BALODIS (Columba palumbus) ✅ Medāt | 1. aug – 10. marts
+- **BALTS LIELAIS SPĀRNA LAUKUMS** — redzams LIDOJUMĀ, pusmēnesveida uz plecu apvidus! 🔑
+- **BALTS PLANKUMS UZ KAKLA SĀNIEM** — redzams arī sēžot! (tikai pieaugušiem)
+- **LIELĀKAIS** no baložiem — 38–44 cm, svars 300–615 g, spārnu plētums 68–80 cm
+- Pelēkzils ķermenis, vīna sārtas krūtis
+- Tēviņi un mātītes izskatās VIENĀDI — nav dzimumu atšķirību
+- Jaunie putni: brūnāki, bez kakla plankuma, bet spārna laukums jau redzams
+
+### MĀJAS BALODIS / KLINŠU BALODIS (Columba livia) ✅ Medāt | Visu gadu
+- Tipiskais **PILSĒTAS BALODIS** — pelēks, ļoti variabla krāsa
+- **DIVAS MELNAS JOSLAS** uz spārniem — galvenā pazīme (ģenētiski tīriem)
+- **ZAĻGANVIOLETS metālisks spīdums** uz kakla un krūtīm
+- **SARKANAS/ROZĀ KĀJAS**
+- **BALTS knābja paugurs** virs nāsīm
+- Balts laukums uz muguras lejasdaļas (ģenētiski tīriem)
+- 30–37 cm, svars 265–380 g
+
+### MEŽA BALODIS (Columba oenas) 🚫 NEMEDĪT — AIZSARGĀTS
+- **MAZĀKAIS** no visiem trijiem baložiem — 28–34 cm (lauku balodim 38–44 cm!)
+- **BEZ JEBKĀDĀM BALTĀM IEZĪMĒM** — nav baltā spārna laukuma, nav baltā kakla plankuma 🔑
+- Tumši **ZILPELĒKS** viscauri — vienots, tumšāks par lauku balodi
+- **DIVAS ĪSAS MELNAS ŠĶĒRSSVĪTRAS** uz sakļautiem spārniem (ĪSĀKAS nekā mājas balodim)
+- Metālisks **ZAĻVIOLETS SPĪDUMS** uz kakla sāniem (mazāks nekā mājas balodim)
+- Kājas sarkanas, knābis dzeltens (atšķirībā no lauku baloža — nav liels balts kakla plankums)
+- **MELNAS/TUMŠAS ACIS** — atšķirībā no lauku baloža (tam DZELTENAS acis)! 🔑
+- Ligzdo **koku dobumos** (melnās dzilnas kaltos) — retāks, vecajos mežos
+- Biotops: veci meži ar dobumainu kokiem, purvu malas, jūrmalas zona
+- **⚠️ Galvenais risks: rudenī migrācijā lido KOPĀ ar lauku baložiem — pārbaudiet baltā laukuma esamību!**
+
+### ⚠️ TRĪS BALOŽU SALĪDZINĀJUMS
+
+| | Lauku balodis ✅ | Mājas balodis ✅ | Meža balodis 🚫 |
+|---|---|---|---|
+| **Galvenā pazīme** | **BALTS spārna laukums** | **2 melnas joslas** (garas) | **BEZ baltā** — vienots pelēkzils |
+| **Izmērs** | **Lielākais** 38–44cm | Vidējs 30–37cm | **Mazākais** 28–34cm |
+| **Kakla plankums** | **LIELS BALTS** plankums | Nav balts | Nav balts |
+| **Spārna joslas** | Nav (tikai baltais laukums) | **2 GARAS melnas joslas** | 2 ĪSAS melnas joslas |
+| **Mugura** | Pelēka | Balts laukums (ģen. tīriem) | **Bez baltā** |
+| **Acis** | **DZELTENAS** | Oranžas/sarkanas | **MELNAS/TUMŠAS** |
+| **Biotops** | Meža malas, lauki | **Pilsēta, saimniecības** | **Veci meži, koku dobumi** |
+| **Sezona** | 1. aug – 10. marts | Visu gadu | ⛔ NEMEDĪT |
+
+> **Drošākā pazīme:** Lauku balodim BALTS lielais spārna laukums — redzams sēžot (kakls) un lidojumā (spārni).
+> Meža balodis — MAZĀKAIS, bez jebkādiem baltiem laukumiem. Rudenī lido kopā ar lauku baložiem — uzmanīgi!
+
+---
+
+## S6. KRAUKLIS (Corvus corax — Common Raven)
+🚫 AIZSARGĀJAMS — NEMEDĪT | Jāatpazīst lai neatšķirtu no pelēkās vārnas!
+
+### 🔑 GALVENĀ PAZĪME — VISS MELNS + LIELS + ĶĪĻASTE
+- **PILNĪGI MELNS** viscauri — nav neviena pelēka laukuma (atšķirībā no vārnas!)
+- **LIELĀKS** par vārnu — 56–69 cm (vārnai 48–54 cm)
+- **MASĪVS, izliekts knābis** — lielāks un stiprāks nekā vārnai
+- **SPURAINAS RĪKLES SPALVAS** — izspūrušas, raksturīgas tikai krauklim
+- **ĶĪĻVEIDĪGA ASTE** — garena, smaila galā (vārnai — noapaļota!)
+- Metālisks spīdums uz apspalvojuma
+
+### Balss 🔑
+- Dziļa **"krra"** — pilnīgi atšķirīga no vārnas ķērkšanas
+- Skaņu dzird no tālienes
+
+### Izmērs — skaitliski
+- Garums: **56–69 cm**, spārnu plētums **115–130 cm**, svars 0,7–1,6 kg
+- Vārna: 48–54 cm, plētums 84–100 cm — krauklis manāmi lielāks
+
+### ⚠️ KRAUKLIS vs PELĒKĀ VĀRNA — KRITISKAIS SALĪDZINĀJUMS
+
+| | Krauklis 🚫 NEMEDĪT | Pelēkā vārna ✅ MEDĪT |
+|---|---|---|
+| **Ķermenis** | **VISS MELNS** | **PELĒKS** ķermenis + melna galva |
+| **Izmērs** | **Lielāks** 56–69 cm | Mazāks 48–54 cm |
+| **Aste** | **ĶĪĻVEIDĪGA** (smaila) | Noapaļota, taisna |
+| **Knābis** | **Masīvs, izliekts** | Mazāks |
+| **Rīkle** | **Spurainas spalvas** | Gludas |
+| **Balss** | Dziļa "krra" | Ķērkšana |
+
+> **Nekad nedrīkst sajaukt:** ja putns ir VISS melns bez pelēka — tā ir KRAUKLIS → NEMEDĪT.
+> Pelēkā vārna vienmēr ir DIVKRĀSU — pelēks ķermenis + melna galva.
+
+---
+
 ## S2. RUBENIS (Lyrurus tetrix — Black Grouse)
 ✅ Medājams | Tikai TĒVIŅI | 1. sept – 31. dec | Limitēts
 
@@ -223,5 +308,107 @@
 - Ligzda: krūmos vai augstā kokā, pārklāta ar **zaru jumtiņu** — raksturīga žagatas ligzda
 - Kaitnieciska: izēd citu putnu olas un mazuļus
 - Viegli pazīstama pēc skaļas "žadzināšanas"
+
+---
+
+## S8. MEŽIRBE (Tetrastes bonasia — Hazel Grouse)
+✅ Medājama | Limitēta — apjoms katru gadu VMD | ⚠️ STIPRI APDRAUDĒTA (EN Sarkanā grāmata)
+
+### 🔑 GALVENĀ PAZĪME — MELNA PAZODE ar BALTĀM MALIŅĀM (tēviņam)
+- Tēviņam: **MELNA PAZODE** apakšā + **BALTAS KONTRASTĒTAS MALIŅAS** — nepārprotami!
+- Mātītei: **nav melnās pazodes** — grūtāk atpazīt
+- **CEKULS** — neliels, var izsliet, vienmēr redzams
+- **SARKANS ACU GREDZENS** — redzams tuvumā
+
+### TĒVIŅŠ 🔑 — MEDĀMAIS (limitēts!)
+- Ķermenis: **RAIBUMAINI PELĒKBRŪNS** — sarežģīts raksts, lieliski maskējas
+- Pazode: **MELNA** ar baltām maliņām — galvenā pazīme!
+- Mugura: **PELĒKA** ar rakstu (vai olīvbrūna — Latvijas dienvidos)
+- Cekuls: **MAZS CEKULS** uz galvas — var izsliet uztraukumā
+- Spārni: brūnāki par pārējo ķermeni
+- Aste: pelēka, melni punktiņi galu malas
+- Izmērs: **35–37 cm**, svars 370–430 g — mazāks par rubeni!
+
+### MĀTĪTE 🔑 — UZMANĪGI!
+- Nav melnās pazodes — **VIENMĒRĪGI RAIBUMAINI PELĒKBRŪNA**
+- Cekuls **ĪSĀKS** nekā tēviņam
+- Grūtāk atpazīt — izmērs palīdz (mazāka par rubeni mātīti)
+- ⚠️ Apdraudēta suga — ja šaubies par dzimumu, NEMEDĪ
+
+### Uzvedība ⚠️ — mednieka piezīme
+- Slēpts dzīvesveids — **GRŪTI NOVĒROT** dabā
+- Par klātbūtni vieglāk spriest pēc **SAUCIENA** (smalka svilpošana)
+- Iztraucēta: **ZEMS, ĪSS lidojums** — aizlido uz koku, tur rēgojas
+- Ziemā: guļ **SNIEGĀ** — drošība + siltums
+
+### Latvijā — kritiska situācija ⚠️
+- Kopš 2005. g.: skaits samazinājies par **89%**!
+- Iemesls: mežu intensīva apsaimniekošana
+- Sarkanā grāmata: **Stipri apdraudēta suga (EN)**
+- **2019. gads — Gada putns Latvijā**
+- **LIMITĒTA** — VMD nosaka apjomu katru gadu; pirms medībām OBLIGĀTI pārbaudi
+
+### Biotops
+- Blīvi **JAUKTU KOKU UN SKUJKOKU MEŽI** — egļu audzes, biezokņi
+- Tipiska nometniece — nemigrē
+- Latvijā: vairāk ziemeļos, Zemgalē retāk
+
+### ⚠️ ATŠĶIRT — MEŽIRBE vs RUBENIS MĀTĪTE
+
+| | **Mežirbe** ✅ (limitēta!) | **Rubenis mātīte** 🚫 NEMEDĪT |
+|---|---|---|
+| **Izmērs** | **Mazāka** 35–37 cm | Lielāka ~45 cm |
+| **Galvenā pazīme** | Tēviņam **MELNA PAZODE** | Nav |
+| **Cekuls** | **Ir** (mazs) | Nav |
+| **Biotops** | **Blīvs mežs** | Atklātākas meža malas, purvi |
+| **Acu gredzens** | **SARKANS** | Nav izteikts |
+
+> **Drošākā taktika:** Mežirbe ir mazāka, ar cekulu un sarkanu acu gredzenu.
+> Tēviņam melna pazode — 100% pārliecība. Bez tās — NEMEDĪ!
+
+---
+
+## S9. FAZĀNS (Phasianus colchicus — Common Pheasant)
+✅ Medājams | 1. okt – 31. janv | Nelimitēts | Latvijā galvenokārt laistīts
+
+### 🔑 GALVENĀ PAZĪME TĒVIŅAM — SARKANA SEKSTE + ZAĻA GALVA + GARA ASTE
+- **KOŠI SARKANA SEKSTE** (kaila āda ap acīm) — absolūti nepārprotama! 🔑
+- **TUMŠI ZILI-ZAĻA METALISKA GALVA** ar nelielu cekulu
+- **GARA SLAIDĀ ASTE** — bieži veido pusi no visa putna garuma!
+- **DZELTENAS ACIS** tēviņam
+- **BALTS GREDZENS AP KAKLU** (daudzām pasugām — ne visiem!)
+
+### TĒVIŅŠ 🔑 — MEDĀMAIS
+- Galva: **ZILI-ZAĻA** ar metālisku spīdumu + SARKANA sekste ap acīm
+- Ķermenis: **ZELTAINI RUDS** ar brūniem, zaļiem, violetiem raibumiem
+- Kakls: **BALTS GREDZENS** (tipiskajam) vai bez tā
+- Aste: **ĻOTI GARA, SLAIDĀ** — svītraini pelēkbrūna, apmēram 42–54 cm
+- Izmērs: **80–90 cm** kopgarums (ar asti!), svars 1,2 kg
+- Atpazīšana: NEIESPĒJAMI sajaukt — tēviņš ir Latvijas krāsainākais medījamais putns
+
+### MĀTĪTE ⚠️ — GRŪTĀK ATPAZĪT
+- **PELĒKBRŪNI RAIBA** — melni plankumi uz dzeltenbrūna fona, kamufleris
+- Aste **uz pusi ĪSĀKA** nekā tēviņam (29–31 cm)
+- **Lielāka** par mežirbi un rubeni mātīti — ~60 cm
+- Nav sarkanas sektes — tikai neliela kaila āda ap aci
+- Ligzdo uz zemes — barojot cāļus viegli ierauga
+
+### Latvijā — praktiskā informācija
+- Savvaļas populācija **NEVAR IEDZĪVOTIES** — Latvijas ziemas pārāk bargās
+- Medī tikai **LAISTĪTOS** putnos — medību saimniecības laista katru gadu
+- Sezona: **1. okt – 31. janv** — ziemas medības
+- Nelimitēts — bet medī tikai tur, kur ir laistīšana
+
+### ⚠️ MĀTĪTES ATŠĶIRUMS — FAZĀNS vs CITI RAIBUMI
+
+| | **Fazāna mātīte** | **Mednis mātīte** 🚫 | **Rubenis mātīte** 🚫 | **Mežirbe** (limit.) |
+|---|---|---|---|---|
+| **Izmērs** | **Lielākā** ~60cm | ~65cm (līdzīga!) | ~45cm | 35–37cm |
+| **Aste** | **Gara, slaidā** | Normāla | Normāla | Īsa |
+| **Apspalvojums** | Dzelt.brūns + melni plankumi | Tumšāks, raibāks | Pelēkāks | Pelēkbrūns |
+| **Biotops** | Lauki, krūmāji | **Vecais mežs** | Purva malas | Blīvs mežs |
+
+> **Mātītes ID:** Fazāna mātīte ir LIELĀKA, ar GARU SLAIDĀ ASTI un DZELTENBRŪNU (ne pelēku) apspalvojumu.
+> Tēviņu nevar sajaukt — Latvijas medījamo putnu krāsainākais!
 
 ---
