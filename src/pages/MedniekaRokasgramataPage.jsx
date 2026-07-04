@@ -3,7 +3,7 @@ import { MOTO, ETIKAS_TEKSTI } from '../data/etika'
 import { EtikasTeksts } from '../components/mednieks/EtikasTeksts'
 import SugasKatalogs from '../components/mednieks/SugasKatalogs'
 import JuristsChat from '../components/mednieks/JuristsChat'
-import CICKalkulators from '../components/mednieks/CICKalkulators'
+import CICKalkulators from '../CICKalkulatorsPage'
 import SelekcijasKalkulators from '../SelekcijasKalkulators'
 import DienasgramataPage from './DienasgramataPage'
 
@@ -98,7 +98,7 @@ export default function MedniekaRokasgramataPage({ onBack }) {
         {aktiva === 'sugas'          && <SugasKatalogs />}
         {aktiva === 'selektors'      && <SelekcijasKalkulators />}
         {aktiva === 'jurists'        && <JuristsChat />}
-        {aktiva === 'cic'            && <CICKalkulators />}
+        {aktiva === 'cic'            && <CICKalkulators onBack={() => setAktiva('sugas')} />}
         {aktiva === 'dienasgramata'  && <DienasgramataPage />}
       </div>
     </div>
