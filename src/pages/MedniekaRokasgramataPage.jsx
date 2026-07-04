@@ -19,21 +19,25 @@ export default function MedniekaRokasgramataPage({ onBack }) {
   const [aktiva, setAktiva] = useState('sugas')
   const [installPrompt, setInstallPrompt] = useState(null)
   const [varInstalet, setVarInstalet] = useState(false)
+  const [showIosHint, setShowIosHint] = useState(false)
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone
 
   useEffect(() => {
-    if (window.matchMedia('(display-mode: standalone)').matches) return
-    // Mēģina nolasīt no window (MainPage to saglabā tur)
+    if (isStandalone) return
+    if (isIOS) { setVarInstalet(true); return }
     if (window.deferredInstallPrompt) {
       setInstallPrompt(window.deferredInstallPrompt)
       setVarInstalet(true)
     }
-    // Arī klausās nākamajiem (ja MainPage vēl nav ielādēts)
     const handler = (e) => { e.preventDefault(); setInstallPrompt(e); setVarInstalet(true) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 
   async function instaletApp() {
+    if (isIOS) { setShowIosHint(true); return }
     if (!installPrompt) return
     installPrompt.prompt()
     const { outcome } = await installPrompt.userChoice
@@ -70,6 +74,20 @@ export default function MedniekaRokasgramataPage({ onBack }) {
           </button>
         )}
       </div>
+
+      {/* iOS instalēšanas instrukcija */}
+      {showIosHint && (
+        <div style={{ background: '#1a2510', border: '1px solid #e8720c', borderRadius: 12, margin: '8px 12px 0', padding: '12px 16px', position: 'relative' }}>
+          <button onClick={() => setShowIosHint(false)} style={{ position: 'absolute', top: 8, right: 10, background: 'none', border: 'none', color: '#7a8f52', fontSize: 18, cursor: 'pointer' }}>×</button>
+          <div style={{ color: '#e8720c', fontWeight: 700, fontSize: 13, marginBottom: 8 }}>📲 Kā instalēt iPhone/iPad:</div>
+          <div style={{ color: '#b8c89a', fontSize: 13, lineHeight: 1.8 }}>
+            1. Atver <strong style={{ color: '#e8f0d8' }}>Safari</strong> pārlūku<br />
+            2. Nospied <strong style={{ color: '#e8f0d8' }}>□↑ (Share)</strong> pogu apakšā<br />
+            3. Izvēlies <strong style={{ color: '#e8f0d8' }}>"Add to Home Screen"</strong><br />
+            4. Nospied <strong style={{ color: '#e8f0d8' }}>Add</strong> — ikona parādās sākumekrānā!
+          </div>
+        </div>
+      )}
 
       {/* Virsraksts un moto */}
       <div style={{ textAlign: 'center', padding: '24px 16px 16px', borderBottom: '1px solid #1a3a1a' }}>
