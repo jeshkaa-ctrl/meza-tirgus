@@ -23,50 +23,115 @@ JURIDISKĀ HIERARHIJA — VIENMĒR IEVĒRO
 MEDĪBU LIKUMS — GALVENIE PANTI
 ═══════════════════════════════════════════
 
-1.pants — Termini:
-- Limitētie medījamie dzīvnieki = vajag medību atļauju
-- Nelimitētie = bez atļaujas, tikai sezonas karte
+1.pants — TERMINI:
+- Limitētie medījamie dzīvnieki = noteikts pieļaujamais nomedīšanas apjoms, vajag medību atļauju
+- Nelimitētie medījamie dzīvnieki = bez apjoma ierobežojuma, tikai sezonas karte
 - Mednieks = persona ar mednieka apliecību
-- Medību sezonas karte = dokuments tiesībām medīt
+- Mednieka sezonas karte = dokuments tiesībām medīt ar šaujamieroci un medību rīkiem
+- Medību atļauja = dokuments limitēto nomedīšanai konkrētā vietā un daudzumā
 - Diennakts tumšais laiks = 2h pēc saulrieta līdz 2h pirms saullēkta
+- Medību tiesības = zemes īpašnieka tiesības medīt savā zemē — var izmantot pats vai nodot citam
+- Medību tiesību īpašnieks = zemes īpašnieks vai tiesiskais valdītājs
+- Medību tiesību lietotājs = persona, uz kuras vārda reģistrēts medību iecirknis
+- Medību iecirknis = vienlaidu medību platība, ko apsaimnieko viens medību tiesību lietotājs
+- Medību produkcija = medību procesā iegūtās trofejas, gaļa un subprodukti
+- Medību trofejas = ragi ar galvaskausu, ilkņi, galvaskausi, ādas
 
-3.pants — Kur AIZLIEGTS medīt:
+3.pants — MEDĪBAS: definīcija un aizliegumi:
+(1) Medības = izsekošana, meklēšana, ķeršana, sagūstīšana, ievainošana vai nonāvēšana ar šaujamieroci, rīkiem vai paņēmieniem
+Medībām PIELĪDZINĀMA: iežogotā platībā turētu dzīvnieku nonāvēšana; izbēgušu nebrīvē audzētu dzīvnieku nonāvēšana (ar īpašnieka rakstveida lūgumu); klaiņojošu mājas dzīvnieku nonāvēšana medību platībās
+
+(3) Medīt AIZLIEGTS:
 - Kapsētās
-- Vietās bez reģistrēta medību iecirkņa
-- Izņēmumi: nelimitētie savā zemē, publiskās ūdenstilpes
+- Vietās bez reģistrēta medību iecirkņa, IZŅEMOT:
+  a) nelimitēto — medību tiesību īpašnieks vai viņa rakstveidā pilnvarotais
+  b) nelimitēto — publiskajās ūdenstilpēs un to tauvas joslā
+  c) ievainota limitētā dzīvnieka izsekošana normatīvajos aktos noteiktajā kārtībā
 
-7.pants — Medību sezona: 1.aprīlis–31.marts
+(21) Medīt PILSĒTĀ — drīkst ja dzīvnieki apdraud sabiedrisko kārtību, pēc pašvaldības saistošajiem noteikumiem
 
-12.pants — Mednieka apliecība obligāta lai saņemtu sezonas karti, medību atļauju un ieroča atļauju
+(6) NEMEDĪJAMOS PUTNUS ārpus sezonas drīkst iegūt ar DAP (Dabas aizsardzības pārvaldes) ikreizēju atļauju: sabiedrības veselībai, lidojumu drošībai, kultūraugu aizsardzībai, faunas aizsardzībai, pētniecībai un mācībām
 
-13.pants — Medīt ar šaujamieroci drīkst TIKAI ar Valsts policijas izsniegtu glabāšanas atļauju
+4.pants — Medījamie dzīvnieki kļūst par īpašumu TIKAI pēc nomedīšanas likumā noteiktajā kārtībā
 
-14.pants — Mednieka apliecību izsniedz VMD pēc eksāmena nokārtošanas
+5.pants — Medību produkciju (nelikumīgi iegūtu) AIZLIEGTS piesavināties; kontrolieri tiesīgi to izņemt
 
-16.pants — Ārzemnieki drīkst medīt ar VMD atļauju ārzemniekam
+7.pants — Medību sezona: 1. aprīlis – 31. marts (nākamajā gadā)
 
-17.pants — Medību iecirkņa minimālās platības:
-- 350 ha — stirnām un mežacūkām
-- 1000 ha — staltbriežu govīm un teļiem
-- 2000 ha — staltbriežu buļļiem
-- 2500 ha — aļņiem
+12.pants — Mednieka apliecība obligāta lai saņemtu: medību atļauju, sezonas karti, šaujamieroča iegādes atļauju
 
-21.pants — Limitētajiem: medību atļauja + sezonas karte
-Nelimitētajiem: tikai sezonas karte
+13.pants — Medīt ar šaujamieroci drīkst TIKAI ar Valsts policijas iestādes izsniegtu glabāšanas atļauju
 
-24.pants — NELIKUMĪGAS MEDĪBAS (galvenie):
-- Medīšana ārpus sezonas vai bez dokumentiem
-- Atrašanās ar sagatavotu ieroci bez saskaņojuma
-- Medīšana bez mednieka apliecības vai sezonas kartes
-- Limitēto dzīvnieku medīšana bez atļaujas
-- Aizliegti rīki: skaņu ieraksti, mākslīgie gaismas avoti naktī
-  (izņēmums: mežacūka, lapsa, jenotsunis)
-- Nakts redzamības un termiskie tēmēkļi naktī
-  (izņēmums: mežacūka, lapsa, jenotsunis)
-- Arbaleti, loki, inde, sprāgstvielas, elektriskie rīki
+14.pants — Mednieka apliecību izsniedz VMD pēc eksāmena nokārtošanas mednieku eksaminācijas komisijā
+
+16.pants — Ārzemnieki drīkst medīt ar VMD izsniegtu atļauju ārzemniekam (vajag savas valsts mednieka dokumentu)
+
+17.pants — Medību iecirkņa REĢISTRĀCIJAS minimums:
+- 350 ha — ja reģistrē PATS medību tiesību īpašnieks (vai blakus esošie ar savstarpēju līgumu)
+- 1000 ha — ja reģistrē medību tiesību LIETOTĀJS (ne īpašnieks)
+
+18.pants — Publiskajās ūdenstilpēs un tauvas joslā — ūdensputnus drīkst medīt BEZ saskaņojuma ar medību tiesību lietotāju
+
+19.pants — Minimālās platības lai medītu konkrētas sugas:
+- 350 ha — stirnu un mežacūku medībās (lauksaimniecības zeme + mežs + krūmāji + purvi)
+- 1000 ha — staltbriežu govju un teļu medībās (tikai meža masīvi, krūmāji, purvi)
+- 2000 ha — staltbriežu buļļu medībās (tikai meža masīvi, krūmāji, purvi)
+- 2500 ha — aļņu medībās (tikai meža masīvi, krūmāji, purvi)
+Ja iecirknis mazāks — medību tiesību lietotāji var slēgt savstarpēju līgumu par kopīgu medīšanu blakus iecirkņos
+
+21.pants — Limitētajiem: medību atļauja + sezonas karte | Nelimitētajiem: tikai sezonas karte
+
+24.pants — NELIKUMĪGAS MEDĪBAS:
+- Medīšana ārpus sezonas vai kārtības
+- Atrašanās ar sagatavotu ieroci bez saskaņojuma (izņemot ievainota dzīvnieka izsekošanu)
+- Medīšana bez dokumentiem (apliecība, sezonas karte, glabāšanas atļauja, medību atļauja limitētajiem)
+- Limitētā pārvietošana no vietas kur nomedīts bez aizpildītas medību atļaujas
+- Nelimitēto medīšana bez medību tiesību lietotāja piekrišanas (izņemot publiskās ūdenstilpes)
 - Medīšana kad dzīvnieki bēg no dabas katastrofas
 
-27.pants — Mednieka PIENĀKUMS uzrādīt ieroci, atļaujas, munīciju, medību produkciju kontrolieriem
+AIZLIEGTI RĪKI, METODES (24.p.9):
+- "Putnu" līme, akli/sakropļoti dzīvnieki kā ēsma
+- Skaņu ieraksti
+- Mākslīgi gaismas avoti diennakts tumšajā laikā — IZŅEMOT: mežacūka, lapsa, jenotsunis
+- Nakts redzamības tēmēkļi (elektroniskie) diennakts tumšajā laikā — IZŅEMOT: mežacūka, lapsa, jenotsunis
+- Termālie (siltumu uztverošie) tēmēkļi diennakts tumšajā laikā — IZŅEMOT: mežacūka, lapsa, jenotsunis
+- Spoguļi un apžilbinošas ierīces
+- Lāzertipa tēmēkļi
+- Neselektīvi tīkli, kājķeramie slazdi un neselektīvas lamatas
+- Arbaleti un loki
+- Pusautomātiskie šaujamieroči ar magazīnu > 3 patronas — IZŅEMOT: mežacūka, lapsa, jenotsunis
+- Lidaparāti, motorizēti sauszemes un ūdens transportlīdzekļi
+- Ieroči, kas nav klasificēti kā medību šaujamieroči
+
+ABSOLŪTI AIZLIEGTI vispārbīstami rīki (24.p.10):
+- Ķerambedres, cilpas, āķi, asi priekšmeti uz takām
+- Elektriskas ierīces kas apdullina vai nogalina dzīvnieku
+- Sprāgstvielas, patšāvēji
+- Inde un saindēta vai imobilizējoša ēsma
+- Gāze vai dūmi
+
+27.pants — Pienākums uzrādīt kontrolieriem: šaujamieroči + glabāšanas atļauja + munīcija + medību rīki + medību dokumenti + medību produkcija
+
+28.pants — Ja atņemta mednieka apliecība vai izņemts medību šaujamierocis: kontroliestāde 3 darba dienu laikā informē VP
+
+29.pants — POSTĪJUMU ATBILDĪBA:
+- Ja medību tiesības NAV nodotas → atbildīgs ZEMES ĪPAŠNIEKS
+- Ja nodots citam lietotājam → kā medību tiesību nodošanas līgumā noteikts
+- Pašvaldības medību koordinācijas komisija var uz laiku pārņemt medību tiesības postījumu vietā
+
+ADMINISTRATĪVIE SODI (32.pants) — 1 naudas soda vienība (NSV) = 5 EUR:
+- Sagatavots ierocis platībā bez saskaņojuma: 8–70 NSV (40–350 €)
+- Medīšana bez sezonas kartes vai atļaujas ārzemniekam: 4–70 NSV (20–350 €)
+- Medīšana ar loku: 4–70 NSV (20–350 €)
+- Limitētā pārvietošana bez aizpildītas atļaujas: 8–100 NSV + medību tiesību aizliegums līdz 1 gadam
+- Medīšana aizliegtā vietā: 8–100 NSV + medību tiesību aizliegums līdz 1 gadam
+- Nelimitēto medīšana bez piekrišanas: 8–100 NSV + medību tiesību aizliegums līdz 1 gadam
+- Aizliegti rīki (nakts gaisma, termālie, pusauto >3 patronas, arbalets, motortransports): 8–100 NSV + medību tiesību aizliegums līdz 1 gadam
+- Medību termiņu neievērošana: 8–140 NSV (40–700 €) + medību tiesību ATŅEMŠANA līdz 3 gadiem
+- Medīšana bez apliecības vai glabāšanas atļaujas: 8–140 NSV + medību tiesību ATŅEMŠANA līdz 3 gadiem
+- Limitēto medīšana bez atļaujas: 8–140 NSV + medību tiesību ATŅEMŠANA līdz 3 gadiem
+- Vispārbīstami rīki (inde, gāze, sprāgstvielas, elektroierīces): 8–140 NSV + medību tiesību ATŅEMŠANA līdz 3 gadiem
+- Neuzrāda ieročus/dokumentus/produkciju kontrolieriem: brīdinājums vai līdz 50 NSV (250 €)
 
 ═══════════════════════════════════════════
 MK MEDĪBU NOTEIKUMI — GALVENIE PUNKTI
