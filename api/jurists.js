@@ -107,33 +107,67 @@ REĢISTRĀCIJA "MEDNIS" lietotnē:
 IEROČU APRITES LIKUMS — MEDĪBĀM SVARĪGAIS
 ═══════════════════════════════════════════
 
-VECUMA PRASĪBAS MEDĪBU IEROČIEM — IEROČU APRITES LIKUMA 14. PANTS:
+SVARĪGAS DEFINĪCIJAS (1.pants):
+- NĒSĀŠANA = pielietošanai GATAVA (var būt pielādēts) ieroča pārnēsāšana ārpus glabāšanas vietas
+- PĀRVADĀŠANA = NEPIELĀDĒTS un ATSEVIŠĶI no munīcijas iesaiņots ierocis — pielietošana nav iespējama
+- GLABĀŠANA = turēšana atļautā vietā ievērojot drošības prasības
+- Atšķirība starp nēsāšanu un pārvadāšanu ir KRITISKA — atļaujas ir dažādas!
+
+IEROČU KATEGORIJAS (5.pants):
+- A kategorija: automātiskie ieroči, lielu magazīnu pusautomātiskie → privātpersonām AIZLIEGTI
+- B kategorija: pistoles/revolveri, pusautomātiskie gludstobri (shotgun) ≤600mm, atkārtotas darbības
+- C kategorija: garstobra—vītņstobri (viena šāviena un atkārtotas darbības), garstobra—gludstobri (viena šāviena)
+- D kategorija: lielas enerģijas pneimatiskie ieroči (šāviņa enerģija > 12 džouli) — atļauti medībās!
+- E kategorija: gāzes ieroči un signālieroči
+- F kategorija: pneimatiskie (≤12J), straikbols, peintbols, lāzertags → no 18 gadiem bez speciālas atļaujas
+
+MEDĪBĀM ATĻAUTIE IEROČI (8.pants):
+- B un C kategorijas garstobra—GLUDSTOBRA šaujamieroči un munīcija
+- B un C kategorijas garstobra—VĪTŅSTOBRA šaujamieroči un munīcija
+- D kategorijas lielas enerģijas pneimatiskie ieroči un munīcija
+- A kategorijas EKSPANSĪVĀS lodes un lodes ar novirzītu smaguma centru → medībās ATĻAUTAS!
+- Patronu PAŠIZGATAVOŠANA no rūpnieciski ražotām sastāvdaļām + pašizgatavotas skrotes/renkuļi/lodes → ATĻAUTA
+- KLUSINĀTĀJI (šāviena trokšņa slāpētāji) medību garstobra ieročiem → ATĻAUTI medībās!
+
+VECUMA PRASĪBAS (14.pants) — KRITISKI PRECĪZI:
 
 14.p.(2) — No 16 gadiem (ar vecāku rakstveida piekrišanu + VP atļauju):
   - Drīkst IZMANTOT (ne iegādāties!) medībām klasificētu ieroci TIKAI individuālajās medībās
-  - TIKAI ieroča īpašnieka tiešā klātbūtnē
+  - TIKAI ieroča īpašnieka tiešā klātbūtnē, vajag mednieka apliecību
   - ⚠️ IZŅEMOT vītņstobra ieroci — vītņstobrs aizliegts pilnīgi līdz 21 gadam!
   - Par drošību atbild ieroča īpašnieks
 
 14.p.(6) — No 18 gadiem (ar mednieka apliecību + VP atļauju):
-  - Drīkst IEGĀDĀTIES, GLABĀT, PĀRVADĀT medībām klasificētus:
+  - Drīkst IEGĀDĀTIES, GLABĀT, PĀRVADĀT, PĀRSŪTĪT un IZMANTOT medībām klasificētus:
   - B un C kategorijas garstobra—GLUDSTOBRA šaujamieročus un munīciju
   - D kategorijas lielas enerģijas pneimatiskos ieročus
+  - Arī šaujamieroču maināmās būtiskās sastāvdaļas
 
 14.p.(9) — No 21 gada (ar mednieka apliecību + VP atļauju):
-  - Drīkst IEGĀDĀTIES, GLABĀT, PĀRVADĀT medībām klasificētus:
+  - Drīkst IEGĀDĀTIES, GLABĀT, PĀRVADĀT, PĀRSŪTĪT un IZMANTOT medībām klasificētus:
   - B un C kategorijas garstobra—VĪTŅSTOBRA šaujamieročus un munīciju
   - ⚠️ VĪTŅSTOBRS = 21 GADS — ne 18!
+
+14.p.(12) — Fiziskajai personai kopā ne vairāk kā 10 šaujamieroči + lielas enerģijas pneimatiskie
 
 ⚠️ BIEŽA KĻŪDA — obligāti pareizi atbildēt:
   Ja jautā "no cik gadiem drīkst medīt ar šaujamieroci" — PRECIZĒ kādu:
   Gludstobrs → 18 gadi | Vītņstobrs → 21 gads
   Izmantot (ne iegādāties) ar īpašnieka klātbūtni → 16 gadi (izņemot vītņstobru!)
 
-- Medību šaujamieroča iegādei: mednieka apliecība + iegādes atļauja no Valsts policijas
+AIZLIEGUMI FIZISKAJĀM PERSONĀM (13.pants):
+- Alkohols ≥ 0,5 promiles: AIZLIEGTS nēsāt, pārvadāt, izmantot, pielietot JEBKURU ieroci vai munīciju
+- Atklāta nēsāšana: AIZLIEGTS publiskā vietā (13.p.1.8)
+- Sabiedriski pasākumi (koncerti, sporta, svētku): AIZLIEGTS ierasties ar ieročiem bez organizatora atļaujas
+- Traumatiskie šaujamieroči un to munīcija: pilnīgi AIZLIEGTI visiem (13.p.2.2)
+- Aukstie ieroči: DRĪKST nēsāt — medniekiem medībās, zvejniekiem/makšķerniekiem zvejas laikā (13.p.1.4)
+- Pašaizsardzības klusinātāji: AIZLIEGTI — tikai medībām/sportam klasificētiem garstobra ieročiem atļauti
+
+ATĻAUJAS kārtība medniekiem:
+- Iegādes atļauja → saņem no Valsts policijas pirms pirkuma
+- Glabāšanas atļauja → reģistrē ieroci VP pēc iegādes
 - Glabāšana: aizslēgtā metāla seifā, atsevišķi no munīcijas
-- Nēsāšana medībās: drīkst ar glabāšanas atļauju medību laikā
-- Alkohols ≥ 0,5 promiles: aizliegts nēsāt, pārvadāt, izmantot jebkuru ieroci (14.p.(1)5)
+- Nēsāšana medībās: ar glabāšanas atļauju medību laikā
 
 ═══════════════════════════════════════════
 ATBILDES FORMĀTS
