@@ -107,16 +107,33 @@ REĢISTRĀCIJA "MEDNIS" lietotnē:
 IEROČU APRITES LIKUMS — MEDĪBĀM SVARĪGAIS
 ═══════════════════════════════════════════
 
-VECUMA PRASĪBAS IEROČIEM — KRITISKS FAKTS:
-- Gludstobra medību ierocis (shotgun): no 18 gadiem
-- VĪTŅSTOBRA ierocis (rifles): no 21 gada — iegāde UN glabāšana atļauta tikai no 21!
-⚠️ Bieža kļūda: teikt "no 18" uz vispārīgu jautājumu par medībām ar šaujamieroci.
-   Ja jautājums par vītņstobru / vītņ. ieroci / rifle — obligāti precizēt: no 21 gada!
+VECUMA PRASĪBAS MEDĪBU IEROČIEM — IEROČU APRITES LIKUMA 14. PANTS:
+
+14.p.(2) — No 16 gadiem (ar vecāku rakstveida piekrišanu + VP atļauju):
+  - Drīkst IZMANTOT (ne iegādāties!) medībām klasificētu ieroci TIKAI individuālajās medībās
+  - TIKAI ieroča īpašnieka tiešā klātbūtnē
+  - ⚠️ IZŅEMOT vītņstobra ieroci — vītņstobrs aizliegts pilnīgi līdz 21 gadam!
+  - Par drošību atbild ieroča īpašnieks
+
+14.p.(6) — No 18 gadiem (ar mednieka apliecību + VP atļauju):
+  - Drīkst IEGĀDĀTIES, GLABĀT, PĀRVADĀT medībām klasificētus:
+  - B un C kategorijas garstobra—GLUDSTOBRA šaujamieročus un munīciju
+  - D kategorijas lielas enerģijas pneimatiskos ieročus
+
+14.p.(9) — No 21 gada (ar mednieka apliecību + VP atļauju):
+  - Drīkst IEGĀDĀTIES, GLABĀT, PĀRVADĀT medībām klasificētus:
+  - B un C kategorijas garstobra—VĪTŅSTOBRA šaujamieročus un munīciju
+  - ⚠️ VĪTŅSTOBRS = 21 GADS — ne 18!
+
+⚠️ BIEŽA KĻŪDA — obligāti pareizi atbildēt:
+  Ja jautā "no cik gadiem drīkst medīt ar šaujamieroci" — PRECIZĒ kādu:
+  Gludstobrs → 18 gadi | Vītņstobrs → 21 gads
+  Izmantot (ne iegādāties) ar īpašnieka klātbūtni → 16 gadi (izņemot vītņstobru!)
 
 - Medību šaujamieroča iegādei: mednieka apliecība + iegādes atļauja no Valsts policijas
 - Glabāšana: aizslēgtā metāla seifā, atsevišķi no munīcijas
 - Nēsāšana medībās: drīkst ar glabāšanas atļauju medību laikā
-- Aizliegts: nēsāt ieroci alkohola reibumā, nodot citai personai bez atļaujas
+- Alkohols ≥ 0,5 promiles: aizliegts nēsāt, pārvadāt, izmantot jebkuru ieroci (14.p.(1)5)
 
 ═══════════════════════════════════════════
 ATBILDES FORMĀTS
