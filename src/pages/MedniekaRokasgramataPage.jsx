@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MOTO, ETIKAS_TEKSTI } from '../data/etika'
 import { EtikasTeksts } from '../components/mednieks/EtikasTeksts'
 import SugasKatalogs from '../components/mednieks/SugasKatalogs'
@@ -17,6 +17,22 @@ const TABS = [
 
 export default function MedniekaRokasgramataPage({ onBack }) {
   const [aktiva, setAktiva] = useState('sugas')
+  const [installPrompt, setInstallPrompt] = useState(null)
+  const [vaрInstalet, setVarInstalet] = useState(false)
+
+  useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) return
+    const handler = (e) => { e.preventDefault(); setInstallPrompt(e); setVarInstalet(true) }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  async function instaletApp() {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const { outcome } = await installPrompt.userChoice
+    if (outcome === 'accepted') { setVarInstalet(false); setInstallPrompt(null) }
+  }
 
   const etikaIndex = new Date().getDate() % ETIKAS_TEKSTI.vispareji.length
   const sākumaEtika = ETIKAS_TEKSTI.vispareji[etikaIndex]
@@ -35,9 +51,18 @@ export default function MedniekaRokasgramataPage({ onBack }) {
       {/* Galvene */}
       <div style={s.hdr}>
         <button style={s.back} onClick={onBack}>←</button>
-        <h1 style={{ margin: 0, color: '#4caf50', fontSize: 15, fontWeight: 700 }}>
+        <h1 style={{ margin: 0, color: '#4caf50', fontSize: 15, fontWeight: 700, flex: 1 }}>
           🏹 Mednieka Rokasgrāmata
         </h1>
+        {varInstalet && (
+          <button onClick={instaletApp} style={{
+            background: '#e8720c', color: '#fff', border: 'none',
+            borderRadius: 8, padding: '6px 12px', fontSize: 12,
+            fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+          }}>
+            📲 Instalēt
+          </button>
+        )}
       </div>
 
       {/* Virsraksts un moto */}

@@ -72,20 +72,20 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+        includeAssets: ['favicon.ico', 'pwa-192x192.png', 'pwa-512x512.png'],
         manifest: {
-          name: 'Meža Tirgus',
-          short_name: 'MežaTirgus',
-          description: 'Meža vērtēšanas un cirsmu aprēķinu rīks',
-          theme_color: '#225522',
-          background_color: '#0f1117',
+          name: 'Mednieka Rokasgrāmata',
+          short_name: 'Rokasgrāmata',
+          description: 'Latvijas mednieka digitālais palīgs — sugas, likumi, dienasgrāmata, selektors',
+          theme_color: '#3d4a2e',
+          background_color: '#1a2510',
           display: 'standalone',
           orientation: 'portrait',
           scope: '/',
           start_url: '/',
           icons: [
-            { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-            { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' }
+            { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+            { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
           ]
         },
         workbox: {
@@ -94,6 +94,11 @@ export default defineConfig(({ mode }) => {
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst'
+            },
+            {
+              urlPattern: /^https:\/\/api\.open-meteo\.com\/.*/i,
+              handler: 'NetworkFirst',
+              options: { cacheName: 'weather-cache', expiration: { maxAgeSeconds: 3600 } }
             }
           ]
         }
