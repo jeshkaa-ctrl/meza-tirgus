@@ -2,79 +2,177 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { menessFaze, menessFazeEmoji } from '../utils/menessFaze'
 
-const shodiensFaze = menessFaze(new Date())
-const fazeEmoji = menessFazeEmoji(shodiensFaze)
+// ── Krāsas ──────────────────────────────────────────────
+const C = {
+  camoDark:   '#3d4a2e',
+  camoMid:    '#5a6b3a',
+  camoLight:  '#7a8f52',
+  camoText:   '#e8f0d8',
+  camoMuted:  '#b8c89a',
+  camoSubtle: '#7a8f52',
+  camoBg:     '#4a5a32',
+  camoBdr:    '#5a6b3a',
+  orange:     '#e8720c',
+  orangeBg:   '#fff3e8',
+  orangeBdr:  '#f5c490',
+  orangeTxt:  '#854f0b',
+  greenBg:    '#f0f7ea',
+  greenBdr:   '#b8c89a',
+  surface1:   '#2e3a1f',
+  surface2:   '#3a4828',
+  border:     '#4a5a32',
+}
 
+// ── Sugu dati ────────────────────────────────────────────
 const MEDIBAS_SUGAS = [
-  'mežacūka', 'staltbriedis', 'stirna', 'alnis',
-  'vilks', 'lapsa', 'bebrs', 'zaķis', 'jenotsunis',
+  { id: 'mežacūka',     emoji: '🐗', label: 'Cūka'    },
+  { id: 'staltbriedis', emoji: '🦌', label: 'Briedis' },
+  { id: 'stirna',       emoji: '🦌', label: 'Stirna'  },
+  { id: 'alnis',        emoji: '🫎', label: 'Alnis'   },
+  { id: 'vilks',        emoji: '🐺', label: 'Vilks'   },
+  { id: 'lapsa',        emoji: '🦊', label: 'Lapsa'   },
+  { id: 'zaķis',        emoji: '🐇', label: 'Zaķis'   },
+  { id: 'putns',        emoji: '🦆', label: 'Putns'   },
 ]
 
 const ZIVU_SUGAS = [
-  'līdaka', 'asaris', 'zandarts', 'karpis', 'līnis',
-  'plaudis', 'vimbis', 'lasis', 'taimiņš', 'forele',
-  'zutis', 'raudis', 'sapals',
+  { id: 'līdaka',    emoji: '🐟', label: 'Līdaka'   },
+  { id: 'asaris',    emoji: '🐟', label: 'Asaris'   },
+  { id: 'zandarts',  emoji: '🐟', label: 'Zandarts' },
+  { id: 'karpis',    emoji: '🐟', label: 'Karpis'   },
+  { id: 'līnis',     emoji: '🐟', label: 'Līnis'    },
+  { id: 'lasis',     emoji: '🐟', label: 'Lasis'    },
+  { id: 'taimiņš',   emoji: '🐟', label: 'Taimiņš'  },
+  { id: 'forele',    emoji: '🐟', label: 'Forele'   },
 ]
 
-const ATRIE_JAUTAJUMI_MEDIBAS = [
-  'Cik medījumus nomedīju šogad?',
-  'Pie kādas mēness fāzes man veicies vislabāk?',
-  'Kurā diennakts laikā visvairāk nomedīju?',
-  'Kāds vējš man der visvairāk?',
-  'Pie kādas temperatūras man veicies labāk?',
+// ── Ātrās jautājumu pogas ─────────────────────────────────
+const JAUTAJUMI_MEDIBAS = [
+  'Cik cūkas šogad?', 'Labākā mēness fāze?',
+  'Cikos nomedīju visvairāk?', 'Kāds vējš man der?', 'Smagākais medījums?',
+]
+const JAUTAJUMI_MAKSKERE = [
+  'Cik zivis šogad?', 'Kura zivs visbiežāk?',
+  'Cikos ķeras labāk?', 'Pie kādas temp. labāk ķeras?', 'Lielākā nozveja?',
 ]
 
-const ATRIE_JAUTAJUMI_MAKSKERE = [
-  'Cik zivis noķēru šogad?',
-  'Kuru zivi ķeru visbiežāk?',
-  'Kurā diennakts laikā veicies vislabāk?',
-  'Pie kādas temperatūras labāk ķeras?',
-  'Pie kāda laika man veicies labāk — saulains vai mākoņains?',
-]
+const shodiensFaze    = menessFaze(new Date())
+const shodiensFazeEm  = menessFazeEmoji(shodiensFaze)
 
-const TUKSA_FORMA = {
-  suga: '', nomedits: false, svars: '',
-  dzimums: '', vejs: '', temperatura: '',
-  nokrisni: '', vieta: '', nozveja_skaits: '',
-}
-
+// ── Komponente ───────────────────────────────────────────
 export default function DienasgramataPage() {
-  const [aktivitate, setAktivitate] = useState('medibas')
-  const [prognoze, setPrognoze] = useState('')
+  const [user,         setUser]         = useState(null)
+  const [aktivitate,   setAktivitate]   = useState('medibas')
+  const [prognoze,     setPrognoze]     = useState('')
   const [prognozeLade, setPrognozeLade] = useState(true)
-  const [ieraksti, setIeraksti] = useState([])
-  const [teksts, setTeksts] = useState('')
-  const [forma, setForma] = useState(TUKSA_FORMA)
-  const [saglaba, setSaglaba] = useState(false)
+  const [ieraksti,     setIeraksti]     = useState([])
+
+  // Forma
+  const [teksts,    setTeksts]    = useState('')
+  const [suga,      setSuga]      = useState('mežacūka')
+  const [vejs,      setVejs]      = useState('')
+  const [nokrisni,  setNokrisni]  = useState('')
+  const [temp,      setTemp]      = useState('')
+  const [nomedits,  setNomedits]  = useState(false)
+  const [svars,     setSvars]     = useState('')
+  const [dzimums,   setDzimums]   = useState('')
+  const [skaits,    setSkaits]    = useState('')
+  const [saglaba,   setSaglaba]   = useState(false)
+
+  // GPS
+  const [gpsStatus, setGpsStatus] = useState('idle')
+
+  // AI jautājumi
   const [jautajums, setJautajums] = useState('')
-  const [atbilde, setAtbilde] = useState('')
+  const [atbilde,   setAtbilde]   = useState('')
   const [jautaLade, setJautaLade] = useState(false)
 
   useEffect(() => {
-    ieladePrognozi()
-    ieladeIerakstus()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+      if (user) {
+        ieladeIerakstus(user.id, 'medibas')
+        ieladePrognozi(user.id, 'medibas')
+      }
+    })
   }, [])
 
-  // Notīra formu mainot aktivitāti
   function mainAktivitati(jauna) {
     setAktivitate(jauna)
-    setForma(TUKSA_FORMA)
+    setSuga(jauna === 'medibas' ? 'mežacūka' : 'līdaka')
+    setNomedits(false)
+    setSvars('')
+    setSkaits('')
+    setDzimums('')
     setAtbilde('')
     setJautajums('')
+    if (user) {
+      ieladeIerakstus(user.id, jauna)
+      ieladePrognozi(user.id, jauna)
+    }
   }
 
-  async function ieladePrognozi() {
+  // ── GPS ──
+  function noteiktGps() {
+    setGpsStatus('loading')
+    navigator.geolocation?.getCurrentPosition(async (pos) => {
+      try {
+        const { latitude: lat, longitude: lng } = pos.coords
+        const r = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
+          `&current=temperature_2m,winddirection_10m,weathercode&timezone=Europe/Riga`
+        )
+        const d = await r.json()
+        const c = d.current
+        setTemp(Math.round(c.temperature_2m).toString())
+        setVejs(virziensNoGradiem(c.winddirection_10m))
+        setNokrisni(laiksNoKoda(c.weathercode))
+        setGpsStatus('done')
+      } catch {
+        setGpsStatus('error')
+      }
+    }, () => setGpsStatus('error'))
+  }
+
+  function virziensNoGradiem(g) {
+    if (g >= 337.5 || g < 22.5)  return 'ziemeļu'
+    if (g < 67.5)  return 'ziemeļaustrumu'
+    if (g < 112.5) return 'austrumu'
+    if (g < 157.5) return 'dienvidaustrumu'
+    if (g < 202.5) return 'dienvidu'
+    if (g < 247.5) return 'dienvidrietumu'
+    if (g < 292.5) return 'rietumu'
+    return 'ziemeļrietumu'
+  }
+
+  function laiksNoKoda(k) {
+    if (k === 0)  return 'sauss'
+    if (k <= 3)   return 'mākoņains'
+    if (k <= 49)  return 'migla'
+    if (k <= 67)  return 'lietus'
+    if (k <= 77)  return 'sniegs'
+    return 'lietus'
+  }
+
+  // ── Datu ielāde ──
+  async function ieladeIerakstus(uid, akt) {
+    const { data } = await supabase
+      .from('medibu_dienasgramata')
+      .select('*')
+      .eq('user_id', uid)
+      .eq('aktivitate', akt)
+      .order('created_at', { ascending: false })
+      .limit(40)
+    setIeraksti(data || [])
+  }
+
+  async function ieladePrognozi(uid, akt) {
     setPrognozeLade(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
       const r = await fetch('/api/dienasgramata-prognoze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.id,
-          menessFaze: shodiensFaze,
-          aktivitate,
-        }),
+        body: JSON.stringify({ userId: uid, menessFaze: shodiensFaze, aktivitate: akt }),
       })
       const d = await r.json()
       setPrognoze(d.prognoze || '')
@@ -84,323 +182,357 @@ export default function DienasgramataPage() {
     setPrognozeLade(false)
   }
 
-  async function ieladeIerakstus() {
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data } = await supabase
-      .from('medibu_dienasgramata')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(60)
-    setIeraksti(data || [])
-  }
-
+  // ── Saglabāšana ──
   async function saglabtIerakstu() {
-    if (!teksts.trim()) return
+    if (!teksts.trim() || !user) return
     setSaglaba(true)
-    const { data: { user } } = await supabase.auth.getUser()
     await supabase.from('medibu_dienasgramata').insert({
-      user_id: user.id,
-      teksts: teksts.trim(),
-      meness_faze: shodiensFaze,
+      user_id:        user.id,
+      teksts:         teksts.trim(),
+      meness_faze:    shodiensFaze,
       aktivitate,
-      suga: forma.suga || null,
-      nomedits: forma.nomedits,
-      svars: forma.svars ? parseFloat(forma.svars) : null,
-      dzimums: aktivitate === 'medibas' ? (forma.dzimums || null) : null,
-      nozveja_skaits: aktivitate === 'makskere' && forma.nozveja_skaits
-        ? parseInt(forma.nozveja_skaits) : null,
-      vejs: forma.vejs || null,
-      temperatura: forma.temperatura ? parseFloat(forma.temperatura) : null,
-      nokrisni: forma.nokrisni || null,
-      vieta: forma.vieta || null,
+      suga:           suga || null,
+      nomedits,
+      svars:          svars ? parseFloat(svars) : null,
+      dzimums:        aktivitate === 'medibas' ? (dzimums || null) : null,
+      nozveja_skaits: aktivitate === 'makskere' && skaits ? parseInt(skaits) : null,
+      vejs:           vejs || null,
+      temperatura:    temp ? parseFloat(temp) : null,
+      nokrisni:       nokrisni || null,
     })
     setTeksts('')
-    setForma(TUKSA_FORMA)
-    ieladeIerakstus()
+    setNomedits(false)
+    setSvars('')
+    setSkaits('')
+    setDzimums('')
     setSaglaba(false)
+    ieladeIerakstus(user.id, aktivitate)
   }
 
+  // ── AI jautājums ──
   async function uzdotJautajumu() {
-    if (!jautajums.trim()) return
+    if (!jautajums.trim() || !user) return
     setJautaLade(true)
     setAtbilde('')
-    const { data: { user } } = await supabase.auth.getUser()
-    const r = await fetch('/api/dienasgramata-jautajums', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, jautajums, aktivitate }),
-    })
-    const d = await r.json()
-    setAtbilde(d.atbilde || '')
+    try {
+      const r = await fetch('/api/dienasgramata-jautajums', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, jautajums, aktivitate }),
+      })
+      const d = await r.json()
+      setAtbilde(d.atbilde || '')
+    } catch {
+      setAtbilde('Neizdevās saņemt atbildi.')
+    }
     setJautaLade(false)
   }
 
   const isMakskere = aktivitate === 'makskere'
-  const atriePogaJautajumi = isMakskere ? ATRIE_JAUTAJUMI_MAKSKERE : ATRIE_JAUTAJUMI_MEDIBAS
-  const filtretieIeraksti = ieraksti.filter(i =>
-    (i.aktivitate || 'medibas') === aktivitate
-  )
+  const sugasSaraksts = isMakskere ? ZIVU_SUGAS : MEDIBAS_SUGAS
 
+  const gpsLabel = {
+    idle:    'Noteikt laikapstākļus automātiski',
+    loading: 'Nosaka atrašanās vietu...',
+    done:    `${temp}°C · ${vejs} · ${nokrisni}`,
+    error:   'GPS nav pieejams — aizpildi manuāli',
+  }[gpsStatus]
+
+  // ═══════════════════════════════════════
+  // RENDER
+  // ═══════════════════════════════════════
   return (
-    <div style={{ maxWidth: '700px', margin: '0 auto', padding: '20px' }}>
+    <div style={{ maxWidth: 440, margin: '0 auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
 
       {/* AKTIVITĀTES TOGGLE */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        {[
-          { id: 'medibas',  nos: '🎯 Medības' },
-          { id: 'makskere', nos: '🎣 Makšķerēšana' },
-        ].map(a => (
-          <button key={a.id} onClick={() => mainAktivitati(a.id)}
-            style={{
-              flex: 1, padding: '10px', border: 'none', borderRadius: '8px',
-              cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600,
-              background: aktivitate === a.id ? '#4a7c3f' : '#1a2e1a',
-              color: aktivitate === a.id ? 'white' : '#6b9e61',
-              border: `1px solid ${aktivitate === a.id ? '#4a7c3f' : '#2d4a2d'}`,
-            }}>
-            {a.nos}
-          </button>
+      <div style={{ display: 'flex', gap: 6 }}>
+        {[{ id: 'medibas', nos: '🎯 Medības' }, { id: 'makskere', nos: '🎣 Makšķerēšana' }].map(a => (
+          <button key={a.id} onClick={() => mainAktivitati(a.id)} style={{
+            flex: 1, padding: '10px 8px', border: 'none', borderRadius: 8, cursor: 'pointer',
+            fontSize: 13, fontWeight: 600,
+            background: aktivitate === a.id ? C.orange : C.camoDark,
+            color: aktivitate === a.id ? '#fff' : C.camoMuted,
+          }}>{a.nos}</button>
         ))}
       </div>
 
-      {/* AI RĪTA PROGNOZE */}
-      <div style={kartesStils('#1a2e1a', '#4a7c3f')}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-          <span style={{ fontSize: '1.6rem' }}>{fazeEmoji}</span>
-          <h2 style={{ color: '#a8c5a0', margin: 0, fontSize: '1.05rem', fontWeight: 600 }}>
-            Šodienas prognoze · {shodiensFaze}
-          </h2>
+      {/* HEADER */}
+      <div style={{ background: C.camoDark, borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 34, height: 34, background: C.orange, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
+            {isMakskere ? '🎣' : '🏹'}
+          </div>
+          <div>
+            <div style={{ color: C.camoText, fontSize: 14, fontWeight: 500 }}>
+              {isMakskere ? 'Makšķernieka dienasgrāmata' : 'Mednieka dienasgrāmata'}
+            </div>
+            <div style={{ color: C.camoMuted, fontSize: 11 }}>
+              {new Date().toLocaleDateString('lv-LV', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
+            </div>
+          </div>
         </div>
-        <p style={{ color: '#e8f5e9', lineHeight: 1.65, margin: 0, fontSize: '0.95rem' }}>
+      </div>
+
+      {/* AI PROGNOZE */}
+      <div style={{ background: C.camoBg, border: `0.5px solid ${C.camoBdr}`, borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 18 }}>{shodiensFazeEm}</span>
+          <span style={{ color: C.orange, fontSize: 12, fontWeight: 500 }}>{shodiensFaze}</span>
+        </div>
+        <p style={{ color: C.camoText, fontSize: 13, lineHeight: 1.6, margin: 0 }}>
           {prognozeLade ? '⏳ Analizē...' : (prognoze || '—')}
         </p>
       </div>
 
       {/* JAUNS IERAKSTS */}
-      <div style={kartesStils('#1a2e1a', '#2d4a2d')}>
-        <h3 style={{ color: '#a8c5a0', marginTop: 0, marginBottom: '14px' }}>
-          {isMakskere ? 'Jauns makšķerēšanas ieraksts' : 'Jauns medību ieraksts'}
-        </h3>
+      <div style={{ background: C.surface2, border: `0.5px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: C.camoLight, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          ✏️ Jauns ieraksts
+        </div>
 
+        {/* Sugu pogas */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5, marginBottom: 10 }}>
+          {sugasSaraksts.map(s => (
+            <button key={s.id} onClick={() => setSuga(s.id)} style={{
+              padding: '7px 4px', borderRadius: 8, cursor: 'pointer', fontSize: 10,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+              background: suga === s.id ? C.orangeBg : C.surface1,
+              border: `0.5px solid ${suga === s.id ? C.orange : C.border}`,
+              color: suga === s.id ? C.orangeTxt : C.camoMuted,
+              fontWeight: suga === s.id ? 600 : 400,
+            }}>
+              <span style={{ fontSize: 15 }}>{s.emoji}</span>
+              <span>{s.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* GPS poga */}
+        <div onClick={gpsStatus !== 'loading' && gpsStatus !== 'done' ? noteiktGps : undefined}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px',
+            background: gpsStatus === 'done' ? C.greenBg : C.orangeBg,
+            border: `0.5px solid ${gpsStatus === 'done' ? C.greenBdr : C.orangeBdr}`,
+            borderRadius: 8, marginBottom: 8,
+            cursor: gpsStatus === 'loading' || gpsStatus === 'done' ? 'default' : 'pointer',
+          }}>
+          <span style={{ fontSize: 15 }}>📍</span>
+          <span style={{ fontSize: 12, color: gpsStatus === 'done' ? C.camoDark : C.orangeTxt, flex: 1 }}>
+            {gpsLabel}
+          </span>
+          {gpsStatus !== 'done' && (
+            <span style={{ fontSize: 10, background: C.orange, color: '#fff', padding: '2px 7px', borderRadius: 10 }}>
+              GPS
+            </span>
+          )}
+        </div>
+
+        {/* Teksts */}
         <textarea
           value={teksts}
           onChange={e => setTeksts(e.target.value)}
           placeholder={isMakskere
-            ? 'Rīta klusums uz ezera, ūdens dzidrs, 06:30 trāpīja līdaka...'
+            ? 'Rīta migla uz ezera, 06:30 ķērās līdaka...'
             : 'Ziemeļu vējš, sniegs, 21:30 iznāca cūkas...'}
           rows={3}
-          style={{ ...laukStils, resize: 'vertical', marginBottom: '12px' }}
+          style={{ ...lauks, resize: 'vertical', marginBottom: 8 }}
         />
 
-        {/* LAIKA APSTĀKĻI — abi tipi */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-          <select value={forma.vejs} onChange={e => setForma({ ...forma, vejs: e.target.value })} style={laukStils}>
-            <option value="">Vējš</option>
-            <option value="ziemeļu">Ziemeļu</option>
-            <option value="dienvidu">Dienvidu</option>
-            <option value="rietumu">Rietumu</option>
-            <option value="austrumu">Austrumu</option>
-            <option value="bezvejš">Bezvējš</option>
-          </select>
-
-          <select value={forma.nokrisni} onChange={e => setForma({ ...forma, nokrisni: e.target.value })} style={laukStils}>
-            <option value="">Laiks</option>
-            <option value="sauss">Sauss</option>
-            <option value="lietus">Lietus</option>
-            <option value="sniegs">Sniegs</option>
-            <option value="migla">Migla</option>
-            <option value="makonains">Mākoņains</option>
-          </select>
-
-          <input
-            type="number"
-            value={forma.temperatura}
-            onChange={e => setForma({ ...forma, temperatura: e.target.value })}
-            placeholder="Temp °C"
-            style={laukStils}
-          />
-
-          <input
-            value={forma.vieta}
-            onChange={e => setForma({ ...forma, vieta: e.target.value })}
-            placeholder={isMakskere ? 'Ūdenstilpe / vieta' : 'Medību vieta'}
-            style={laukStils}
-          />
-        </div>
-
-        {/* SUGA */}
-        <div style={{ marginBottom: '12px' }}>
-          <select value={forma.suga} onChange={e => setForma({ ...forma, suga: e.target.value })} style={laukStils}>
-            <option value="">{isMakskere ? 'Zivs suga' : 'Medījuma suga'}</option>
-            {(isMakskere ? ZIVU_SUGAS : MEDIBAS_SUGAS).map(s => (
-              <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* REZULTĀTS */}
-        {isMakskere ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
-            <label style={{ color: '#a8c5a0', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-              <input type="checkbox" checked={forma.nomedits}
-                onChange={e => setForma({ ...forma, nomedits: e.target.checked })} />
-              Noķēru!
-            </label>
-            {forma.nomedits && <>
-              <input type="number" value={forma.nozveja_skaits}
-                onChange={e => setForma({ ...forma, nozveja_skaits: e.target.value })}
-                placeholder="Skaits" style={{ ...laukStils, width: '90px' }} />
-              <input type="number" value={forma.svars}
-                onChange={e => setForma({ ...forma, svars: e.target.value })}
-                placeholder="Svars kg" style={{ ...laukStils, width: '100px' }} />
-            </>}
+        {/* Apstākļi */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 8 }}>
+          <div>
+            <div style={etiketite}>Vējš</div>
+            <select value={vejs} onChange={e => setVejs(e.target.value)} style={lauks}>
+              <option value="">—</option>
+              {['ziemeļu','dienvidu','rietumu','austrumu','bezvejš','ziemeļaustrumu','dienvidrietumu'].map(o => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
           </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
-            <label style={{ color: '#a8c5a0', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-              <input type="checkbox" checked={forma.nomedits}
-                onChange={e => setForma({ ...forma, nomedits: e.target.checked })} />
-              Nomedīju!
-            </label>
-            {forma.nomedits && <>
-              <input type="number" value={forma.svars}
-                onChange={e => setForma({ ...forma, svars: e.target.value })}
-                placeholder="Svars kg" style={{ ...laukStils, width: '100px' }} />
-              <select value={forma.dzimums}
-                onChange={e => setForma({ ...forma, dzimums: e.target.value })}
-                style={{ ...laukStils, flex: 1 }}>
-                <option value="">Dzimums</option>
-                <option value="tēviņš">Tēviņš / Kuilis</option>
-                <option value="mātīte">Mātīte / Sivēnmāte</option>
-                <option value="mazulis">Mazulis / Teļš</option>
-              </select>
+          <div>
+            <div style={etiketite}>Laiks</div>
+            <select value={nokrisni} onChange={e => setNokrisni(e.target.value)} style={lauks}>
+              <option value="">—</option>
+              {['sauss','mākoņains','lietus','sniegs','migla'].map(o => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <div style={etiketite}>Temp °C</div>
+            <input type="number" value={temp} onChange={e => setTemp(e.target.value)}
+              placeholder="°C" style={lauks} />
+          </div>
+        </div>
+
+        {/* Rezultāts */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px',
+          background: C.greenBg, border: `0.5px solid ${C.greenBdr}`,
+          borderRadius: 8, marginBottom: nomedits ? 8 : 10,
+        }}>
+          <label style={{ fontSize: 13, color: C.camoDark, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontWeight: 500 }}>
+            <input type="checkbox" checked={nomedits} onChange={e => setNomedits(e.target.checked)} style={{ width: 16, height: 16 }} />
+            {isMakskere ? '✓ Noķēru!' : '✓ Nomedīju!'}
+          </label>
+        </div>
+
+        {nomedits && (
+          <div style={{ display: 'grid', gridTemplateColumns: isMakskere ? '1fr 1fr' : '1fr 1fr', gap: 6, marginBottom: 10 }}>
+            {isMakskere ? <>
+              <div>
+                <div style={etiketite}>Skaits (gb.)</div>
+                <input type="number" value={skaits} onChange={e => setSkaits(e.target.value)}
+                  placeholder="3" style={lauks} />
+              </div>
+              <div>
+                <div style={etiketite}>Svars (kg)</div>
+                <input type="number" value={svars} onChange={e => setSvars(e.target.value)}
+                  placeholder="2.4" style={lauks} />
+              </div>
+            </> : <>
+              <div>
+                <div style={etiketite}>Svars (kg)</div>
+                <input type="number" value={svars} onChange={e => setSvars(e.target.value)}
+                  placeholder="80" style={lauks} />
+              </div>
+              <div>
+                <div style={etiketite}>Dzimums</div>
+                <select value={dzimums} onChange={e => setDzimums(e.target.value)} style={lauks}>
+                  <option value="">—</option>
+                  <option value="tēviņš">Kuilis / tēviņš</option>
+                  <option value="mātīte">Sivēnmāte / mātīte</option>
+                  <option value="mazulis">Mazulis / teļš</option>
+                </select>
+              </div>
             </>}
           </div>
         )}
 
-        <button onClick={saglabtIerakstu} disabled={saglaba || !teksts.trim()}
-          style={pogasStils(!teksts.trim() || saglaba)}>
-          {saglaba ? '⏳ Saglabā...' : 'Saglabāt ierakstu'}
+        <button onClick={saglabtIerakstu} disabled={saglaba || !teksts.trim()} style={{
+          width: '100%', padding: 11,
+          background: saglaba || !teksts.trim() ? C.camoMid : C.orange,
+          color: '#fff', border: 'none', borderRadius: 8,
+          fontSize: 14, fontWeight: 500,
+          cursor: saglaba || !teksts.trim() ? 'default' : 'pointer',
+        }}>
+          {saglaba ? '⏳ Saglabā...' : '💾 Saglabāt ierakstu'}
         </button>
       </div>
 
       {/* AI JAUTĀJUMI */}
-      <div style={kartesStils('#1a2e1a', '#2d4a2d')}>
-        <h3 style={{ color: '#a8c5a0', marginTop: 0, marginBottom: '12px' }}>Jautā saviem datiem</h3>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
-          {atriePogaJautajumi.map(q => (
-            <button key={q} onClick={() => setJautajums(q)} style={atrasPogas}>{q}</button>
+      <div style={{ background: C.surface2, border: `0.5px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: C.camoLight, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          📊 Jautā saviem datiem
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
+          {(isMakskere ? JAUTAJUMI_MAKSKERE : JAUTAJUMI_MEDIBAS).map(q => (
+            <button key={q} onClick={() => setJautajums(q)} style={{
+              padding: '4px 10px', background: C.greenBg,
+              border: `0.5px solid ${C.greenBdr}`, borderRadius: 20,
+              fontSize: 11, color: C.camoDark, cursor: 'pointer',
+            }}>{q}</button>
           ))}
         </div>
-
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           <input value={jautajums} onChange={e => setJautajums(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && uzdotJautajumu()}
             placeholder="Uzdod jautājumu par saviem datiem..."
-            style={{ ...laukStils, flex: 1 }}
-            onKeyDown={e => e.key === 'Enter' && uzdotJautajumu()} />
-          <button onClick={uzdotJautajumu} disabled={jautaLade || !jautajums.trim()}
-            style={{ ...pogasStils(!jautajums.trim() || jautaLade), width: 'auto', padding: '8px 16px' }}>
-            {jautaLade ? '⏳' : '→'}
-          </button>
+            style={{ ...lauks, flex: 1 }} />
+          <button onClick={uzdotJautajumu} disabled={jautaLade || !jautajums.trim()} style={{
+            padding: '8px 14px', background: C.camoDark,
+            color: C.camoText, border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 16,
+          }}>🔍</button>
         </div>
-
         {atbilde && (
-          <div style={{ marginTop: '12px', padding: '12px', background: '#0d1a0d', borderRadius: '8px', borderLeft: '3px solid #4a7c3f' }}>
-            <p style={{ color: '#e8f5e9', margin: 0, lineHeight: 1.65, fontSize: '0.95rem' }}>{atbilde}</p>
+          <div style={{ marginTop: 10, padding: '10px 12px', background: C.greenBg, borderRadius: 8, borderLeft: `2px solid ${C.camoMid}`, fontSize: 13, color: C.camoDark, lineHeight: 1.6 }}>
+            {jautaLade ? '⏳ Analizē...' : atbilde}
           </div>
         )}
       </div>
 
-      {/* IERAKSTU SARAKSTS */}
-      <div>
-        <h3 style={{ color: '#a8c5a0', marginBottom: '12px' }}>
-          {isMakskere ? 'Makšķerēšanas' : 'Medību'} vēsture ({filtretieIeraksti.length})
-        </h3>
-        {filtretieIeraksti.length === 0 && (
-          <p style={{ color: '#6b9e61', fontSize: '0.9rem' }}>Nav ierakstu vēl. Pievieno pirmo!</p>
+      {/* VĒSTURE */}
+      <div style={{ background: C.surface2, border: `0.5px solid ${C.border}`, borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: C.camoLight, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          📖 Vēsture ({ieraksti.length})
+        </div>
+        {ieraksti.length === 0 && (
+          <p style={{ color: C.camoMuted, fontSize: 13 }}>Vēl nav ierakstu. Pievieno pirmo!</p>
         )}
-        {filtretieIeraksti.map(i => (
-          <div key={i.id} style={{ ...kartesStils('#1a2e1a', '#2d4a2d'), marginBottom: '8px', padding: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '4px' }}>
-              <span style={{ color: '#6b9e61', fontSize: '0.8rem' }}>
-                {new Date(i.created_at).toLocaleString('lv-LV')}
+        {ieraksti.map((i, idx) => (
+          <div key={i.id} style={{ paddingBottom: 10, marginBottom: 10, borderBottom: idx < ieraksti.length - 1 ? `0.5px solid ${C.border}` : 'none' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4, gap: 8 }}>
+              <span style={{ fontSize: 11, color: C.camoSubtle }}>
+                {new Date(i.created_at).toLocaleString('lv-LV', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </span>
-              <span style={{ fontSize: '0.8rem', color: '#a8c5a0' }}>
-                {menessFazeEmoji(i.meness_faze)} {i.meness_faze}
-                {i.temperatura != null && ` · ${i.temperatura}°C`}
-                {i.vejs && ` · ${i.vejs}`}
-                {i.nokrisni && ` · ${i.nokrisni}`}
-              </span>
+              <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                {i.meness_faze && (
+                  <span style={zime(C.greenBg, C.greenBdr, C.camoDark)}>
+                    {menessFazeEmoji(i.meness_faze)} {i.meness_faze}
+                  </span>
+                )}
+                {i.temperatura != null && (
+                  <span style={zime(C.surface1, C.border, C.camoMuted)}>🌡️ {i.temperatura}°C</span>
+                )}
+                {i.vejs && (
+                  <span style={zime(C.surface1, C.border, C.camoMuted)}>💨 {i.vejs}</span>
+                )}
+                {i.nomedits && (
+                  <span style={zime(C.orangeBg, C.orangeBdr, C.orangeTxt)}>
+                    ✓ {i.nozveja_skaits ? `${i.nozveja_skaits} gb.` : ''} {i.svars ? `${i.svars} kg` : 'nomedīts'}
+                  </span>
+                )}
+              </div>
             </div>
-            <p style={{ color: '#e8f5e9', margin: '4px 0', fontSize: '0.95rem', lineHeight: 1.5 }}>{i.teksts}</p>
-            {i.nomedits && (
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: '#0d3d0d', border: '1px solid #4a7c3f',
-                borderRadius: '20px', padding: '3px 10px',
-                marginTop: '6px', fontSize: '0.8rem', color: '#6bcb77',
-              }}>
-                {isMakskere ? '✓ Noķēru' : '✓ Nomedīts'}
-                {i.suga && ` · ${i.suga}`}
-                {i.nozveja_skaits && ` · ${i.nozveja_skaits} gb.`}
-                {i.svars && ` · ${i.svars} kg`}
-                {i.dzimums && ` · ${i.dzimums}`}
-              </div>
-            )}
-            {i.vieta && (
-              <div style={{ marginTop: '4px', fontSize: '0.78rem', color: '#4a7c3f' }}>
-                📍 {i.vieta}
-              </div>
+            <p style={{ fontSize: 13, color: C.camoText, lineHeight: 1.5, margin: '0 0 2px' }}>{i.teksts}</p>
+            {(i.suga || i.dzimums) && (
+              <p style={{ fontSize: 11, color: C.camoMuted, margin: 0 }}>
+                {[i.suga, i.dzimums].filter(Boolean).join(' · ')}
+              </p>
             )}
           </div>
         ))}
       </div>
+
+      {/* DROŠĪBA */}
+      <div style={{ background: C.camoDark, borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ color: C.camoText, fontSize: 11, fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          🛡️ Drošība
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a href="tel:112" style={{ ...avarsPogas, background: C.orange, color: '#fff', border: 'none' }}>
+            📞 Zvanīt 112
+          </a>
+          <a href="https://www.112.lv/app" target="_blank" rel="noopener noreferrer"
+            style={{ ...avarsPogas, background: C.orangeBg, color: C.orangeTxt, border: `0.5px solid ${C.orangeBdr}` }}>
+            📲 112 Latvija app
+          </a>
+        </div>
+      </div>
+
     </div>
   )
 }
 
-function kartesStils(bg, border) {
-  return {
-    background: bg,
-    border: `1px solid ${border}`,
-    borderRadius: '12px',
-    padding: '20px',
-    marginBottom: '20px',
-  }
+// ── Stili ────────────────────────────────────────────────
+const lauks = {
+  background: '#2e3a1f', border: '0.5px solid #4a5a32',
+  borderRadius: 8, color: '#e8f0d8',
+  padding: '7px 10px', fontSize: 13, width: '100%',
+  boxSizing: 'border-box', outline: 'none',
 }
 
-const laukStils = {
-  background: '#0d1a0d',
-  border: '1px solid #2d4a2d',
-  borderRadius: '8px',
-  color: '#e8f5e9',
-  padding: '8px 12px',
-  fontSize: '0.9rem',
-  width: '100%',
-  boxSizing: 'border-box',
+const etiketite = {
+  fontSize: 10, color: '#7a8f52', marginBottom: 2,
 }
 
-function pogasStils(disabled) {
-  return {
-    padding: '10px 20px',
-    background: disabled ? '#2d4a2d' : '#4a7c3f',
-    color: disabled ? '#6b9e61' : 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    fontSize: '0.9rem',
-    width: '100%',
-  }
+const avarsPogas = {
+  flex: 1, padding: '10px 8px', borderRadius: 8,
+  fontSize: 12, fontWeight: 500, cursor: 'pointer',
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  gap: 5, textDecoration: 'none',
 }
 
-const atrasPogas = {
-  padding: '5px 10px',
-  background: '#0d1a0d',
-  border: '1px solid #2d4a2d',
-  borderRadius: '20px',
-  color: '#6b9e61',
-  cursor: 'pointer',
-  fontSize: '0.78rem',
+function zime(bg, bdr, clr) {
+  return { fontSize: 10, padding: '2px 7px', borderRadius: 10, background: bg, color: clr, border: `0.5px solid ${bdr}` }
 }
