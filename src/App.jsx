@@ -63,6 +63,8 @@ const initialPage = urlParams.get('payment') === 'success'
   ? 'veikals'
   : urlParams.get('page') === 'admin'
   ? 'admin'
+  : urlParams.get('page') === 'rokasgramata'
+  ? 'mednieks'
   : 'landing'
 
 const [page,setPageRaw]=useState(initialPage)
