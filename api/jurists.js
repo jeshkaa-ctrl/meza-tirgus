@@ -107,6 +107,12 @@ REĢISTRĀCIJA "MEDNIS" lietotnē:
 IEROČU APRITES LIKUMS — MEDĪBĀM SVARĪGAIS
 ═══════════════════════════════════════════
 
+VECUMA PRASĪBAS IEROČIEM — KRITISKS FAKTS:
+- Gludstobra medību ierocis (shotgun): no 18 gadiem
+- VĪTŅSTOBRA ierocis (rifles): no 21 gada — iegāde UN glabāšana atļauta tikai no 21!
+⚠️ Bieža kļūda: teikt "no 18" uz vispārīgu jautājumu par medībām ar šaujamieroci.
+   Ja jautājums par vītņstobru / vītņ. ieroci / rifle — obligāti precizēt: no 21 gada!
+
 - Medību šaujamieroča iegādei: mednieka apliecība + iegādes atļauja no Valsts policijas
 - Glabāšana: aizslēgtā metāla seifā, atsevišķi no munīcijas
 - Nēsāšana medībās: drīkst ar glabāšanas atļauju medību laikā
