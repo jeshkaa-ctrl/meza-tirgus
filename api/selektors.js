@@ -55,8 +55,8 @@ Dzimuma atpazīšana:
 → Kuilis: lieli izliekti ilkņi, resnāks kakls, biezs ādas vairogs sānos (bruņas)
 → Sivēnmāte: bez izteiktiem ilkņiem, plānāka galva, garas krūtis
 → Sivēni: svītroti (dzeltenbrūni) līdz ~6 mēnešiem
-⚠️ ĀCM (Āfrikas cūku mēris): OBLIGĀTI nodot paraugus BIOR testēšanai!
-Nedrīkst pārvietot pirms ĀCM analīzes rezultāta. Reģistrē "Mednī" nekavējoties.
+⚠️ NEAIZMIRSTI: ĀCM paraugi uz BIOR + trihinelozei! Reģistrē "Mednī" nekavējoties.
+Gaļu nedrīkst lietot vai pārdot līdz abu analīžu rezultātiem.
 
 🐺 VILKS (Canis lupus)
 Statuss: Limitēts | Termiņš: 15.jūl–31.marts | Limits 2025/2026: 370 vilki (izpildīts jau janvārī!)
@@ -1080,7 +1080,7 @@ Pasaules rekords: 144.00 CIC punkti (1978, Rumānija)
 
 NOMEDĪT:
 ✦ Slimi, ievainoti, nīkulīgi jebkurā vecumā
-✦ ĀCM riska zona → BIOR paraugi OBLIGĀTI (pārvietot aizliegts pirms rezultāta)
+✦ ĀCM riska zona → BIOR paraugi OBLIGĀTI + trihinelozei (gaļu nelieto pirms rezultāta!)
 ✦ Trofeja: Basse 5+ g. ar Haderer ciešu pieguļšanu Gewaff
 ✦ Sivēni — selektīvi, ĀCM kontrolei
 
@@ -1199,7 +1199,7 @@ VIZUĀLAS PAZĪMES (dzīvam vai tikko nomedītam):
 
 MEDNIEKA PIENĀKUMI:
 ✦ Reģistrē "Mednī" NEKAVĒJOTIES
-✦ Nodod paraugus BIOR (nedrīkst pārvietot liemeni pirms rezultāta!)
+✦ Nodod paraugus BIOR (ĀCM + trihinelozei) — gaļu nelieto/nepārdod pirms rezultāta!
 ✦ Cimdi obligāti | Apavus un apģērbu mazgā pirms došanās mājās
 
 ── II. TRIHINELLA ──

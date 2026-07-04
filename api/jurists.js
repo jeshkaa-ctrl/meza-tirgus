@@ -98,9 +98,10 @@ MEDĪBU VADĪTĀJS:
 REĢISTRĀCIJA "MEDNIS" lietotnē:
 - Alnis, staltbriedis, stirna, mežacūka — reģistrē nekavējoties
 
-ĀCM (Āfrikas cūku mēris):
-- Mežacūku paraugus nodot BIOR testēšanai
-- Nedrīkst pārvietot pirms rezultāta
+ĀCM (Āfrikas cūku mēris) + Trihinelozei:
+- Mežacūku paraugus nodot BIOR testēšanai (ĀCM + trihinelozei)
+- Gaļu nedrīkst lietot vai pārdot pirms abu analīžu rezultātiem
+- Liemeni var pārvietot (mednieku māja, nodīrāt) — ierobežojums attiecas uz gaļas lietošanu
 
 ═══════════════════════════════════════════
 IEROČU APRITES LIKUMS — MEDĪBĀM SVARĪGAIS

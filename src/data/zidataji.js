@@ -43,7 +43,7 @@ export const ZIDATAJI = [
     sezona: 'Visu gadu',
     dokuments: 'Sezonas karte',
     regestrecija: 'MEDNIS lietotne — nekavējoties',
-    info: 'Medī visu gadu, bet ĀCM (Āfrikas cūku mēris) prasības: paraugus nodot BIOR testēšanai, nedrīkst pārvietot pirms rezultāta.',
+    info: 'Medī visu gadu. ⚠️ Neaizmirsti: ĀCM paraugi uz BIOR + trihinelozei! Gaļu nedrīkst lietot vai pārdot līdz abu analīžu rezultātiem.',
     etikaKey: 'nelimiteta',
   },
   {
