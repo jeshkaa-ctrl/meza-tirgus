@@ -137,33 +137,78 @@ ADMINISTRATĪVIE SODI (32.pants) — 1 naudas soda vienība (NSV) = 5 EUR:
 MK MEDĪBU NOTEIKUMI — GALVENIE PUNKTI
 ═══════════════════════════════════════════
 
-LIMITĒTIE DZĪVNIEKI (vajag atļauju):
-- Alnis: buļļi, govis, teļi — 1.sept–31.dec
+LIMITĒTIE DZĪVNIEKI (vajag medību atļauju + sezonas karti) — MK noteikumu 3.1.punkts:
+- Alnis: buļļi, govis, teļi — 1. sept–31. dec
 - Staltbriedis: buļļi 1.sept–15.febr | buļļi līdz 2g. 15.aug–31.marts | govis 15.jūl–31.janv | teļi 15.jūl–31.marts
-- Vilks: 15.jūl–31.marts (vai līdz VMD apjoma izpildei)
-- Mednis un rubenis: 1.sept–31.dec
+  ⚠️ Ar govs atļauju drīkst nomedīt arī teļu vai ≤2g. bulli (MK 6., 6.1 punkts)
+- Vilks: 15. jūl – 31. marts (vai līdz VMD noteiktā apjoma izpildei)
+- Mednis un rubenis: 1. sept – 31. dec
+- Mežirbe: 1. sept – 31. janv ← LIMITĒTĀ suga! (bieži nepareizi iekļauj nelimitētajos)
 
-NELIMITĒTIE (tikai sezonas karte):
-- Stirna: āži 1.jūn–30.nov | kazas un kazlēni 15.aug–30.nov
+NELIMITĒTIE ZĪDĪTĀJI (tikai sezonas karte):
+- Stirna: āži 1. jūn–30. nov | kazas un kazlēni 15. aug–30. nov
 - Mežacūka: visu gadu
 - Lapsa: visu gadu
 - Jenotsunis: visu gadu
-- Āpsis, meža cauna, sesks, amerikas ūdele, ondatra, bebrs: 1.okt–15.marts
-- Zaķis (pelēkais un baltais): 1.nov–31.janv
-- Pelēkā vārna, žagata: visu gadu
-- Krauklis (Corvus corax): AIZSARGĀJAMS — nemedīt!
+- Āpsis: 1. aug – 31. marts ← (ne oktobris!)
+- Bebrs: 15. jūl – 15. apr (meliorācijas sistēmās līdz 30. apr)
+- Ondatra: 15. jūl – 15. apr
+- Meža cauna, akmens cauna, sesks: 1. okt – 31. marts
+- Amerikas ūdele: visu gadu (invazīvā)
+- Pelēkais zaķis un baltais zaķis: 1. okt – 31. janv ← (ne novembris!)
+- Raķelis (hibrīds): 1. sept – 31. dec
+- Dambriedis, muflons, Sika briedis, jenots, nutrija, baibaks: visu gadu (invazīvās)
+- Zeltainais šakālis: 15. jūl – 31. marts
 
-AIZLIEGTS medīt visu laiku:
-- Lācis, lūsis, ūdrs, Eiropas norka — aizsargājamas sugas
+NELIMITĒTIE PUTNI (tikai sezonas karte):
+- Fazāns: 1. aug – 31. marts
+- Lauku balodis: 1. aug – 15. nov
+- Mājas balodis: 1. aug – 31. dec
+- Sloka: 1. sept – 15. dec
+- Pelēkā vārna, žagata: 15. jūn – 30. apr ← (ne visu gadu!)
+- Sējas zoss, baltpieres zoss, Kanādas zoss, garkaklis, platknābis, baltvēderis: 15. sept – 30. nov
+- Meža zoss, laucis, krīklis, pelēkā pīle, meža pīle, prīkšķe, cekulpīle, ķerra, melnā pīle, gaigala:
+  20. aug–14. sept (tikai trešd/sestd/svētd), tad 15. sept–15. dec katru dienu
+- Publiskajos ūdeņos: vienam medniekam vienā dienā ne vairāk kā 10 ūdensputni (MK 10.1)
 
-MEDĪBU VADĪTĀJS:
-- Dzinējmedībās obligāti jābūt medību vadītājam ar apliecību
-- Individuālajās medībās mednieks pats pilda vadītāja lomu
+AIZSARGĀJAMAS SUGAS — NEMEDĪT nekad:
+- Lācis, lūsis, ūdrs, Eiropas norka, krauklis (Corvus corax)
 
-REĢISTRĀCIJA "MEDNIS" lietotnē:
-- Alnis, staltbriedis, stirna, mežacūka — reģistrē nekavējoties
+DZINĒJMEDĪBAS (MK 11. punkts):
+- Atļautas tikai saullēkta–saulrieta laikā
+- Periods: 1. oktobris – 31. marts
+- Mežacūku un staltbriežu dzinējmedības — tikai līdz 31. janvārim
+- Dzinējmedībās OBLIGĀTS spilgtas krāsas apģērbs (MK 68. punkts)
+- Bez medību vadītāja dzinējmedības AIZLIEGTAS
 
-ĀCM (Āfrikas cūku mēris) + Trihinelozei:
+IEROČA PRASĪBAS LIELĀKIEM DZĪVNIEKIEM (MK 66. punkts):
+- Aļņiem, staltbriežiem, mežacūkām → vītņstobrs ar šāviņa enerģiju ≥ 3000 J stobra galā
+- Jaunākiem par 1 gadu — pietiek ar ≥ 1500 J individuālajās medībās
+- Alternatīva: 20.–10. kalibra gludstobrs ar medību lodi
+- Ar lielas enerģijas pneimatiku atļauts medīt tikai: pelēkās vārnas, žagatas, lauku un mājas baložus
+
+DROŠĪBAS PRASĪBAS NAKTS MEDĪBĀS (MK 80., 81. punkts):
+- Diennakts tumšajā laikā medīt TIKAI no paaugstinājuma, kura platforma ≥ 2,5 m, kas ļauj šaut uz leju
+- Mežacūka/lapsa/jenotsunis ar nakts/termālo tēmēkli — arī no paaugstinājuma ≥ 2,5 m
+- Izņēmums: aļņu un staltbriežu buļļi 1. sept–15. okt — var arī bez paaugstinājuma
+- Pārvietojoties naktī ar nakts/termālo tēmēkli: ierocis jābūt IZLĀDĒTAM
+- Ja dabiskais apgaismojums neļauj izšķirt mērķi — šaušana AIZLIEGTA (izņemot mežacūka/lapsa/jenotsunis)
+
+MEDNIEKA PIENĀKUMI LAUKĀ (MK 51., 101. punkts):
+- PIRMS pārvietošanas vai sadalīšanas — reģistrē MEDNIS lietotnē (alnis, staltbriedis, mežacūka, stirna)
+- PIRMS izsekošanas — ja ievainots alnis, staltbriedis, mežacūka, stirna — arī reģistrē lietotnē
+- Ievainotā dzīvnieka izsekošanu BEZ medību vadītāja atļaujas AIZLIEGTS uzsākt
+- Nomedīta dzīvnieka vēdināšana vietā nav pārvietošana — drīkst bez reģistrācijas
+- Mednieks informē "atbildīgo personu" pirms medībām par plānotajām medībām
+- Pēc šāviena pie kritoša lielā dzīvnieka pieiet ar PIELĀDĒTU ieroci, NO MUGURPUSES
+
+MEDĪBU SUŅI (MK 95.–100. punkts):
+- Tikai šķirnes medību suņi, vakcinēti un apzīmēti
+- Sunim medībās obligāti jābūt spilgtas krāsas elementam ≥ 2 cm platumā
+- Aļņu/staltbriežu/mežacūku/stirnu dzinējos: suns atļauts tikai dzinējmedību periodā (1.okt–31.marts)
+- Ievainotu dzīvnieku meklēšanai ar suni — atļauts visas sugas sezonas laikā
+
+ĀCM (Āfrikas cūku mēris) + TRIHINELOZEI:
 - Mežacūku paraugus nodot BIOR testēšanai (ĀCM + trihinelozei)
 - Gaļu nedrīkst lietot vai pārdot pirms abu analīžu rezultātiem
 - Liemeni var pārvietot (mednieku māja, nodīrāt) — ierobežojums attiecas uz gaļas lietošanu
