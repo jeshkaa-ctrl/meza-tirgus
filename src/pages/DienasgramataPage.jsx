@@ -5,20 +5,41 @@ import { menessFaze, menessFazeEmoji } from '../utils/menessFaze'
 const shodiensFaze = menessFaze(new Date())
 const fazeEmoji = menessFazeEmoji(shodiensFaze)
 
-const ATRIE_JAUTAJUMI = [
+const MEDIBAS_SUGAS = [
+  'mežacūka', 'staltbriedis', 'stirna', 'alnis',
+  'vilks', 'lapsa', 'bebrs', 'zaķis', 'jenotsunis',
+]
+
+const ZIVU_SUGAS = [
+  'līdaka', 'asaris', 'zandarts', 'karpis', 'līnis',
+  'plaudis', 'vimbis', 'lasis', 'taimiņš', 'forele',
+  'zutis', 'raudis', 'sapals',
+]
+
+const ATRIE_JAUTAJUMI_MEDIBAS = [
   'Cik medījumus nomedīju šogad?',
   'Pie kādas mēness fāzes man veicies vislabāk?',
   'Kurā diennakts laikā visvairāk nomedīju?',
   'Kāds vējš man der visvairāk?',
-  'Kāds ir mans smagākais medījums?',
+  'Pie kādas temperatūras man veicies labāk?',
+]
+
+const ATRIE_JAUTAJUMI_MAKSKERE = [
+  'Cik zivis noķēru šogad?',
+  'Kuru zivi ķeru visbiežāk?',
+  'Kurā diennakts laikā veicies vislabāk?',
+  'Pie kādas temperatūras labāk ķeras?',
+  'Pie kāda laika man veicies labāk — saulains vai mākoņains?',
 ]
 
 const TUKSA_FORMA = {
   suga: '', nomedits: false, svars: '',
-  dzimums: '', vejs: '', temperatura: '', nokrisni: '', vieta: '',
+  dzimums: '', vejs: '', temperatura: '',
+  nokrisni: '', vieta: '', nozveja_skaits: '',
 }
 
 export default function DienasgramataPage() {
+  const [aktivitate, setAktivitate] = useState('medibas')
   const [prognoze, setPrognoze] = useState('')
   const [prognozeLade, setPrognozeLade] = useState(true)
   const [ieraksti, setIeraksti] = useState([])
@@ -34,6 +55,14 @@ export default function DienasgramataPage() {
     ieladeIerakstus()
   }, [])
 
+  // Notīra formu mainot aktivitāti
+  function mainAktivitati(jauna) {
+    setAktivitate(jauna)
+    setForma(TUKSA_FORMA)
+    setAtbilde('')
+    setJautajums('')
+  }
+
   async function ieladePrognozi() {
     setPrognozeLade(true)
     try {
@@ -44,6 +73,7 @@ export default function DienasgramataPage() {
         body: JSON.stringify({
           userId: user.id,
           menessFaze: shodiensFaze,
+          aktivitate,
         }),
       })
       const d = await r.json()
@@ -61,7 +91,7 @@ export default function DienasgramataPage() {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(50)
+      .limit(60)
     setIeraksti(data || [])
   }
 
@@ -73,10 +103,13 @@ export default function DienasgramataPage() {
       user_id: user.id,
       teksts: teksts.trim(),
       meness_faze: shodiensFaze,
+      aktivitate,
       suga: forma.suga || null,
       nomedits: forma.nomedits,
       svars: forma.svars ? parseFloat(forma.svars) : null,
-      dzimums: forma.dzimums || null,
+      dzimums: aktivitate === 'medibas' ? (forma.dzimums || null) : null,
+      nozveja_skaits: aktivitate === 'makskere' && forma.nozveja_skaits
+        ? parseInt(forma.nozveja_skaits) : null,
       vejs: forma.vejs || null,
       temperatura: forma.temperatura ? parseFloat(forma.temperatura) : null,
       nokrisni: forma.nokrisni || null,
@@ -96,15 +129,40 @@ export default function DienasgramataPage() {
     const r = await fetch('/api/dienasgramata-jautajums', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, jautajums }),
+      body: JSON.stringify({ userId: user.id, jautajums, aktivitate }),
     })
     const d = await r.json()
     setAtbilde(d.atbilde || '')
     setJautaLade(false)
   }
 
+  const isMakskere = aktivitate === 'makskere'
+  const atriePogaJautajumi = isMakskere ? ATRIE_JAUTAJUMI_MAKSKERE : ATRIE_JAUTAJUMI_MEDIBAS
+  const filtretieIeraksti = ieraksti.filter(i =>
+    (i.aktivitate || 'medibas') === aktivitate
+  )
+
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', padding: '20px' }}>
+
+      {/* AKTIVITĀTES TOGGLE */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+        {[
+          { id: 'medibas',  nos: '🎯 Medības' },
+          { id: 'makskere', nos: '🎣 Makšķerēšana' },
+        ].map(a => (
+          <button key={a.id} onClick={() => mainAktivitati(a.id)}
+            style={{
+              flex: 1, padding: '10px', border: 'none', borderRadius: '8px',
+              cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600,
+              background: aktivitate === a.id ? '#4a7c3f' : '#1a2e1a',
+              color: aktivitate === a.id ? 'white' : '#6b9e61',
+              border: `1px solid ${aktivitate === a.id ? '#4a7c3f' : '#2d4a2d'}`,
+            }}>
+            {a.nos}
+          </button>
+        ))}
+      </div>
 
       {/* AI RĪTA PROGNOZE */}
       <div style={kartesStils('#1a2e1a', '#4a7c3f')}>
@@ -121,29 +179,22 @@ export default function DienasgramataPage() {
 
       {/* JAUNS IERAKSTS */}
       <div style={kartesStils('#1a2e1a', '#2d4a2d')}>
-        <h3 style={{ color: '#a8c5a0', marginTop: 0, marginBottom: '14px' }}>Jauns ieraksts</h3>
+        <h3 style={{ color: '#a8c5a0', marginTop: 0, marginBottom: '14px' }}>
+          {isMakskere ? 'Jauns makšķerēšanas ieraksts' : 'Jauns medību ieraksts'}
+        </h3>
 
         <textarea
           value={teksts}
           onChange={e => setTeksts(e.target.value)}
-          placeholder="Ziemeļu vējš, sniegs, 21:30 iznāca cūkas..."
+          placeholder={isMakskere
+            ? 'Rīta klusums uz ezera, ūdens dzidrs, 06:30 trāpīja līdaka...'
+            : 'Ziemeļu vējš, sniegs, 21:30 iznāca cūkas...'}
           rows={3}
           style={{ ...laukStils, resize: 'vertical', marginBottom: '12px' }}
         />
 
+        {/* LAIKA APSTĀKĻI — abi tipi */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-          <select value={forma.suga} onChange={e => setForma({ ...forma, suga: e.target.value })} style={laukStils}>
-            <option value="">Suga</option>
-            <option value="mežacūka">Mežacūka</option>
-            <option value="staltbriedis">Staltbriedis</option>
-            <option value="stirna">Stirna</option>
-            <option value="alnis">Alnis</option>
-            <option value="vilks">Vilks</option>
-            <option value="lapsa">Lapsa</option>
-            <option value="bebrs">Bebrs</option>
-            <option value="zaķis">Zaķis</option>
-          </select>
-
           <select value={forma.vejs} onChange={e => setForma({ ...forma, vejs: e.target.value })} style={laukStils}>
             <option value="">Vējš</option>
             <option value="ziemeļu">Ziemeļu</option>
@@ -159,6 +210,7 @@ export default function DienasgramataPage() {
             <option value="lietus">Lietus</option>
             <option value="sniegs">Sniegs</option>
             <option value="migla">Migla</option>
+            <option value="makonains">Mākoņains</option>
           </select>
 
           <input
@@ -168,40 +220,67 @@ export default function DienasgramataPage() {
             placeholder="Temp °C"
             style={laukStils}
           />
+
+          <input
+            value={forma.vieta}
+            onChange={e => setForma({ ...forma, vieta: e.target.value })}
+            placeholder={isMakskere ? 'Ūdenstilpe / vieta' : 'Medību vieta'}
+            style={laukStils}
+          />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
-          <label style={{ color: '#a8c5a0', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-            <input
-              type="checkbox"
-              checked={forma.nomedits}
-              onChange={e => setForma({ ...forma, nomedits: e.target.checked })}
-            />
-            Nomedīju!
-          </label>
-
-          {forma.nomedits && <>
-            <input
-              type="number"
-              value={forma.svars}
-              onChange={e => setForma({ ...forma, svars: e.target.value })}
-              placeholder="Svars kg"
-              style={{ ...laukStils, width: '100px' }}
-            />
-            <select value={forma.dzimums} onChange={e => setForma({ ...forma, dzimums: e.target.value })} style={{ ...laukStils, flex: 1 }}>
-              <option value="">Dzimums</option>
-              <option value="tēviņš">Tēviņš / Kuilis</option>
-              <option value="mātīte">Mātīte / Sivēnmāte</option>
-              <option value="mazulis">Mazulis / Teļš</option>
-            </select>
-          </>}
+        {/* SUGA */}
+        <div style={{ marginBottom: '12px' }}>
+          <select value={forma.suga} onChange={e => setForma({ ...forma, suga: e.target.value })} style={laukStils}>
+            <option value="">{isMakskere ? 'Zivs suga' : 'Medījuma suga'}</option>
+            {(isMakskere ? ZIVU_SUGAS : MEDIBAS_SUGAS).map(s => (
+              <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+            ))}
+          </select>
         </div>
 
-        <button
-          onClick={saglabtIerakstu}
-          disabled={saglaba || !teksts.trim()}
-          style={pogasStils(!teksts.trim() || saglaba)}
-        >
+        {/* REZULTĀTS */}
+        {isMakskere ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            <label style={{ color: '#a8c5a0', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input type="checkbox" checked={forma.nomedits}
+                onChange={e => setForma({ ...forma, nomedits: e.target.checked })} />
+              Noķēru!
+            </label>
+            {forma.nomedits && <>
+              <input type="number" value={forma.nozveja_skaits}
+                onChange={e => setForma({ ...forma, nozveja_skaits: e.target.value })}
+                placeholder="Skaits" style={{ ...laukStils, width: '90px' }} />
+              <input type="number" value={forma.svars}
+                onChange={e => setForma({ ...forma, svars: e.target.value })}
+                placeholder="Svars kg" style={{ ...laukStils, width: '100px' }} />
+            </>}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            <label style={{ color: '#a8c5a0', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+              <input type="checkbox" checked={forma.nomedits}
+                onChange={e => setForma({ ...forma, nomedits: e.target.checked })} />
+              Nomedīju!
+            </label>
+            {forma.nomedits && <>
+              <input type="number" value={forma.svars}
+                onChange={e => setForma({ ...forma, svars: e.target.value })}
+                placeholder="Svars kg" style={{ ...laukStils, width: '100px' }} />
+              <select value={forma.dzimums}
+                onChange={e => setForma({ ...forma, dzimums: e.target.value })}
+                style={{ ...laukStils, flex: 1 }}>
+                <option value="">Dzimums</option>
+                <option value="tēviņš">Tēviņš / Kuilis</option>
+                <option value="mātīte">Mātīte / Sivēnmāte</option>
+                <option value="mazulis">Mazulis / Teļš</option>
+              </select>
+            </>}
+          </div>
+        )}
+
+        <button onClick={saglabtIerakstu} disabled={saglaba || !teksts.trim()}
+          style={pogasStils(!teksts.trim() || saglaba)}>
           {saglaba ? '⏳ Saglabā...' : 'Saglabāt ierakstu'}
         </button>
       </div>
@@ -211,26 +290,18 @@ export default function DienasgramataPage() {
         <h3 style={{ color: '#a8c5a0', marginTop: 0, marginBottom: '12px' }}>Jautā saviem datiem</h3>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
-          {ATRIE_JAUTAJUMI.map(q => (
-            <button key={q} onClick={() => setJautajums(q)} style={atrasPogas}>
-              {q}
-            </button>
+          {atriePogaJautajumi.map(q => (
+            <button key={q} onClick={() => setJautajums(q)} style={atrasPogas}>{q}</button>
           ))}
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <input
-            value={jautajums}
-            onChange={e => setJautajums(e.target.value)}
+          <input value={jautajums} onChange={e => setJautajums(e.target.value)}
             placeholder="Uzdod jautājumu par saviem datiem..."
             style={{ ...laukStils, flex: 1 }}
-            onKeyDown={e => e.key === 'Enter' && uzdotJautajumu()}
-          />
-          <button
-            onClick={uzdotJautajumu}
-            disabled={jautaLade || !jautajums.trim()}
-            style={{ ...pogasStils(!jautajums.trim() || jautaLade), width: 'auto', padding: '8px 16px' }}
-          >
+            onKeyDown={e => e.key === 'Enter' && uzdotJautajumu()} />
+          <button onClick={uzdotJautajumu} disabled={jautaLade || !jautajums.trim()}
+            style={{ ...pogasStils(!jautajums.trim() || jautaLade), width: 'auto', padding: '8px 16px' }}>
             {jautaLade ? '⏳' : '→'}
           </button>
         </div>
@@ -244,11 +315,13 @@ export default function DienasgramataPage() {
 
       {/* IERAKSTU SARAKSTS */}
       <div>
-        <h3 style={{ color: '#a8c5a0', marginBottom: '12px' }}>Ierakstu vēsture ({ieraksti.length})</h3>
-        {ieraksti.length === 0 && (
+        <h3 style={{ color: '#a8c5a0', marginBottom: '12px' }}>
+          {isMakskere ? 'Makšķerēšanas' : 'Medību'} vēsture ({filtretieIeraksti.length})
+        </h3>
+        {filtretieIeraksti.length === 0 && (
           <p style={{ color: '#6b9e61', fontSize: '0.9rem' }}>Nav ierakstu vēl. Pievieno pirmo!</p>
         )}
-        {ieraksti.map(i => (
+        {filtretieIeraksti.map(i => (
           <div key={i.id} style={{ ...kartesStils('#1a2e1a', '#2d4a2d'), marginBottom: '8px', padding: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '4px' }}>
               <span style={{ color: '#6b9e61', fontSize: '0.8rem' }}>
@@ -256,8 +329,9 @@ export default function DienasgramataPage() {
               </span>
               <span style={{ fontSize: '0.8rem', color: '#a8c5a0' }}>
                 {menessFazeEmoji(i.meness_faze)} {i.meness_faze}
-                {i.vejs && ` · ${i.vejs}`}
                 {i.temperatura != null && ` · ${i.temperatura}°C`}
+                {i.vejs && ` · ${i.vejs}`}
+                {i.nokrisni && ` · ${i.nokrisni}`}
               </span>
             </div>
             <p style={{ color: '#e8f5e9', margin: '4px 0', fontSize: '0.95rem', lineHeight: 1.5 }}>{i.teksts}</p>
@@ -268,10 +342,16 @@ export default function DienasgramataPage() {
                 borderRadius: '20px', padding: '3px 10px',
                 marginTop: '6px', fontSize: '0.8rem', color: '#6bcb77',
               }}>
-                ✓ Nomedīts
+                {isMakskere ? '✓ Noķēru' : '✓ Nomedīts'}
                 {i.suga && ` · ${i.suga}`}
+                {i.nozveja_skaits && ` · ${i.nozveja_skaits} gb.`}
                 {i.svars && ` · ${i.svars} kg`}
                 {i.dzimums && ` · ${i.dzimums}`}
+              </div>
+            )}
+            {i.vieta && (
+              <div style={{ marginTop: '4px', fontSize: '0.78rem', color: '#4a7c3f' }}>
+                📍 {i.vieta}
               </div>
             )}
           </div>
