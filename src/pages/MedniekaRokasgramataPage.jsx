@@ -5,12 +5,14 @@ import SugasKatalogs from '../components/mednieks/SugasKatalogs'
 import JuristsChat from '../components/mednieks/JuristsChat'
 import CICKalkulators from '../components/mednieks/CICKalkulators'
 import SelekcijasKalkulators from '../SelekcijasKalkulators'
+import DienasgramataPage from './DienasgramataPage'
 
 const TABS = [
-  { id: 'sugas',     nos: '🦌 Sugas' },
-  { id: 'selektors', nos: '🎯 Selektors' },
-  { id: 'jurists',   nos: '⚖️ Jurists' },
-  { id: 'cic',       nos: '🏆 CIC' },
+  { id: 'sugas',        nos: '🦌 Sugas' },
+  { id: 'selektors',   nos: '🎯 Selektors' },
+  { id: 'jurists',     nos: '⚖️ Jurists' },
+  { id: 'cic',         nos: '🏆 CIC' },
+  { id: 'dienasgramata', nos: '📖 Dienasgrāmata' },
 ]
 
 export default function MedniekaRokasgramataPage({ onBack }) {
@@ -68,10 +70,11 @@ export default function MedniekaRokasgramataPage({ onBack }) {
 
       {/* Saturs */}
       <div style={{ padding: 16, maxWidth: 900, margin: '0 auto' }}>
-        {aktiva === 'sugas'     && <SugasKatalogs />}
-        {aktiva === 'selektors' && <SelekcijasKalkulators />}
-        {aktiva === 'jurists'   && <JuristsChat />}
-        {aktiva === 'cic'       && <CICKalkulators />}
+        {aktiva === 'sugas'          && <SugasKatalogs />}
+        {aktiva === 'selektors'      && <SelekcijasKalkulators />}
+        {aktiva === 'jurists'        && <JuristsChat />}
+        {aktiva === 'cic'            && <CICKalkulators />}
+        {aktiva === 'dienasgramata'  && <DienasgramataPage />}
       </div>
     </div>
   )
