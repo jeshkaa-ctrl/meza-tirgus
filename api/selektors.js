@@ -321,17 +321,15 @@ Medņa un rubeņa dabisks hibrīds — izskatās kā starpposms starp abiem.
 Reti sastopams.
 
 🐦 PELĒKĀ VĀRNA (Corvus cornix)
-Statuss: Nelimitēts | Termiņš: 1. augusts – 28. februāris
-⚠️ LIGZDOŠANAS LAIKĀ AIZLIEGTS medīt — ES Putnu direktīva 2009/147/EK 7.pants!
-  (Ligzdošana aptuveni marts–jūlijs — šajā periodā NEMEDĪT)
+Statuss: Nelimitēts | Medī visu gadu, IZŅEMOT 30. aprīlis – 15. jūnijs
+⚠️ AIZLIEGTS medīt 30. apr – 15. jūn — mazuļu laiks (Latvijas likums + ES direktīva)
 PELĒKS ķermenis, MELNA galva, spārni un aste. Labi atpazīstama.
 ⚠️ Drīkst medīt arī NAKTĪ no paaugstinājuma — izņēmums!
 Bīstama mazputnu ligzdām — aktīvi nomedīt ieteicams.
 
 🐦 ŽAGATA (Pica pica)
-Statuss: Nelimitēts | Termiņš: 1. augusts – 28. februāris
-⚠️ LIGZDOŠANAS LAIKĀ AIZLIEGTS medīt — ES Putnu direktīva 2009/147/EK 7.pants!
-  (Ligzdošana aptuveni marts–jūlijs — šajā periodā NEMEDĪT)
+Statuss: Nelimitēts | Medī visu gadu, IZŅEMOT 30. aprīlis – 15. jūnijs
+⚠️ AIZLIEGTS medīt 30. apr – 15. jūn — mazuļu laiks (Latvijas likums + ES direktīva)
 MELNA ar BALTU, raksturīga GARA ASTE. Viegli atpazīstama.
 Bīstama mazputnu ligzdām.
 

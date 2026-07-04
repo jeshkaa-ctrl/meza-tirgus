@@ -28,7 +28,7 @@ export const SAUSZEMES_PUTNI = [
   {
     id: 'sloka',       nos: 'Sloka',          lat: 'Scolopax rusticola',
     emoji: '🐦',       tips: 'nelimitets',
-    sezona: '1. aug – 30. apr (galvenokārt rudens migrācijā)',
+    sezona: '1. sept – 15. dec (MK 3.2.9)',
     dokuments: 'Sezonas karte',
     info: 'Garo knābīšu putns. Medī crepuskulā (krēslā) — "velkšana" ir tradicionāla medību metode. Migrē cauri Latvijai pavasarī un rudenī.',
     etikaKey: 'nelimiteta',
@@ -60,17 +60,17 @@ export const SAUSZEMES_PUTNI = [
   {
     id: 'peleka_varna_putni', nos: 'Pelēkā vārna', lat: 'Corvus cornix',
     emoji: '🐦',       tips: 'nelimitets',
-    sezona: '1. aug – 28. febr. ⚠️ Ligzdošanas laikā AIZLIEGTS (ES Putnu direktīva)',
+    sezona: 'Visu gadu ⚠️ izņemot 30. apr – 15. jūn (ligzdošanas aizsardzība)',
     dokuments: 'Sezonas karte',
-    info: 'Pelēks ķermenis, melna galva, spārni un aste. UZMANĪGI — atšķirt no aizsargājamā kraukļa (Corvus corax), kas ir pilnīgi melns un lielāks. ⚠️ ES Putnu direktīva aizliedz medīt ligzdošanas sezonā (aptuveni marts–jūlijs).',
+    info: 'Pelēks ķermenis, melna galva, spārni un aste. UZMANĪGI — atšķirt no aizsargājamā kraukļa (Corvus corax), kas ir pilnīgi melns un lielāks. ⚠️ Aizliegts medīt 30. aprīlis – 15. jūnijs (mazuļu laiks).',
     etikaKey: 'nelimiteta',
   },
   {
     id: 'zagata_putni', nos: 'Žagata',        lat: 'Pica pica',
     emoji: '🐦‍⬛',      tips: 'nelimitets',
-    sezona: '1. aug – 28. febr. ⚠️ Ligzdošanas laikā AIZLIEGTS (ES Putnu direktīva)',
+    sezona: 'Visu gadu ⚠️ izņemot 30. apr – 15. jūn (ligzdošanas aizsardzība)',
     dokuments: 'Sezonas karte',
-    info: 'Melns un balts putns ar garu asti. Ligzdu plēsēja — kaitē vietējo putnu ligzdošanai. ⚠️ ES Putnu direktīva aizliedz medīt ligzdošanas sezonā (aptuveni marts–jūlijs).',
+    info: 'Melns un balts putns ar garu asti. Ligzdu plēsēja — kaitē vietējo putnu ligzdošanai. ⚠️ Aizliegts medīt 30. aprīlis – 15. jūnijs (mazuļu laiks).',
     etikaKey: 'nelimiteta',
   },
   // ─── AIZSARGĀJAMI ────────────────────────────────────────────────────────────
