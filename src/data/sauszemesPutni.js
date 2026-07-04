@@ -60,17 +60,17 @@ export const SAUSZEMES_PUTNI = [
   {
     id: 'peleka_varna_putni', nos: 'Pelēkā vārna', lat: 'Corvus cornix',
     emoji: '🐦',       tips: 'nelimitets',
-    sezona: 'Visu gadu',
+    sezona: '1. aug – 28. febr. ⚠️ Ligzdošanas laikā AIZLIEGTS (ES Putnu direktīva)',
     dokuments: 'Sezonas karte',
-    info: 'Pelēks ķermenis, melna galva, spārni un aste. UZMANĪGI — atšķirt no aizsargājamā kraukļa (Corvus corax), kas ir pilnīgi melns un lielāks.',
+    info: 'Pelēks ķermenis, melna galva, spārni un aste. UZMANĪGI — atšķirt no aizsargājamā kraukļa (Corvus corax), kas ir pilnīgi melns un lielāks. ⚠️ ES Putnu direktīva aizliedz medīt ligzdošanas sezonā (aptuveni marts–jūlijs).',
     etikaKey: 'nelimiteta',
   },
   {
     id: 'zagata_putni', nos: 'Žagata',        lat: 'Pica pica',
     emoji: '🐦‍⬛',      tips: 'nelimitets',
-    sezona: 'Visu gadu',
+    sezona: '1. aug – 28. febr. ⚠️ Ligzdošanas laikā AIZLIEGTS (ES Putnu direktīva)',
     dokuments: 'Sezonas karte',
-    info: 'Melns un balts putns ar garu asti. Ligzdu plēsēja — kaitē vietējo putnu ligzdošanai.',
+    info: 'Melns un balts putns ar garu asti. Ligzdu plēsēja — kaitē vietējo putnu ligzdošanai. ⚠️ ES Putnu direktīva aizliedz medīt ligzdošanas sezonā (aptuveni marts–jūlijs).',
     etikaKey: 'nelimiteta',
   },
   // ─── AIZSARGĀJAMI ────────────────────────────────────────────────────────────

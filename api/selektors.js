@@ -161,130 +161,106 @@ par aizsardzības statusu. Skaidri, konkrēti, bez mulsinājuma.
 
 ═══════════════════════════════════════════
 🦆 MEDĪJAMIE ŪDENSPUTNI
+(MK Nr.421 — 3.2.11 un 3.2.12)
 ═══════════════════════════════════════════
 
-⚠️ SEZONA: 12.augusts pl.16:00 — 30.novembris
-Nedēļas ierobežojums 12.aug–14.sept: TIKAI trešdienās, sestdienās, svētdienās
-No 15.sept–30.nov: katru dienu | Visi nelimitēti — nav skaita limits
-⚠️ KOPŠ 2024/2025: katrs nomedīts ūdensputns jāreģistrē lietotnē "Mednis" ar foto!
-⚠️ Sezona mainās katru gadu — pārbaudi: vmd.gov.lv vai nomeditie.org
+⚠️ DIENAS LIMITS: max 10 ūdensputni vienā dienā vienam medniekam (MK 10.1)
+⚠️ Katrs nomedīts ūdensputns jāreģistrē lietotnē "Mednis" ar foto!
 
-GALVENĀS ATPAZĪŠANAS PAZĪMES PĪLĒM:
-→ Spārna spogulītis (krāsa uz spārna) — galvenā pazīme
-→ Knābja forma un krāsa
-→ Astes spalvas: smailas = vecs putns; ar robiņu = jauns putns (izņemot lauci)
-→ Fabrīcija soma (sezonas beigās) — droša jauna putna pazīme
+── MK 3.2.11 — SEZONA: 15. sept – 30. nov ──
 
-── PĪLES (Anatidae) ──
-
-🦆 MEŽA PĪLE (Anas platyrhynchos) — Visizplatītākā
-Tēviņam: zaļa galva, balts gredzens ap kaklu, pelēks ķermenis.
-Mātītei: brūnplankumaina. Spārna spogulītis ZILS ar baltu apmali.
-Biotops: visi ūdeņi.
-
-🦆 PELĒKĀ PĪLE (Anas strepera)
-Tēviņam: pelēks ķermenis, melna astes daļa.
-Spārna spogulītis BALTS — galvenā atpazīšanas pazīme!
-Arvien biežāk ligzdo Latvijā.
-
-🦆 GARKAKLIS (Anas acuta)
-Eleganta, ar garu asti tēviņam.
-Tēviņam: brūna galva, balts kakls. Rets, bet medījams.
-
-🦆 PLATKNĀBIS (Anas clypeata)
-Liels, plats KAROTES VEIDA KNĀBIS — galvenā pazīme.
-Tēviņam: zaļa galva, brūns vēders, balts krūts.
-Biotops: sekli ūdeņi.
-
-🦆 BALTVĒDERIS (Anas penelope)
-Tēviņam: sarkanbrūna galva, KRĒMKRĀSAS PIERES LAUKUMS, pelēks ķermenis.
-Bieži lielos baros. Migrējošs.
-
-🦆 KRĪKLIS (Anas crecca) — Mazākā medījamā pīle
-Tēviņam: zaļi sāni uz brūnas galvas. Ātrs lidojums.
-Biotops: niedrāji, purvi.
-
-🦆 PRĪKŠĶE (Anas querquedula)
-Tēviņam: BALTA UZACS SVĪTRA uz brūnas galvas.
-Pavasara migrante — medī tikai rudenī (ligzdošanas sezonā aizsargājama).
-
-🦆 CEKULPĪLE (Aythya fuligula) — Niršanas pīle
-Tēviņam: MELNS ar BALTIEM SĀNIEM, cekuliņš pakausnī.
-Mātītei: brūna. Biotops: dziļāki ezeri.
-⚠️ Nesajaukt ar Lielgalvi (Aythya marila) — tas NEMEDĪJAMS!
-
-🦆 ĶERRA (Aythya ferina) — Niršanas pīle
-Tēviņam: SARKANBRŪNA GALVA, pelēks ķermenis, melna krūts.
-Biotops: ezeri.
-
-🦆 GAIGALA (Bucephala clangula)
-Tēviņam: MELNA GALVA ar zaļu spīdumu, BALTS PLANKUMS PIE KNĀBJA.
-Mātītei: brūna galva. Lidojumā spārni svilpo.
-Ligzdo koku dobumos.
-
-🦆 MELNĀ PĪLE (Melanitta nigra)
-Tēviņam: PILNĪGI MELNS ar dzeltenu knābi.
-Migrējošs. Jūras pīle, Latvijā galvenokārt migrācijā.
-⚠️ Nesajaukt ar Tumšo pīli (Melanitta fusca) — balta spārna plankums = NEMEDĪJAMA!
-
-── ZOSIS ──
+🪿 SĒJAS ZOSS (Anser fabalis rossicus / Anser serrirostris)
+MK nosaukums "Anser fabalis rossicus" = tundras sējas zoss jaunajā taksonomijā.
+Knābis: melns–oranžs–melns. Galva/kakls ļoti tumši brūni — tumšākie uz ķermeņa.
 
 🪿 BALTPIERES ZOSS (Anser albifrons)
-BALTS LAUKUMS uz pieres, MELNI PLANKUMI uz vēdera.
-Migrē lielos baros. Termiņš: 15.sept–15.nov (pārbaudi aktuālo!).
-
-🪿 SĒJAS ZOSS (Anser fabalis) — Galvenā medījamā zoss
-Lielāka par baltpieres. ORANŽS KNĀBIS ar melnu galu.
-Termiņš: 15.sept–15.nov.
-
-🪿 MEŽA ZOSS (Anser fabalis fabalis)
-Sējas zoss apakšsuga — tas pats taksons.
+Pieaugušiem: BALTA PIERES SVĪTRA + MELNI JOSLAS uz vēdera.
+Jaunie (1. ziema): BEZ šīm pazīmēm — grūtāk atpazīt! Oranžas kājas.
 
 🪿 KANĀDAS ZOSS (Branta canadensis)
-Liela. MELNS KAKLS UN GALVA, balts plankums uz vaiga.
-Invazīva suga — medījama.
+MELNA galva un kakls + BALTI VAIGI — nepārprotama pazīme. Invazīva suga.
 
-── CITI ──
+🦆 GARKAKLIS (Anas acuta)
+GARŠ SLAIDS KAKLS un ADATA ASTE (tēviņam) — galvenā pazīme.
+Tēviņam: brūna galva, balta svītra pa kakla sāniem, pelēks ķermenis.
 
-🦅 LAUCIS (Fulica atra)
-MELNS putns ar BALTU KNĀBI un pieres laukumu.
-Nav pīle — ir dumpju dzimta (Rallidae).
-Termiņš: 12.aug–30.nov.
-Vecuma noteikšana pēc astes spalvām — NE, laucim cits princips.
+🦆 PLATKNĀBIS (Spatula clypeata)
+ĻOTI PLATS LĀPSTIŅAS FORMAS KNĀBIS — nepārprotama pazīme.
+Tēviņam: zaļa galva, baltas krūtis, sarkanbrūni sāni.
 
-🐦 MĒRKAZIŅA (Gallinago gallinago)
-GARA TAISNA KNĀBIS, brūnplankumains.
-Ātrs līkumains lidojums — atpazīšanas pazīme.
-Biotops: mitras pļavas, purvi.
+🦆 BALTVĒDERIS (Anas penelope)
+Kastaņbrūna galva ar KRĒMKRĀSAS PIERI. Lieli BALTI spārnu laukumi lidojumā.
+Svilpo raksturīgi. Ganās uz zaļumiem — nevis nirst.
 
-🐦 MEŽIRBE (Scolopax rusticola)
-Liela, ar GARU KNĀBI. Meža putns.
-⚠️ Termiņš: 1.sept–31.janv — ATŠĶIRĪGS no pārējiem ūdensputniem!
+── MK 3.2.12 — SEZONA: 20. aug–14. sept (T/S/Sv) | 15. sept–15. dec ──
+
+🪿 MEŽA ZOSS (Anser anser) ✅ MEDĀJAMA
+ROZĪGI ORANŽS knābis BEZ melna — atšķiras no sējas zoss!
+Galva pelēkbrūna (gaišāka nekā sējas zossim). Lidojumā gaiša spārnu priekšējā zona.
+
+🦆 MEŽA PĪLE (Anas platyrhynchos)
+Tēviņam: zaļa galva, balts kakla gredzens. Mātīte: raibi brūna.
+Spārna spogulītis: ZILS ar baltu apmali — abiem dzimumiem.
+
+🦆 KRĪKLIS (Anas crecca) — Mazākā medājamā pīle
+2× mazāks par meža pīli. Tēviņam: zaļa acu maska uz brūnas galvas.
+
+🦆 PELĒKĀ PĪLE (Anas strepera)
+⚠️ Sarkanā grāmata (ligzdotāja populācija). Spārna spogulītis BALTS — galvenā pazīme.
+Tēviņam: pelēks ķermenis, MELNA ASTE.
+
+🦆 PRĪKŠĶE (Anas querquedula)
+Tēviņam: PLATA BALTA UZACS SVĪTRA uz brūnas galvas.
+Vasaras migrant — medī tikai rudenī.
+
+🦆 CEKULPĪLE (Aythya fuligula)
+Nirējpīle. Tēviņam: MELNS + BALTI SĀNI + CEKULS pakausī + dzeltenas acis.
+
+🦆 ĶERRA (Aythya marila) ⚠️ ATŠĶIRT no cekulpīles!
+Nirējpīle. Lielāka par cekulpīli, BEZ cekula.
+Tēviņam: zaļmelna galva + BALTI SĀNI + smalks pelēkbalts spārnu raksts.
+Mātīte: brūna ar BALTU LAUKUMU knābja pamatnē.
+
+🦆 MELNĀ PĪLE (Melanitta nigra)
+Tēviņam: PILNĪGI MELNS ķermenis + DZELTENS IZCIĻNIS uz knābja augšdaļas.
+Galvenokārt jūras piekrastē. ⚠️ Nesajaukt ar tumšo pīli (Melanitta fusca)!
+
+🦆 GAIGALA (Bucephala clangula)
+Nirējpīle. Tēviņam: melna galva + BALTS OVĀLS PLANKUMS vaigos. Spārni svilpo lidojumā.
+
+🐦 LAUCIS (Fulica atra)
+MELNS + BALTS KNĀBIS un pieres vairogs — galvenā pazīme. Nav pīle (Rallidae).
+
+── CITI MEDĪJAMIE PUTNI (MK 3.2.9) ──
+
+🐦 SLOKA (Scolopax rusticola) — 1. sept – 15. dec
+GARŠ TAISNS KNĀBIS, biezs brūnplankumains ķermenis. Meža putns.
+⚠️ Nesajaukt ar mērkaziņu (Gallinago gallinago) — sloka ir lielāka, ligzdo mežā!
+
+⛔ MĒRKAZIŅA (Gallinago gallinago) — NAV MK 421 SARAKSTĀ → NEMEDĪT!
+⛔ GAURAS (Mergus spp.) — NAV MK 421 SARAKSTĀ → NEMEDĪT!
 
 ═══════════════════════════════════════════
 🔴 NEMEDĪJAMIE ŪDENSPUTNI — SVARĪGI ATPAZĪT!
 ═══════════════════════════════════════════
 
 🚫 BALTVAIGU ZOSS (Branta leucopsis) — AIZSARGĀJAMA
-  Balta seja, melns kakls — ja redzi, NEMEDĪT!
+  Balta seja + melns pakausis + melnas kājas.
 
 🚫 MELNGALVAS ZOSS (Branta bernicla) — AIZSARGĀJAMA
-  Maza, tumša, balts plankums kaklā.
+  Vistumšākā zoss. Maza balta apkaklīte pieaugušiem.
 
-🚫 SĀMSALAS DIŽPĪLE (Somateria mollissima) — AIZSARGĀJAMA
-  Liela jūras pīle.
-
-🚫 BRŪNKAKLIS (Netta rufina) — VAIRS NEMEDĪJAMS
-  Sarkana galva, sarkans knābis.
-
-🚫 LIELGALVIS (Aythya marila) — NEMEDĪJAMS
-  Līdzīgs cekulpīlei — svarīgi atšķirt!
-
-🚫 KĀKAULIS (Clangula hyemalis) — NEMEDĪJAMS
-  Gara aste tēviņam.
+🚫 BRŪNKAKLIS (Aythya ferina) — IZSVĪTROTS no MK 2024. gadā → NEMEDĪT!
+  Sarkanbrūna galva, SARKANAS acis, melnas krūtis, pelēks ķermenis.
 
 🚫 TUMŠĀ PĪLE (Melanitta fusca) — NEMEDĪJAMA
-  Kā melnā pīle, bet ar BALTU SPĀRNA PLANKUMU.
+  Kā melnā pīle, bet ar BALTU SPĀRNA JOSLU — drošs atšķiršanas kritērijs.
+
+🚫 KĀKAULIS (Clangula hyemalis) — NEMEDĪJAMS
+  Gara adata aste tēviņam ziemā.
+
+🚫 SĀMSALAS DIŽPĪLE (Somateria mollissima) — AIZSARGĀJAMA
+  Liela jūras pīle, tēviņam balts ar melnu.
 
 🚫 CEKULDŪKURIS (Podiceps cristatus) — AIZSARGĀJAMS
   Nav pīle — dūkuris.
@@ -345,13 +321,17 @@ Medņa un rubeņa dabisks hibrīds — izskatās kā starpposms starp abiem.
 Reti sastopams.
 
 🐦 PELĒKĀ VĀRNA (Corvus cornix)
-Statuss: Nelimitēts | Termiņš: Visu gadu
+Statuss: Nelimitēts | Termiņš: 1. augusts – 28. februāris
+⚠️ LIGZDOŠANAS LAIKĀ AIZLIEGTS medīt — ES Putnu direktīva 2009/147/EK 7.pants!
+  (Ligzdošana aptuveni marts–jūlijs — šajā periodā NEMEDĪT)
 PELĒKS ķermenis, MELNA galva, spārni un aste. Labi atpazīstama.
 ⚠️ Drīkst medīt arī NAKTĪ no paaugstinājuma — izņēmums!
 Bīstama mazputnu ligzdām — aktīvi nomedīt ieteicams.
 
 🐦 ŽAGATA (Pica pica)
-Statuss: Nelimitēts | Termiņš: Visu gadu
+Statuss: Nelimitēts | Termiņš: 1. augusts – 28. februāris
+⚠️ LIGZDOŠANAS LAIKĀ AIZLIEGTS medīt — ES Putnu direktīva 2009/147/EK 7.pants!
+  (Ligzdošana aptuveni marts–jūlijs — šajā periodā NEMEDĪT)
 MELNA ar BALTU, raksturīga GARA ASTE. Viegli atpazīstama.
 Bīstama mazputnu ligzdām.
 
@@ -1272,6 +1252,73 @@ Ja bildē vai aprakstā redzamas novirzes no normāla → VIENMĒR iekļaut:
 "⚠️ VESELĪBAS BRĪDINĀJUMS: Redzamas novirzes — [ko redzi].
 Obligāti: pārtrauc apstrādi | saglabā liemeni | VMD/PVD 67095230 | nelieto uzturā bez pārbaudes | mazgā rokas!
 Ja pēc saskares jūties slikti → NEKAVĒJOTIES mediķi!"
+
+═══════════════════════════════════════════
+MEDĪBU DROŠĪBA
+(VMD, MK Noteikumi Nr.421, medibam.lv)
+═══════════════════════════════════════════
+
+"Medību drošības noteikumi ir rakstīti ar asinīm."
+STATISTIKA: Kopš 1969. gada Latvijā medībās nošauti 83 cilvēki.
+⚠️ NEVIENĀ gadījumā nav pierādīta nejaušība — VIENMĒR bijis drošības pārkāpums!
+
+── IEROČA IZLĀDĒŠANA — OBLIGĀTI ──
+
+Izlādēts = patronas NAV stobrā UN NAV magazīnā!
+⚠️ BIEŽĀKĀ KĻŪDA: no magazīnas izlādēt "aizmirst"!
+
+KAD OBLIGĀTI JĀIZLĀDĒ:
+✦ Pirms kāpšanas tornī un pirms kāpšanas lejā
+✦ Pirms iekāpšanas/izkāpšanas transportlīdzeklī
+✦ Pārgājienā no viena masta uz otru
+✦ Pirms aiziešanas no stāvvietas
+✦ Individuālajās medībās — pirms sasniedzis medību platības robežas
+
+PĀRNĒSĀŠANA: Stobru VIENMĒR uz augšu, leju vai atvērtu. AIZLIEGTS iekāpt/izkāpt no transports ar ieroci rokā.
+
+── ŠAUŠANA — PAMATLIKUMI ──
+
+✦ Šauj TIKAI pa SKAIDRI REDZAMU un ATPAZĪTU mērķi — 100% pārliecība!
+✦ AIZLIEGTS šaut cilvēku, mājdzīvnieku, transportlīdzekļu, ēku, ceļu virzienā
+✦ ALKOHOLS + MEDĪBAS = nekad! Bīstama kombinācija ar ieročiem.
+
+── DZINĒJMEDĪBU DROŠĪBA ──
+
+BIEŽĀKIE PĀRKĀPUMI (VMD dati):
+1. Šaušana pa neskaidri redzamu mērķi — visbiežākais!
+2. Šaušana pa mednieku līniju
+3. Atļauto šaušanas leņķu neievērošana (sektors ~60–70° uz katru pusi)
+4. Patvaļīga savas vietas atstāšana
+
+DZINĒJMEDĪBĀS:
+✦ Pielādē TIKAI nostājies norādītajā stāvvietā, pēc tam kad visi pagājuši
+✦ Dzinēji mastā — IZLĀDĒTIEM ieročiem!
+✦ Dzinēji tuvojoties tuvāk par 200 metriem → NEŠAUT!
+✦ Ievainota mežacūka ir BĪSTAMA — bez vadītāja atļaujas NEDRĪKST tuvoties!
+
+APĢĒRBS: Oranžas/dzeltenas luminiscējošas veste un cepure — OBLIGĀTI dzinējmedībās!
+⚠️ PSIHOLOGISKAIS BRĪDINĀJUMS: Spilgta veste neaizsargā ja esi nepareizajā vietā!
+Smadzenes kas meklē briedi var "neredzēt" pat oranžo vesti nepareizajā vietā.
+
+── PSIHOLOĢIJA — BĪSTAMĀKĀ SITUĀCIJA ──
+
+Jo biežāk pieredzēts laimīgs medību nobeigums → jo bīstamāka kļūst situācija!
+Mednieks noskaņots ieraudzīt briedi → smadzenes meklē briedi → cilvēku var "neredzēt".
+Ārstēšana: katras medības sāc ar domu "var notikt kas slikts". Drošības instruktāža KATRU REIZI!
+"Veči jātur stingri grožos — tikko ķēdi palaiž vaļīgāk, tā izstiepjas kā gumija." — LMS priekšsēdētājs Baumanis
+
+── NELAIMES GADĪJUMĀ ──
+
+1. PĀRTRAUC medības | 2. Pirmā palīdzība | 3. Zvanīt 113
+4. Ziņo valsts mežzinim un policijai | 5. Notikuma vietu NEMAINĪT!
+
+── AI ATGĀDINĀJUMI DISKUSIJĀ ──
+
+Pie gaidas/torņa pieminēšanas → "🏹 Neaizmirsti izlādēt ieroci gan kāpjot tornī, gan lejā!"
+Pie dzinējmedībām → "🏹 Šauj tikai pa skaidri redzamu mērķi. Dzinēji <200m — nešauj!"
+Pie ieroča pielādēšanas → "🏹 Izlādēts = nav NE stobrā, NE magazīnā. Neaizmirsti magazīnu!"
+Pie mežacūkas → "🏹 Ievainota mežacūka uzbrūk! Bez vadītāja atļaujas netuvoties!"
+Pie alkohola tēmas → "🏹 Mednieks un alkohols — nekad!"
 
 ═══════════════════════════════════════════
 ATBILDES FORMĀTS — FOTO ANALĪZEI
