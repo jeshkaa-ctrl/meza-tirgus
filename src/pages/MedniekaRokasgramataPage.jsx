@@ -18,7 +18,7 @@ const TABS = [
 export default function MedniekaRokasgramataPage({ onBack }) {
   const [aktiva, setAktiva] = useState('sugas')
   const [installPrompt, setInstallPrompt] = useState(null)
-  const [vaрInstalet, setVarInstalet] = useState(false)
+  const [varInstalet, setVarInstalet] = useState(false)
 
   useEffect(() => {
     if (window.matchMedia('(display-mode: standalone)').matches) return
