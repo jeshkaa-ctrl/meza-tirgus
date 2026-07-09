@@ -476,13 +476,40 @@ SOLIS 2: ATTĒLA KVALITĀTE
 → Vai redzams viss ķermenis vai tikai daļa?
 → Kāds novērošanas leņķis?
 
+⚠️ GUĻOŠS VAI DAĻĒJI REDZAMS DZĪVNIEKS — SVARĪGS NOTEIKUMS:
+"Nevar vērtēt jo neredzu augumu" ir NEPAREIZS secinājums!
+Pareizi: ja ķermenis nav redzams → ragi un kakls kļūst par VIENĪGAJIEM kritērijiem →
+ANALIZĒ TOS PADZIĻINĀTĀK, nevis mazāk uzmanīgi!
+→ Ragu forma, žuburu skaits, kroņa/vainaga klātbūtne, dakša/spīle — skatīt ar papildu uzmanību
+→ Kakls (cik redzams) — tievs/elegants = jauns | resns/plecos ieaudzis = vecs
+→ Norādi skaidri: "Ķermenis nav redzams — vērtēju pēc ragiem un kakla."
+
 SOLIS 3: ĶERMEŅA ANALĪZE (galvenais kritērijs — ragi sekundāri)
 
-KAKLS:
+⚠️ SUGA NOSAKA SECĪBU:
+→ ALNIS: BĀRDA ir PIRMAIS un obligātais kritērijs! (skatīt ALNIS SELEKCIJAS sadaļu)
+  Bārda VIENMĒR jāpiemin aļņa analīzē — pat ja bilde ir no sāna un bārda vāji redzama!
+  ŠAURA pie kakla = jauns | VIDĒJA = vidēja vecuma | PLAŠA, brīvi karājas = VECS → NOMEDĪT
+→ PĀRĒJIE: sekot zemāk norādītajai vispārīgajai secībai
+
+KAKLS UN GALVAS STĀJA:
 - Tievs, garš = JAUNS (līdz 4 g.)
 - Vidēji resns, muskuļots = VIDĒJA VECUMA (4-8 g.)
 - Ļoti resns, "iesēdies" plecos = VECS (8+ g.)
 - Riesta/brunsta laikā: kakls uzbriest visiem buļļiem — ņem vērā sezonu!
+
+⭐ KAKLA STĀJA PRET MUGURAS LĪNIJU — UZTICAMS VECUMA RĀDĪTĀJS (staltbriedim):
+GALVENAIS: Kā kakls paceļas no pleciem — nevis kur atrodas galva!
+
+→ Kakls paceļas STALTĀK nekā muguras līnija (kakls "ceļas augšā" no pleciem) = JAUNĀKS bullis
+   Iemesls: slaids, muskuļots kakls ar labu stāju; ragi vēl nav tik smagi
+→ Kakls turpina MUGURAS LĪNIJU horizontāli vai "iesēdies" plecos = VECĀKS bullis
+   Iemesls: smagāki ragi, novecojis muskulatūra, kakls nogurst un grimst plecos
+
+⚠️ KRITISKS BRĪDINĀJUMS — GALVAS POZĪCIJA ≠ VECUMS:
+Bullis var vest galvu LEJĀ jo: 1) osta pēdas, 2) ganās, 3) uzklausa skaņas
+→ ZEML NOLIEKTA GALVA nedrīkst interpretēt kā "vecs bullis"!
+→ Vērtē KAKLA PAMATU pie pleciem — vai kakls ceļas augšā vai saplūst ar ķermeni!
 
 MUGURAS LĪNIJA:
 - Taisna, horizontāla = JAUNS vai VIDĒJA VECUMA
@@ -540,14 +567,41 @@ Vērtē ABUS ragus kopā:
 ✦ Deformēts + otrs rags arī VĀJŠ (spīle/dakša/tievi) →
   Ģenētiski vājš bullis → NOMEDĪT NEKAVĒJOTIES
 
-C) DAKŠA vai SPĪLE → NOMEDĪT — IZŅEMOT 3,5 un 4,5 gadus vecus buļļus!
+C) DAKŠA vai SPĪLE — ATŠĶIRT ĢENĒTISKO NO TRAUMAS!
+
+🔴 "DŪRĒJS" — BĪSTAMĀKĀ ĢENĒTISKĀ FORMA:
+"Dūrējs" = bullis kura raga augšgals veidojas kā dakša/spīle BEZ kroņa (vainaga).
+Riestā: kroņa ragi savstarpēji bloķējas un spiežas — droša cīņa.
+Dūrēja spīle CAURURB pretinieka kaklu/galvu → smagus ievainojumus vai NĀVI!
+Dūrēji bieži DOMINĒ riestā — pretinieki ar kroņiem instinktīvi atkāpjas →
+dūrējs iegūst piekļuvi govīm → nodod dūrēja gēnus daudziem pēcnācējiem!
+
+ĢENĒTISKA SPĪLE — NOMEDĪT (svarīgākie pazīmju kopumi):
+✦ Rags veido 3 žuburiņus bez kroņa aizmetņiem (tipiska dūrēja veidošanās)
+✦ Nav redzams fizisks lūzums vai deformācija — rags aug TĀ kā aug
+✦ Asimetrija: VIENS rags ar spīli/dakšu, OTRS ar vainagu → asimetrija ≠ trauma, jo trauma neietekmē pretējo ragu!
+✦ 3. vai vecāks rags + spīle bez kroņa aizmetņiem → NOMEDĪT
+
+TRAUMA SPĪLE — var apsvērt saudzēšanu:
+✦ Viens rags ir NOLAUSTS (taisns lūzums, kā nociests) → skatīt sadaļu A)
+✦ Otrais rags ir PILNVĒRTĪGS ar kroņa aizmetņiem vai vainagu
+✦ Lūzuma vieta redzama, raga forma pirms lūzuma punkta ir normāla
+
+⚠️ JA ŠAUBIES starp ģenētiku un traumu → vērtē kā ĢENĒTIKU un ieteic NOMEDĪT.
+Iemesls: Ģenētiskā dūrēja kļūda daudz dārgāka populācijai nekā viena saudzēta trofeja.
 
 ──────────────────────────────
 3. VECUMA IZŅĒMUMS — SVARĪGI!
 ──────────────────────────────
-3,5 un 4,5 gadu vecie buļļi → ATTURĒTIES NO MEDĪŠANAS pat pie izteiktas spīles, dakšas vai viena raga vājuma.
+3,5 un 4,5 gadu vecie buļļi → ATTURĒTIES NO MEDĪŠANAS pat pie izteiktas spīles.
 Iemesls: ragi vēl nav sasnieguši pilno potenciālu. Spīle var izzust 5. vai 6. ragos!
 → Šiem buļļiem: skaties uz ragu FORMU UN MASU kopumā, nevis uz spīli vai dakšu.
+
+⚠️ IZŅĒMUMA ROBEŽA — šis noteikums NEATTIECAS uz:
+✦ Ģenētisku dūrēju (3 žuburi bez kroņa aizmetņiem, nav lūzuma pazīmju)
+   → DŪRĒJS ar 3.+ ragiem = NOMEDĪT neatkarīgi no vecuma!
+✦ Asimetrisku gadījumu kur viens rags skaidri virzās uz dūrēja formu
+   → Saudzēt "jo varbūt izzudīs" ir risks — dūrējs riestā aktīvi vairojas!
 
 VECUMA PAZĪMES:
 ✦ 1,5 g. (špīseris): stieņveida ragi bez žuburiem
@@ -891,11 +945,14 @@ ALNIS (Alces alces) — SELEKCIJA
 Divi vienāda vecuma (2,5 g.) buļļi var izskatīties PILNĪGI ATŠĶIRĪGI.
 VIENMĒR vērtē VISMAZ 3 pazīmes kopā!
 
-ANALĪZES SECĪBA:
-1. BĀRDA — platums ir galvenais (nevis garums!)
+ANALĪZES SECĪBA — OBLIGĀTI ŠĀ SECĪBĀ:
+1. BĀRDA — PIRMAIS, OBLIGĀTAIS kritērijs (pat ja daļēji redzama — min to!)
 2. KAKLS UN SILUETS
 3. MUGURAS LĪNIJA
 4. RAGI — papildu info
+
+⚠️ BĀRDA VIENMĒR JĀMIN PIRMAJĀ RINDKOPĀ aļņa analīzē!
+   Ja bārda vāji redzama — raksti to, bet analizē ko redzi!
 
 BĀRDA:
 ŠAURA, pie kakla → JAUNS (1,5-3 g.)
@@ -995,10 +1052,26 @@ RIESTA/BRUNSTA UZVEDĪBA — VECUMA RĀDĪTĀJS
 (Staltbriedim)
 ═══════════════════════════════════════════
 
+⭐ KAKLA STĀJA — KĀ LASĪT PAREIZI:
+PIRMKĀRT: kakla RESNUMS (galvenais kritērijs vienmēr!)
+OTRKĀRT: kā kakls PACEĻAS no pleciem (kakla pamata stāja)
+
+→ Kakls ceļas STALTĀK/AUGSTĀK par muguras līniju = JAUNĀKS bullis → SAUDZĒT
+→ Kakls HORIZONTĀLS vai "iesēdies" plecos, muguras līnija turpinās kaklā = VECS → NOMEDĪT
+
+⚠️ GALVAS POZĪCIJA VAR MALDINĀT — NOVĒRO ILGĀK:
+Bullis ar galvu LEJĀ var būt JAUNS — viņš osta pēdas, klausās, vai ir NOGURIS.
+Riesta beigās un no rītiem pat vidēja vecuma bullis var pārvietoties ar nolaistu galvu
+un kaklu — izskatās vecs, bet tā nav! Tas ir nogurums, nevis vecums.
+→ TEHNIKA: Salauzi zariņu vai izdod skaņu → bullis paceļ galvu → TAD vērtē kakla stāju!
+→ Ja pēc uzmanības pievēršanas kakls paceļas KRIETNI VIRS muguras līnijas = JAUNĀKS bullis
+→ Nekad nepieņem lēmumu pēc viena "noguruma mirkļa" — novēro vismaz dažas sekundes!
+
 JAUNAIS BULLIS (5-7 g.) — SKAĻĀKAIS, VĒL NAV PILNBRIEDIS:
 → Tievāks kakls, mazāk izteikta parīkle
 → VISSKAĻĀKAIS riestā — cīnās par pirmo harēmu
 → Nervozs, bieži zaudē cīņas
+→ Galva bieži pacelta augstu (dominances poza)
 → SAUDZĒT!
 
 PILNBRIEDIS (8-10 g.) — RIESTA MAKSIMUMS:

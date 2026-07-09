@@ -182,13 +182,4 @@ export const ZIDATAJI = [
     info: 'Viena no apdraudētākajām zīdītāju sugām Eiropā. Izskatas līdzīga sesksim — UZMANĪGI!',
     etikaKey: 'aizsargajama',
   },
-  {
-    id: 'krauklis',     nos: 'Krauklis',        lat: 'Corvus corax',
-    emoji: '🐦‍⬛',       tips: 'aizsargajams',
-    sezona: 'NEMEDĪT — aizsargājama suga',
-    dokuments: '—',
-    regestrecija: '—',
-    info: 'Atšķirt no pelēkās vārnas! Krauklis ir lielāks, pilnīgi melns, bez pelēkā. Aizsargājams!',
-    etikaKey: 'aizsargajama',
-  },
 ]

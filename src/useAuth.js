@@ -6,14 +6,18 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Pārbauda esošo sesiju; ja nav — mēģina admin auto-login
+    let sesijasParbaude = false
+
+    // Pārbauda esošo sesiju — TAS ir galvenais loading avots
     supabase.auth.getSession().then(({ data: { session } }) => {
+      sesijasParbaude = true
       if (session?.user) ielādētProfilu(session.user)
-      else setLoading(false)
+      else { setUser(null); setLoading(false) }
     })
 
-    // Klausās izmaiņas (pieteikšanās, izrakstīšanās)
+    // Klausās izmaiņas (pieteikšanās, izrakstīšanās) — neiestata loading sākumā
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!sesijasParbaude) return  // ignorē pirms getSession atbild
       if (session?.user) ielādētProfilu(session.user)
       else { setUser(null); setLoading(false) }
     })

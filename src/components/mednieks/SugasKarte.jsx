@@ -20,6 +20,15 @@ export default function SugasKarte({ suga, onClick }) {
       onMouseEnter={e => e.currentTarget.style.borderColor = '#4caf50'}
       onMouseLeave={e => e.currentTarget.style.borderColor = '#1a3a1a'}>
 
+      {/* Bilde */}
+      {suga.attels && (
+        <div style={{ margin: '-16px -16px 12px', borderRadius: '12px 12px 0 0', overflow: 'hidden', height: 150, background: '#060d06' }}>
+          <img src={suga.attels} alt={suga.nos}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }}
+            onError={e => { e.currentTarget.parentElement.style.display = 'none' }} />
+        </div>
+      )}
+
       {/* Galvene */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10 }}>
         <div style={{ flex: 1 }}>

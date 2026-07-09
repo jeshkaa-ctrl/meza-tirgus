@@ -15,7 +15,7 @@ const TABS = [
   { id: 'dienasgramata', nos: '📖 Dienasgrāmata' },
 ]
 
-export default function MedniekaRokasgramataPage({ onBack, user, onReg }) {
+export default function MedniekaRokasgramataPage({ onBack, user, onReg, authLoading }) {
   const [aktiva, setAktiva] = useState('sugas')
   const [installPrompt, setInstallPrompt] = useState(null)
   const [varInstalet, setVarInstalet] = useState(false)
@@ -55,6 +55,15 @@ export default function MedniekaRokasgramataPage({ onBack, user, onReg }) {
     back: { background: 'transparent', border: 'none', color: '#4caf50', fontSize: 22, cursor: 'pointer',
             padding: '0 4px', minWidth: 36, minHeight: 44 },
   }
+
+  // Kamēr auth ielādējas — rāda spinneri, nevis gate
+  if (authLoading) return (
+    <div style={{ minHeight: '100vh', background: '#060d06', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+      <div style={{ width: 40, height: 40, border: '3px solid #1a3a1a', borderTop: '3px solid #4caf50', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+      <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
+      <div style={{ color: '#4a7a4a', fontSize: 14 }}>Ielādē...</div>
+    </div>
+  )
 
   // Gate — tikai reģistrētiem lietotājiem
   if (!user) return (
