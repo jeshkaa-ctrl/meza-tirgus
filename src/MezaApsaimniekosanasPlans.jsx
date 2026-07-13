@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { supabase } from './supabaseClient'
 import { C as DS, F, spinnerCSS } from './ds'
 import { buildWFS, apstradatNogabalu } from './ipasums/engine'
 import { NOGABALA_KRASA, SUGAS_KRASA, getVecumaGrupa } from './ipasums/constants'
@@ -301,8 +302,16 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
     setLadeText('Ielādē VMD nogabalu datus...')
     let vmdFeats = []
     try {
-      const d = await lvmFetch(buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500))
-      vmdFeats = d?.features || []
+      const { data: sbData } = await supabase
+        .from('meza_nogabali')
+        .select('*')
+        .eq('kadastrs', kad)
+      if (sbData && sbData.length > 0) {
+        vmdFeats = sbData.map(n => ({ properties: n, geometry: null }))
+      } else {
+        const d = await lvmFetch(buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500))
+        vmdFeats = d?.features || []
+      }
     } catch { lvmErr = true }
 
     setLvmKluda(lvmErr)
