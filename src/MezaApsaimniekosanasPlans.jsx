@@ -294,7 +294,7 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
 
     let kadFeat = null
     try {
-      const d = await lvmFetch(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
+      const d = await lvmFetch(`/api/vzd?kadastrs=${kad}`)
       kadFeat = d?.features?.[0]
     } catch { lvmErr = true }
 

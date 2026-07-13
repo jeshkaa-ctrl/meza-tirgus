@@ -56,9 +56,9 @@ export default function IpasumAnalīze({ onBack }) {
     setKluda(''); setFaze('lade'); setLadeText('Saņem kadastra robežas...')
     let lvmKluda = false
     try {
-      // 1. Kadastra robeža (LVM GEO) — ar 8s timeout
+      // 1. Kadastra robeža — LVM GEO, fallback VZD (caur /api/vzd)
       try {
-        const kadData = await lvmWFSTimeout(buildWFS('/publicwfs/wfs', 'publicwfs:kkparcel', `code='${kad}'`))
+        const kadData = await lvmWFSTimeout(`/api/vzd?kadastrs=${kad}`)
         const kadFeat = kadData?.features?.[0]
         if (kadFeat) setKadGeom(kadFeat)
       } catch { lvmKluda = true }
