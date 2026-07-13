@@ -114,7 +114,7 @@ Atpazīšana: Tumšs augums, gaišāka seja ar tumšu "masku" ap acīm.
 Statuss: Nelimitēts | Termiņš: 1.okt–15.marts
 Svars: 0,5–2 kg | Mūžs: 5–8 g.
 Invazīva suga — izbēgusi no kažokzvēru fermām. Izspiež aizsargājamo Eiropas norku.
-Biotops: upju un ezeru krasti. Teju identiski izskatās kā Eiropas norka.
+Biotops: upju un ezeru krasti. Teju identiski izskatās kā Eiropas ūdele.
 ⚠️ Svarīgi atšķirt no aizsargājamās EIROPAS NORKAS (Mustela lutreola)!
 
 🐭 ONDATRA (Ondatra zibethicus)

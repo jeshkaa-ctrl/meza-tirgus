@@ -88,7 +88,7 @@ export const ZIDATAJI = [
     sezona: '1. okt – 15. marts',
     dokuments: 'Sezonas karte',
     regestrecija: '—',
-    info: 'Svarīgi neatšķirt no Eiropas norkas — aizsargājamas sugas! Sesks ir lielāks, tumšāks, ar raksturīgu maskas iezīmi.',
+    info: 'Svarīgi neatšķirt no Eiropas ūdeles — aizsargājamas sugas! Sesks ir lielāks, tumšāks, ar raksturīgu maskas iezīmi.',
     etikaKey: 'nelimiteta',
   },
   {
@@ -97,7 +97,7 @@ export const ZIDATAJI = [
     sezona: '1. okt – 15. marts',
     dokuments: 'Sezonas karte',
     regestrecija: '—',
-    info: 'Invazīva suga — draud vietējai Eiropas norkai (aizsargājamai). Aktīva medīšana palīdz noriku populācijai.',
+    info: 'Invazīva suga — draud vietējai Eiropas ūdelei (aizsargājamai). Aktīva medīšana palīdz ūdeļu populācijai.',
     etikaKey: 'nelimiteta',
   },
   {
@@ -174,7 +174,7 @@ export const ZIDATAJI = [
     etikaKey: 'aizsargajama',
   },
   {
-    id: 'eu_norika',    nos: 'Eiropas norka',   lat: 'Mustela lutreola',
+    id: 'eu_norika',    nos: 'Eiropas ūdele',   lat: 'Mustela lutreola',
     emoji: '🐾',        tips: 'aizsargajams',
     sezona: 'NEMEDĪT — kritiski apdraudēta suga',
     dokuments: '—',
