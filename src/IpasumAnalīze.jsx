@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { supabase } from './supabaseClient'
 import { C as DS, F, spinnerCSS } from './ds'
 import { AIZSARDZIBA, getAizsardzibaStatus, SORT_CENAS } from './ipasums/constants'
 import { buildWFS, apstradatNogabalu, paarrekinatRindu } from './ipasums/engine'
@@ -62,11 +63,24 @@ export default function IpasumAnalīze({ onBack }) {
         if (kadFeat) setKadGeom(kadFeat)
       } catch { lvmKluda = true }
 
-      // 2. VMD nogabali (LVM GEO) — ar 8s timeout
+      // 2. VMD nogabali — vispirms mūsu Supabase DB, tad LVM GEO
       setLadeText('Iegūst VMD nogabalu datus...')
       let vmdData = null
       try {
-        vmdData = await lvmWFSTimeout(buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500))
+        const { data: supabaseNogabali } = await supabase
+          .from('meza_nogabali')
+          .select('*')
+          .eq('kadastrs', kad)
+        if (supabaseNogabali && supabaseNogabali.length > 0) {
+          vmdData = {
+            features: supabaseNogabali.map(n => ({
+              properties: n,
+              geometry: null
+            }))
+          }
+        } else {
+          vmdData = await lvmWFSTimeout(buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500))
+        }
       } catch { lvmKluda = true }
 
       // 3. Egļu aizsardzība (LVM GEO) — ar 8s timeout

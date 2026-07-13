@@ -84,11 +84,32 @@ function parseColor(color) {
   return { bonNum: 3, bieziba: 1.0 }
 }
 
+const BON_REV = { 'Ia':1, 'I':2, 'II':3, 'III':4, 'IV':5, 'V':6 }
+
 export function apstradatNogabalu(feat, i) {
   const p = feat.properties || {}
-  const taksGads      = parseInt(p.gtf) || 2011
+  // LVM GEO: p.gtf = taksa gads, vecums jākorektē uz šodien
+  // Supabase: p.gtf nav, a10 jau aktuāls → gadskorekcija = 0
+  const taksGads      = parseInt(p.gtf) || new Date().getFullYear()
   const gadskorekcija = new Date().getFullYear() - taksGads
-  const { bonNum, bieziba } = parseColor(p.color)
+
+  let bonNum, bieziba
+  if (p.color != null) {
+    // LVM GEO avots — bonitāte un bieziba no color lauka ("2 III-8" formāts)
+    const parsed = parseColor(p.color)
+    bonNum  = parsed.bonNum
+    bieziba = parsed.bieziba
+  } else {
+    // Supabase avots — bonitāte no h10+a10, bieziba no g10
+    const h = parseFloat(p.h10) || 0
+    const a = parseInt(p.a10)   || 0
+    const g = parseFloat(p.g10) || 0
+    const kods = SUGAS_KODS[parseInt(p.s10) || 0] || 'P'
+    const bonStr = (h > 0 && a > 10) ? getBonitate(kods, a, h) : 'II'
+    bonNum  = BON_REV[bonStr] || 3
+    bieziba = g > 0 ? Math.min(1.0, Math.max(0.1, g / 28)) : 1.0
+  }
+
   const bonWfs  = BONITATES[bonNum] || 'II'
   const platiba = parseFloat(p.nog_plat) || 0
 
