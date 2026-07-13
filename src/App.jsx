@@ -44,6 +44,7 @@ const SelekcijasKalkulators      = React.lazy(() => import("./SelekcijasKalkulat
 const JuristsPage                = React.lazy(() => import("./JuristsPage"))
 const CICKalkulatorsPage         = React.lazy(() => import("./CICKalkulatorsPage"))
 const MedniekaRokasgramataPage   = React.lazy(() => import("./pages/MedniekaRokasgramataPage"))
+const SakumsPage                 = React.lazy(() => import("./pages/SakumsPage"))
 import { supabase } from "./supabaseClient"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -273,6 +274,12 @@ if(page==="veikals") {
   )
 }
 if(page==="main") return <>
+  <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#060d06",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50"}}>Ielādē...</div></div>}>
+    <SakumsPage user={user} onNavigate={setPage} onReg={()=>atvertReg("main")} onIziet={iziet}/>
+  </React.Suspense>
+  {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
+</>
+if(page==="main_old") return <>
   <MainPage onNavigate={setPage} user={user} onReg={()=>atvertReg("main")} onIziet={iziet}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
