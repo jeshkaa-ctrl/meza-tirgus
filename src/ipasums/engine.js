@@ -86,6 +86,19 @@ function parseColor(color) {
 
 const BON_REV = { 'Ia':1, 'I':2, 'II':3, 'III':4, 'IV':5, 'V':6 }
 
+// Apstrādā sugas kodu — atbalsta gan skaitliskus ('3', 3) gan burtus ('E')
+// SHP/VMD dati: '1','3','4' utt. — parseInt strādā
+// Ja kādreiz Supabase satur 'P','E','B' — reverss lookup
+const SUGAS_KODS_REV = Object.fromEntries(
+  Object.entries(SUGAS_KODS).map(([k, v]) => [v, parseInt(k)])
+)
+function parseSugaKods(val) {
+  if (!val) return 0
+  const n = parseInt(val)
+  if (!isNaN(n) && n > 0) return n            // '3' → 3
+  return SUGAS_KODS_REV[String(val).trim()] || 0  // 'E' → 3
+}
+
 export function apstradatNogabalu(feat, i) {
   const p = feat.properties || {}
   // LVM GEO: p.gtf = taksa gads, vecums jākorektē uz šodien
@@ -104,7 +117,7 @@ export function apstradatNogabalu(feat, i) {
     const h = parseFloat(p.h10) || 0
     const a = parseInt(p.a10)   || 0
     const g = parseFloat(p.g10) || 0
-    const kods = SUGAS_KODS[parseInt(p.s10) || 0] || 'P'
+    const kods = SUGAS_KODS[parseSugaKods(p.s10)] || 'P'
     const bonStr = (h > 0 && a > 10) ? getBonitate(kods, a, h) : 'II'
     bonNum  = BON_REV[bonStr] || 3
     bieziba = g > 0 ? Math.min(1.0, Math.max(0.1, g / 28)) : 1.0
@@ -114,7 +127,7 @@ export function apstradatNogabalu(feat, i) {
   const platiba = parseFloat(p.nog_plat) || 0
 
   const slani = [10,11,12,13,14].map(sfx => {
-    const sKods = parseInt(p[`s${sfx}`]) || 0
+    const sKods = parseSugaKods(p[`s${sfx}`])
     if (!sKods) return null
     const aWfs = parseInt(p[`a${sfx}`]) || 0
     const vec  = aWfs + gadskorekcija

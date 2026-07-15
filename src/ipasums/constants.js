@@ -1,21 +1,26 @@
-// WFS sugas kodu kartēšana — pārbaudīts pēc reāliem LVM GEO datiem:
-// 03=Egle, 04=Bērzs, 08=Apse, 10=Ozols (NE 7!)
+// VMD MVR sugas kodi — pārbaudīts pēc SHP un LVM GEO datiem
 export const SUGAS_KARTE = {
   1:'Priede',      2:'Lapegle',     3:'Egle',        4:'Bērzs',
   5:'Melnalksnis', 6:'Baltalksnis', 7:'Goba',        8:'Apse',
   9:'Osis',        10:'Ozols',      11:'Liepa',       12:'Vītols',
+  13:'Zemā priede',16:'Kļava',      19:'Papele',      21:'Robīnija',
+  24:'Cita skujk.',32:'Cita lapk.',
 }
 
 export const SUGAS_KODS = {
-  1:'P',  2:'P',  3:'E',  4:'B',
-  5:'Bl', 6:'Ba', 7:'G',  8:'A',
-  9:'Os', 10:'Oz',11:'Ba',12:'Ba',
+  1:'P',  2:'Lg', 3:'E',  4:'B',
+  5:'Bl', 6:'Ol', 7:'G',  8:'A',
+  9:'Os', 10:'Oz',11:'Lp',12:'Vt',
+  13:'Pm',16:'Kļ',19:'Pa', 21:'Rb',
+  24:'Sk',32:'Lk',
 }
 
 export const SUGAS_KRASA = {
   1:'#d86010', 2:'#a06010', 3:'#6040a0', 4:'#2060c0',
   5:'#d03880', 6:'#e060a8', 7:'#a09060', 8:'#40a010',
   9:'#888800', 10:'#585858',11:'#e8d000',12:'#40b898',
+  13:'#b06830',16:'#c0a000',19:'#60b060', 21:'#e0c090',
+  24:'#906030',32:'#708060',
 }
 
 // LVM bonitātes kodi (bv10): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V
