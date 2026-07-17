@@ -11,7 +11,7 @@ import { acmHeaders } from './utils/acm'
 
 // ── Karte ────────────────────────────────────────────────────────────────────
 
-function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets }) {
+function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx }) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
@@ -188,6 +188,26 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     return () => { active = false }
   }, [planAttels, overlayRedigets, kadGeom])
 
+  // Hover izcelšana — atjaunina tikai stilus, nerekrē slāni
+  useEffect(() => {
+    if (!nogLayRef.current) return
+    nogLayRef.current.eachLayer(lyr => {
+      const feat = lyr.feature
+      const nIdx = nogabali.findIndex(x => x.id === feat?.id)
+      if (nIdx < 0) return
+      const n  = nogabali[nIdx]
+      const vg = n ? getVecumaGrupa(n.sugaKods, n.vecums) : 2
+      const hl = nIdx === hoverIdx
+      lyr.setStyle({
+        color:       hl ? '#ffeb3b' : (n?.mapManuali ? '#4caf50' : '#aaaaaa'),
+        weight:      hl ? 3.5       : (n?.mapManuali ? 2.5 : 1.5),
+        fillColor:   NOGABALA_KRASA[`${n?.sugaKods}-${vg}`] || SUGAS_KRASA[n?.sugaKods] || '#888',
+        fillOpacity: hl ? 0.88 : 0.72,
+        dashArray:   n?.mapManuali ? null : '4,3',
+      })
+    })
+  }, [hoverIdx, nogabali])
+
   // Tikai opacity maiņa — nepārveido overlay
   useEffect(() => {
     if (overlayRef.current) overlayRef.current.setOpacity(overlayOpacity)
@@ -198,11 +218,13 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
 
 // ── Nogabalu saraksta rinda ────────────────────────────────────────────────
 
-function NogabalsRinda({ n, idx, onKliks, aktīvs }) {
+function NogabalsRinda({ n, idx, onKliks, onHover, aktīvs }) {
   const zaļs = n.mapManuali
   return (
     <button
       onClick={() => onKliks(n, idx)}
+      onMouseEnter={() => onHover(idx)}
+      onMouseLeave={() => onHover(null)}
       style={{
         width: '100%', textAlign: 'left', padding: '10px 12px',
         borderRadius: 8, cursor: 'pointer', border: 'none',
@@ -266,6 +288,7 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [overlayRedigets, setOverlayRedigets] = useState(false)
   const [nogLade,         setNogLade]         = useState(false)
   const [nogKluda,        setNogKluda]        = useState(null)
+  const [hoverIdx,        setHoverIdx]        = useState(null)
 
   const mapDivRef = useRef(null)
   const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
@@ -710,6 +733,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             <NogabalsRinda
               key={n.id} n={n} idx={idx}
               onKliks={atvertModalu}
+              onHover={setHoverIdx}
               aktīvs={mapModal?.index === idx}
             />
           ))
@@ -851,7 +875,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           <div ref={mapDivRef} style={{ position: 'absolute', inset: 0 }} />
           <MAPKarte
             kadGeom={kadGeom} nogabali={nogabali} onNogabalsKliks={atvertModalu} mapRef={mapDivRef}
-            planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets}
+            planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets} hoverIdx={hoverIdx}
           />
           <OverlayPanel />
         </div>
