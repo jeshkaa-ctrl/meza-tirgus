@@ -264,6 +264,8 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [planAttels,      setPlanAttels]      = useState(null)  // data URL plāna lapai
   const [overlayOpacity,  setOverlayOpacity]  = useState(0.55)
   const [overlayRedigets, setOverlayRedigets] = useState(false)
+  const [nogLade,         setNogLade]         = useState(false)
+  const [nogKluda,        setNogKluda]        = useState(null)
 
   const mapDivRef = useRef(null)
   const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
@@ -333,6 +335,29 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
       return arr
     })
     setMapModal(null)
+  }
+
+  // ── Nogabalu manuālā ielāde (atsevišķs solis pēc robežas) ──────────────────
+  const ieladetNogabalus = async () => {
+    const kad = kadInput.replace(/\s/g, '')
+    setNogLade(true)
+    setNogKluda(null)
+    try {
+      const { data, error } = await supabase
+        .from('meza_nogabali')
+        .select('*')
+        .eq('kadastrs', kad)
+      if (error) throw error
+      if (!data?.length) {
+        setNogKluda('Nogabali nav atrasti šim kadastram VMD datos.')
+        return
+      }
+      setNogabali(data.map((n, i) => apstradatNogabalu({ properties: n, geometry: null }, i)))
+    } catch (e) {
+      setNogKluda('Nogabalu ielāde neizdevās: ' + e.message)
+    } finally {
+      setNogLade(false)
+    }
   }
 
   // ── PDF ģenerēšana ──────────────────────────────────────────────────────────
@@ -652,8 +677,28 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
       {/* Saraksts */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px' }}>
         {nogabali.length === 0 ? (
-          <div style={{ padding: '24px 0', textAlign: 'center', color: DS.textDim, fontSize: 12 }}>
-            Nav atrasti nogabali VMD datos.
+          <div style={{ padding: '20px 8px', textAlign: 'center' }}>
+            {nogKluda && (
+              <div style={{ fontSize: 11, color: '#ffb74d', marginBottom: 10, lineHeight: 1.5 }}>
+                ⚠️ {nogKluda}
+              </div>
+            )}
+            <button
+              onClick={ieladetNogabalus}
+              disabled={nogLade}
+              style={{
+                padding: '10px 18px', borderRadius: 8,
+                cursor: nogLade ? 'wait' : 'pointer',
+                background: `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
+                color: '#fff', border: 'none', fontSize: 13, fontWeight: 600,
+                opacity: nogLade ? 0.7 : 1, width: '100%',
+              }}
+            >
+              {nogLade ? '⏳ Meklē VMD datos...' : '🌲 Pievienot nogabalus'}
+            </button>
+            <div style={{ fontSize: 10, color: DS.textDim, marginTop: 8, lineHeight: 1.5 }}>
+              Meklē VMD meža taksācijas datus pēc kadastra
+            </div>
           </div>
         ) : (
           nogabali.map((n, idx) => (
