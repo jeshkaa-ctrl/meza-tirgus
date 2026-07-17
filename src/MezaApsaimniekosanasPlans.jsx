@@ -344,7 +344,7 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
     setNogKluda(null)
     try {
       const { data, error } = await supabase
-        .from('meza_nogabali')
+        .from('meza_nogabali_geo')
         .select('*')
         .eq('kadastrs', kad)
       if (error) throw error
@@ -352,7 +352,12 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
         setNogKluda('Nogabali nav atrasti šim kadastram VMD datos.')
         return
       }
-      setNogabali(data.map((n, i) => apstradatNogabalu({ properties: n, geometry: null }, i)))
+      setNogabali(data.map((n, i) => apstradatNogabalu({
+        type: 'Feature',
+        id: String(n.id),
+        geometry: n.geometry || null,
+        properties: n,
+      }, i)))
     } catch (e) {
       setNogKluda('Nogabalu ielāde neizdevās: ' + e.message)
     } finally {
@@ -676,8 +681,8 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
 
       {/* Saraksts */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px' }}>
-        {nogabali.length === 0 ? (
-          <div style={{ padding: '20px 8px', textAlign: 'center' }}>
+        {(nogabali.length === 0 || !nogabali[0]?.geojson?.geometry) ? (
+          <div style={{ padding: nogabali.length > 0 ? '8px' : '20px 8px', textAlign: 'center' }}>
             {nogKluda && (
               <div style={{ fontSize: 11, color: '#ffb74d', marginBottom: 10, lineHeight: 1.5 }}>
                 ⚠️ {nogKluda}
@@ -694,7 +699,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
                 opacity: nogLade ? 0.7 : 1, width: '100%',
               }}
             >
-              {nogLade ? '⏳ Meklē VMD datos...' : '🌲 Pievienot nogabalus'}
+              {nogLade ? '⏳ Meklē VMD datos...' : nogabali.length > 0 ? '🗺️ Ielādēt poligonus kartē' : '🌲 Pievienot nogabalus'}
             </button>
             <div style={{ fontSize: 10, color: DS.textDim, marginTop: 8, lineHeight: 1.5 }}>
               Meklē VMD meža taksācijas datus pēc kadastra
