@@ -4,40 +4,56 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Nepareizs kadastra numurs' })
   }
 
-  // Mēģina geolatvija.lv WFS (prasa pārlūka sesiju — no servera bloķēts)
-  const targetUrl = `https://geolatvija.lv/apis/wfs` +
-    `?service=WFS&version=2.0.0&request=GetFeature` +
-    `&typeNames=publicwfs:kkparcel` +
-    `&outputFormat=application/json` +
-    `&srsName=EPSG:4326` +
-    `&CQL_FILTER=code%3D'${kadastrs}'`
+  const sbUrl = process.env.VITE_SUPABASE_URL
+  const sbKey = process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY
+
+  if (!sbUrl || !sbKey) {
+    return res.status(503).json({ error: 'Servera konfigurācijas kļūda' })
+  }
 
   try {
-    const r = await fetch(targetUrl, {
+    // Vaicā kadastru_robezas_geo skatu — geometry atgriežas kā parsēts JSON objekts
+    const url = `${sbUrl}/rest/v1/kadastru_robezas_geo` +
+      `?kadastrs=eq.${encodeURIComponent(kadastrs)}` +
+      `&select=kadastrs,area_m2,geometry` +
+      `&limit=1`
+
+    const r = await fetch(url, {
       headers: {
-        'Accept': 'application/json, application/xml',
-        'User-Agent': 'Mozilla/5.0 (compatible; MezaTirgus/1.0)',
-        'Referer': 'https://geolatvija.lv/',
+        'apikey':        sbKey,
+        'Authorization': `Bearer ${sbKey}`,
+        'Accept':        'application/json',
       },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(8000),
     })
 
-    const text = await r.text()
-
-    // Atklāj HTML atbildes (geolatvija bloķē bez sesijas)
-    if (text.trim().startsWith('<') || text.includes('<!doctype')) {
-      console.warn('[vzd] geolatvija.lv atgrieza HTML — serviss prasa autentifikāciju')
+    if (!r.ok) {
+      const body = await r.text()
+      console.error('[vzd] Supabase kļūda:', r.status, body)
       return res.status(503).json({ error: 'Kadastra robežu serviss nav pieejams' })
     }
 
-    const data = JSON.parse(text)
-    if (!data?.features?.length) {
+    const rows = await r.json()
+
+    if (!rows?.length || !rows[0].geometry) {
       return res.status(404).json({ error: 'Kadastra vienība nav atrasta', kadastrs })
     }
 
-    res.setHeader('Cache-Control', 's-maxage=3600')
+    const { geometry, area_m2 } = rows[0]
+
+    // Atgriežam GeoJSON FeatureCollection ko MezaApsaimniekosanasPlans.jsx
+    // izmanto kā kadGeom: features[0] = kadFeat
+    res.setHeader('Cache-Control', 's-maxage=86400')
     res.setHeader('Content-Type', 'application/json')
-    return res.status(200).json(data)
+    return res.status(200).json({
+      type:     'FeatureCollection',
+      features: [{
+        type:       'Feature',
+        id:         kadastrs,
+        geometry,
+        properties: { kadastrs, area_m2 },
+      }],
+    })
 
   } catch (e) {
     console.error('[vzd] kļūda:', e.message)
