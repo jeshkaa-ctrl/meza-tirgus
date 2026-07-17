@@ -1,26 +1,32 @@
-// VMD MVR sugas kodi — pārbaudīts pēc SHP un LVM GEO datiem
+// VMD MVR sugas kodi — pārbaudīts pēc SHP, LVM GEO un VMD klasifikatora Excel
 export const SUGAS_KARTE = {
-  1:'Priede',      2:'Lapegle',     3:'Egle',        4:'Bērzs',
-  5:'Melnalksnis', 6:'Baltalksnis', 7:'Goba',        8:'Apse',
-  9:'Osis',        10:'Ozols',      11:'Liepa',       12:'Vītols',
-  13:'Zemā priede',16:'Kļava',      19:'Papele',      21:'Robīnija',
-  24:'Cita skujk.',32:'Cita lapk.',
+  1:'Priede',      2:'Lapegle',     3:'Egle',         4:'Bērzs',
+  5:'Melnalksnis', 6:'Baltalksnis', 7:'Goba',         8:'Apse',
+  9:'Osis',        10:'Ozols',      11:'Liepa',        12:'Vītols',
+  13:'Zemā priede',14:'Citas egles',16:'Kļava',        17:'Dižskabārdis',
+  19:'Papele',     20:'Papele',     21:'Robīnija',     23:'Skabārdis',
+  24:'Cita skujk.',25:'Hibrīdā apse',32:'Cita lapk.', 35:'Pīlādži',
+  61:'Citi ozoli', 64:'Citas kļavas',
 }
 
 export const SUGAS_KODS = {
   1:'P',  2:'Lg', 3:'E',  4:'B',
   5:'Bl', 6:'Ol', 7:'G',  8:'A',
   9:'Os', 10:'Oz',11:'Lp',12:'Vt',
-  13:'Pm',16:'Kļ',19:'Pa', 21:'Rb',
-  24:'Sk',32:'Lk',
+  13:'Pm',14:'Ec',16:'Kļ',17:'Ds',
+  19:'Pa',20:'Pa',21:'Rb',23:'Sk',
+  24:'Csk',25:'Ha',32:'Lk',35:'Pī',
+  61:'Ozc',64:'Kc',
 }
 
 export const SUGAS_KRASA = {
   1:'#d86010', 2:'#a06010', 3:'#6040a0', 4:'#2060c0',
   5:'#d03880', 6:'#e060a8', 7:'#a09060', 8:'#40a010',
   9:'#888800', 10:'#585858',11:'#e8d000',12:'#40b898',
-  13:'#b06830',16:'#c0a000',19:'#60b060', 21:'#e0c090',
-  24:'#906030',32:'#708060',
+  13:'#b06830',14:'#5050c0',16:'#c0a000',17:'#a0c060',
+  19:'#60b060',20:'#50a050',21:'#e0c090',23:'#90b070',
+  24:'#906030',25:'#60c090',32:'#708060',35:'#c0b040',
+  61:'#484848',64:'#b0a010',
 }
 
 // LVM bonitātes kodi (bv10): 1=Ia, 2=I, 3=II, 4=III, 5=IV, 6=V
