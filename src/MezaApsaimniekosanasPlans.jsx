@@ -842,7 +842,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
 
   // ── Desktop layout ────────────────────────────────────────────────────────────
   if (!isMobile) return (
-    <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <style>{spinnerCSS}</style>
 
       {/* Header */}
