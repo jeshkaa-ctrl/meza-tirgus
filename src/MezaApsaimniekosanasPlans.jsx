@@ -590,8 +590,17 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [merRezims,       setMerRezims]       = useState('nav')
   const [merResultats,    setMerResultats]    = useState(null)
 
-  const mapDivRef = useRef(null)
-  const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
+  const mapDivRef           = useRef(null)
+  const isMobile            = typeof window !== 'undefined' && window.innerWidth < 700
+  const drawerAutoOpenedRef = useRef(false)
+
+  // ── Auto-atvērt drawer mobilajā skatā tiklīdz nogabali ielādēti ──────────────
+  useEffect(() => {
+    if (isMobile && nogabali.length > 0 && !drawerAutoOpenedRef.current) {
+      drawerAutoOpenedRef.current = true
+      setDrawerOpen(true)
+    }
+  }, [nogabali.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── LVM GEO timeout ─────────────────────────────────────────────────────────
   const lvmFetch = async (url, ms = 8000) => {
@@ -1437,10 +1446,25 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         {/* Handle */}
         <button
           onClick={() => setDrawerOpen(o => !o)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0 4px', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '10px 0 6px', flexShrink: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+            touchAction: 'none', minHeight: 44, width: '100%',
+          }}
         >
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: DS.greenBdr }} />
-          <div style={{ fontSize: 11, color: DS.textMut, fontFamily: F.family }}>
+          <div style={{
+            width: 40, height: 4, borderRadius: 2,
+            background: drawerOpen ? DS.greenBdr : DS.green,
+            transition: 'background 0.2s',
+          }} />
+          <div style={{
+            fontSize: drawerOpen ? 11 : 14,
+            color: drawerOpen ? DS.textMut : DS.green,
+            fontFamily: F.family,
+            fontWeight: drawerOpen ? 400 : 700,
+            transition: 'all 0.2s',
+          }}>
             {drawerOpen
               ? '▾ Aizvērt sarakstu'
               : `▴ Nogabalu saraksts (${aizpilditi}/${kopā})`}
