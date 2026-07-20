@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { supabase } from './supabaseClient'
 import { C as DS, F, spinnerCSS } from './ds'
@@ -13,6 +13,8 @@ const TILE_URLS = {
   osm:      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   satelits: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 }
+
+const DRAWER_CLOSED = 72
 
 // ── Karte ────────────────────────────────────────────────────────────────────
 
@@ -555,6 +557,92 @@ function NogabalsRinda({ n, idx, onKliks, onHover, aktīvs }) {
   )
 }
 
+// ── Nogabalu saraksta panelis (memo — novērš re-mount pie parent re-render) ───
+
+const SarakstaPane = memo(function SarakstaPane({
+  kadInput, kopPlatiba, kopā, aizpilditi, lvmKluda,
+  nogabali, nogKluda, nogLade, ieladetNogabalus,
+  atvertModalu, setHoverIdx, mapModal,
+  maNogabali, visiGatavi, pdfLade, onPdfKliks,
+}) {
+  const sortedWithIdx = useMemo(
+    () => nogabali
+      .map((n, originalIdx) => ({ n, originalIdx }))
+      .sort((a, b) => (Number(a.n.nr) || 0) - (Number(b.n.nr) || 0)),
+    [nogabali]
+  )
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ padding: '12px 14px', borderBottom: `1px solid ${DS.greenBdr}`, flexShrink: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: DS.text, marginBottom: 4 }}>
+          {kadInput} · {kopPlatiba.toFixed(1)} ha
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, height: 6, borderRadius: 3, background: DS.bgDeep, overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${kopā > 0 ? (aizpilditi / kopā) * 100 : 0}%`, background: DS.green, borderRadius: 3, transition: 'width 0.3s' }} />
+          </div>
+          <span style={{ fontSize: 11, color: DS.textMut, flexShrink: 0 }}>{aizpilditi}/{kopā}</span>
+        </div>
+      </div>
+      {lvmKluda && (
+        <div style={{ margin: '8px 10px 0', padding: '8px 10px', borderRadius: 7, background: '#1f1000', border: '1px solid #e65100', fontSize: 11, color: '#ffb74d', lineHeight: 1.5 }}>
+          ⚠️ LVM GEO pagaidām nav pieejams. Nogabali netika ielādēti automātiski.
+        </div>
+      )}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px' }}>
+        {(nogabali.length === 0 || !nogabali[0]?.geojson?.geometry) ? (
+          <div style={{ padding: nogabali.length > 0 ? '8px' : '20px 8px', textAlign: 'center' }}>
+            {nogKluda && (
+              <div style={{ fontSize: 11, color: '#ffb74d', marginBottom: 10, lineHeight: 1.5 }}>⚠️ {nogKluda}</div>
+            )}
+            <button
+              onClick={ieladetNogabalus} disabled={nogLade}
+              style={{
+                padding: '10px 18px', borderRadius: 8, cursor: nogLade ? 'wait' : 'pointer',
+                background: `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
+                color: '#fff', border: 'none', fontSize: 13, fontWeight: 600,
+                opacity: nogLade ? 0.7 : 1, width: '100%',
+              }}
+            >
+              {nogLade ? '⏳ Meklē VMD datos...' : nogabali.length > 0 ? '🗺️ Ielādēt poligonus kartē' : '🌲 Pievienot nogabalus'}
+            </button>
+            <div style={{ fontSize: 10, color: DS.textDim, marginTop: 8, lineHeight: 1.5 }}>
+              Meklē VMD meža taksācijas datus pēc kadastra
+            </div>
+          </div>
+        ) : (
+          sortedWithIdx.map(({ n, originalIdx }) => (
+            <NogabalsRinda
+              key={n.id} n={n} idx={originalIdx}
+              onKliks={atvertModalu} onHover={setHoverIdx}
+              aktīvs={mapModal?.index === originalIdx}
+            />
+          ))
+        )}
+      </div>
+      <div style={{ padding: '6px 10px 14px', flexShrink: 0 }}>
+        {visiGatavi ? (
+          <button
+            onClick={onPdfKliks} disabled={pdfLade}
+            style={{
+              width: '100%', padding: '13px', borderRadius: 10, fontSize: 14, fontWeight: 700,
+              cursor: pdfLade ? 'wait' : 'pointer',
+              background: pdfLade ? DS.greenDk : `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
+              color: '#fff', border: 'none', opacity: pdfLade ? 0.8 : 1,
+            }}
+          >
+            {pdfLade ? '⏳ Gatavo PDF...' : '📄 Ģenerēt apsaimniekošanas plānu PDF'}
+          </button>
+        ) : (
+          <div style={{ textAlign: 'center', fontSize: 11, color: DS.textDim, padding: '6px 0' }}>
+            Aizpildi {maNogabali.filter(n => !n.mapManuali).length} mežaudžu nogabalus lai ģenerētu PDF
+          </div>
+        )}
+      </div>
+    </div>
+  )
+})
+
 // ── Galvenais komponents ──────────────────────────────────────────────────────
 
 export default function MezaApsaimniekosanasPlans({ onBack }) {
@@ -589,6 +677,7 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [marsrutsKluda,   setMarsrutsKluda]   = useState(null)
   const [merRezims,       setMerRezims]       = useState('nav')
   const [merResultats,    setMerResultats]    = useState(null)
+  const [pdfModalOpen,    setPdfModalOpen]    = useState(false)
 
   const mapDivRef           = useRef(null)
   const isMobile            = typeof window !== 'undefined' && window.innerWidth < 700
@@ -1013,117 +1102,6 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
 
   // ────────────────────── DARBA SKATS ──────────────────────────────────────────
 
-  const inp9 = {
-    padding: '7px 10px', borderRadius: 6, background: DS.bgDeep,
-    border: `1px solid ${DS.greenBdr}`, color: DS.text, fontSize: 12,
-    outline: 'none', width: '100%', boxSizing: 'border-box', fontFamily: F.family,
-  }
-
-  const SarakstaPane = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Galvene */}
-      <div style={{ padding: '12px 14px', borderBottom: `1px solid ${DS.greenBdr}`, flexShrink: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: DS.text, marginBottom: 4 }}>
-          {kadInput} · {kopPlatiba.toFixed(1)} ha
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ flex: 1, height: 6, borderRadius: 3, background: DS.bgDeep, overflow: 'hidden' }}>
-            <div style={{ height: '100%', width: `${kopā > 0 ? (aizpilditi / kopā) * 100 : 0}%`, background: DS.green, borderRadius: 3, transition: 'width 0.3s' }} />
-          </div>
-          <span style={{ fontSize: 11, color: DS.textMut, flexShrink: 0 }}>{aizpilditi}/{kopā}</span>
-        </div>
-      </div>
-
-      {/* LVM GEO kļūda */}
-      {lvmKluda && (
-        <div style={{ margin: '8px 10px 0', padding: '8px 10px', borderRadius: 7, background: '#1f1000', border: '1px solid #e65100', fontSize: 11, color: '#ffb74d', lineHeight: 1.5 }}>
-          ⚠️ LVM GEO pagaidām nav pieejams. Nogabali netika ielādēti automātiski.
-        </div>
-      )}
-
-      {/* Saraksts */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 10px' }}>
-        {(nogabali.length === 0 || !nogabali[0]?.geojson?.geometry) ? (
-          <div style={{ padding: nogabali.length > 0 ? '8px' : '20px 8px', textAlign: 'center' }}>
-            {nogKluda && (
-              <div style={{ fontSize: 11, color: '#ffb74d', marginBottom: 10, lineHeight: 1.5 }}>
-                ⚠️ {nogKluda}
-              </div>
-            )}
-            <button
-              onClick={ieladetNogabalus}
-              disabled={nogLade}
-              style={{
-                padding: '10px 18px', borderRadius: 8,
-                cursor: nogLade ? 'wait' : 'pointer',
-                background: `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
-                color: '#fff', border: 'none', fontSize: 13, fontWeight: 600,
-                opacity: nogLade ? 0.7 : 1, width: '100%',
-              }}
-            >
-              {nogLade ? '⏳ Meklē VMD datos...' : nogabali.length > 0 ? '🗺️ Ielādēt poligonus kartē' : '🌲 Pievienot nogabalus'}
-            </button>
-            <div style={{ fontSize: 10, color: DS.textDim, marginTop: 8, lineHeight: 1.5 }}>
-              Meklē VMD meža taksācijas datus pēc kadastra
-            </div>
-          </div>
-        ) : (
-          nogabali.map((n, idx) => (
-            <NogabalsRinda
-              key={n.id} n={n} idx={idx}
-              onKliks={atvertModalu}
-              onHover={setHoverIdx}
-              aktīvs={mapModal?.index === idx}
-            />
-          ))
-        )}
-      </div>
-
-      {/* Titullapas dati */}
-      <div style={{ padding: '10px 10px 0', borderTop: `1px solid ${DS.greenBdr}`, flexShrink: 0 }}>
-        <div style={{ fontSize: 10, color: DS.textDim, marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-          📄 Titullapas dati
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 8 }}>
-          {[
-            { lauks: 'nosaukums', placeholder: 'Īpašuma nosaukums (piem. "Priedes")' },
-            { lauks: 'novads',    placeholder: 'Novads (piem. Saulkrastu novads)' },
-            { lauks: 'pagasts',   placeholder: 'Pagasts' },
-          ].map(({ lauks, placeholder }) => (
-            <input
-              key={lauks}
-              value={titullapa[lauks]}
-              onChange={e => setTitullapa(prev => ({ ...prev, [lauks]: e.target.value }))}
-              placeholder={placeholder}
-              style={inp9}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* PDF poga */}
-      <div style={{ padding: '6px 10px 14px', flexShrink: 0 }}>
-        {visiGatavi ? (
-          <button
-            onClick={genPdf}
-            disabled={pdfLade}
-            style={{
-              width: '100%', padding: '13px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: pdfLade ? 'wait' : 'pointer',
-              background: pdfLade ? DS.greenDk : `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
-              color: '#fff', border: 'none', opacity: pdfLade ? 0.8 : 1,
-            }}
-          >
-            {pdfLade ? '⏳ Gatavo PDF...' : '📄 Ģenerēt apsaimniekošanas plānu PDF'}
-          </button>
-        ) : (
-          <div style={{ textAlign: 'center', fontSize: 11, color: DS.textDim, padding: '6px 0' }}>
-            Aizpildi {maNogabali.filter(n => !n.mapManuali).length} mežaudžu nogabalus lai ģenerētu PDF
-          </div>
-        )}
-      </div>
-    </div>
-  )
-
   // ── Overlay vadības panelis ───────────────────────────────────────────────────
   const OverlayPanel = () => !planAttels ? null : (
     <div style={{
@@ -1182,7 +1160,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
   // ── Tile slāņu izvēlne ───────────────────────────────────────────────────────
   const TileSlāņiPanel = () => (
     <div style={{
-      position: 'absolute', left: 10, bottom: 16, zIndex: 400,
+      position: 'absolute', left: 10, bottom: isMobile ? DRAWER_CLOSED + 8 : 16, zIndex: 400,
       display: 'flex', flexDirection: 'column', gap: 4,
       fontFamily: F.family,
     }}>
@@ -1366,7 +1344,13 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Kreisais panelis */}
         <div style={{ width: 300, flexShrink: 0, borderRight: `1px solid ${DS.greenBdr}`, background: DS.bgCard, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <SarakstaPane />
+          <SarakstaPane
+            kadInput={kadInput} kopPlatiba={kopPlatiba} kopā={kopā} aizpilditi={aizpilditi}
+            lvmKluda={lvmKluda} nogabali={nogabali} nogKluda={nogKluda} nogLade={nogLade}
+            ieladetNogabalus={ieladetNogabalus} atvertModalu={atvertModalu} setHoverIdx={setHoverIdx}
+            mapModal={mapModal} maNogabali={maNogabali} visiGatavi={visiGatavi}
+            pdfLade={pdfLade} onPdfKliks={() => setPdfModalOpen(true)}
+          />
         </div>
 
         {/* Karte */}
@@ -1387,7 +1371,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         </div>
       </div>
 
-      {/* Modāls */}
+      {/* Nogabala rediģēšanas modālis */}
       {mapModal && (
         <MapNogabalsModal
           nogabals={mapModal.nogabals}
@@ -1395,12 +1379,84 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           onClose={() => setMapModal(null)}
         />
       )}
+
+      {/* PDF titullapas modālis */}
+      {pdfModalOpen && (
+        <div
+          onClick={() => setPdfModalOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 2000,
+            background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 20, fontFamily: F.family,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: DS.bgCard, border: `1px solid ${DS.greenBdr}`,
+              borderRadius: 16, padding: 24, width: '100%', maxWidth: 440,
+              color: DS.text, boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            }}
+          >
+            <div style={{ fontSize: 16, fontWeight: 700, color: DS.green, marginBottom: 16 }}>
+              📄 Titullapas dati
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              {[
+                { lauks: 'nosaukums', label: 'Īpašuma nosaukums', placeholder: 'Piemērs: Priedes' },
+                { lauks: 'novads',    label: 'Novads',             placeholder: 'Piemērs: Saulkrastu novads' },
+                { lauks: 'pagasts',   label: 'Pagasts',            placeholder: 'Piemērs: Zvejniekciema pagasts' },
+              ].map(({ lauks, label, placeholder }) => (
+                <div key={lauks}>
+                  <div style={{ fontSize: 11, color: DS.textMut, marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {label}
+                  </div>
+                  <input
+                    value={titullapa[lauks]}
+                    onChange={e => setTitullapa(prev => ({ ...prev, [lauks]: e.target.value }))}
+                    placeholder={placeholder}
+                    style={{
+                      padding: '10px 14px', borderRadius: 8, background: DS.bgDeep,
+                      border: `1px solid ${DS.greenBdr}`, color: DS.text, fontSize: 14,
+                      outline: 'none', width: '100%', boxSizing: 'border-box', fontFamily: F.family,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setPdfModalOpen(false)}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                  background: 'none', border: `1px solid ${DS.greenBdr}`,
+                  color: DS.textMut, cursor: 'pointer', fontFamily: F.family,
+                }}
+              >
+                Atcelt
+              </button>
+              <button
+                onClick={() => { setPdfModalOpen(false); genPdf() }}
+                disabled={pdfLade}
+                style={{
+                  flex: 2, padding: '12px', borderRadius: 10, fontSize: 14, fontWeight: 700,
+                  background: `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
+                  color: '#fff', border: 'none', cursor: pdfLade ? 'wait' : 'pointer',
+                  opacity: pdfLade ? 0.8 : 1, fontFamily: F.family,
+                }}
+              >
+                {pdfLade ? '⏳ Gatavo PDF...' : '📄 Ģenerēt PDF'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
   // ── Mobilais layout ───────────────────────────────────────────────────────────
-  const DRAWER_CLOSED = 72
-  const DRAWER_OPEN   = Math.round(window.innerHeight * 0.55)
+  const DRAWER_OPEN = Math.round(window.innerHeight * 0.55)
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -1474,7 +1530,13 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         {/* Saraksts */}
         {drawerOpen && (
           <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <SarakstaPane />
+            <SarakstaPane
+              kadInput={kadInput} kopPlatiba={kopPlatiba} kopā={kopā} aizpilditi={aizpilditi}
+              lvmKluda={lvmKluda} nogabali={nogabali} nogKluda={nogKluda} nogLade={nogLade}
+              ieladetNogabalus={ieladetNogabalus} atvertModalu={atvertModalu} setHoverIdx={setHoverIdx}
+              mapModal={mapModal} maNogabali={maNogabali} visiGatavi={visiGatavi}
+              pdfLade={pdfLade} onPdfKliks={() => setPdfModalOpen(true)}
+            />
           </div>
         )}
 
@@ -1497,13 +1559,86 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         )}
       </div>
 
-      {/* Modāls */}
+      {/* Nogabala rediģēšanas modālis */}
       {mapModal && (
         <MapNogabalsModal
           nogabals={mapModal.nogabals}
           onSave={saglabatNogabalu}
           onClose={() => setMapModal(null)}
         />
+      )}
+
+      {/* PDF titullapas modālis */}
+      {pdfModalOpen && (
+        <div
+          onClick={() => setPdfModalOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 2000,
+            background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 20, fontFamily: F.family,
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: DS.bgCard, border: `1px solid ${DS.greenBdr}`,
+              borderRadius: 16, padding: 24, width: '100%', maxWidth: 440,
+              color: DS.text, boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            }}
+          >
+            <div style={{ fontSize: 16, fontWeight: 700, color: DS.green, marginBottom: 16 }}>
+              📄 Titullapas dati
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              {[
+                { lauks: 'nosaukums', label: 'Īpašuma nosaukums', placeholder: 'Piemērs: Priedes' },
+                { lauks: 'novads',    label: 'Novads',             placeholder: 'Piemērs: Saulkrastu novads' },
+                { lauks: 'pagasts',   label: 'Pagasts',            placeholder: 'Piemērs: Zvejniekciema pagasts' },
+              ].map(({ lauks, label, placeholder }) => (
+                <div key={lauks}>
+                  <div style={{ fontSize: 11, color: DS.textMut, marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {label}
+                  </div>
+                  <input
+                    value={titullapa[lauks]}
+                    onChange={e => setTitullapa(prev => ({ ...prev, [lauks]: e.target.value }))}
+                    placeholder={placeholder}
+                    style={{
+                      padding: '10px 14px', borderRadius: 8, background: DS.bgDeep,
+                      border: `1px solid ${DS.greenBdr}`, color: DS.text, fontSize: 14,
+                      outline: 'none', width: '100%', boxSizing: 'border-box', fontFamily: F.family,
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setPdfModalOpen(false)}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 10, fontSize: 14, fontWeight: 600,
+                  background: 'none', border: `1px solid ${DS.greenBdr}`,
+                  color: DS.textMut, cursor: 'pointer', fontFamily: F.family,
+                }}
+              >
+                Atcelt
+              </button>
+              <button
+                onClick={() => { setPdfModalOpen(false); genPdf() }}
+                disabled={pdfLade}
+                style={{
+                  flex: 2, padding: '12px', borderRadius: 10, fontSize: 14, fontWeight: 700,
+                  background: `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
+                  color: '#fff', border: 'none', cursor: pdfLade ? 'wait' : 'pointer',
+                  opacity: pdfLade ? 0.8 : 1, fontFamily: F.family,
+                }}
+              >
+                {pdfLade ? '⏳ Gatavo PDF...' : '📄 Ģenerēt PDF'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
