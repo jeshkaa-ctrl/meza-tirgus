@@ -16,7 +16,7 @@ const TILE_URLS = {
 
 // ── Karte ────────────────────────────────────────────────────────────────────
 
-function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda }) {
+function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda, onGpsPozicija, marsruts, kadastrs }) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
@@ -32,6 +32,8 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
   const gpsCircleRef      = useRef(null)
   const gpsWatchRef       = useRef(null)
   const gpsCenteredRef    = useRef(false)
+  const centroidsMarkerRef = useRef(null)
+  const marsrutsLayRef    = useRef(null)
 
   // Inicializē karti un kadastra slāni
   useEffect(() => {
@@ -53,6 +55,28 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
       if (kadGeom) {
         const kl = L.geoJSON(kadGeom, { style: { color: '#00BFFF', weight: 3, fillOpacity: 0 } }).addTo(map)
         kadLayRef.current = kl
+        const center = kl.getBounds().getCenter()
+
+        // Centroīda pin — tālā mērogā (zoom < 12) parāda īpašuma atrašanās vietu
+        const pinIcon = L.divIcon({
+          html: '<div style="width:30px;height:30px;background:#2e7d32;border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,0.6);margin:-15px 0 0 -15px">🌲</div>',
+          iconSize: [0, 0], className: '',
+        })
+        const pin = L.marker(center, { icon: pinIcon, zIndexOffset: 1500 })
+        if (kadastrs) pin.bindTooltip(`<b>${kadastrs}</b>`, { direction: 'top', offset: [0, -8] })
+        centroidsMarkerRef.current = pin
+
+        const updatePin = () => {
+          if (!centroidsMarkerRef.current) return
+          if (map.getZoom() < 12) {
+            if (!map.hasLayer(centroidsMarkerRef.current)) centroidsMarkerRef.current.addTo(map)
+          } else {
+            if (map.hasLayer(centroidsMarkerRef.current)) centroidsMarkerRef.current.remove()
+          }
+        }
+        map.on('zoomend', updatePin)
+        updatePin()
+
         map.fitBounds(kl.getBounds(), { padding: [24, 24] })
       } else {
         map.setView([56.88, 24.60], 7)
@@ -61,6 +85,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     init().catch(console.error)
     return () => {
       active = false
+      centroidsMarkerRef.current = null
       if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null }
     }
   }, [kadGeom, mapRef])
@@ -255,6 +280,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
       if (gpsMarkerRef.current) { gpsMarkerRef.current.remove(); gpsMarkerRef.current = null }
       if (gpsCircleRef.current) { gpsCircleRef.current.remove(); gpsCircleRef.current = null }
       gpsCenteredRef.current = false
+      if (onGpsPozicija) onGpsPozicija(null)
     }
 
     if (!gpsAktivs) { cleanup(); return }
@@ -298,6 +324,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
           }
 
           if (onGpsKluda) onGpsKluda(null)
+          if (onGpsPozicija) onGpsPozicija({ lat, lng })
         },
         (err) => { if (onGpsKluda) onGpsKluda(err.message) },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
@@ -310,7 +337,38 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     return cleanup
   }, [gpsAktivs]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Maršruts — uzzīmē GeoJSON līniju kartē
+  useEffect(() => {
+    if (!leafletRef.current) return
+    const draw = async () => {
+      const L = (await import('leaflet')).default
+      if (!leafletRef.current) return
+      if (marsrutsLayRef.current) { marsrutsLayRef.current.remove(); marsrutsLayRef.current = null }
+      if (!marsruts) return
+      const layer = L.geoJSON(marsruts, { style: { color: '#FF6B00', weight: 4, opacity: 0.88 } }).addTo(leafletRef.current)
+      marsrutsLayRef.current = layer
+      leafletRef.current.fitBounds(layer.getBounds(), { padding: [30, 30] })
+    }
+    draw().catch(console.error)
+  }, [marsruts])
+
   return null
+}
+
+function nearestBoundaryPoint(kadGeom, userLat, userLng) {
+  const geom = kadGeom?.geometry
+  if (!geom) return null
+  const rings = geom.type === 'Polygon' ? geom.coordinates
+    : geom.type === 'MultiPolygon' ? geom.coordinates.flat(1)
+    : []
+  let best = null, bestD = Infinity
+  for (const ring of rings) {
+    for (const [lng, lat] of ring) {
+      const d = (lat - userLat) ** 2 + (lng - userLng) ** 2
+      if (d < bestD) { bestD = d; best = { lat, lng } }
+    }
+  }
+  return best
 }
 
 // ── Nogabalu saraksta rinda ────────────────────────────────────────────────
@@ -390,6 +448,11 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [tileKluda,       setTileKluda]       = useState(false)
   const [gpsAktivs,       setGpsAktivs]       = useState(false)
   const [gpsKluda,        setGpsKluda]        = useState(null)
+  const [gpsPozicija,     setGpsPozicija]     = useState(null)
+  const [marsruts,        setMarsruts]        = useState(null)
+  const [marsrutsInfo,    setMarsrutsInfo]    = useState(null)
+  const [marsrutsLade,    setMarsrutsLade]    = useState(false)
+  const [marsrutsKluda,   setMarsrutsKluda]   = useState(null)
 
   const mapDivRef = useRef(null)
   const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
@@ -486,6 +549,35 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
       setNogKluda('Nogabalu ielāde neizdevās: ' + e.message)
     } finally {
       setNogLade(false)
+    }
+  }
+
+  // ── Maršruta aprēķins (OSRM) ────────────────────────────────────────────────
+  const aprēķinātMarsrutu = async () => {
+    if (!gpsPozicija || !kadGeom) return
+    setMarsrutsLade(true)
+    setMarsrutsKluda(null)
+    setMarsruts(null)
+    setMarsrutsInfo(null)
+    try {
+      const near = nearestBoundaryPoint(kadGeom, gpsPozicija.lat, gpsPozicija.lng)
+      if (!near) throw new Error('Nevar noteikt īpašuma robežas punktu')
+      const url = `https://router.project-osrm.org/route/v1/driving/${gpsPozicija.lng},${gpsPozicija.lat};${near.lng},${near.lat}?overview=full&geometries=geojson`
+      const ctrl = new AbortController()
+      const timer = setTimeout(() => ctrl.abort(), 10000)
+      const resp = await fetch(url, { signal: ctrl.signal })
+      clearTimeout(timer)
+      if (!resp.ok) throw new Error('osrm_err')
+      const data = await resp.json()
+      const route = data.routes?.[0]
+      if (!route) throw new Error('Maršruts nav atrasts')
+      setMarsruts(route.geometry)
+      setMarsrutsInfo({ distKm: (route.distance / 1000).toFixed(1), minUtes: Math.round(route.duration / 60) })
+    } catch (e) {
+      const isNet = e.name === 'AbortError' || e.message === 'osrm_err' || e.message.includes('fetch')
+      setMarsrutsKluda(isNet ? 'Maršruta serviss pagaidām nav pieejams' : e.message)
+    } finally {
+      setMarsrutsLade(false)
     }
   }
 
@@ -969,6 +1061,46 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           {label}
         </button>
       ))}
+
+      {/* Maršruts — tikai kad īpašums ielādēts */}
+      {kadGeom && <>
+        <div style={{ height: 1, background: DS.greenBdr, margin: '2px 0' }} />
+        <button
+          onClick={aprēķinātMarsrutu}
+          disabled={!gpsAktivs || !gpsPozicija || marsrutsLade}
+          title={!gpsAktivs ? 'Ieslēdz GPS lai aprēķinātu maršrutu' : !gpsPozicija ? 'Gaida GPS pozīciju...' : 'Aprēķināt maršrutu uz īpašumu'}
+          style={{
+            padding: '6px 11px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+            border: `1px solid ${marsrutsInfo ? DS.green : DS.greenBdr}`,
+            background: marsrutsInfo ? `${DS.green}44` : 'rgba(8,16,8,0.88)',
+            color: (!gpsAktivs || !gpsPozicija) ? DS.textDim : DS.text,
+            cursor: (!gpsAktivs || !gpsPozicija || marsrutsLade) ? 'not-allowed' : 'pointer',
+            backdropFilter: 'blur(6px)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+            fontFamily: F.family,
+            opacity: (!gpsAktivs || !gpsPozicija) ? 0.55 : 1,
+          }}
+        >
+          {marsrutsLade ? '⏳ Aprēķina...' : '🚗 Maršruts'}
+        </button>
+        {marsrutsInfo && (
+          <div style={{
+            padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 600,
+            background: 'rgba(8,16,8,0.88)', border: `1px solid ${DS.green}`,
+            color: DS.green, backdropFilter: 'blur(6px)', boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            <span style={{ flex: 1 }}>{marsrutsInfo.distKm} km · ~{marsrutsInfo.minUtes} min</span>
+            <button
+              onClick={() => { setMarsruts(null); setMarsrutsInfo(null); setMarsrutsKluda(null) }}
+              style={{ background: 'none', border: 'none', color: DS.textDim, fontSize: 13, cursor: 'pointer', padding: 0, lineHeight: 1 }}
+            >✕</button>
+          </div>
+        )}
+        {marsrutsKluda && (
+          <div style={{ fontSize: 10, color: '#ffb74d', maxWidth: 140, lineHeight: 1.4, padding: '2px 0' }}>⚠️ {marsrutsKluda}</div>
+        )}
+      </>}
     </div>
   )
 
@@ -1054,6 +1186,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets} hoverIdx={hoverIdx}
             mapSlānis={mapSlānis} onTileKluda={setTileKluda}
             gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
+            onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
           />
           <TileSlāņiPanel />
           <TileKludaIndikators />
@@ -1098,6 +1231,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets}
           mapSlānis={mapSlānis} onTileKluda={setTileKluda}
           gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
+          onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
         />
         <TileSlāņiPanel />
         <TileKludaIndikators />
