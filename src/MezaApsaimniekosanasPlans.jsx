@@ -22,6 +22,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
+  const nogLabelsLayRef   = useRef(null)
   const overlayRef        = useRef(null)
   const cornersRef        = useRef([])
   const centerMarkerRef   = useRef(null)
@@ -128,6 +129,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
       const L = (await import('leaflet')).default
       if (!active || !leafletRef.current) return
       if (nogLayRef.current) { nogLayRef.current.remove(); nogLayRef.current = null }
+      if (nogLabelsLayRef.current) { nogLabelsLayRef.current.remove(); nogLabelsLayRef.current = null }
       if (nogabali.length === 0) return
 
       const layer = L.geoJSON(
@@ -157,6 +159,24 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
         }
       ).addTo(leafletRef.current)
       nogLayRef.current = layer
+
+      // Nogabalu numuru etiķetes kartē (viduspunkts katram nogabalam)
+      const labelsLay = L.layerGroup()
+      nogabali.forEach(n => {
+        if (!n.geojson?.geometry) return
+        try {
+          const center = L.geoJSON(n.geojson).getBounds().getCenter()
+          L.marker(center, {
+            icon: L.divIcon({
+              html: `<div style="background:rgba(0,0,0,0.75);color:#e8f5e9;border:1px solid #4caf5099;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700;white-space:nowrap;pointer-events:none;line-height:1.4">${n.nr_text}</div>`,
+              className: '', iconSize: [0, 0], iconAnchor: [0, 0],
+            }),
+            interactive: false, zIndexOffset: 600,
+          }).addTo(labelsLay)
+        } catch { /* nav ģeometrijas */ }
+      })
+      nogLabelsLayRef.current = labelsLay
+      labelsLay.addTo(leafletRef.current)
 
       if (!kadGeom && nogabali.length > 0) {
         leafletRef.current.fitBounds(layer.getBounds(), { padding: [20, 20] })
@@ -565,12 +585,12 @@ const SarakstaPane = memo(function SarakstaPane({
   atvertModalu, setHoverIdx, mapModal,
   maNogabali, visiGatavi, pdfLade, onPdfKliks,
 }) {
-  const sortedWithIdx = useMemo(
-    () => nogabali
+  const sortedWithIdx = useMemo(() => {
+    const nrKey = s => { const p = String(s || '').split(/[.\-]/).map(Number); return (p[0] || 0) * 10000 + (p[1] || 0) }
+    return nogabali
       .map((n, originalIdx) => ({ n, originalIdx }))
-      .sort((a, b) => (Number(a.n.nr) || 0) - (Number(b.n.nr) || 0)),
-    [nogabali]
-  )
+      .sort((a, b) => nrKey(a.n.nr_text) - nrKey(b.n.nr_text))
+  }, [nogabali])
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ padding: '12px 14px', borderBottom: `1px solid ${DS.greenBdr}`, flexShrink: 0 }}>
