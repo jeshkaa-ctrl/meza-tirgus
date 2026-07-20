@@ -16,7 +16,7 @@ const TILE_URLS = {
 
 // ── Karte ────────────────────────────────────────────────────────────────────
 
-function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda }) {
+function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda }) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
@@ -28,6 +28,10 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
   const tileLayRef        = useRef(null)
   const tileErrRef        = useRef(0)
   const mapSlānisRef      = useRef(mapSlānis)
+  const gpsMarkerRef      = useRef(null)
+  const gpsCircleRef      = useRef(null)
+  const gpsWatchRef       = useRef(null)
+  const gpsCenteredRef    = useRef(false)
 
   // Inicializē karti un kadastra slāni
   useEffect(() => {
@@ -244,6 +248,68 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     if (overlayRef.current) overlayRef.current.setOpacity(overlayOpacity)
   }, [overlayOpacity])
 
+  // GPS marķieris — zils (precīzs) vai sarkans (vājš) punkts + precizitātes aplis
+  useEffect(() => {
+    const cleanup = () => {
+      if (gpsWatchRef.current != null) { navigator.geolocation.clearWatch(gpsWatchRef.current); gpsWatchRef.current = null }
+      if (gpsMarkerRef.current) { gpsMarkerRef.current.remove(); gpsMarkerRef.current = null }
+      if (gpsCircleRef.current) { gpsCircleRef.current.remove(); gpsCircleRef.current = null }
+      gpsCenteredRef.current = false
+    }
+
+    if (!gpsAktivs) { cleanup(); return }
+    if (!navigator.geolocation) { if (onGpsKluda) onGpsKluda('Geolocation nav atbalstīts šajā pārlūkā'); return }
+
+    const startWatch = async () => {
+      const L = (await import('leaflet')).default
+
+      const dotIcon = (good) => L.divIcon({
+        html: `<div style="width:16px;height:16px;border-radius:50%;background:${good ? '#2196f3' : '#f44336'};border:2.5px solid #fff;box-shadow:0 0 0 2px ${good ? '#2196f3' : '#f44336'}44,0 2px 8px rgba(0,0,0,0.5);margin:-8px 0 0 -8px"></div>`,
+        iconSize: [0, 0], className: '',
+      })
+
+      gpsWatchRef.current = navigator.geolocation.watchPosition(
+        (pos) => {
+          if (!leafletRef.current) return
+          const { latitude: lat, longitude: lng, accuracy } = pos.coords
+          const good = accuracy < 50
+          const latlng = [lat, lng]
+
+          if (!gpsMarkerRef.current) {
+            gpsMarkerRef.current = L.marker(latlng, { icon: dotIcon(good), zIndexOffset: 2000 }).addTo(leafletRef.current)
+          } else {
+            gpsMarkerRef.current.setLatLng(latlng)
+            gpsMarkerRef.current.setIcon(dotIcon(good))
+          }
+
+          if (!gpsCircleRef.current) {
+            gpsCircleRef.current = L.circle(latlng, {
+              radius: accuracy, color: '#2196f3', weight: 1,
+              fillColor: '#2196f3', fillOpacity: 0.1, interactive: false,
+            }).addTo(leafletRef.current)
+          } else {
+            gpsCircleRef.current.setLatLng(latlng)
+            gpsCircleRef.current.setRadius(accuracy)
+          }
+
+          if (!gpsCenteredRef.current) {
+            leafletRef.current.setView(latlng, Math.max(leafletRef.current.getZoom(), 15))
+            gpsCenteredRef.current = true
+          }
+
+          if (onGpsKluda) onGpsKluda(null)
+        },
+        (err) => { if (onGpsKluda) onGpsKluda(err.message) },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+      )
+    }
+
+    if (leafletRef.current) {
+      startWatch().catch(console.error)
+    }
+    return cleanup
+  }, [gpsAktivs]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return null
 }
 
@@ -322,6 +388,8 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [hoverIdx,        setHoverIdx]        = useState(null)
   const [mapSlānis,       setMapSlānis]       = useState('osm')
   const [tileKluda,       setTileKluda]       = useState(false)
+  const [gpsAktivs,       setGpsAktivs]       = useState(false)
+  const [gpsKluda,        setGpsKluda]        = useState(null)
 
   const mapDivRef = useRef(null)
   const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
@@ -917,6 +985,37 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
     </div>
   )
 
+  const GpsPoga = () => (
+    <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 400, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+      <button
+        onClick={() => { setGpsAktivs(a => !a); setGpsKluda(null) }}
+        title={gpsAktivs ? 'Izslēgt GPS' : 'Ieslēgt GPS atrašanās vietu'}
+        style={{
+          width: 38, height: 38, borderRadius: 8,
+          border: `1px solid ${gpsKluda ? '#f44336' : gpsAktivs ? DS.green : DS.greenBdr}`,
+          background: gpsKluda ? 'rgba(30,0,0,0.9)' : gpsAktivs ? `${DS.green}cc` : 'rgba(8,16,8,0.88)',
+          color: gpsKluda ? '#f44336' : gpsAktivs ? '#fff' : DS.textMut,
+          fontSize: 18, cursor: 'pointer',
+          backdropFilter: 'blur(6px)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        📍
+      </button>
+      {gpsKluda && (
+        <div style={{
+          background: 'rgba(30,0,0,0.92)', border: '1px solid #f44336',
+          borderRadius: 7, padding: '5px 9px', fontSize: 10, color: '#f44336',
+          maxWidth: 180, lineHeight: 1.4, backdropFilter: 'blur(6px)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.45)', fontFamily: F.family,
+        }}>
+          ⚠️ {gpsKluda}
+        </div>
+      )}
+    </div>
+  )
+
   // ── Desktop layout ────────────────────────────────────────────────────────────
   if (!isMobile) return (
     <div style={{ height: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -954,9 +1053,11 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             kadGeom={kadGeom} nogabali={nogabali} onNogabalsKliks={atvertModalu} mapRef={mapDivRef}
             planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets} hoverIdx={hoverIdx}
             mapSlānis={mapSlānis} onTileKluda={setTileKluda}
+            gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
           />
           <TileSlāņiPanel />
           <TileKludaIndikators />
+          <GpsPoga />
           <OverlayPanel />
         </div>
       </div>
@@ -996,9 +1097,11 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           kadGeom={kadGeom} nogabali={nogabali} onNogabalsKliks={atvertModalu} mapRef={mapDivRef}
           planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets}
           mapSlānis={mapSlānis} onTileKluda={setTileKluda}
+          gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
         />
         <TileSlāņiPanel />
         <TileKludaIndikators />
+        <GpsPoga />
         <OverlayPanel />
       </div>
 
