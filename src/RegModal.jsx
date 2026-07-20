@@ -250,7 +250,7 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, no
             autoComplete={rezims==="jauns"?"new-password":"current-password"}
             style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
         </div>
-        <div style={{display: rezims === "reset" ? "none" : "block", marginBottom:"16px"}}>
+        <div style={{display: rezims === "jauns" ? "block" : "none", marginBottom:"16px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>Atkārtot paroli:</label><br/>
           <input ref={parole2Ref} type="password" defaultValue="" autoComplete="new-password"
             style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
