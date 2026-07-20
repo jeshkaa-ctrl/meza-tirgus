@@ -16,9 +16,30 @@ const TILE_URLS = {
 
 const DRAWER_CLOSED = 72
 
+// Atrod indeksu, pēc kura jāievieto jaunā virsotne (tuvākā mala)
+function nearestEdgeIdx(coords, lng, lat) {
+  let best = Infinity, bestIdx = 1
+  for (let i = 0; i < coords.length; i++) {
+    const [ax, ay] = coords[i], [bx, by] = coords[(i + 1) % coords.length]
+    const dx = bx - ax, dy = by - ay
+    const lenSq = dx*dx + dy*dy
+    const t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((lng-ax)*dx + (lat-ay)*dy) / lenSq))
+    const d = (ax + t*dx - lng) ** 2 + (ay + t*dy - lat) ** 2
+    if (d < best) { best = d; bestIdx = i + 1 }
+  }
+  return bestIdx
+}
+
 // ── Karte ────────────────────────────────────────────────────────────────────
 
-function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda, onGpsPozicija, marsruts, kadastrs, merRezims, onMerUpdate }) {
+function MAPKarte({
+  kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets,
+  hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda, onGpsPozicija, marsruts, kadastrs,
+  merRezims, onMerUpdate,
+  // Ģeometrijas rediģēšana
+  geomEditTarget, geomEditAddMode, geomEditGpsPoint,
+  onGeomCtxMenu, onGeomEditCoords, onGeomAddModeDone, onGeomGpsVertexDone,
+}) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
@@ -46,6 +67,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
   const merPendingRef         = useRef(null)
   const merClickHandlerRef    = useRef(null)
   const merDblClickHandlerRef = useRef(null)
+  const geomEditStateRef      = useRef({ coords: null, rebuild: null })
 
   // Inicializē karti un kadastra slāni
   useEffect(() => {
@@ -151,6 +173,14 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
             if (!n) return
             const idx = nogabali.indexOf(n)
             lyr.on('click', () => { if (merRezimRef.current !== 'nav') return; onNogabalsKliks(n, idx) })
+            lyr.on('contextmenu', e => {
+              if (merRezimRef.current !== 'nav') return
+              L.DomEvent.preventDefault(e.originalEvent)
+              if (onGeomCtxMenu && leafletRef.current) {
+                const pt = leafletRef.current.latLngToContainerPoint(e.latlng)
+                onGeomCtxMenu(n, idx, pt.x, pt.y)
+              }
+            })
             lyr.bindTooltip(
               `<b>${n.nr_text}</b> · ${n.sugaNos} ${n.vecums}g · ${n.platiba.toFixed(1)} ha${n.mapManuali ? ' <span style="color:#4caf50">✓ MAP</span>' : ''}`,
               { direction: 'top', sticky: true, className: 'map-tooltip' }
@@ -184,7 +214,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     }
     update().catch(console.error)
     return () => { active = false }
-  }, [nogabali, kadGeom, onNogabalsKliks])
+  }, [nogabali, kadGeom, onNogabalsKliks, onGeomCtxMenu])
 
   // Plāna attēls — overlay + pozicionēšanas marķieri
   useEffect(() => {
@@ -488,6 +518,166 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     }
   }, [merRezims]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Ģeometrijas virsotņu rediģēšana ──────────────────────────────────────────
+  useEffect(() => {
+    if (!geomEditTarget || !leafletRef.current) return
+    let active = true
+    const editCoords = []   // [[lng, lat], ...] — mutable, shared with handlers
+    let vMarkers = []
+    let ePoly = null
+
+    const setup = async () => {
+      const L = (await import('leaflet')).default
+      if (!active || !leafletRef.current) return
+      const { n } = geomEditTarget
+      const geom = n.geojson?.geometry
+      if (!geom || !['Polygon', 'MultiPolygon'].includes(geom.type)) return
+
+      const ring = geom.type === 'Polygon'
+        ? geom.coordinates[0]
+        : geom.coordinates[0][0]
+      ring.slice(0, -1).forEach(c => editCoords.push([c[0], c[1]]))
+
+      // Padara oriģinālo slāni gaiši
+      if (nogLayRef.current) {
+        nogLayRef.current.eachLayer(l => l.setStyle({ opacity: 0.2, fillOpacity: 0.08 }))
+      }
+      if (nogLabelsLayRef.current) nogLabelsLayRef.current.eachLayer(l => l.setOpacity?.(0.2))
+
+      const toLL = ([lng, lat]) => L.latLng(lat, lng)
+
+      const rebuildPoly = () => {
+        if (ePoly) { ePoly.remove(); ePoly = null }
+        if (editCoords.length < 2) return
+        ePoly = L.polygon(editCoords.map(toLL), {
+          color: '#e040fb', weight: 2, fillColor: '#e040fb',
+          fillOpacity: 0.14, dashArray: '5,3', interactive: false,
+        }).addTo(leafletRef.current)
+        if (onGeomEditCoords) onGeomEditCoords([...editCoords])
+      }
+
+      const buildVMarkers = () => {
+        vMarkers.forEach(m => { try { m.closePopup(); m.remove() } catch {} })
+        vMarkers = editCoords.map(([lng, lat], i) => {
+          const m = L.marker([lat, lng], {
+            draggable: true,
+            icon: L.divIcon({
+              html: `<div style="width:14px;height:14px;background:#e040fb;border:2.5px solid #fff;border-radius:50%;margin:-7px 0 0 -7px;cursor:grab;box-shadow:0 1px 6px rgba(0,0,0,0.55)"></div>`,
+              iconSize: [0, 0], className: '',
+            }),
+            zIndexOffset: 1200,
+          }).addTo(leafletRef.current)
+
+          m.on('drag', e => {
+            editCoords[i] = [e.latlng.lng, e.latlng.lat]
+            rebuildPoly()
+          })
+
+          m.on('click', e => {
+            L.DomEvent.stopPropagation(e.originalEvent)
+            if (editCoords.length <= 3) {
+              m.bindPopup('<span style="font-size:11px;color:#f44336">Min. 3 virsotnes</span>').openPopup()
+              return
+            }
+            m.bindPopup(`
+              <div style="text-align:center;padding:2px 4px">
+                <div style="font-size:11px;color:#aaa;margin-bottom:6px">Virsotne ${i + 1}</div>
+                <button data-delidx="${i}" style="background:#e040fb;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600">🗑️ Dzēst</button>
+              </div>
+            `).openPopup()
+          })
+
+          m.on('popupopen', () => {
+            const btn = m.getPopup()?.getElement()?.querySelector('[data-delidx]')
+            if (!btn) return
+            btn.onclick = () => {
+              const di = Number(btn.dataset.delidx)
+              editCoords.splice(di, 1)
+              m.closePopup()
+              rebuildPoly()
+              buildVMarkers()
+            }
+          })
+
+          return m
+        })
+      }
+
+      buildVMarkers()
+      rebuildPoly()
+
+      geomEditStateRef.current = {
+        coords: editCoords,
+        rebuild: () => { rebuildPoly(); buildVMarkers() },
+      }
+
+      if (onGeomEditCoords) onGeomEditCoords([...editCoords])
+    }
+
+    setup().catch(console.error)
+
+    return () => {
+      active = false
+      vMarkers.forEach(m => { try { m.closePopup(); m.remove() } catch {} })
+      vMarkers = []
+      if (ePoly) { try { ePoly.remove() } catch {} ePoly = null }
+      geomEditStateRef.current = { coords: null, rebuild: null }
+
+      // Atjauno oriģinālo slāni
+      if (nogLayRef.current) {
+        nogLayRef.current.eachLayer(lyr => {
+          const n2 = nogabali.find(x => x.id === lyr.feature?.id)
+          if (!n2) return
+          const vg = getVecumaGrupa(n2.sugaKods, n2.vecums)
+          lyr.setStyle({
+            color: n2.mapManuali ? '#4caf50' : '#aaaaaa',
+            weight: n2.mapManuali ? 2.5 : 1.5,
+            fillColor: NOGABALA_KRASA[`${n2.sugaKods}-${vg}`] || SUGAS_KRASA[n2.sugaKods] || '#888',
+            fillOpacity: 0.72, dashArray: n2.mapManuali ? null : '4,3',
+          })
+        })
+      }
+      if (nogLabelsLayRef.current) nogLabelsLayRef.current.eachLayer(l => l.setOpacity?.(1))
+    }
+  }, [geomEditTarget?.n?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── "Pievienot virsotni" — nākamais klikšķis kartē ievieto punktu tuvākajā malā
+  useEffect(() => {
+    if (!leafletRef.current || !geomEditAddMode) return
+    const map = leafletRef.current
+    map.getContainer().style.cursor = 'crosshair'
+
+    const handle = (e) => {
+      const { coords, rebuild } = geomEditStateRef.current
+      if (!coords?.length) return
+      const { lng, lat } = e.latlng
+      const idx = nearestEdgeIdx(coords, lng, lat)
+      coords.splice(idx, 0, [lng, lat])
+      if (rebuild) rebuild()
+      if (onGeomEditCoords) onGeomEditCoords([...coords])
+      if (onGeomAddModeDone) onGeomAddModeDone()
+    }
+
+    map.on('click', handle)
+    return () => {
+      map.off('click', handle)
+      if (map.getContainer()) map.getContainer().style.cursor = ''
+    }
+  }, [geomEditAddMode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── GPS virsotne — ievieto virsotni GPS pozīcijā
+  useEffect(() => {
+    if (!geomEditGpsPoint) return
+    const { coords, rebuild } = geomEditStateRef.current
+    if (!coords?.length) return
+    const { lat, lng } = geomEditGpsPoint
+    const idx = nearestEdgeIdx(coords, lng, lat)
+    coords.splice(idx, 0, [lng, lat])
+    if (rebuild) rebuild()
+    if (onGeomEditCoords) onGeomEditCoords([...coords])
+    if (onGeomGpsVertexDone) onGeomGpsVertexDone()
+  }, [geomEditGpsPoint]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return null
 }
 
@@ -698,6 +888,13 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [merRezims,       setMerRezims]       = useState('nav')
   const [merResultats,    setMerResultats]    = useState(null)
   const [pdfModalOpen,    setPdfModalOpen]    = useState(false)
+  const [geomCtxMenu,     setGeomCtxMenu]     = useState(null)  // { n, idx, x, y }
+  const [geomEditTarget,  setGeomEditTarget]  = useState(null)  // { n, idx }
+  const [geomEditAddMode, setGeomEditAddMode] = useState(false)
+  const [geomEditGpsPoint,setGeomEditGpsPoint]= useState(null)
+  const [geomEditLade,    setGeomEditLade]    = useState(false)
+  const [geomEditKluda,   setGeomEditKluda]   = useState(null)
+  const geomEditCoordsRef = useRef(null)
 
   const mapDivRef           = useRef(null)
   const isMobile            = typeof window !== 'undefined' && window.innerWidth < 700
@@ -776,6 +973,46 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
       return arr
     })
     setMapModal(null)
+  }
+
+  // ── Ģeometrijas rediģēšana ───────────────────────────────────────────────────
+  const onGeomCtxMenu = useCallback((n, idx, x, y) => {
+    setGeomCtxMenu({ n, idx, x, y })
+  }, [])
+
+  const saveGeomEdit = async () => {
+    const coords = geomEditCoordsRef.current
+    if (!coords?.length || !geomEditTarget) return
+    const { n, idx } = geomEditTarget
+    const geomType = n.geojson?.geometry?.type
+    if (!geomType) return
+
+    // Aizver gredzenu un veido jauno ģeometriju
+    const ring = [...coords, coords[0]]
+    const newGeometry = geomType === 'Polygon'
+      ? { type: 'Polygon', coordinates: [ring] }
+      : { type: 'MultiPolygon', coordinates: [[ring]] }  // vienkāršo uz vienu polygonu
+
+    setGeomEditLade(true)
+    setGeomEditKluda(null)
+    try {
+      const r = await fetch('/api/update-geom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: n.id, geojson: newGeometry }),
+      })
+      if (!r.ok) throw new Error((await r.json()).error || 'Saglabāšanas kļūda')
+      setNogabali(prev => prev.map((nog, i) => i !== idx ? nog : {
+        ...nog,
+        geojson: { ...nog.geojson, geometry: newGeometry },
+      }))
+      setGeomEditTarget(null)
+      geomEditCoordsRef.current = null
+    } catch (e) {
+      setGeomEditKluda(e.message)
+    } finally {
+      setGeomEditLade(false)
+    }
   }
 
   // ── Nogabalu manuālā ielāde (atsevišķs solis pēc robežas) ──────────────────
@@ -1293,6 +1530,126 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
     </div>
   )
 
+  // ── Ģeometrijas rediģēšanas UI (konteksta izvēlne + edit panelis) ─────────────
+  const GeomOverlays = () => (
+    <>
+      {/* Konteksta izvēlne — parādās uz labā klikšķa / ilga pieskāriena */}
+      {geomCtxMenu && (
+        <div
+          onClick={() => setGeomCtxMenu(null)}
+          style={{ position: 'absolute', inset: 0, zIndex: 1400 }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              position: 'absolute',
+              left: Math.min(geomCtxMenu.x, (mapDivRef.current?.offsetWidth || 400) - 200),
+              top: Math.min(geomCtxMenu.y, (mapDivRef.current?.offsetHeight || 400) - 100),
+              zIndex: 1500,
+              background: 'rgba(8,16,8,0.97)',
+              border: `1px solid ${DS.greenBdr}`,
+              borderRadius: 9, padding: 4,
+              fontFamily: F.family,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
+              minWidth: 190,
+            }}
+          >
+            {[
+              {
+                label: '✏️ Labot robežu',
+                action: () => {
+                  setGeomEditTarget({ n: geomCtxMenu.n, idx: geomCtxMenu.idx })
+                  setGeomCtxMenu(null)
+                },
+                disabled: !['Polygon','MultiPolygon'].includes(geomCtxMenu.n.geojson?.geometry?.type),
+              },
+              { label: '➕ Sadalīt nogabalu (drīzumā)', action: () => setGeomCtxMenu(null), disabled: true },
+            ].map(({ label, action, disabled }) => (
+              <button key={label} onClick={action} disabled={disabled}
+                style={{
+                  display: 'block', width: '100%', padding: '10px 14px',
+                  textAlign: 'left', background: 'none', border: 'none',
+                  color: disabled ? DS.textDim : DS.text,
+                  fontSize: 13, cursor: disabled ? 'not-allowed' : 'pointer',
+                  borderRadius: 6, fontFamily: F.family,
+                }}
+              >{label}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Rediģēšanas panelis — redzams kamēr geomEditTarget aktīvs */}
+      {geomEditTarget && (
+        <div style={{
+          position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1500, background: 'rgba(8,0,20,0.96)',
+          border: '1.5px solid #e040fb', borderRadius: 10,
+          padding: '10px 14px', fontFamily: F.family,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
+          display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap',
+          maxWidth: 'calc(100% - 32px)',
+        }}>
+          <span style={{ fontSize: 12, color: '#e040fb', fontWeight: 700, marginRight: 2 }}>
+            ✏️ {geomEditTarget.n.nr_text}
+          </span>
+
+          <button
+            onClick={() => setGeomEditAddMode(true)}
+            disabled={geomEditAddMode}
+            style={{
+              padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+              border: `1px solid ${geomEditAddMode ? '#e040fb' : '#e040fb66'}`,
+              background: geomEditAddMode ? '#e040fb33' : 'rgba(224,64,251,0.12)',
+              color: geomEditAddMode ? '#e040fb' : '#e040fbaa',
+              cursor: geomEditAddMode ? 'default' : 'pointer', fontFamily: F.family,
+            }}
+          >➕ Virsotne</button>
+
+          {gpsPozicija && (
+            <button
+              onClick={() => setGeomEditGpsPoint(gpsPozicija)}
+              style={{
+                padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+                border: '1px solid #e040fb66', background: 'rgba(224,64,251,0.12)',
+                color: '#e040fbaa', cursor: 'pointer', fontFamily: F.family,
+              }}
+            >📍 GPS virsotne</button>
+          )}
+
+          <button
+            onClick={saveGeomEdit}
+            disabled={geomEditLade}
+            style={{
+              padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 700,
+              border: '1px solid #e040fb', background: '#e040fb',
+              color: '#fff', cursor: geomEditLade ? 'wait' : 'pointer', fontFamily: F.family,
+              opacity: geomEditLade ? 0.7 : 1,
+            }}
+          >{geomEditLade ? '⏳' : '💾 Saglabāt'}</button>
+
+          <button
+            onClick={() => { setGeomEditTarget(null); setGeomEditKluda(null); setGeomEditAddMode(false) }}
+            style={{
+              padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+              border: `1px solid ${DS.greenBdr}`, background: 'transparent',
+              color: DS.textMut, cursor: 'pointer', fontFamily: F.family,
+            }}
+          >✕ Atcelt</button>
+
+          {geomEditAddMode && (
+            <div style={{ width: '100%', fontSize: 11, color: '#e040fb88', marginTop: 2 }}>
+              Klikšķini kartē lai pievienotu virsotni. Klikšķis uz virsotnes → dzēst to.
+            </div>
+          )}
+          {geomEditKluda && (
+            <div style={{ width: '100%', fontSize: 11, color: DS.error, marginTop: 2 }}>⚠️ {geomEditKluda}</div>
+          )}
+        </div>
+      )}
+    </>
+  )
+
   const TileKludaIndikators = () => !tileKluda ? null : (
     <div style={{
       position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
@@ -1383,10 +1740,17 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
             onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
             merRezims={merRezims} onMerUpdate={setMerResultats}
+            geomEditTarget={geomEditTarget} geomEditAddMode={geomEditAddMode}
+            geomEditGpsPoint={geomEditGpsPoint}
+            onGeomCtxMenu={onGeomCtxMenu}
+            onGeomEditCoords={coords => { geomEditCoordsRef.current = coords }}
+            onGeomAddModeDone={() => setGeomEditAddMode(false)}
+            onGeomGpsVertexDone={() => setGeomEditGpsPoint(null)}
           />
           <TileSlāņiPanel />
           <TileKludaIndikators />
           <GpsPoga />
+          <GeomOverlays />
           <OverlayPanel />
         </div>
       </div>
@@ -1501,10 +1865,17 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
           onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
           merRezims={merRezims} onMerUpdate={setMerResultats}
+          geomEditTarget={geomEditTarget} geomEditAddMode={geomEditAddMode}
+          geomEditGpsPoint={geomEditGpsPoint}
+          onGeomCtxMenu={onGeomCtxMenu}
+          onGeomEditCoords={coords => { geomEditCoordsRef.current = coords }}
+          onGeomAddModeDone={() => setGeomEditAddMode(false)}
+          onGeomGpsVertexDone={() => setGeomEditGpsPoint(null)}
         />
         <TileSlāņiPanel />
         <TileKludaIndikators />
         <GpsPoga />
+        <GeomOverlays />
         <OverlayPanel />
       </div>
 
