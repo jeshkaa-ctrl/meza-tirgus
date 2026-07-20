@@ -9,9 +9,14 @@ import { generateMAPpdf } from './map/mapPdfEngine'
 import { aprēķināt } from './map/landCategoryEngine'
 import { acmHeaders } from './utils/acm'
 
+const TILE_URLS = {
+  osm:      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  satelits: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+}
+
 // ── Karte ────────────────────────────────────────────────────────────────────
 
-function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx }) {
+function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda }) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
@@ -20,6 +25,9 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
   const centerMarkerRef   = useRef(null)
   const prevPlanAttelsRef = useRef(null) // detektē vai planAttels mainījies
   const savedBoundsRef    = useRef(null) // saglabā pozīciju starp redigets pārslēgšanām
+  const tileLayRef        = useRef(null)
+  const tileErrRef        = useRef(0)
+  const mapSlānisRef      = useRef(mapSlānis)
 
   // Inicializē karti un kadastra slāni
   useEffect(() => {
@@ -31,7 +39,11 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
       if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null }
 
       const map = L.map(mapRef.current, { zoomControl: true, attributionControl: false })
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 20 }).addTo(map)
+      const tl = L.tileLayer(TILE_URLS[mapSlānisRef.current] || TILE_URLS.osm, { maxZoom: 20 })
+      tl.on('tileerror', () => { tileErrRef.current++; if (tileErrRef.current >= 3 && onTileKluda) onTileKluda(true) })
+      tl.on('tileload',  () => { if (tileErrRef.current > 0) { tileErrRef.current = 0; if (onTileKluda) onTileKluda(false) } })
+      tl.addTo(map)
+      tileLayRef.current = tl
       leafletRef.current = map
 
       if (kadGeom) {
@@ -48,6 +60,25 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
       if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null }
     }
   }, [kadGeom, mapRef])
+
+  // Tile slāņa maiņa — noņem veco, pievieno jauno (ne mount, jo leafletRef vēl null)
+  useEffect(() => {
+    mapSlānisRef.current = mapSlānis
+    if (!leafletRef.current) return
+    const swap = async () => {
+      const L = (await import('leaflet')).default
+      if (!leafletRef.current) return
+      if (tileLayRef.current) { tileLayRef.current.remove(); tileLayRef.current = null }
+      tileErrRef.current = 0
+      if (onTileKluda) onTileKluda(false)
+      const tl = L.tileLayer(TILE_URLS[mapSlānis] || TILE_URLS.osm, { maxZoom: 20 })
+      tl.on('tileerror', () => { tileErrRef.current++; if (tileErrRef.current >= 3 && onTileKluda) onTileKluda(true) })
+      tl.on('tileload',  () => { if (tileErrRef.current > 0) { tileErrRef.current = 0; if (onTileKluda) onTileKluda(false) } })
+      tl.addTo(leafletRef.current)
+      tileLayRef.current = tl
+    }
+    swap().catch(console.error)
+  }, [mapSlānis]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Atjaunina nogabalu slāni
   useEffect(() => {
@@ -289,6 +320,8 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [nogLade,         setNogLade]         = useState(false)
   const [nogKluda,        setNogKluda]        = useState(null)
   const [hoverIdx,        setHoverIdx]        = useState(null)
+  const [mapSlānis,       setMapSlānis]       = useState('osm')
+  const [tileKluda,       setTileKluda]       = useState(false)
 
   const mapDivRef = useRef(null)
   const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
@@ -840,6 +873,50 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
     </div>
   )
 
+  // ── Tile slāņu izvēlne ───────────────────────────────────────────────────────
+  const TileSlāņiPanel = () => (
+    <div style={{
+      position: 'absolute', left: 10, bottom: 16, zIndex: 400,
+      display: 'flex', flexDirection: 'column', gap: 4,
+      fontFamily: F.family,
+    }}>
+      {[
+        { key: 'osm',      label: '🗺️ Karte' },
+        { key: 'satelits', label: '🛰️ Satelīts' },
+      ].map(({ key, label }) => (
+        <button
+          key={key}
+          onClick={() => setMapSlānis(key)}
+          style={{
+            padding: '6px 11px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+            border: `1px solid ${mapSlānis === key ? DS.green : DS.greenBdr}`,
+            background: mapSlānis === key ? `${DS.green}cc` : 'rgba(8,16,8,0.88)',
+            color: mapSlānis === key ? '#fff' : DS.textMut,
+            cursor: 'pointer', textAlign: 'left',
+            backdropFilter: 'blur(6px)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+            fontFamily: F.family,
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+
+  const TileKludaIndikators = () => !tileKluda ? null : (
+    <div style={{
+      position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 401, background: 'rgba(30,20,0,0.92)',
+      border: '1px solid #e65100', borderRadius: 8,
+      padding: '6px 12px', fontSize: 11, color: '#ffb74d',
+      backdropFilter: 'blur(6px)', boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+      fontFamily: F.family, whiteSpace: 'nowrap', pointerEvents: 'none',
+    }}>
+      ⚠️ Kartes attēli neielādējas (vājš signāls) — robežas un dati redzami
+    </div>
+  )
+
   // ── Desktop layout ────────────────────────────────────────────────────────────
   if (!isMobile) return (
     <div style={{ height: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -876,7 +953,10 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           <MAPKarte
             kadGeom={kadGeom} nogabali={nogabali} onNogabalsKliks={atvertModalu} mapRef={mapDivRef}
             planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets} hoverIdx={hoverIdx}
+            mapSlānis={mapSlānis} onTileKluda={setTileKluda}
           />
+          <TileSlāņiPanel />
+          <TileKludaIndikators />
           <OverlayPanel />
         </div>
       </div>
@@ -915,7 +995,10 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         <MAPKarte
           kadGeom={kadGeom} nogabali={nogabali} onNogabalsKliks={atvertModalu} mapRef={mapDivRef}
           planAttels={planAttels} overlayOpacity={overlayOpacity} overlayRedigets={overlayRedigets}
+          mapSlānis={mapSlānis} onTileKluda={setTileKluda}
         />
+        <TileSlāņiPanel />
+        <TileKludaIndikators />
         <OverlayPanel />
       </div>
 
