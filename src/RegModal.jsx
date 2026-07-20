@@ -245,7 +245,7 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, no
 
         <div style={{display: rezims === "reset" ? "none" : "block", marginBottom:"10px"}}>
           <label style={{fontSize:"11px",fontWeight:"bold"}}>Parole:</label>
-          <span style={{fontSize:"10px",color:"#888",marginLeft:"8px"}}>min. 8 simboli, vismaz 1 cipars</span><br/>
+          {rezims === "jauns" && <span style={{fontSize:"10px",color:"#888",marginLeft:"8px"}}>min. 8 simboli, vismaz 1 cipars</span>}<br/>
           <input ref={paroleRef} type="password" defaultValue=""
             autoComplete={rezims==="jauns"?"new-password":"current-password"}
             style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px",boxSizing:"border-box"}}/>
