@@ -16,7 +16,7 @@ const TILE_URLS = {
 
 // ── Karte ────────────────────────────────────────────────────────────────────
 
-function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda, onGpsPozicija, marsruts, kadastrs }) {
+function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets, hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda, onGpsPozicija, marsruts, kadastrs, merRezims, onMerUpdate }) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
   const nogLayRef         = useRef(null)
@@ -32,8 +32,17 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
   const gpsCircleRef      = useRef(null)
   const gpsWatchRef       = useRef(null)
   const gpsCenteredRef    = useRef(false)
-  const centroidsMarkerRef = useRef(null)
-  const marsrutsLayRef    = useRef(null)
+  const centroidsMarkerRef    = useRef(null)
+  const marsrutsLayRef        = useRef(null)
+  const merLayRef             = useRef(null)
+  const merMarkersRef         = useRef([])
+  const merLabelRef           = useRef(null)
+  const merPunktiRef          = useRef([])
+  const merRezimRef           = useRef('nav')
+  const merFinishedRef        = useRef(false)
+  const merPendingRef         = useRef(null)
+  const merClickHandlerRef    = useRef(null)
+  const merDblClickHandlerRef = useRef(null)
 
   // Inicializē karti un kadastra slāni
   useEffect(() => {
@@ -137,7 +146,7 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
             const n = nogabali.find(x => x.id === feat.id)
             if (!n) return
             const idx = nogabali.indexOf(n)
-            lyr.on('click', () => onNogabalsKliks(n, idx))
+            lyr.on('click', () => { if (merRezimRef.current !== 'nav') return; onNogabalsKliks(n, idx) })
             lyr.bindTooltip(
               `<b>${n.nr_text}</b> · ${n.sugaNos} ${n.vecums}g · ${n.platiba.toFixed(1)} ha${n.mapManuali ? ' <span style="color:#4caf50">✓ MAP</span>' : ''}`,
               { direction: 'top', sticky: true, className: 'map-tooltip' }
@@ -352,6 +361,111 @@ function MAPKarte({ kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, over
     draw().catch(console.error)
   }, [marsruts])
 
+  // Mērīšanas rīki — attālums un laukums
+  useEffect(() => {
+    merRezimRef.current = merRezims
+    const map = leafletRef.current
+
+    const clearLayers = () => {
+      if (merLayRef.current) { merLayRef.current.remove(); merLayRef.current = null }
+      merMarkersRef.current.forEach(m => m.remove()); merMarkersRef.current = []
+      if (merLabelRef.current) { merLabelRef.current.remove(); merLabelRef.current = null }
+      merPunktiRef.current = []
+    }
+
+    if (merPendingRef.current) { clearTimeout(merPendingRef.current); merPendingRef.current = null }
+    clearLayers()
+
+    if (!map) { if (onMerUpdate) onMerUpdate(null); return }
+    if (map._container) map._container.style.cursor = ''
+    if (merRezims === 'nav') { if (onMerUpdate) onMerUpdate(null); return }
+
+    map._container.style.cursor = 'crosshair'
+    merFinishedRef.current = false
+
+    const showLabel = (L, latlng, text) => {
+      if (merLabelRef.current) { merLabelRef.current.remove(); merLabelRef.current = null }
+      if (!text) return
+      merLabelRef.current = L.marker(latlng, {
+        icon: L.divIcon({
+          html: `<div style="background:rgba(8,0,20,0.92);border:1.5px solid #e040fb;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700;color:#e040fb;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5)">${text}</div>`,
+          className: '', iconSize: [0, 0],
+        }),
+        interactive: false, zIndexOffset: 3500,
+      }).addTo(map)
+    }
+
+    const redraw = (L, pts) => {
+      if (merLayRef.current) { merLayRef.current.remove(); merLayRef.current = null }
+      const mode = merRezimRef.current
+      if (mode === 'attālums') {
+        if (pts.length >= 2) {
+          merLayRef.current = L.polyline(pts, { color: '#e040fb', weight: 3, opacity: 0.9, interactive: false }).addTo(map)
+        }
+        let total = 0
+        for (let i = 1; i < pts.length; i++) total += L.latLng(pts[i - 1]).distanceTo(L.latLng(pts[i]))
+        const txt = pts.length >= 2 ? fmtDist(total) : null
+        showLabel(L, pts[pts.length - 1], txt)
+        if (onMerUpdate) onMerUpdate(txt)
+      } else {
+        if (pts.length >= 3) {
+          merLayRef.current = L.polygon(pts, {
+            color: '#e040fb', weight: 2, opacity: 0.9,
+            fillColor: '#e040fb', fillOpacity: 0.15, interactive: false,
+          }).addTo(map)
+          const ha = polygonAreaHa(pts)
+          const txt = `${ha.toFixed(2)} ha`
+          showLabel(L, merLayRef.current.getBounds().getCenter(), txt)
+          if (onMerUpdate) onMerUpdate(txt)
+        } else if (pts.length === 2) {
+          merLayRef.current = L.polyline(pts, { color: '#e040fb', weight: 2, opacity: 0.9, interactive: false }).addTo(map)
+          if (onMerUpdate) onMerUpdate(null)
+        } else {
+          if (onMerUpdate) onMerUpdate(null)
+        }
+      }
+    }
+
+    const handleClick = (e) => {
+      if (merPendingRef.current) { clearTimeout(merPendingRef.current); merPendingRef.current = null }
+      merPendingRef.current = setTimeout(async () => {
+        merPendingRef.current = null
+        if (merFinishedRef.current) return
+        const L = (await import('leaflet')).default
+        if (!leafletRef.current) return
+        const pts = merPunktiRef.current
+        pts.push({ lat: e.latlng.lat, lng: e.latlng.lng })
+        const dot = L.circleMarker(e.latlng, {
+          radius: 5, color: '#fff', weight: 2, fillColor: '#e040fb', fillOpacity: 1, interactive: false,
+        }).addTo(map)
+        merMarkersRef.current.push(dot)
+        redraw(L, pts)
+      }, 220)
+    }
+
+    const handleDblClick = () => {
+      if (merPendingRef.current) { clearTimeout(merPendingRef.current); merPendingRef.current = null }
+      if (merFinishedRef.current) return
+      merFinishedRef.current = true
+      if (map._container) map._container.style.cursor = ''
+      map.off('click', handleClick)
+      map.off('dblclick', handleDblClick)
+      merClickHandlerRef.current = null
+      merDblClickHandlerRef.current = null
+    }
+
+    merClickHandlerRef.current = handleClick
+    merDblClickHandlerRef.current = handleDblClick
+    map.on('click', handleClick)
+    map.on('dblclick', handleDblClick)
+
+    return () => {
+      if (merPendingRef.current) { clearTimeout(merPendingRef.current); merPendingRef.current = null }
+      if (merClickHandlerRef.current) { map.off('click', merClickHandlerRef.current); merClickHandlerRef.current = null }
+      if (merDblClickHandlerRef.current) { map.off('dblclick', merDblClickHandlerRef.current); merDblClickHandlerRef.current = null }
+    }
+  }, [merRezims]) // eslint-disable-line react-hooks/exhaustive-deps
+
   return null
 }
 
@@ -369,6 +483,26 @@ function nearestBoundaryPoint(kadGeom, userLat, userLng) {
     }
   }
   return best
+}
+
+function polygonAreaHa(latlngs) {
+  if (latlngs.length < 3) return 0
+  const R = 6371000, rad = Math.PI / 180
+  let area = 0
+  const n = latlngs.length
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n
+    const xi = latlngs[i].lng * rad * Math.cos(latlngs[i].lat * rad)
+    const yi = latlngs[i].lat * rad
+    const xj = latlngs[j].lng * rad * Math.cos(latlngs[j].lat * rad)
+    const yj = latlngs[j].lat * rad
+    area += xi * yj - xj * yi
+  }
+  return Math.abs(area / 2) * R * R / 10000
+}
+
+function fmtDist(m) {
+  return m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(2)} km`
 }
 
 // ── Nogabalu saraksta rinda ────────────────────────────────────────────────
@@ -453,6 +587,8 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   const [marsrutsInfo,    setMarsrutsInfo]    = useState(null)
   const [marsrutsLade,    setMarsrutsLade]    = useState(false)
   const [marsrutsKluda,   setMarsrutsKluda]   = useState(null)
+  const [merRezims,       setMerRezims]       = useState('nav')
+  const [merResultats,    setMerResultats]    = useState(null)
 
   const mapDivRef = useRef(null)
   const isMobile  = typeof window !== 'undefined' && window.innerWidth < 700
@@ -555,6 +691,7 @@ export default function MezaApsaimniekosanasPlans({ onBack }) {
   // ── Maršruta aprēķins (OSRM) ────────────────────────────────────────────────
   const aprēķinātMarsrutu = async () => {
     if (!gpsPozicija || !kadGeom) return
+    setMerRezims('nav'); setMerResultats(null)
     setMarsrutsLade(true)
     setMarsrutsKluda(null)
     setMarsruts(null)
@@ -1046,7 +1183,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
       ].map(({ key, label }) => (
         <button
           key={key}
-          onClick={() => setMapSlānis(key)}
+          onClick={() => { setMapSlānis(key); setMerRezims('nav'); setMerResultats(null) }}
           style={{
             padding: '6px 11px', borderRadius: 7, fontSize: 12, fontWeight: 600,
             border: `1px solid ${mapSlānis === key ? DS.green : DS.greenBdr}`,
@@ -1101,6 +1238,51 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           <div style={{ fontSize: 10, color: '#ffb74d', maxWidth: 140, lineHeight: 1.4, padding: '2px 0' }}>⚠️ {marsrutsKluda}</div>
         )}
       </>}
+
+      {/* Mērīšanas rīki */}
+      <div style={{ height: 1, background: DS.greenBdr, margin: '2px 0' }} />
+      {[
+        { key: 'attālums', label: '📏 Mērīt', hint: 'Mērīt attālumu — klikšķini punktus, dubultklikšķis pabeigt' },
+        { key: 'laukums',  label: '📐 Laukums', hint: 'Mērīt laukumu — klikšķini virsotnes, dubultklikšķis pabeigt' },
+      ].map(({ key, label, hint }) => (
+        <button
+          key={key}
+          onClick={() => { setMerRezims(merRezims === key ? 'nav' : key); setMerResultats(null) }}
+          title={hint}
+          style={{
+            padding: '6px 11px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+            border: `1px solid ${merRezims === key ? '#e040fb' : DS.greenBdr}`,
+            background: merRezims === key ? 'rgba(224,64,251,0.22)' : 'rgba(8,16,8,0.88)',
+            color: merRezims === key ? '#e040fb' : DS.textMut,
+            cursor: 'pointer', textAlign: 'left',
+            backdropFilter: 'blur(6px)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+            fontFamily: F.family,
+          }}
+        >
+          {label}
+        </button>
+      ))}
+      {merRezims !== 'nav' && !merResultats && (
+        <div style={{ fontSize: 10, color: '#e040fb99', lineHeight: 1.4, padding: '1px 2px', maxWidth: 140 }}>
+          {merRezims === 'attālums' ? 'Klikšķini punktus · 2× pabeigt' : 'Klikšķini virsotnes · 2× pabeigt'}
+        </div>
+      )}
+      {merResultats && (
+        <div style={{
+          padding: '5px 10px', borderRadius: 7, fontSize: 11, fontWeight: 600,
+          background: 'rgba(8,16,8,0.88)', border: '1px solid #e040fb',
+          color: '#e040fb', backdropFilter: 'blur(6px)', boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', gap: 4,
+        }}>
+          <span style={{ flex: 1 }}>{merRezims === 'laukums' ? '📐' : '📏'} {merResultats}</span>
+          <button
+            onClick={() => { setMerRezims('nav'); setMerResultats(null) }}
+            style={{ background: 'none', border: 'none', color: DS.textDim, fontSize: 13, cursor: 'pointer', padding: 0, lineHeight: 1 }}
+            title="Notīrīt mērījumu"
+          >🗑️</button>
+        </div>
+      )}
     </div>
   )
 
@@ -1187,6 +1369,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             mapSlānis={mapSlānis} onTileKluda={setTileKluda}
             gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
             onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
+            merRezims={merRezims} onMerUpdate={setMerResultats}
           />
           <TileSlāņiPanel />
           <TileKludaIndikators />
@@ -1232,6 +1415,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           mapSlānis={mapSlānis} onTileKluda={setTileKluda}
           gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
           onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
+          merRezims={merRezims} onMerUpdate={setMerResultats}
         />
         <TileSlāņiPanel />
         <TileKludaIndikators />
