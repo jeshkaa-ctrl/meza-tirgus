@@ -161,7 +161,7 @@ if(page==="map-plans") {
   )
   return (
     <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#080f08",display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{color:"#4caf50",fontSize:16}}>Ielādē...</div></div>}>
-      <MezaApsaimniekosanasPlans onBack={()=>setPage("main")} />
+      <MezaApsaimniekosanasPlans onBack={()=>setPage("main")} user={user} onReg={()=>atvertReg("map")} />
     </React.Suspense>
   )
 }

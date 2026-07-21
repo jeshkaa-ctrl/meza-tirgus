@@ -839,7 +839,7 @@ const SarakstaPane = memo(function SarakstaPane({
 
 // ── Galvenais komponents ──────────────────────────────────────────────────────
 
-export default function MezaApsaimniekosanasPlans({ onBack }) {
+export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const [faze,            setFaze]            = useState('ievads')
   const [kadInput,        setKadInput]        = useState('')
   const [kluda,           setKluda]           = useState('')
@@ -1818,7 +1818,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
+      <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} onReg={onReg} />
       <style>{spinnerCSS}</style>
 
       {/* Header */}

@@ -1,9 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../supabaseClient'
 
-export function PdfMaksasGate({ info, onClose }) {
-  const [lade, setLade]     = useState(false)
-  const [klude, setKlude]   = useState(null)
+export function PdfMaksasGate({ info, onClose, onReg }) {
+  const [lade, setLade]           = useState(false)
+  const [klude, setKlude]         = useState(null)
+  const [gaidaLogin, setGaidaLogin] = useState(false)
+
+  const saktMaksajumuRef = useRef(null)
+
+  useEffect(() => {
+    if (!gaidaLogin) return
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        setGaidaLogin(false)
+        setKlude(null)
+        saktMaksajumuRef.current?.()
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [gaidaLogin])
 
   if (!info) return null
 
@@ -14,7 +29,13 @@ export function PdfMaksasGate({ info, onClose }) {
     setKlude(null)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setKlude('Lūdzu pierakstieties vispirms.'); setLade(false); return }
+      if (!user) {
+        setKlude('Pierakstieties — maksājums turpināsies automātiski pēc pieteikšanās.')
+        setGaidaLogin(true)
+        onReg?.()
+        setLade(false)
+        return
+      }
 
       const resp = await fetch('/api/montonio', {
         method:  'POST',
@@ -46,6 +67,8 @@ export function PdfMaksasGate({ info, onClose }) {
       setLade(false)
     }
   }
+
+  saktMaksajumuRef.current = saktMaksajumu
 
   return (
     <div style={{

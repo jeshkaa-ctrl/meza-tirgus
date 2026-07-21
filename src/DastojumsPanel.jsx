@@ -269,7 +269,7 @@ ${ekoRez.map(r=>`<tr>
       {rezultati && (
   user
     ? <button onClick={exportPDF} style={{padding:"6px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🖨 Drukāt PDF</button>
-    : <button onClick={()=>setShowReg(true)} style={{padding:"6px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
+    : <button onClick={()=>onReg?.()} style={{padding:"6px 20px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>🔒 Reģistrējies lai drukātu PDF</button>
 )}
     </div>
 
