@@ -131,7 +131,7 @@ export default function SelekcijasKalkulators({ onBack }) {
         ? `Lūdzu analizē šos ${imgs.length} attēlus (dažādi leņķi) un sniedz selekcijas vērtējumu.`
         : 'Lūdzu analizē šo attēlu un sniedz selekcijas vērtējumu.'
 
-      const r = await fetch("/api/selektors", {
+      const r = await fetch("/api/ai?action=selektors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ zinojumi: [{ role: 'user', content: [...bildeSaturs, { type: 'text', text: userTeksts }] }] })
@@ -158,7 +158,7 @@ export default function SelekcijasKalkulators({ onBack }) {
     if (!jautajums.trim()) return
     setLade(true); setKļūda(""); setRezultats("")
     try {
-      const r = await fetch("/api/selektors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jautajums: jautajums.trim() }) })
+      const r = await fetch("/api/ai?action=selektors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jautajums: jautajums.trim() }) })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || "Servera kļūda")
       setRezultats(d.teksts)
@@ -177,7 +177,7 @@ export default function SelekcijasKalkulators({ onBack }) {
     setKonvThread(prev => [...prev, { role: 'user', teksts }])
 
     try {
-      const r = await fetch("/api/selektors", {
+      const r = await fetch("/api/ai?action=selektors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ zinojumi: jaunasZinojumi, suga: detektSuga })

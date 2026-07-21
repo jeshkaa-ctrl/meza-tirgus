@@ -184,7 +184,7 @@ export default function DienasgramataPage() {
   async function ieladePrognozi(uid, akt) {
     setPrognozeLade(true)
     try {
-      const r = await fetch('/api/dienasgramata-prognoze', {
+      const r = await fetch('/api/dienasgramata?action=prognoze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: uid, menessFaze: shodiensFaze, aktivitate: akt }),
@@ -236,7 +236,7 @@ export default function DienasgramataPage() {
     setJautaLade(true)
     setAtbilde('')
     try {
-      const r = await fetch('/api/dienasgramata-jautajums', {
+      const r = await fetch('/api/dienasgramata', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, jautajums, aktivitate }),

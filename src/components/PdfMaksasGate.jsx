@@ -16,7 +16,7 @@ export function PdfMaksasGate({ info, onClose }) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setKlude('Lūdzu pierakstieties vispirms.'); setLade(false); return }
 
-      const resp = await fetch('/api/montonio-checkout', {
+      const resp = await fetch('/api/montonio', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({

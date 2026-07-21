@@ -46,7 +46,7 @@ export default function JuristsChat() {
     if (!q) return
     setLade(true); setKļūda(''); setAtbilde('')
     try {
-      const r = await fetch('/api/jurists', {
+      const r = await fetch('/api/ai?action=jurists', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jautajums: q }),
       })

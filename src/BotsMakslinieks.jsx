@@ -135,7 +135,7 @@ export default function BotsMakslinieks({ initialData }) {
       const prompt = customPrompt.trim()
         || aiData.dalle_prompt
         || `Vivid professional outdoor product poster, ${category} theme, dramatic forest lighting`
-      const dalleResp = await fetch('/api/openai-image', {
+      const dalleResp = await fetch('/api/ai?action=image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
