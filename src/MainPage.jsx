@@ -40,7 +40,7 @@ const SADAJAS = (isAdmin) => [
       { icon: "🧾", title: "Rēķinu krātuve",          desc: "Rēķinu izveide, drukāšana, mēneša un gada pārskats",                 page: "rekini" },
       { icon: "🚛", title: "Loģistikas kalkulators",  desc: "Transporta izmaksas, piegādes maršruti",                             page: "logistika" },
       { icon: "🏭", title: "Manas iepirkuma vietas",   desc: "Reģistrē iepirkuma punktu un cenas — parādīsies loģistikas kalkulatorā", page: "pirceja_cenas" },
-      { icon: "💳", title: "Abonements",              desc: "Pro un Komercija plāni — paplašinātas iespējas",                     page: "subscription" },
+      { icon: "💳", title: "Abonements",              desc: "Bizness plāni no 29€/mēn — pavadzīmes, rēķini, neierobežoti rīki",  page: "subscription" },
     ]
   },
   {

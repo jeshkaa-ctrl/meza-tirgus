@@ -1,5 +1,7 @@
 import React, { useState } from "react"
 import CaurmeraPanel from "./CaurmeraPanel"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 import RekinsPanel from "./RekinsPanel"
 import DastojumsPanel from "./DastojumsPanel"
 
@@ -13,6 +15,7 @@ const [nogabals,setNogabals]=useState(savedState?.nogabals||"")
 
 const [cirteVeids,setCirteVeids]=useState(savedState?.cirteVeids||"")
 const [cirteIzpilde,setCirteIzpilde]=useState(savedState?.cirteIzpilde||"")
+const [pdfMaksa,setPdfMaksa]=useState(null)
 const [platiba,setPlatiba]=useState(savedState?.platiba||0)
 const [showCaurmers,setShowCaurmers]=useState(false)
 const [showDastojums,setShowDastojums]=useState(false)
@@ -243,7 +246,10 @@ a.href=url;a.download=`cirsma_${kadastrs||"skice"}.zip`;a.click()
 URL.revokeObjectURL(url)
 })
 }
-const exportSkice=()=>{
+const exportSkice=async()=>{
+const maksa = await parbauditVaiMaksaPdf(user, 'skice')
+if (!maksa.allowed) { setPdfMaksa(maksa); return }
+
 const today=new Date().toLocaleDateString("lv-LV")
 
 const svgContent=`
@@ -460,7 +466,7 @@ return(
 
 <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
 {user
-  ? <button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"1px solid #4caf50",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🖨 Drukāt / Saglabāt PDF</button>
+  ? <><PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} /><button onClick={exportSkice} style={{padding:"8px 20px",background:"#225522",color:"white",border:"1px solid #4caf50",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🖨 Drukāt / Saglabāt PDF</button></>
   : <button onClick={()=>{onReg?.()}} style={{padding:"8px 20px",background:"#555",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"13px"}}>🔒 Reģistrējies lai drukātu PDF</button>
 }
 <button onClick={()=>setShowRekins(true)} style={{padding:"8px 20px",background:"#e65100",color:"white",border:"none",borderRadius:"6px",cursor:"pointer",fontSize:"13px",fontWeight:"bold"}}>🧾 Izveidot rēķinu</button>

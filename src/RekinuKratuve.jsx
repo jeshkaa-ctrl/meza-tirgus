@@ -23,6 +23,8 @@
 import React, { useState, useEffect } from "react"
 import RekinsPanel from "./RekinsPanel"
 import { supabase } from "./supabaseClient"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 
 function RekinuKratuve({ onBack, user, onReg }) {
   const [rekini,          setRekini]          = useState([])
@@ -30,6 +32,7 @@ function RekinuKratuve({ onBack, user, onReg }) {
   const [kluda,           setKluda]           = useState('')
   const [filtrGads,       setFiltrGads]       = useState("")
   const [pdfLadeId,       setPdfLadeId]       = useState(null)
+  const [pdfMaksa,        setPdfMaksa]        = useState(null)
   const [filtrKlients,    setFiltrKlients]    = useState("")
   const [showJaunsRekins, setShowJaunsRekins] = useState(false)
 
@@ -57,6 +60,8 @@ function RekinuKratuve({ onBack, user, onReg }) {
 
   const lejupieladetPdf = async (r) => {
     setPdfLadeId(r.id)
+    const maksa = await parbauditVaiMaksaPdf(user, 'rekins')
+    if (!maksa.allowed) { setPdfLadeId(null); setPdfMaksa(maksa); return }
     try {
       const skaitliVardos = (n) => {
         const v = Math.floor(n), c = Math.round((n - v) * 100)
@@ -179,6 +184,7 @@ ${r.pvn_rezims==="reversais"?`<tr><td colspan="6" style="border:1px solid #ccc;p
 
   return (
     <div style={{ minHeight: "100vh", background: "#080f08", color: "#e8f5e9", fontFamily: "Arial", padding: "0" }}>
+      <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
       <div style={{ background: "#1b3a1b", borderBottom: "2px solid #4caf50", padding: "12px 20px", display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
         <button onClick={onBack} style={{ padding: "6px 14px", background: "transparent", border: "none", color: "#4caf50", fontSize: "16px", cursor: "pointer" }}>← Atpakaļ</button>
         <h2 style={{ margin: 0, color: "#4caf50" }}>🧾 Rēķinu krātuve</h2>

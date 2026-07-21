@@ -3,6 +3,14 @@ import ReactDOM from "react-dom/client"
 import App from "./App.jsx"
 import ErrorBoundary from "./ErrorBoundary.jsx"
 import "./index.css"
+import { registerSW } from 'virtual:pwa-register'
+
+// Pārbauda jaunu SW versiju ik stundu — lietotājs saņem update bez manuālas darbības
+registerSW({
+  onRegisteredSW(swUrl, r) {
+    if (r) setInterval(() => r.update(), 60 * 60 * 1000)
+  },
+})
 
 const Lade = () => (
   <div style={{ minHeight: '100vh', background: '#080f08', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>

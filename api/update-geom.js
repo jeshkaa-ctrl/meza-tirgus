@@ -1,6 +1,6 @@
 // Atjaunina nogabala ģeometriju meza_nogabali.geom via PostGIS RPC
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end()
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const { id, geojson } = req.body || {}
   if (!id || !geojson) return res.status(400).json({ error: 'id un geojson ir obligāti' })

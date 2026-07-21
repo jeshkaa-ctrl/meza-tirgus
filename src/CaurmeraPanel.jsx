@@ -1,5 +1,7 @@
 import React, { useState } from "react"
 import { getBonitate } from "./bonityEngine"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 import { minDiameter, getVeidaugstums } from "./tables"
 import { calcSortimentsByQuality } from "./qualityEngine"
 
@@ -13,6 +15,7 @@ function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, on
   const [merijumi, setMerijumi] = useState(
     savedState?.merijumi || Array.from({length:40}, (_,i) => ({d: 15+i, n: 0}))
   )
+  const [pdfMaksa, setPdfMaksa] = useState(null)
 
   const saglabat = (jaunie) => onSaveState?.({
     suga: jaunie?.suga??suga,
@@ -95,7 +98,10 @@ function CaurmeraPanel({kadastrs="", nogabals="", saimnieciba="", savedState, on
   })()
   const sortimentNames = {log:"Zāģbaļķi",small:"Sīkbaļķi",veneer:"Finieris",tara:"Tara",pulp:"Papīrmalka",fire:"Malka",chips:"Šķelda"}
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
+    const maksa = await parbauditVaiMaksaPdf(user, 'caurmers')
+    if (!maksa.allowed) { setPdfMaksa(maksa); return }
+
     const today = new Date().toLocaleDateString("lv-LV")
     const aktiveRindas = merijumi.filter(r => r.n > 0)
     const col1 = aktiveRindas.slice(0, Math.ceil(aktiveRindas.length/3))
@@ -163,6 +169,7 @@ td{border:1px solid #ccc;padding:2px 5px;text-align:center;font-size:9px}
 
  return (
     <div style={{marginTop:"24px",padding:"20px",border:"2px solid #4caf50",borderRadius:"10px",background:"#141f14",color:"#e8f5e9"}}>
+      <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
       <h2 style={{color:"#4caf50",marginTop:0}}>📏 Caurmēra mērījumi</h2>
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"8px",marginBottom:"16px"}}>

@@ -1,79 +1,83 @@
 import { useState } from 'react'
 import { useSubscription } from './hooks/useSubscription'
 import { supabase } from './supabaseClient'
-import { C as DS, F, R, S, btn, spinnerCSS } from './ds'
+import { C as DS, F, spinnerCSS } from './ds'
 
-const PLANS = [
+const BUSINESS_PLANS = [
   {
-    id:       'free',
-    nosaukums:'Bezmaksas',
-    cena_men: 0,
-    cena_gad: 0,
-    krasa:    '#4a7a4a',
-    border:   '#2d4a2d',
-    ikona:    '🌱',
-    apraksts: 'Pamata rīki bez maksas',
+    id:         'business_sakuma',
+    nosaukums:  'Sākuma',
+    cena_men:   29,
+    cena_gad:   290,
+    krasa:      '#4caf50',
+    border:     '#4caf50',
+    ikona:      '🌲',
+    apraksts:   'Līdz 50 pavadzīmēm/mēn.',
+    pavadzimes: '50/mēn.',
     funkcijas: [
-      { label: 'Cirsmu novērtēšana',      ir: true  },
-      { label: 'Kubikmetru kalkulators',   ir: true  },
-      { label: 'Dastojuma uzmērīšana',     ir: true  },
-      { label: 'Krautuves mērītājs (AI)',  ir: true  },
-      { label: 'PDF lejupielāde',          ir: false },
-      { label: 'Rēķinu arhīvs',            ir: false },
-      { label: 'Sludinājumu publicēšana',  ir: false },
-      { label: 'Izsoles publicēšana',      ir: false },
-      { label: 'Pavadzīmju reģistrs',      ir: false },
+      { label: 'PDF dokumenti (bez kartes PDF)'    },
+      { label: 'Rēķinu arhīvs'                     },
+      { label: 'Loģistikas kalkulators'             },
+      { label: 'Iepirkuma vietu reģistrācija'       },
+      { label: '3 sludinājumi/mēn.'                 },
+      { label: 'Pavadzīmju reģistrs (50/mēn.)'      },
     ],
   },
   {
-    id:       'pro',
-    nosaukums:'Pro',
-    cena_men: 19,
-    cena_gad: 159,
-    krasa:    '#4caf50',
-    border:   '#4caf50',
-    ikona:    '🌲',
-    apraksts: 'Meža speciālistiem',
-    ieteicams: true,
+    id:         'business_videjais',
+    nosaukums:  'Vidējais',
+    cena_men:   45,
+    cena_gad:   450,
+    krasa:      '#66bb6a',
+    border:     '#66bb6a',
+    ikona:      '🌳',
+    apraksts:   'Līdz 150 pavadzīmēm/mēn.',
+    pavadzimes: '150/mēn.',
+    ieteicams:  true,
     funkcijas: [
-      { label: 'Cirsmu novērtēšana',      ir: true  },
-      { label: 'Kubikmetru kalkulators',   ir: true  },
-      { label: 'Dastojuma uzmērīšana',     ir: true  },
-      { label: 'Krautuves mērītājs (AI)',  ir: true  },
-      { label: 'PDF lejupielāde',          ir: true  },
-      { label: 'Rēķinu arhīvs',            ir: true  },
-      { label: 'Sludinājumu publicēšana',  ir: true  },
-      { label: 'Izsoles publicēšana',      ir: false },
-      { label: 'Pavadzīmju reģistrs',      ir: false },
+      { label: 'PDF dokumenti (bez kartes PDF)'    },
+      { label: 'Rēķinu arhīvs'                     },
+      { label: 'Loģistikas kalkulators'             },
+      { label: 'Iepirkuma vietu reģistrācija'       },
+      { label: '3 sludinājumi/mēn.'                 },
+      { label: 'Pavadzīmju reģistrs (150/mēn.)'     },
     ],
   },
   {
-    id:       'business',
-    nosaukums:'Komercija',
-    cena_men: 59,
-    cena_gad: 490,
-    krasa:    '#fbbf24',
-    border:   '#fbbf24',
-    ikona:    '🏢',
-    apraksts: 'Uzņēmumiem un tirgotājiem',
+    id:         'business_neierobezots',
+    nosaukums:  'Neierobežots',
+    cena_men:   69,
+    cena_gad:   690,
+    krasa:      '#fbbf24',
+    border:     '#fbbf24',
+    ikona:      '🏢',
+    apraksts:   'Neierobežotas pavadzīmes',
+    pavadzimes: '♾ /mēn.',
     funkcijas: [
-      { label: 'Cirsmu novērtēšana',      ir: true  },
-      { label: 'Kubikmetru kalkulators',   ir: true  },
-      { label: 'Dastojuma uzmērīšana',     ir: true  },
-      { label: 'Krautuves mērītājs (AI)',  ir: true  },
-      { label: 'PDF lejupielāde',          ir: true  },
-      { label: 'Rēķinu arhīvs',            ir: true  },
-      { label: 'Sludinājumu publicēšana',  ir: true  },
-      { label: 'Izsoles publicēšana',      ir: true  },
-      { label: 'Pavadzīmju reģistrs',      ir: true  },
+      { label: 'PDF dokumenti (bez kartes PDF)'    },
+      { label: 'Rēķinu arhīvs'                     },
+      { label: 'Loģistikas kalkulators'             },
+      { label: 'Iepirkuma vietu reģistrācija'       },
+      { label: '3 sludinājumi/mēn.'                 },
+      { label: 'Pavadzīmju reģistrs (♾ /mēn.)'      },
     ],
   },
 ]
 
 const VIENREIZIGI = [
-  { nosaukums: 'PDF izdruka',            cena: '2.50 €',  apraksts: 'Viena dokumenta PDF' },
-  { nosaukums: 'Sludinājums',            cena: '5.00 €',  apraksts: '30 dienas aktīvs' },
-  { nosaukums: 'Izcelts sludinājums',    cena: '15.00 €', apraksts: 'Augšgalā 14 dienas' },
+  { nosaukums: 'Kartes PDF',           cena: '5.00 €',  apraksts: 'Meža plāns ar karti' },
+  { nosaukums: 'Sludinājums',          cena: '5.00 €',  apraksts: '30 dienas aktīvs' },
+  { nosaukums: 'Izcelts sludinājums',  cena: '15.00 €', apraksts: 'Augšgalā 14 dienas' },
+]
+
+const FREE_FUNKCIJAS = [
+  'Cirsmu novērtēšana',
+  'Kubikmetru kalkulators',
+  'Dastojuma uzmērīšana',
+  'Krautuves mērītājs (AI)',
+  'Loģistikas kalkulators',
+  'Cirsmas skice (bez PDF)',
+  'Tirgus kopiena un sludinājumu skatīšana',
 ]
 
 export default function SubscriptionPage({ onBack, onNavigate, user }) {
@@ -98,6 +102,8 @@ export default function SubscriptionPage({ onBack, onNavigate, user }) {
     }
   }
 
+  const isBizness = ['business', 'business_sakuma', 'business_videjais', 'business_neierobezots'].includes(tagadejais)
+
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family }}>
       <style>{spinnerCSS}</style>
@@ -116,24 +122,52 @@ export default function SubscriptionPage({ onBack, onNavigate, user }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '28px 20px 60px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '28px 20px 60px' }}>
 
         {/* Tagadējais plāns */}
         {!loading && (
-          <div style={{ marginBottom: 24, padding: '12px 18px', background: '#111f11', border: '1px solid #2d4a2d', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ marginBottom: 28, padding: '12px 18px', background: '#111f11', border: '1px solid #2d4a2d', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 20 }}>📋</span>
             <div>
               <div style={{ fontSize: 13, color: '#7ab87a' }}>Tavs pašreizējais plāns</div>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#4caf50' }}>
-                {PLANS.find(p => p.id === tagadejais)?.nosaukums || 'Bezmaksas'}
+                {isBizness
+                  ? (BUSINESS_PLANS.find(p => p.id === tagadejais)?.nosaukums || 'Bizness') + ' (Biznesa plāns)'
+                  : 'Bezmaksas'}
               </div>
             </div>
           </div>
         )}
 
+        {/* ── BEZMAKSAS ─────────────────────────────────────────── */}
+        <div style={{ background: '#111f11', border: '1px solid #2d4a2d', borderRadius: 12, padding: '20px 24px', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 8 }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#4caf50' }}>🌱 Bezmaksas</div>
+              <div style={{ fontSize: 12, color: '#4a7a4a', marginTop: 2 }}>Reģistrācija — visi pamata rīki bez maksas</div>
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#e8f5e9' }}>€0</div>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 28px' }}>
+            {FREE_FUNKCIJAS.map(f => (
+              <div key={f} style={{ fontSize: 13, color: '#a8d8a8', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: '#4caf50', fontSize: 12 }}>✓</span>{f}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── BIZNESA PLĀNI ─────────────────────────────────────── */}
+        <div style={{ marginBottom: 16 }}>
+          <h3 style={{ color: '#4caf50', fontSize: 16, fontWeight: 800, margin: '0 0 6px' }}>🏢 Biznesa plāni</h3>
+          <p style={{ color: '#7ab87a', fontSize: 13, margin: '0 0 16px' }}>
+            Iekļauts visos plānos: visi bezmaksas rīki + PDF dokumenti (bez kartes) + rēķinu arhīvs + loģistikas kalkulators + iepirkuma vietu reģistrācija + 3 sludinājumi/mēn.
+          </p>
+        </div>
+
         {/* Cikla toggle */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 0, marginBottom: 28, background: '#111f11', borderRadius: 8, padding: 4, width: 'fit-content', margin: '0 auto 28px' }}>
-          {[{ val: false, label: 'Mēnesī' }, { val: true, label: 'Gadā (ietaupa ~30%)' }].map(({ val, label }) => (
+        <div style={{ display: 'flex', gap: 0, marginBottom: 20, background: '#111f11', borderRadius: 8, padding: 4, width: 'fit-content' }}>
+          {[{ val: false, label: 'Mēnesī' }, { val: true, label: 'Gadā (ietaupa 2 mēn.)' }].map(({ val, label }) => (
             <button key={label} onClick={() => setCiklsGads(val)} style={{
               padding: '7px 20px', borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 500,
               background: ciklsGads === val ? '#225522' : 'transparent',
@@ -144,9 +178,9 @@ export default function SubscriptionPage({ onBack, onNavigate, user }) {
           ))}
         </div>
 
-        {/* Plāni */}
+        {/* 3 Biznesa kartiņas */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 40 }}>
-          {PLANS.map(p => {
+          {BUSINESS_PLANS.map(p => {
             const aktīvs  = tagadejais === p.id
             const cena    = ciklsGads ? p.cena_gad : p.cena_men
             const periods = ciklsGads ? '/gadā' : '/mēn.'
@@ -154,14 +188,14 @@ export default function SubscriptionPage({ onBack, onNavigate, user }) {
             return (
               <div key={p.id} style={{
                 background: '#111f11',
-                border: `2px solid ${aktīvs ? p.border : '#2d4a2d'}`,
+                border: `2px solid ${aktīvs ? p.border : p.ieteicams ? p.border + '66' : '#2d4a2d'}`,
                 borderRadius: 12,
                 padding: '20px 20px 24px',
                 position: 'relative',
                 boxShadow: aktīvs ? `0 0 20px ${p.border}22` : 'none',
               }}>
                 {p.ieteicams && !aktīvs && (
-                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#4caf50', color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 12px', borderRadius: 10 }}>
+                  <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: p.krasa, color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 12px', borderRadius: 10, whiteSpace: 'nowrap' }}>
                     POPULĀRĀKAIS
                   </div>
                 )}
@@ -173,67 +207,58 @@ export default function SubscriptionPage({ onBack, onNavigate, user }) {
 
                 <div style={{ fontSize: 28, marginBottom: 8 }}>{p.ikona}</div>
                 <div style={{ fontSize: 18, fontWeight: 700, color: p.krasa, marginBottom: 4 }}>{p.nosaukums}</div>
-                <div style={{ fontSize: 12, color: '#7ab87a', marginBottom: 16 }}>{p.apraksts}</div>
+                <div style={{ fontSize: 12, color: '#7ab87a', marginBottom: 8 }}>{p.apraksts}</div>
+                <div style={{ fontSize: 11, color: '#4caf50', background: 'rgba(76,175,80,0.1)', borderRadius: 6, padding: '3px 8px', display: 'inline-block', marginBottom: 16 }}>
+                  📄 {p.pavadzimes} pavadzīmes
+                </div>
 
                 <div style={{ marginBottom: 20 }}>
-                  {cena === 0 ? (
-                    <span style={{ fontSize: 32, fontWeight: 700, color: '#e8f5e9' }}>Bezmaksas</span>
-                  ) : (
-                    <>
-                      <span style={{ fontSize: 32, fontWeight: 700, color: '#e8f5e9' }}>€{cena}</span>
-                      <span style={{ fontSize: 13, color: '#7ab87a', marginLeft: 4 }}>{periods}</span>
-                    </>
-                  )}
-                  {ciklsGads && p.cena_gad > 0 && (
+                  <span style={{ fontSize: 32, fontWeight: 700, color: '#e8f5e9' }}>€{cena}</span>
+                  <span style={{ fontSize: 13, color: '#7ab87a', marginLeft: 4 }}>{periods}</span>
+                  {ciklsGads && (
                     <div style={{ fontSize: 11, color: '#4caf50', marginTop: 2 }}>
-                      ~€{(p.cena_gad / 12).toFixed(2)}/mēn. — ietaupa €{(p.cena_men * 12 - p.cena_gad)} gadā
+                      ~€{(p.cena_gad / 12).toFixed(0)}/mēn. — ietaupa €{p.cena_men * 12 - p.cena_gad} gadā
                     </div>
                   )}
                 </div>
 
-                {/* Funkcijas */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
                   {p.funkcijas.map(f => (
                     <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
-                      <span style={{ fontSize: 14, color: f.ir ? '#4caf50' : '#3a4a3a', flexShrink: 0 }}>
-                        {f.ir ? '✓' : '✗'}
-                      </span>
-                      <span style={{ color: f.ir ? '#a8d8a8' : '#3a4a3a' }}>{f.label}</span>
+                      <span style={{ fontSize: 14, color: '#4caf50', flexShrink: 0 }}>✓</span>
+                      <span style={{ color: '#a8d8a8' }}>{f.label}</span>
                     </div>
                   ))}
                 </div>
 
                 <button
-                  disabled={aktīvs || maksajums.loading || p.id === 'free'}
+                  disabled={aktīvs || maksajums.loading}
                   onClick={() => saktMaksajumu(p.id, ciklsGads ? 'yearly' : 'monthly')}
                   style={{
                     width: '100%', padding: '12px 0', borderRadius: 8, border: 'none',
                     background: aktīvs
                       ? '#1a2e1a'
-                      : p.id === 'free'
-                      ? '#1a2e1a'
                       : maksajums.loading
                       ? '#1a3a1a'
-                      : p.id === 'pro' ? '#225522' : '#7a6000',
-                    color: aktīvs || p.id === 'free' ? '#4a7a4a' : 'white',
+                      : p.id === 'business_neierobezots'
+                      ? '#7a6000'
+                      : '#225522',
+                    color: aktīvs ? '#4a7a4a' : 'white',
                     fontSize: 14, fontWeight: 600,
-                    cursor: aktīvs || p.id === 'free' ? 'default' : 'pointer',
+                    cursor: aktīvs ? 'default' : 'pointer',
                     opacity: maksajums.loading ? 0.7 : 1,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   }}
                 >
                   {aktīvs
                     ? '✓ Aktīvs plāns'
-                    : p.id === 'free'
-                    ? 'Bezmaksas'
                     : maksajums.loading
                     ? '⏳ Novirza uz banku...'
-                    : `🏦 Maksāt ar internetbanku — €${cena}${ciklsGads ? '/gadā' : '/mēn.'}`
+                    : `🏦 Abonēt — €${cena}${ciklsGads ? '/gadā' : '/mēn.'}`
                   }
                 </button>
 
-                {/* Banku logotipi */}
-                {p.id !== 'free' && !aktīvs && (
+                {!aktīvs && (
                   <div style={{ marginTop: 10, textAlign: 'center' }}>
                     <div style={{ fontSize: 10, color: '#3a5a3a', marginBottom: 4 }}>Pieejamas bankas:</div>
                     <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -274,7 +299,7 @@ export default function SubscriptionPage({ onBack, onNavigate, user }) {
             ))}
           </div>
           <p style={{ fontSize: 11, color: '#4a7a4a', margin: '14px 0 0', textAlign: 'center' }}>
-            ⏳ Vienreizējie maksājumi — drīzumā ar Stripe integrāciju
+            ⏳ Vienreizējie maksājumi — drīzumā ar Montonio integrāciju
           </p>
         </div>
 

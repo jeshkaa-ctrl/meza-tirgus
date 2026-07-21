@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { acmHeaders } from "./utils/acm"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -287,6 +289,7 @@ export default function DastojumsKalkulators({ onBack, initialFile, onNavigateLo
   const [solis, setSolis] = useState(0) // 0=ielāde, 1=pārbaude, 2=cenas, 3=rezultāts
   const [loading, setLoading] = useState(false)
   const [kļūda, setKļūda] = useState("")
+  const [pdfMaksa, setPdfMaksa] = useState(null)
   const [aiDati, setAiDati] = useState(null)
   const [saimnieciba, setSaimnieciba] = useState("")
   const [kadastrs, setKadastrs] = useState("")
@@ -324,7 +327,10 @@ export default function DastojumsKalkulators({ onBack, initialFile, onNavigateLo
     }))
   }
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
+    const maksa = await parbauditVaiMaksaPdf(null, 'dastojums')
+    if (!maksa.allowed) { setPdfMaksa(maksa); return }
+
     const today = new Date().toLocaleDateString("lv-LV")
     const nogStr = nogabali.map(n => `${n.nr} (${n.platiba}ha)`).join(", ")
     const balkiCena = rez.vidBalkasCena.toFixed(0)
@@ -679,6 +685,7 @@ ${kop.skelda>0.01?`<tr><td style="color:#e65100">Šķelda bonuss ${kop.skelda.to
         )}
 
         <div style={{display:"flex", gap:10, flexWrap:"wrap"}}>
+          <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
           <button style={s.btn} onClick={exportPDF}>🖨 Drukāt / Saglabāt PDF</button>
           {onNavigateLogistika && rez.kopaM3 > 0 && (
             <button style={{...s.btn, background:"linear-gradient(135deg,#1565c0,#0d47a1)"}} onClick={() => {

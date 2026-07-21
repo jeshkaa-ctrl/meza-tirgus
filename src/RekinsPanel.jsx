@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react"
 import { getKlienti, saveKlients } from "./CaurmeraPanel"
 import { supabase } from "./supabaseClient"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 
 function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
 
@@ -30,6 +32,7 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
   const [emailLade,       setEmailLade]       = useState(false)
   const [emailOk,         setEmailOk]         = useState(false)
   const [pdfLade,         setPdfLade]         = useState(false)
+  const [pdfMaksa,        setPdfMaksa]        = useState(null)
 
   // ── Rēķins ────────────────────────────────────────────────────────────────
   const [rekinsNr,       setRekinsNr]       = useState(() => Number(localStorage.getItem("rekins_nr") || 0) + 1)
@@ -269,6 +272,10 @@ function RekinsPanel({ kadastrs, saimnieciba, platiba, onClose, user, onReg }) {
       }).then(() => {}).catch(() => {})
     }
 
+    // Pārbauda PDF maksājumu (€2.50 bez Bizness abonementa)
+    const maksa = await parbauditVaiMaksaPdf(user, 'rekins')
+    if (!maksa.allowed) { setPdfMaksa(maksa); return }
+
     // ── PDF ģenerēšana ar html2canvas + jsPDF ────────────────────────────────
     const gads = new Date().getFullYear()
     const bodyHTML = `
@@ -343,6 +350,7 @@ ${pvnRezims==="reversais"?`<tr><td colspan="6" style="border:1px solid #ccc;padd
 
   return (
     <div style={{ marginTop: "24px", padding: "20px", border: "2px solid #4caf50", borderRadius: "8px", background: "#f0f8f0" }}>
+      <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
         <h2 style={{ color: "#225522", margin: 0 }}>🧾 Rēķina sagatave</h2>
         <button onClick={onClose} style={{ padding: "4px 12px", background: "#888", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>✕ Aizvērt</button>

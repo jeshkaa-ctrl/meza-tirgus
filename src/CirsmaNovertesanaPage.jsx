@@ -1,6 +1,8 @@
 import { useState } from "react"
 import * as pdfjsLib from "pdfjs-dist"
 import { getBonitate } from "./bonityEngine"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 import { calcSortimentsByQuality } from "./qualityEngine"
 import { getVeidaugstums, GminTable, GkritTable } from "./tables"
 import { SORT_KEYS, SORT_NAMES, DEFAULT_PRICES } from "./sortimentConfig"
@@ -95,6 +97,7 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
   const [showPrices, setShowPrices] = useState(false)
   // Pielāgoti papildu sortimenti: [{id, nosaukums, cena}]
   const [papilduSort, setPapilduSort] = useState([])
+  const [pdfMaksa,    setPdfMaksa]    = useState(null)
 
   const saglabat = (jaunasCircsmas, jaunaisKadastrs, jaunaSaimnieciba) => {
     onSaveState?.({
@@ -289,7 +292,10 @@ export default function CirsmaNovertesanaPage({onBack, kadastrsIn="", saimniecib
     reader.readAsArrayBuffer(file)
   }
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
+    const maksa = await parbauditVaiMaksaPdf(user, 'cirsma')
+    if (!maksa.allowed) { setPdfMaksa(maksa); return }
+
     const today = new Date().toLocaleDateString("lv-LV")
     let html = `<html><head><meta charset="UTF-8"><style>
 body{font-family:Arial;font-size:11px;padding:20px;max-width:1000px;margin:0 auto}
@@ -358,6 +364,7 @@ html += `<tr><td>${s.suga}</td><td>${s.vecums}</td><td>${s.h}</td><td>${s.d||"�
 
   return (
     <div style={{minHeight:"100vh",background:"#080f08",color:"#e8f5e9",fontFamily:"Arial,sans-serif"}}>
+      <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
       {/* Pogu josla augšā */}
       <div style={{background:"#1b3a1b",borderBottom:"2px solid #4caf50",padding:"12px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:"8px"}}>
         <div style={{display:"flex",gap:"8px",alignItems:"center",flexWrap:"wrap"}}>

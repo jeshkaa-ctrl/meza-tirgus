@@ -15,9 +15,9 @@ export default function MaksajumsPaldies({ onTurpina }) {
   const [mēģinajumi, setMēģinajumi] = useState(0)
 
   useEffect(() => {
-    // Nolasa URL parametrus
-    const params = new URLSearchParams(window.location.search)
-    const plan = params.get('plan') || ''
+    const params  = new URLSearchParams(window.location.search)
+    const plan    = params.get('plan') || ''
+    const type    = params.get('type') || ''
     const payment = params.get('payment')
 
     setPlanId(plan)
@@ -27,17 +27,47 @@ export default function MaksajumsPaldies({ onTurpina }) {
       return
     }
 
-    // Pārbauda vai Supabase jau atjaunināts (webhook var kavēties 1-5s)
+    // PDF vienreizējs maksājums — polē pdf_payments
+    if (type === 'pdf') {
+      const pdfInfo = (() => {
+        try { return JSON.parse(sessionStorage.getItem('mt_pdf_payment') || 'null') } catch { return null }
+      })()
+      if (!pdfInfo?.merchantRef) { setStatuss('aktivs'); return }
+
+      let attempts = 0
+      const MAX = 8
+      const checkPdf = async () => {
+        attempts++
+        setMēģinajumi(attempts)
+        try {
+          const { data } = await supabase
+            .from('pdf_payments')
+            .select('apmaksats')
+            .eq('merchant_ref', pdfInfo.merchantRef)
+            .maybeSingle()
+          if (data?.apmaksats) {
+            sessionStorage.removeItem('mt_pdf_payment')
+            setStatuss('aktivs')
+            return
+          }
+        } catch {}
+        if (attempts < MAX) setTimeout(checkPdf, 1500)
+        else setStatuss('aktivs') // Webhook kavējas — lietotājs mēģinās vēlreiz
+      }
+      setTimeout(checkPdf, 1500)
+      return
+    }
+
+    // Abonements — polē subscriptions
     let attempts = 0
     const MAX = 8
 
     const check = async () => {
       attempts++
       setMēģinajumi(attempts)
-
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { setStatuss('aktivs'); return } // nav ielogojies — rāda panākumu
+        if (!user) { setStatuss('aktivs'); return }
 
         const { data } = await supabase
           .from('subscriptions')
@@ -51,15 +81,11 @@ export default function MaksajumsPaldies({ onTurpina }) {
         }
       } catch {}
 
-      if (attempts < MAX) {
-        setTimeout(check, 1500)
-      } else {
-        // Webhook varētu kavēties — rādam panākumu jebkurā gadījumā
-        setStatuss('aktivs')
-      }
+      if (attempts < MAX) setTimeout(check, 1500)
+      else setStatuss('aktivs')
     }
 
-    setTimeout(check, 1000) // Pirmā pārbaude pēc 1s
+    setTimeout(check, 1000)
   }, [])
 
   // Notīra URL parametrus
@@ -102,32 +128,51 @@ export default function MaksajumsPaldies({ onTurpina }) {
           </>
         )}
 
-        {statuss === 'aktivs' && (
-          <>
-            <div style={{ fontSize: 56, marginBottom: S.md }}>✅</div>
-            <h2 style={{ color: C.green, fontSize: F.h2, fontWeight: F.weightBlack, margin: `0 0 ${S.sm}` }}>
-              Paldies par maksājumu!
-            </h2>
-            {planId && (
-              <div style={{
-                background: `${C.green}15`, border: `1px solid ${C.green}44`,
-                borderRadius: R.lg, padding: S.md, margin: `${S.md} 0`,
-              }}>
-                <div style={{ color: C.textDim, fontSize: F.xs, marginBottom: 4 }}>Aktivizētais plāns</div>
-                <div style={{ color: C.green, fontSize: F.lg, fontWeight: F.weightBold }}>
-                  🌲 {PLAN_NOSAUKUMI[planId] || planId}
+        {statuss === 'aktivs' && (() => {
+          const params  = new URLSearchParams(window.location.search)
+          const isPdf   = params.get('type') === 'pdf'
+          return (
+            <>
+              <div style={{ fontSize: 56, marginBottom: S.md }}>✅</div>
+              <h2 style={{ color: C.green, fontSize: F.h2, fontWeight: F.weightBlack, margin: `0 0 ${S.sm}` }}>
+                Paldies par maksājumu!
+              </h2>
+              {isPdf ? (
+                <div style={{
+                  background: `${C.green}15`, border: `1px solid ${C.green}44`,
+                  borderRadius: R.lg, padding: S.md, margin: `${S.md} 0`,
+                }}>
+                  <div style={{ color: C.green, fontSize: F.base, fontWeight: F.weightBold, marginBottom: 6 }}>
+                    📄 PDF maksājums apstiprināts
+                  </div>
+                  <div style={{ color: C.textDim, fontSize: F.sm, lineHeight: 1.6 }}>
+                    Atgriezieties uz rīku un klikšķiniet PDF pogu — dokuments tiks ģenerēts uzreiz.
+                    Šis atļaujas kods derīgs 24 stundas.
+                  </div>
                 </div>
-              </div>
-            )}
-            <p style={{ color: C.textMut, fontSize: F.sm, lineHeight: 1.6, margin: `0 0 ${S.xl}` }}>
-              Jūsu abonements ir aktivizēts. Ja plāns nav redzams uzreiz —
-              izejiet un ielogojieties vēlreiz.
-            </p>
-            <button onClick={onTurpina} style={{ ...btn.primary, justifyContent: 'center', width: '100%' }}>
-              Turpināt uz Meža tirgu →
-            </button>
-          </>
-        )}
+              ) : planId && (
+                <div style={{
+                  background: `${C.green}15`, border: `1px solid ${C.green}44`,
+                  borderRadius: R.lg, padding: S.md, margin: `${S.md} 0`,
+                }}>
+                  <div style={{ color: C.textDim, fontSize: F.xs, marginBottom: 4 }}>Aktivizētais plāns</div>
+                  <div style={{ color: C.green, fontSize: F.lg, fontWeight: F.weightBold }}>
+                    🌲 {PLAN_NOSAUKUMI[planId] || planId}
+                  </div>
+                </div>
+              )}
+              {!isPdf && (
+                <p style={{ color: C.textMut, fontSize: F.sm, lineHeight: 1.6, margin: `0 0 ${S.xl}` }}>
+                  Jūsu abonements ir aktivizēts. Ja plāns nav redzams uzreiz —
+                  izejiet un ielogojieties vēlreiz.
+                </p>
+              )}
+              <button onClick={onTurpina} style={{ ...btn.primary, justifyContent: 'center', width: '100%' }}>
+                {isPdf ? 'Atgriezties uz rīku →' : 'Turpināt uz Meža tirgu →'}
+              </button>
+            </>
+          )
+        })()}
 
         {statuss === 'klude' && (
           <>

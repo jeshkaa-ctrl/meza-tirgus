@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 
 const PLAN_FEATURES = {
-  free:     { pdf: false, archive: false, listings: false, auctions_publish: false, waybills: false },
-  pro:      { pdf: true,  archive: true,  listings: true,  auctions_publish: false, waybills: false },
-  business: { pdf: true,  archive: true,  listings: true,  auctions_publish: true,  waybills: true  },
+  free:                  { pdf: false, archive: false, listings: false, waybills: false },
+  pro:                   { pdf: true,  archive: true,  listings: true,  waybills: false },
+  business:              { pdf: true,  archive: true,  listings: true,  waybills: true  },
+  business_sakuma:       { pdf: true,  archive: true,  listings: true,  waybills: true  },
+  business_videjais:     { pdf: true,  archive: true,  listings: true,  waybills: true  },
+  business_neierobezots: { pdf: true,  archive: true,  listings: true,  waybills: true  },
 }
 
 export function useSubscription() {
@@ -47,8 +50,8 @@ export function useSubscription() {
   }, [])
 
   const can        = (feature) => PLAN_FEATURES[plan]?.[feature] ?? false
-  const isPro      = plan === 'pro' || plan === 'business'
-  const isBusiness = plan === 'business'
+  const isPro      = plan !== 'free'
+  const isBusiness = ['business', 'business_sakuma', 'business_videjais', 'business_neierobezots'].includes(plan)
 
   return { plan, status, loading, can, isPro, isBusiness }
 }

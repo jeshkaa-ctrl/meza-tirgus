@@ -176,6 +176,8 @@ setSaving(true); setError(null);
       const { data, error } = await supabase.from("pavadzimes").insert([row]).select().single();
       if (error) throw error;
       setRecords(prev => [data, ...prev]);
+      // Skaita pavadzīmes mēnesī — nekad nebloķē saglabāšanu
+      supabase.rpc('increment_pavadzimes', { p_user_id: user?.id }).catch(() => {})
       setPreview(null); setExtracted(null); setVerifyData(null); setVerifyMode(false);
       setSolis(1); setIzveletsSoferis(null); setIzveletaAuto(""); setIzveletiVeids(""); setIzveletiKlients("");
       setTab("registrs");

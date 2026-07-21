@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 import { calcSortimentsByQuality } from "./qualityEngine"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 import { getVeidaugstums } from "./tables"
 import { C as DS, F, spinnerCSS } from "./ds"
 
@@ -253,6 +255,7 @@ export default function CirsmaNovertesanaMobile({ onBack }) {
   const [jD, setJD] = useState("")
   const [aktSuga, setAktSuga] = useState(null)
   const [oSt, setOSt] = useState(false)
+  const [pdfMaksa, setPdfMaksa] = useState(null)
 
   const pl = parseFloat(platiba) || 0
 
@@ -379,7 +382,10 @@ export default function CirsmaNovertesanaMobile({ onBack }) {
   }
 
   // ── PDF ──────────────────────────────────────────────────────────────────
-  const exportPDF = () => {
+  const exportPDF = async () => {
+    const maksa = await parbauditVaiMaksaPdf(null, 'cirsma')
+    if (!maksa.allowed) { setPdfMaksa(maksa); return }
+
     const today = new Date().toLocaleDateString("lv-LV")
     const res = rezultati()
     const kopKub = res.reduce((s,r)=>s+r.kub,0)
@@ -861,6 +867,7 @@ ${piezimes?`<tr><td>${piezimes}</td></tr>`:""}</tbody></table>`:""}
           )}
         </>}
         <div style={{padding:"0 16px"}}>
+          <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
           <button style={c.btnO} onClick={exportPDF}>{t.printPDF}</button>
           <button style={{...c.btn2,width:"100%",marginTop:8}} onClick={()=>setSolis(3)}>{t.editBack}</button>
           <button style={{...c.btnD,width:"100%",marginTop:8}} onClick={notirit}>{t.deleteAll}</button>

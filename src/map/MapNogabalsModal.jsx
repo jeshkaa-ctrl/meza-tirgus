@@ -95,7 +95,7 @@ function lēmumKrasa(lēmums) {
 
 // ── Galvenais komponents ──────────────────────────────────────────────────────
 
-export default function MapNogabalsModal({ nogabals, onSave, onClose }) {
+export default function MapNogabalsModal({ nogabals, onSave, onClose, onGeomEdit }) {
   // Inicializē formu no LVM GEO datiem vai tukšu
   const [d, setD] = useState(() => ({
     kategorija: nogabals?.kategorija || 'MA',
@@ -353,6 +353,22 @@ export default function MapNogabalsModal({ nogabals, onSave, onClose }) {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Ģeometrijas rediģēšana */}
+          {onGeomEdit && ['Polygon', 'MultiPolygon'].includes(nogabals?.geojson?.geometry?.type) && (
+            <button
+              onClick={onGeomEdit}
+              style={{
+                width: '100%', padding: '11px', borderRadius: 10,
+                fontSize: 14, cursor: 'pointer', marginBottom: 12,
+                background: 'transparent',
+                border: '1.5px solid #e040fb',
+                color: '#e040fb', fontWeight: 600,
+              }}
+            >
+              📐 Labot nogabala ģeometriju
+            </button>
           )}
 
           {/* Pogas */}

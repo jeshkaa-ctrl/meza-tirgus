@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { calcDastojums, calcH } from "./dastojumsEngine"
+import { parbauditVaiMaksaPdf } from './utils/pdfPaymentCheck'
+import { PdfMaksasGate } from './components/PdfMaksasGate'
 
 const SUGAS = ["P","E","B","A","Ba","Bl","M","Oz","Os","G"]
 const D_KLASES = [8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68]
@@ -13,6 +15,7 @@ function tuksiMerijumi(){
 export default function DastojumsPanel({kadastrs, saimnieciba, onClose, user, onReg}){
   const [stavi, setStavi] = useState([{suga:"P",hVid:0,merijumi:tuksiMerijumi()}])
   const [rezultati, setRezultati] = useState(null)
+  const [pdfMaksa,  setPdfMaksa]  = useState(null)
   const [cenas, setCenas] = useState(DEFAULT_CENAS)
   const [showCenas, setShowCenas] = useState(false)
   const [eko, setEko] = useState(SUGAS.map(s=>({suga:s,skaits:0,d:0})))
@@ -60,8 +63,10 @@ export default function DastojumsPanel({kadastrs, saimnieciba, onClose, user, on
     }
   },[cenas])
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     if(!rezultati) return
+    const maksa = await parbauditVaiMaksaPdf(user, 'dastojums')
+    if (!maksa.allowed) { setPdfMaksa(maksa); return }
     const today = new Date().toLocaleDateString("lv-LV")
     const kopaKraja = rezultati.reduce((s,r)=>s+r.kopaKraja,0)
     const kopaVertiba = rezultati.reduce((s,r)=>s+r.vertiba,0)
@@ -150,6 +155,7 @@ ${ekoRez.map(r=>`<tr>
 
   return(
   <div style={{padding:"20px",fontFamily:"Arial",maxWidth:"1100px",background:"#0f1a0f",color:"#e8f5e9",borderRadius:"10px"}}>
+    <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} />
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
       <h2 style={{color:"#4caf50",margin:0}}>🌲 Dastojuma aprēķins</h2>
       {onClose && <button onClick={onClose} style={{padding:"4px 12px",background:"#888",color:"white",border:"none",borderRadius:"4px",cursor:"pointer"}}>✕ Aizvērt</button>}

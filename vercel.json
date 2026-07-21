@@ -6,5 +6,11 @@
     { "source": "/api/anthropic/:path*", "destination": "/api/anthropic" },
     { "source": "/api/lvmgeo/:path*",   "destination": "/api/lvmgeo"   },
     { "source": "/(.*)",              "destination": "/index.html"    }
+  ],
+  "crons": [
+    {
+      "path": "/api/pavadzimes-cron",
+      "schedule": "0 6 * * *"
+    }
   ]
 }
