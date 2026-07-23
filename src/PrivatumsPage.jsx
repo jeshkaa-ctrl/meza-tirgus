@@ -23,7 +23,7 @@ export default function PrivatumsPage({ onBack }) {
         {[
           {
             virsraksts: '1. Pārzinis',
-            teksts: 'Meža tirgus platformas pārzinis ir Artijs Ješkins (mezatirgus.info@gmail.com). Platforma pieejama vietnē meza-tirgus.lv.',
+            teksts: 'Meža tirgus platformas pārzinis ir Arturs Skrebelis (mezatirgus.info@gmail.com). Platforma pieejama vietnē meza-tirgus.lv.',
           },
           {
             virsraksts: '2. Kādi dati tiek vākti',
