@@ -107,6 +107,143 @@ function AtzinasPanelis() {
   )
 }
 
+// ── Sistēmas paziņojumu pārvaldības panelis ──
+function PazinojumuAdminPanelis() {
+  const [pazinojumi, setPazinojumi] = useState([])
+  const [teksts,     setTeksts]     = useState('')
+  const [tips,       setTips]       = useState('info')
+  const [lade,       setLade]       = useState(true)
+  const [saglaba,    setSaglaba]    = useState(false)
+
+  useEffect(() => { ielade() }, [])
+
+  async function ielade() {
+    setLade(true)
+    const { data } = await supabase
+      .from('sistemas_pazinojumi')
+      .select('*')
+      .order('created_at', { ascending: false })
+    setPazinojumi(data || [])
+    setLade(false)
+  }
+
+  async function publicet() {
+    if (!teksts.trim()) return
+    setSaglaba(true)
+    await supabase.from('sistemas_pazinojumi').insert({ teksts: teksts.trim(), tips })
+    setTeksts('')
+    await ielade()
+    setSaglaba(false)
+  }
+
+  async function deaktivizet(id) {
+    await supabase.from('sistemas_pazinojumi').update({ aktivs: false }).eq('id', id)
+    setPazinojumi(prev => prev.map(p => p.id === id ? { ...p, aktivs: false } : p))
+  }
+
+  const TIPS_INFO = {
+    'info':        { ikona: '🔵', krasa: '#42a5f5' },
+    'brīdinājums': { ikona: '🟡', krasa: '#ffa726' },
+    'kļūda':       { ikona: '🔴', krasa: '#ef5350' },
+  }
+
+  return (
+    <div>
+      {/* Jauna paziņojuma forma */}
+      <div style={{
+        background: C.bgCard, border: `1px solid ${C.greenBdr}`,
+        borderRadius: 10, padding: 20, marginBottom: 24,
+      }}>
+        <div style={{ fontSize: F.sm, fontWeight: 700, color: C.text, marginBottom: 14 }}>
+          Jauns paziņojums
+        </div>
+        <textarea
+          value={teksts}
+          onChange={e => setTeksts(e.target.value)}
+          placeholder="Paziņojuma teksts..."
+          rows={3}
+          style={{
+            width: '100%', background: C.bgInner,
+            border: `1px solid ${C.greenBdr}`, borderRadius: 7,
+            padding: '10px 12px', color: C.text, fontSize: F.sm,
+            fontFamily: F.family, resize: 'vertical',
+            outline: 'none', boxSizing: 'border-box',
+          }}
+        />
+        <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+          {Object.entries(TIPS_INFO).map(([t, { ikona, krasa }]) => (
+            <button key={t} onClick={() => setTips(t)} style={{
+              padding: '6px 14px', borderRadius: 6, cursor: 'pointer',
+              border: `1px solid ${tips === t ? krasa : C.greenBdr}`,
+              background: tips === t ? C.bgInner : 'transparent',
+              color: tips === t ? krasa : C.textDim,
+              fontSize: F.xs, fontFamily: F.family,
+              fontWeight: tips === t ? 700 : 400,
+            }}>
+              {ikona} {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+          <div style={{ flex: 1 }} />
+          <button
+            onClick={publicet}
+            disabled={!teksts.trim() || saglaba}
+            style={{
+              padding: '8px 22px', borderRadius: 7, border: 'none',
+              cursor: teksts.trim() && !saglaba ? 'pointer' : 'default',
+              background: teksts.trim() && !saglaba ? C.green : C.bgInner,
+              color: teksts.trim() && !saglaba ? '#fff' : C.textDim,
+              fontSize: F.sm, fontWeight: 700, fontFamily: F.family,
+            }}
+          >
+            {saglaba ? 'Saglabā...' : 'Publicēt'}
+          </button>
+        </div>
+      </div>
+
+      {/* Saraksts */}
+      {lade && (
+        <div style={{ textAlign: 'center', padding: 40, color: C.textDim }}>Ielādē...</div>
+      )}
+      {!lade && pazinojumi.length === 0 && (
+        <div style={{ textAlign: 'center', padding: 40, color: C.textDim }}>Nav paziņojumu</div>
+      )}
+      {!lade && pazinojumi.map(p => {
+        const tk = TIPS_INFO[p.tips] || TIPS_INFO['info']
+        return (
+          <div key={p.id} style={{
+            background: C.bgCard, border: `1px solid ${p.aktivs ? C.greenBdr : '#222'}`,
+            borderRadius: 8, padding: '12px 16px', marginBottom: 8,
+            display: 'flex', alignItems: 'flex-start', gap: 12,
+            opacity: p.aktivs ? 1 : 0.5,
+          }}>
+            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{tk.ikona}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: F.sm, color: C.text, lineHeight: 1.5 }}>{p.teksts}</div>
+              <div style={{ fontSize: 11, color: C.textDim, marginTop: 4, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{ color: tk.krasa }}>{p.tips}</span>
+                <span>·</span>
+                <span>{new Date(p.created_at).toLocaleDateString('lv-LV')}</span>
+                <span>·</span>
+                <span style={{ color: p.aktivs ? C.green : '#555' }}>
+                  {p.aktivs ? '● aktīvs' : '○ neaktīvs'}
+                </span>
+              </div>
+            </div>
+            {p.aktivs && (
+              <button onClick={() => deaktivizet(p.id)} style={{
+                padding: '5px 12px', borderRadius: 6,
+                border: `1px solid ${C.errorBdr}`, background: 'transparent',
+                color: C.error, fontSize: F.xs, cursor: 'pointer',
+                fontFamily: F.family, flexShrink: 0, fontWeight: 600,
+              }}>Deaktivizēt</button>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 const LAPU_NOSAUKUMI = {
   landing: '🏠 Sākumlapa', main: '🛠 Darba virsma', tirgus: '🌿 Tirgus',
   standard: '📄 VMD PDF analīze', cirsma: '🌲 Cirsmas novērtēšana',
@@ -236,6 +373,7 @@ export default function AdminDashboard({ onBack, onNavigate }) {
           { id: 'bankieris',   label: '💳 Banķieris' },
           { id: 'gramatvedis', label: '📊 Grāmatvedis' },
           { id: 'atzinas',    label: '🧠 Atziņas' },
+          { id: 'pazinojumi', label: '📢 Paziņojumi' },
         ].map(c => (
           <button key={c.id} onClick={() => setCilne(c.id)} style={{
             background: 'none', border: 'none',
@@ -408,6 +546,9 @@ CREATE POLICY "admin_lasa" ON app_events
 
         {/* ── SELEKTORA ATZIŅAS ── */}
         {cilne === 'atzinas' && <AtzinasPanelis />}
+
+        {/* ── SISTĒMAS PAZIŅOJUMI ── */}
+        {cilne === 'pazinojumi' && <PazinojumuAdminPanelis />}
 
         {/* ── BOTI (meklētājs / mākslinieks / pārdevējs) ── */}
         {(cilne === 'bots' || cilne === 'makslinieks' || cilne === 'pardevejs' || cilne === 'bankieris') && (

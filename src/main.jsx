@@ -2,6 +2,7 @@ import React, { Suspense } from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App.jsx"
 import ErrorBoundary from "./ErrorBoundary.jsx"
+import SistemasPazinojumiPortal from "./SistemasPazinojumiPortal.jsx"
 import "./index.css"
 import { registerSW } from 'virtual:pwa-register'
 
@@ -23,6 +24,7 @@ const Lade = () => (
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ErrorBoundary>
+      <SistemasPazinojumiPortal />
       <Suspense fallback={<Lade />}>
         <App />
       </Suspense>
