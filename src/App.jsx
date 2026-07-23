@@ -29,6 +29,7 @@ const TirgusLapa             = React.lazy(() => import("./kopiena/TirgusLapa"))
 const AdminDashboard         = React.lazy(() => import("./AdminDashboard"))
 const VeikalsPage            = React.lazy(() => import("./VeikalsPage"))
 const PrivatumsPage          = React.lazy(() => import("./PrivatumsPage"))
+const NoteikumiPage          = React.lazy(() => import("./NoteikumiPage"))
 const CirsmaskicePage        = React.lazy(() => import("./CirsmaskicePage"))
 const CaurmeraPage           = React.lazy(() => import("./CaurmeraPage"))
 const AtjaunosanaPage        = React.lazy(() => import("./AtjaunosanaPage"))
@@ -141,7 +142,7 @@ if(page==="sludinajumi") return <>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="landing") return <>
-  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onIpasums={()=>setPage("ipasums")} onVeikals={()=>setPage("veikals")} onAdmin={()=>setPage("admin")}/>
+  <LandingPage onEnter={()=>setPage("main")} onStandard={()=>setPage("standard")} user={user} onIziet={iziet} onReg={()=>atvertReg("landing")} onSludinajumi={()=>setPage("sludinajumi")} onLikumi={()=>setPage("jautaparmezu")} onTirgus={()=>setPage("tirgus")} onPrivatums={()=>setPage("privatums")} onNoteikumi={()=>setPage("noteikumi")} onIpasums={()=>setPage("ipasums")} onVeikals={()=>setPage("veikals")} onAdmin={()=>setPage("admin")}/>
   {showReg && <RegModal onRegistreties={async(d)=>{await registreties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onPieteikties={async(d)=>{await pieteikties(d);setShowReg(false);if(regAtpakal)setPage(regAtpakal)}} onAizvērt={()=>setShowReg(false)} nosutitParolesReset={nosutitParolesReset}/>}
 </>
 if(page==="ipasums") return (
@@ -247,6 +248,7 @@ if(page==="mednieks") return <>
 </>
 if(page==="dastojums") { setPage("dastojums_pdf"); return null }
 if(page==="privatums") return <PrivatumsPage onBack={()=>setPage("landing")}/>
+if(page==="noteikumi") return <NoteikumiPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
 if(page==="profils") return (
   <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#060d06"}}/>}>

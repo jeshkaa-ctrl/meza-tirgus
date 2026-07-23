@@ -17,7 +17,7 @@ return(
 )
 }
 
-function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums, onIpasums, onVeikals, onAdmin}){
+function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums, onNoteikumi, onIpasums, onVeikals, onAdmin}){
 return(
 <div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -278,6 +278,10 @@ return(
     <p style={{color:"#666",fontSize:"12px",margin:"0 0 8px"}}>© 2026 Meža tirgus · meža-tirgus.lv · Darbarīks meža speciālistam un meža īpašniekam</p>
     <button onClick={onPrivatums} style={{background:"none",border:"none",color:"#4a6a4a",fontSize:"11px",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
       Privātuma politika
+    </button>
+    {" · "}
+    <button onClick={onNoteikumi} style={{background:"none",border:"none",color:"#4a6a4a",fontSize:"11px",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
+      Lietošanas noteikumi
     </button>
     {" · "}
     <button onClick={onAdmin} style={{background:"none",border:"none",color:"#3a4a3a",fontSize:"11px",cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
