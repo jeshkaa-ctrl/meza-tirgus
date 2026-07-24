@@ -74,15 +74,17 @@ export default function IpasumAnalīze({ onBack }) {
       let nogabaliAvots = 'nav'
       try {
         const { data: supabaseNogabali } = await supabase
-          .from('meza_nogabali')
+          .from('meza_nogabali_geo')
           .select('*')
           .eq('kadastrs', kad)
         if (supabaseNogabali && supabaseNogabali.length > 0) {
           nogabaliAvots = 'supabase'
           vmdData = {
             features: supabaseNogabali.map(n => ({
+              type: 'Feature',
+              id: String(n.id),
+              geometry: n.geometry || null,
               properties: n,
-              geometry: null  // karte rāda kadastra robežu; tabula/diagrammas pilnīgas
             }))
           }
         } else {
