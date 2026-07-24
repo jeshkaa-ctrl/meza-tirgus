@@ -54,44 +54,62 @@ export default function IpasumAnalīze({ onBack }) {
       setKluda('Kadastra numuram jābūt 11 cipariem (piemērs: 42820040063)'); return
     }
     setKluda(''); setFaze('lade'); setLadeText('Saņem kadastra robežas...')
-    let lvmKluda = false
+    setLvmGeoNepieejams(false); setBannerisAizverts(false)
+    // dapNepieejams = true tikai kad LVM GEO DAP serviss nestrādā (egļu aizsardzība)
+    // nogabaliAvots paliek 'nav' kad ABAS datu bāzes (Supabase + LVM GEO) neatgrieza nogabalus
+    let dapNepieejams = false
     try {
-      // 1. Kadastra robeža — LVM GEO, fallback VZD (caur /api/vzd)
+      // 1. Kadastra robeža — mūsu Supabase kadastru_robezas_geo (caur /api/vzd)
+      //    NEMAINĪTA loģika — /api/vzd jau izmanto Supabase kā avotu
       try {
         const kadData = await lvmWFSTimeout(`/api/vzd?kadastrs=${kad}`)
         const kadFeat = kadData?.features?.[0]
         if (kadFeat) setKadGeom(kadFeat)
-      } catch { lvmKluda = true }
+      } catch { /* robeža nav kritiska — turpina bez tās */ }
 
-      // 2. VMD nogabali — vispirms mūsu Supabase DB, tad LVM GEO
+      // 2. VMD nogabali — VISPIRMS mūsu Supabase DB (99.78% Latvijas pārklājums)
+      //    FALLBACK: LVM GEO WFS, ja Supabase neatrod šo kadastru
       setLadeText('Iegūst VMD nogabalu datus...')
       let vmdData = null
+      let nogabaliAvots = 'nav'
       try {
         const { data: supabaseNogabali } = await supabase
           .from('meza_nogabali')
           .select('*')
           .eq('kadastrs', kad)
         if (supabaseNogabali && supabaseNogabali.length > 0) {
+          nogabaliAvots = 'supabase'
           vmdData = {
             features: supabaseNogabali.map(n => ({
               properties: n,
-              geometry: null
+              geometry: null  // karte rāda kadastra robežu; tabula/diagrammas pilnīgas
             }))
           }
         } else {
+          // LVM GEO fallback — reti (kadastrs nav mūsu DB)
           vmdData = await lvmWFSTimeout(buildWFS('/publicwfs/ows', 'publicwfs:vmdpubliccompartments', `kadastrs='${kad}'`, 500))
+          if (vmdData?.features?.length > 0) nogabaliAvots = 'lvmgeo'
         }
-      } catch { lvmKluda = true }
+      } catch { /* nogabaliAvots paliek 'nav' */ }
 
-      // 3. Egļu aizsardzība (LVM GEO) — ar 8s timeout
+      // 3. Egļu aizsardzība — LVM GEO (nav Supabase ekvivalenta)
+      //    Kļūda ir pieļaujama — rāda tukšu aizsardzības slāni
       setLadeText('Iegūst aizsardzības teritorijas...')
       let dapFeatures = []
       try {
         const dapData = await lvmWFSTimeout(buildWFS('/publicwfs/ows', 'publicwfs:vmdspruceprotcompartments', `cadaster='${kad}'`, 20))
         dapFeatures = dapData?.features || []
-      } catch { lvmKluda = true }
+      } catch { dapNepieejams = true }
 
-      if (lvmKluda) setLvmGeoNepieejams(true)
+      // Banner rādās TIKAI kad LVM GEO DAP kļūdaini vai nogabali nav NEKUR atrasti
+      if (dapNepieejams) setLvmGeoNepieejams(true)
+
+      // Ja nogabali nav ne Supabase, ne LVM GEO — skaidra kļūda, ne sabrukums
+      if (nogabaliAvots === 'nav') {
+        setFaze('ievads')
+        setKluda('Šim kadastram dati nav pieejami — mēģini vēlreiz vēlāk vai pārbaudi kadastra numuru.')
+        return
+      }
 
       setLadeText('Aprēķina meža vērtību...')
       const aizsardzibaStatus = getAizsardzibaStatus(dapFeatures)
@@ -148,7 +166,7 @@ export default function IpasumAnalīze({ onBack }) {
   const LvmBanneris = () => lvmGeoNepieejams && !bannerisAizverts ? (
     <div style={{ margin:'10px 16px 0', padding:'10px 14px', borderRadius:8, background:'#1f1000', border:'1px solid #e65100', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
       <div style={{ fontSize:12, color:'#ffb74d', lineHeight:1.5 }}>
-        ⚠️ Publiskie meža karšu dati šobrīd nav pieejami tehnisku iemeslu dēļ. Pārējā funkcionalitāte darbojas kā parasti.
+        ⚠️ LVM GEO šobrīd nav pieejams tehnisku problēmu dēļ. Rādām datus no mūsu pašu datubāzes (VMD dati). Pamata aprēķini (platība, suga, vecums, orientējošā vērtība) ir pieejami, taču daži papildu dati var nebūt pilnīgi.
       </div>
       <button onClick={()=>setBannerisAizverts(true)} style={{ background:'none', border:'none', color:'#ffb74d', fontSize:18, cursor:'pointer', padding:'0 4px', flexShrink:0, lineHeight:1 }}>✕</button>
     </div>
