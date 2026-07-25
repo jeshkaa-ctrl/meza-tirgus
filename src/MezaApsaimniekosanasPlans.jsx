@@ -895,7 +895,7 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const [mapModal,        setMapModal]        = useState(null)
   const [drawerOpen,      setDrawerOpen]      = useState(false)
   const [lvmKluda,        setLvmKluda]        = useState(false)
-  const [titullapa,       setTitullapa]       = useState({ novads: '', pagasts: '', nosaukums: '' })
+  const [titullapa,       setTitullapa]       = useState({ novads: '', pagasts: '', nosaukums: '', ipasnieks: '', mezniecia: '' })
   const [pdfLade,         setPdfLade]         = useState(false)
   const [uploadLade,      setUploadLade]      = useState(false)
   const [uploadProgress,  setUploadProgress]  = useState('')
@@ -2225,9 +2225,11 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
               {[
-                { lauks: 'nosaukums', label: 'Īpašuma nosaukums', placeholder: 'Piemērs: Priedes' },
-                { lauks: 'novads',    label: 'Novads',             placeholder: 'Piemērs: Saulkrastu novads' },
-                { lauks: 'pagasts',   label: 'Pagasts',            placeholder: 'Piemērs: Zvejniekciema pagasts' },
+                { lauks: 'ipasnieks', label: 'Zemes īpašnieks',      placeholder: 'Piemērs: Jānis Bērziņš' },
+                { lauks: 'nosaukums', label: 'Īpašuma nosaukums',    placeholder: 'Piemērs: Priedes' },
+                { lauks: 'novads',    label: 'Novads',                placeholder: 'Piemērs: Saulkrastu novads' },
+                { lauks: 'pagasts',   label: 'Pagasts',               placeholder: 'Piemērs: Zvejniekciema pagasts' },
+                { lauks: 'mezniecia', label: 'Uzraugāmā mežniecība', placeholder: 'Piemērs: Pierīgas mežniecība' },
               ].map(({ lauks, label, placeholder }) => (
                 <div key={lauks}>
                   <div style={{ fontSize: 11, color: DS.textMut, marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -2432,9 +2434,11 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
               {[
-                { lauks: 'nosaukums', label: 'Īpašuma nosaukums', placeholder: 'Piemērs: Priedes' },
-                { lauks: 'novads',    label: 'Novads',             placeholder: 'Piemērs: Saulkrastu novads' },
-                { lauks: 'pagasts',   label: 'Pagasts',            placeholder: 'Piemērs: Zvejniekciema pagasts' },
+                { lauks: 'ipasnieks', label: 'Zemes īpašnieks',      placeholder: 'Piemērs: Jānis Bērziņš' },
+                { lauks: 'nosaukums', label: 'Īpašuma nosaukums',    placeholder: 'Piemērs: Priedes' },
+                { lauks: 'novads',    label: 'Novads',                placeholder: 'Piemērs: Saulkrastu novads' },
+                { lauks: 'pagasts',   label: 'Pagasts',               placeholder: 'Piemērs: Zvejniekciema pagasts' },
+                { lauks: 'mezniecia', label: 'Uzraugāmā mežniecība', placeholder: 'Piemērs: Pierīgas mežniecība' },
               ].map(({ lauks, label, placeholder }) => (
                 <div key={lauks}>
                   <div style={{ fontSize: 11, color: DS.textMut, marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>

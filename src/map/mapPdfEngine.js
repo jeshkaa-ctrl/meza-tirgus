@@ -3,6 +3,23 @@ import autoTable from 'jspdf-autotable'
 
 // ── Roboto fonts ar latviešu burtu atbalstu ───────────────────────────────────
 let _fontCache = {}
+let _logoDataUrl = undefined
+
+async function ladeLogo() {
+  if (_logoDataUrl !== undefined) return _logoDataUrl
+  try {
+    const r = await fetch('/pwa-192x192.png')
+    if (!r.ok) { _logoDataUrl = null; return null }
+    const buf = await r.arrayBuffer()
+    const bytes = new Uint8Array(buf)
+    let binary = ''
+    const CHUNK = 0x8000
+    for (let i = 0; i < bytes.length; i += CHUNK)
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK))
+    _logoDataUrl = 'data:image/png;base64,' + btoa(binary)
+  } catch { _logoDataUrl = null }
+  return _logoDataUrl
+}
 
 async function ladeFontu(doc) {
   const toBase64 = async (url) => {
@@ -46,10 +63,13 @@ const MAR  = 14                  // kreisā/labā mala mm
 function zimetGalveni(doc, titullapa, kadastrs) {
   doc.setFillColor(...GRN)
   doc.rect(0, 0, A4W, 12, 'F')
+  if (_logoDataUrl) {
+    try { doc.addImage(_logoDataUrl, 'PNG', MAR, 1, 10, 10) } catch {}
+  }
   doc.setFont('Roboto', 'bold')
   doc.setFontSize(9)
   doc.setTextColor(...WHT)
-  doc.text('MEŽA TIRGUS  ·  meža-tirgus.lv', MAR, 8)
+  doc.text('MEŽA TIRGUS  ·  meža-tirgus.lv', _logoDataUrl ? MAR + 12 : MAR, 8)
   const kad = `Kadastrs: ${kadastrs}  ·  ${titullapa?.nosaukums || ''}  ·  ${titullapa?.novads || ''}`
   doc.text(kad, A4W - MAR, 8, { align: 'right' })
 }
@@ -75,32 +95,41 @@ function lapaTitullapa(doc, titullapa, kadastrs, nogabali, gads) {
   doc.rect(0, 14, W, 36, 'F')
 
   doc.setFont('Roboto', 'bold')
-  doc.setFontSize(22)
+  doc.setFontSize(20)
   doc.setTextColor(...WHT)
-  doc.text('MEŽA INVENTARIZĀCIJAS', W / 2, 27, { align: 'center' })
-  doc.text('DATU APKOPOJUMS', W / 2, 38, { align: 'center' })
+  doc.text('MEŽA INVENTARIZĀCIJAS APRAKSTS', W / 2, 29, { align: 'center' })
 
-  doc.setFontSize(11)
+  doc.setFontSize(12)
   doc.setFont('Roboto', 'normal')
+  doc.text(`no ${gads}. līdz ${gads + 20}. gadam`, W / 2, 39, { align: 'center' })
   doc.text('Meža apsaimniekošanas plāns', W / 2, 46, { align: 'center' })
 
-  // Logo bloks augšā labajā
-  doc.setFillColor(...GRN2)
-  doc.roundedRect(W - 52, 15, 38, 10, 2, 2, 'F')
-  doc.setFont('Roboto', 'bold')
-  doc.setFontSize(10)
-  doc.setTextColor(...WHT)
-  doc.text('MEŽA TIRGUS', W - 33, 21.5, { align: 'center' })
+  // Logo augšā labajā stūrī
+  if (_logoDataUrl) {
+    try { doc.addImage(_logoDataUrl, 'PNG', W - 44, 15, 20, 20) } catch {
+      doc.setFillColor(...GRN2)
+      doc.roundedRect(W - 52, 15, 38, 10, 2, 2, 'F')
+      doc.setFont('Roboto', 'bold'); doc.setFontSize(10); doc.setTextColor(...WHT)
+      doc.text('MEŽA TIRGUS', W - 33, 21.5, { align: 'center' })
+    }
+  } else {
+    doc.setFillColor(...GRN2)
+    doc.roundedRect(W - 52, 15, 38, 10, 2, 2, 'F')
+    doc.setFont('Roboto', 'bold'); doc.setFontSize(10); doc.setTextColor(...WHT)
+    doc.text('MEŽA TIRGUS', W - 33, 21.5, { align: 'center' })
+  }
 
   // Pamatinformācija — tabulas veidā
   let y = 60
   const infoRindas = [
-    ['Novads',             titullapa?.novads    || '—'],
-    ['Pagasts',            titullapa?.pagasts   || '—'],
-    ['Īpašuma nosaukums',  titullapa?.nosaukums || '—'],
-    ['Kadastra nr.',       kadastrs || '—'],
-    ['Datums',             new Date().toLocaleDateString('lv-LV')],
+    ['Zemes īpašnieks',         titullapa?.ipasnieks || '—'],
+    ['Novads',                  titullapa?.novads    || '—'],
+    ['Pagasts',                 titullapa?.pagasts   || '—'],
+    ['Īpašuma nosaukums',       titullapa?.nosaukums || '—'],
+    ['Kadastra nr.',            kadastrs || '—'],
+    ['Uzraugāmā mežniecība',   titullapa?.mezniecia || '—'],
     ['Inventarizācijas periods', `${gads}. – ${gads + 20}. gads`],
+    ['Datums',                  new Date().toLocaleDateString('lv-LV')],
   ]
 
   doc.setFillColor(...GRN4)
@@ -353,6 +382,84 @@ function lapaKopsavilkums(doc, nogabali, titullapa, kadastrs) {
     foot: [sv4Kopa],
     columnStyles: Object.fromEntries([...VEC_GRUPAS.map((_, i) => [i + 1, { halign: 'right' }]), [VEC_GRUPAS.length + 1, { halign: 'right', fontStyle: 'bold' }]]),
   })
+  y = doc.lastAutoTable.finalY + 8
+
+  // ─── 5. tabula: Suga × Augšanas apstākļu tipa grupa ──────────────────────────
+  const TIPU_GRUPAS = {
+    Vr:'Sausieņi', Dm:'Sausieņi', Gs:'Sausieņi', Vc:'Sausieņi',
+    Sl:'Slapjaiņi', Lk:'Slapjaiņi', Ln:'Slapjaiņi',
+    Kg:'Purvaiņi',
+  }
+  const TIPU_GRUPU_SEC = ['Sausieņi', 'Slapjaiņi', 'Purvaiņi', 'Nav norādīts']
+
+  const sugaTips = {}
+  const tipsKopa = {}
+  maMezaudzes.forEach(n => {
+    const s = n.sugaNos || 'Cita'
+    const tg = TIPU_GRUPAS[n.mezaTips] || 'Nav norādīts'
+    if (!sugaTips[s]) sugaTips[s] = {}
+    sugaTips[s][tg] = ((sugaTips[s][tg] || 0) + n.platiba)
+    tipsKopa[tg] = ((tipsKopa[tg] || 0) + n.platiba)
+  })
+
+  const activeTipas = TIPU_GRUPU_SEC.filter(g => tipsKopa[g] > 0)
+  const st5Head = [['Suga', ...activeTipas, 'Kopā (ha)']]
+  const st5Body = []
+  SUGAS_SECIBA.forEach(suga => {
+    if (!sugaTips[suga]) return
+    const rinda = [suga]
+    let kopa = 0
+    activeTipas.forEach(g => {
+      const v = sugaTips[suga][g] || 0
+      rinda.push(v > 0 ? v.toFixed(2) : '—')
+      kopa += v
+    })
+    rinda.push(kopa.toFixed(2))
+    st5Body.push(rinda)
+  })
+  const st5Kopa = ['KOPĀ', ...activeTipas.map(g => tipsKopa[g] ? tipsKopa[g].toFixed(2) : '—'), maMezaudzes.reduce((s,n)=>s+n.platiba,0).toFixed(2)]
+
+  if (st5Body.length > 0) {
+    if (y + 40 > A4H - 20) { doc.addPage(); zimetGalveni(doc, titullapa, kadastrs); y = 16 }
+    y = tblVirsraksts(doc, '5. Mežaudžu sadalījums pēc sugām un augšanas apstākļu tipa grupām (ha)', y)
+    autoTable(doc, {
+      ...tblOpts(y),
+      head: st5Head,
+      body: st5Body,
+      foot: [st5Kopa],
+      columnStyles: Object.fromEntries([
+        ...activeTipas.map((_, i) => [i + 1, { halign: 'right' }]),
+        [activeTipas.length + 1, { halign: 'right', fontStyle: 'bold' }],
+      ]),
+    })
+    y = doc.lastAutoTable.finalY + 8
+  }
+
+  // ─── 6. tabula: Aizsardzības pazīmju sadalījums ──────────────────────────────
+  const aizsKopa = {}
+  const kopPlAll = nogabali.reduce((s, n) => s + (n.platiba || 0), 0)
+  nogabali.forEach(n => {
+    const a = n.rawProps?.aizsardziba
+    const key = (a != null && String(a).trim() && String(a).trim() !== '0')
+      ? String(a).trim()
+      : 'Bez aizsardzības pazīmēm'
+    aizsKopa[key] = (aizsKopa[key] || 0) + (n.platiba || 0)
+  })
+  const aizs6Body = Object.entries(aizsKopa)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, pl]) => [k, pl.toFixed(2), `${((pl / kopPlAll) * 100).toFixed(1)}%`])
+
+  if (aizs6Body.length > 0) {
+    if (y + 30 > A4H - 20) { doc.addPage(); zimetGalveni(doc, titullapa, kadastrs); y = 16 }
+    y = tblVirsraksts(doc, '6. Nogabalu sadalījums pēc aizsardzības pazīmēm', y)
+    autoTable(doc, {
+      ...tblOpts(y),
+      head: [['Aizsardzības pazīme', 'Platība (ha)', '%']],
+      body: aizs6Body,
+      foot: [['KOPĀ', kopPlAll.toFixed(2), '100.0%']],
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
+    })
+  }
 }
 
 // ── Lapa 3+: Nogabalu tabula ─────────────────────────────────────────────────
@@ -372,15 +479,23 @@ function lapaNogabali(doc, nogabali, titullapa, kadastrs) {
     Ce:'Ceļš', Gr:'Grāvis', KvSt:'KvStiga', Kr:'Krautuve',
   }
 
-  // Katram nogabalam — 2 rindas: datu rinda + apraksta rinda
+  // Galvenā rinda + papildu stāvu rindas + apraksta rinda
   const rows = []
-  nogabali.forEach(n => {
+  const rowMeta = []
+
+  nogabali.forEach((n, nogIdx) => {
     const haKraja = n.kategorija === 'MA' && n.krajaHa > 0
+
+    const izcAtj = typeof n.izcAtjaunots === 'number' && n.izcAtjaunots > 1900 ? n.izcAtjaunots : 0
+    const izcG   = parseInt(n.izcGads || n.rawProps?.izc_gads) || 0
+    const izcVal = izcAtj ? `M ${izcAtj}` : izcG > 1900 ? String(izcG) : '—'
+
     rows.push([
       n.nr_text,
       n.platiba?.toFixed(2) || '—',
       KAT_NOS[n.kategorija] || n.kategorija,
       n.mezaTips || '—',
+      izcVal,
       n.bonitate || '—',
       haKraja ? (n.h || '—') : '—',
       haKraja ? (n.d || '—') : '—',
@@ -390,8 +505,26 @@ function lapaNogabali(doc, nogabali, titullapa, kadastrs) {
       haKraja ? (n.krajaHa || '—') : '—',
       haKraja ? (n.kraja || '—') : '—',
     ])
+    rowMeta.push({ type: 'main', nogIdx })
 
-    // Apraksta rinda (colSpan=12)
+    // Papildus stāvu rindas — subdominējošās sugas (izlaiž dominējošo)
+    const papildStavi = (n.slani || []).filter(s => s.sKods !== n.sugaKods)
+    papildStavi.forEach(s => {
+      const sKrajaHa = s.kub > 0 && n.platiba > 0 ? Math.round(s.kub / n.platiba) : 0
+      rows.push([
+        '', '', `  ↳ ${s.nos || '—'}`, '—', '—', '—',
+        s.hEff > 0 ? s.hEff : '—',
+        s.dEff > 0 ? s.dEff : '—',
+        s.vec  > 0 ? s.vec  : '—',
+        '—',
+        s.gEff > 0 ? s.gEff.toFixed(1) : '—',
+        sKrajaHa > 0 ? sKrajaHa : '—',
+        s.kub  > 0 ? s.kub  : '—',
+      ])
+      rowMeta.push({ type: 'stav', nogIdx })
+    })
+
+    // Apraksta rinda (colSpan=13)
     const dalas = []
     if (n.audzeFormula && n.audzeFormula !== '—') dalas.push(`Audze: ${n.audzeFormula}`)
     if (n.lēmums && n.lēmums !== '—') dalas.push(`Pasākums: ${n.lēmums}`)
@@ -401,21 +534,22 @@ function lapaNogabali(doc, nogabali, titullapa, kadastrs) {
 
     rows.push([{
       content: dalas.length ? dalas.join('  ·  ') : ' ',
-      colSpan: 12,
+      colSpan: 13,
       styles: {
         fontSize: 7, textColor: DIM,
         cellPadding: { top: 1, right: 4, bottom: 2, left: 8 },
         fillColor: GRN4,
       },
     }])
+    rowMeta.push({ type: 'desc', nogIdx })
   })
 
   autoTable(doc, {
     startY: 23,
     margin: { left: MAR, right: MAR },
     head: [[
-      'Nr', 'ha', 'Kategorija', 'MežaTips',
-      'Bon', 'H m', 'D cm', 'Vec', 'Biez',
+      'Nr', 'ha', 'Kategorija', 'Mežs\nTips', 'Izc.',
+      'Bon', 'H\nm', 'D\ncm', 'Vec', 'Biez',
       'G\nm²/ha', 'Krāja\nm³/ha', 'Kop.\nkrāja m³',
     ]],
     body: rows,
@@ -424,23 +558,29 @@ function lapaNogabali(doc, nogabali, titullapa, kadastrs) {
     columnStyles: {
       0:  { cellWidth: 9,  halign: 'center' },
       1:  { cellWidth: 13, halign: 'right'  },
-      2:  { cellWidth: 24 },
-      3:  { cellWidth: 17 },
-      4:  { cellWidth: 11, halign: 'center' },
-      5:  { cellWidth: 11, halign: 'right'  },
-      6:  { cellWidth: 11, halign: 'right'  },
-      7:  { cellWidth: 11, halign: 'right'  },
+      2:  { cellWidth: 22 },
+      3:  { cellWidth: 13 },
+      4:  { cellWidth: 11, halign: 'center', fontSize: 7 },
+      5:  { cellWidth: 10, halign: 'center' },
+      6:  { cellWidth: 10, halign: 'right'  },
+      7:  { cellWidth: 10, halign: 'right'  },
       8:  { cellWidth: 10, halign: 'right'  },
-      9:  { cellWidth: 14, halign: 'right'  },
-      10: { cellWidth: 17, halign: 'right'  },
-      11: { cellWidth: 18, halign: 'right', fontStyle: 'bold' },
+      9:  { cellWidth: 9,  halign: 'right'  },
+      10: { cellWidth: 13, halign: 'right'  },
+      11: { cellWidth: 16, halign: 'right'  },
+      12: { cellWidth: 18, halign: 'right', fontStyle: 'bold' },
     },
     theme: 'grid',
     didParseCell: (data) => {
-      // Datu rindas (pāra indekss) — alternatīvs fons
-      if (data.section === 'body' && !data.cell.raw?.colSpan) {
-        const nogIdx = Math.floor(data.row.index / 2)
-        if (nogIdx % 2 === 1) data.cell.styles.fillColor = GRN3
+      if (data.section !== 'body') return
+      const meta = rowMeta[data.row.index]
+      if (!meta || data.cell.raw?.colSpan) return
+      if (meta.type === 'stav') {
+        data.cell.styles.fillColor = [228, 236, 250]
+        data.cell.styles.fontSize = 7.5
+        data.cell.styles.textColor = [40, 70, 130]
+      } else if (meta.type === 'main' && meta.nogIdx % 2 === 1) {
+        data.cell.styles.fillColor = GRN3
       }
     },
     didDrawPage: () => {
@@ -568,7 +708,7 @@ export async function generateMAPpdf(opts) {
   const gads = new Date().getFullYear()
 
   const doc = new jsPDF('p', 'mm', 'a4')
-  await ladeFontu(doc)
+  await Promise.all([ladeFontu(doc), ladeLogo()])
 
   // Lapa 1 — Titullapa
   lapaTitullapa(doc, titullapa, kadastrs, nogabali, gads)
