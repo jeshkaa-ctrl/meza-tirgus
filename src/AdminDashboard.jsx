@@ -244,6 +244,113 @@ function PazinojumuAdminPanelis() {
   )
 }
 
+// ── Ziņu/pieteikumu pārvaldības panelis ──
+function ZinasAdminPanelis() {
+  const [zinas,   setZinas]   = useState([])
+  const [filtrs,  setFiltrs]  = useState('visi')
+  const [lade,    setLade]    = useState(true)
+
+  useEffect(() => { ielade() }, [filtrs])
+
+  async function ielade() {
+    setLade(true)
+    let q = supabase
+      .from('admin_zinas')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (filtrs !== 'visi') q = q.eq('tips', filtrs)
+    const { data } = await q
+    setZinas(data || [])
+    setLade(false)
+  }
+
+  async function mainStatusu(id, jaunaisStatus) {
+    await supabase.from('admin_zinas').update({ statuss: jaunaisStatus }).eq('id', id)
+    setZinas(prev => prev.map(z => z.id === id ? { ...z, statuss: jaunaisStatus } : z))
+  }
+
+  const STATUS_KRASA = { jauns: '#42a5f5', skatits: '#ffa726', atrisināts: '#4caf50' }
+  const TIPS_IKONA   = { pieteikums: '🤖', zina: '💬', sudziba: '⚠️' }
+
+  return (
+    <div>
+      <div style={{ color: C.textMut, fontSize: F.xs, marginBottom: 16, lineHeight: 1.6 }}>
+        Ienākošie pieteikumi, ziņas un atbalsta pieprasījumi no lietotājiem.
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {[
+          { id: 'visi',       nos: '📬 Visi' },
+          { id: 'pieteikums', nos: '🤖 Pieteikumi' },
+          { id: 'zina',       nos: '💬 Ziņas' },
+          { id: 'sudziba',    nos: '⚠️ Sūdzības' },
+        ].map(f => (
+          <button key={f.id} onClick={() => setFiltrs(f.id)} style={{
+            padding: '8px 16px', borderRadius: 6, cursor: 'pointer', fontFamily: F.family,
+            fontSize: F.xs, fontWeight: filtrs === f.id ? 700 : 400, border: 'none',
+            background: filtrs === f.id ? C.green : C.bgCard,
+            color: filtrs === f.id ? '#fff' : C.textMut,
+            outline: filtrs === f.id ? 'none' : `1px solid ${C.greenBdr}`,
+          }}>{f.nos}</button>
+        ))}
+      </div>
+
+      {lade && <div style={{ textAlign: 'center', padding: 40, color: C.textDim }}>Ielādē...</div>}
+
+      {!lade && zinas.length === 0 && (
+        <div style={{ textAlign: 'center', padding: 40, color: C.textDim }}>
+          Nav ziņu šajā kategorijā
+        </div>
+      )}
+
+      {!lade && zinas.map(z => (
+        <div key={z.id} style={{
+          background: C.bgCard, border: `1px solid ${C.greenBdr}`,
+          borderRadius: 8, padding: 16, marginBottom: 12,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: F.xs, fontWeight: 700, color: C.green, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                {TIPS_IKONA[z.tips] || '📩'} {z.tips}
+              </span>
+              <span style={{ fontSize: F.xs, color: STATUS_KRASA[z.statuss] || C.textDim, background: `${STATUS_KRASA[z.statuss] || '#555'}22`, borderRadius: 4, padding: '1px 7px' }}>
+                {z.statuss || 'jauns'}
+              </span>
+              {z.vards && <span style={{ fontSize: F.xs, color: C.textDim }}>no: {z.vards}</span>}
+            </div>
+            <span style={{ fontSize: 11, color: C.textDim, flexShrink: 0 }}>
+              {new Date(z.created_at).toLocaleDateString('lv-LV')} {new Date(z.created_at).toLocaleTimeString('lv-LV', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          </div>
+          <div style={{ fontSize: F.sm, color: C.textDim, marginBottom: 8 }}>
+            <span style={{ color: C.textPri }}>E-pasts:</span> {z.no_epasta}
+          </div>
+          <div style={{ fontSize: F.sm, color: C.textSec, lineHeight: 1.6, background: C.bgInner, borderRadius: 6, padding: '10px 12px', marginBottom: 12, whiteSpace: 'pre-wrap' }}>
+            {z.saturs}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {z.statuss !== 'skatits' && (
+              <button onClick={() => mainStatusu(z.id, 'skatits')} style={{
+                padding: '7px 18px', borderRadius: 6, border: `1px solid #42a5f5`,
+                background: 'transparent', color: '#42a5f5', fontSize: F.xs, fontWeight: 700, cursor: 'pointer', fontFamily: F.family,
+              }}>👁 Atzīmēt kā skatītu</button>
+            )}
+            {z.statuss !== 'atrisināts' && (
+              <button onClick={() => mainStatusu(z.id, 'atrisināts')} style={{
+                padding: '7px 18px', borderRadius: 6, border: 'none',
+                background: '#1b5e20', color: '#fff', fontSize: F.xs, fontWeight: 700, cursor: 'pointer', fontFamily: F.family,
+              }}>✅ Atrisināts</button>
+            )}
+            <a href={`mailto:${z.no_epasta}?subject=Re: Jūsu pieteikums — Meža Tirgus`} style={{
+              padding: '7px 18px', borderRadius: 6, border: `1px solid ${C.greenBdr}`,
+              color: C.textMut, fontSize: F.xs, fontWeight: 600, textDecoration: 'none', fontFamily: F.family, display: 'inline-flex', alignItems: 'center',
+            }}>✉️ Atbildēt</a>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const LAPU_NOSAUKUMI = {
   landing: '🏠 Sākumlapa', main: '🛠 Darba virsma', tirgus: '🌿 Tirgus',
   standard: '📄 VMD PDF analīze', cirsma: '🌲 Cirsmas novērtēšana',
@@ -374,6 +481,7 @@ export default function AdminDashboard({ onBack, onNavigate }) {
           { id: 'gramatvedis', label: '📊 Grāmatvedis' },
           { id: 'atzinas',    label: '🧠 Atziņas' },
           { id: 'pazinojumi', label: '📢 Paziņojumi' },
+          { id: 'zinas',      label: '📬 Ziņas' },
         ].map(c => (
           <button key={c.id} onClick={() => setCilne(c.id)} style={{
             background: 'none', border: 'none',
@@ -549,6 +657,9 @@ CREATE POLICY "admin_lasa" ON app_events
 
         {/* ── SISTĒMAS PAZIŅOJUMI ── */}
         {cilne === 'pazinojumi' && <PazinojumuAdminPanelis />}
+
+        {/* ── ZIŅAS / PIETEIKUMI ── */}
+        {cilne === 'zinas' && <ZinasAdminPanelis />}
 
         {/* ── BOTI (meklētājs / mākslinieks / pārdevējs) ── */}
         {(cilne === 'bots' || cilne === 'makslinieks' || cilne === 'pardevejs' || cilne === 'bankieris') && (

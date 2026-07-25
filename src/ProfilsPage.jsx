@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { supabase } from './supabaseClient'
 
 export default function ProfilsPage({ user, onBack, mainitParoli, iziet }) {
   const [jauna,    setJauna]    = useState('')
@@ -6,6 +7,35 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet }) {
   const [statuss,  setStatuss]  = useState('')
   const [lade,     setLade]     = useState(false)
   const [radata,   setRadata]   = useState(false)
+
+  const [aSaturs,  setASaturs]  = useState('')
+  const [aTips,    setATips]    = useState('zina')
+  const [aLade,    setALade]    = useState(false)
+  const [aStatuss, setAStatuss] = useState(null)
+
+  async function nosutitAtbalstu() {
+    if (!aSaturs.trim()) return
+    setALade(true); setAStatuss(null)
+    try {
+      const { error } = await supabase.from('admin_zinas').insert({
+        no_epasta: user.epasts,
+        vards:     user.vards || null,
+        saturs:    aSaturs.trim(),
+        tips:      aTips,
+      })
+      if (error) throw error
+      await fetch('/api/email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact', to: 'mezatirgus.info@gmail.com',
+          no_epasta: user.epasts, vards: user.vards || null,
+          saturs: aSaturs.trim(), tips: aTips,
+        }),
+      })
+      setAStatuss('ok'); setASaturs('')
+    } catch { setAStatuss('kluda') }
+    setALade(false)
+  }
 
   const iniciāļi = (user.vards || user.epasts || '?')
     .split(' ').map(v => v[0]).join('').toUpperCase().slice(0, 2)
@@ -111,6 +141,48 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet }) {
             </button>
           </div>
         )}
+
+        {/* Sazināties ar atbalstu */}
+        <div style={{ background: '#0a140a', border: '1px solid #1a3a1a', borderRadius: 14, padding: 20 }}>
+          <div style={{ fontSize: 11, color: '#4caf50', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>✉️ Sazināties ar atbalstu</div>
+          {aStatuss === 'ok' ? (
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+              <div style={{ color: '#81c784', fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Ziņa nosūtīta!</div>
+              <div style={{ color: '#5a8a5a', fontSize: 12 }}>Atbildēsim uz {user.epasts} drīzumā.</div>
+              <button onClick={() => setAStatuss(null)} style={{ marginTop: 12, padding: '7px 18px', background: 'transparent', border: '1px solid #2e7d32', borderRadius: 7, color: '#4caf50', fontSize: 12, cursor: 'pointer' }}>Sūtīt vēl</button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[
+                  { id: 'zina',    nos: '💬 Ziņa' },
+                  { id: 'sudziba', nos: '⚠️ Sūdzība' },
+                ].map(t => (
+                  <button key={t.id} onClick={() => setATips(t.id)} style={{
+                    padding: '7px 16px', borderRadius: 6, cursor: 'pointer', border: 'none',
+                    background: aTips === t.id ? '#2e7d32' : '#0d1a0d',
+                    color: aTips === t.id ? '#fff' : '#5a8a5a',
+                    fontSize: 12, fontWeight: aTips === t.id ? 700 : 400,
+                    outline: aTips === t.id ? 'none' : '1px solid #1a3a1a',
+                  }}>{t.nos}</button>
+                ))}
+              </div>
+              <textarea value={aSaturs} onChange={e => { setASaturs(e.target.value); setAStatuss(null) }} rows={4}
+                placeholder="Aprakstiet jautājumu vai problēmu..."
+                style={{ width: '100%', background: '#040c04', border: `1px solid ${aStatuss === 'kluda' ? '#ef5350' : '#1a3a1a'}`, borderRadius: 8, color: '#ddeadd', fontSize: 13, padding: '10px 12px', outline: 'none', boxSizing: 'border-box', fontFamily: "'Inter',sans-serif", resize: 'vertical', lineHeight: 1.6 }} />
+              {aStatuss === 'kluda' && (
+                <div style={{ color: '#ef5350', fontSize: 12 }}>⚠️ Kļūda nosūtot. Mēģiniet vēlreiz.</div>
+              )}
+              <button onClick={nosutitAtbalstu} disabled={aLade || !aSaturs.trim()} style={{
+                width: '100%', padding: 12, background: aLade || !aSaturs.trim() ? '#1a3a1a' : '#2e7d32',
+                color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: aLade || !aSaturs.trim() ? 'default' : 'pointer',
+              }}>
+                {aLade ? 'Sūta...' : '📤 Nosūtīt'}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Iziet */}
         <button onClick={iziet} style={{

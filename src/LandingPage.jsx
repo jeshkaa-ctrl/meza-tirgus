@@ -1,5 +1,6 @@
-import React from "react"
+import React, { useState } from "react"
 import { C as DS, F } from "./ds"
+import { supabase } from "./supabaseClient"
 import JautaParMezuWidget from "./components/JautaParMezuWidget"
 
 function MezaTirgusLogo(){
@@ -18,6 +19,44 @@ return(
 }
 
 function LandingPage({onEnter, onStandard, user, onIziet, onReg, onSludinajumi, onLikumi, onTirgus, onPrivatums, onNoteikumi, onIpasums, onVeikals, onAdmin}){
+
+  const [pVards,   setPVards]   = useState('')
+  const [pEpasts,  setPEpasts]  = useState('')
+  const [pSaturs,  setPSaturs]  = useState('')
+  const [pLade,    setPLade]    = useState(false)
+  const [pStatuss, setPStatuss] = useState(null) // null | 'ok' | 'kluda'
+
+  async function nosutitPieteikumu() {
+    if (!pEpasts.trim() || !pSaturs.trim()) {
+      setPStatuss('kluda_lauki')
+      return
+    }
+    setPLade(true); setPStatuss(null)
+    try {
+      const { error } = await supabase.from('admin_zinas').insert({
+        no_epasta: pEpasts.trim(),
+        vards:     pVards.trim() || null,
+        saturs:    pSaturs.trim(),
+        tips:      'pieteikums',
+      })
+      if (error) throw error
+      // Admin paziņojuma e-pasts
+      await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'contact', to: 'mezatirgus.info@gmail.com',
+          no_epasta: pEpasts.trim(), vards: pVards.trim() || null,
+          saturs: pSaturs.trim(), tips: 'pieteikums',
+        }),
+      })
+      setPStatuss('ok'); setPVards(''); setPEpasts(''); setPSaturs('')
+    } catch {
+      setPStatuss('kluda')
+    }
+    setPLade(false)
+  }
+
 return(
 <div style={{fontFamily:F.family,minHeight:"100vh",background:DS.bg,maxWidth:"100%",overflowX:"hidden"}}>
 
@@ -269,6 +308,74 @@ return(
           </div>
         ))}
       </div>
+    </div>
+
+    {/* ── PIETEIKT PAKALPOJUMU ───────────────────────────── */}
+    <div style={{background:"linear-gradient(135deg,#0d1a2d,#0f1f0f)",border:"1px solid #1565c044",borderRadius:"16px",padding:"32px",marginBottom:"40px"}}>
+      <div style={{textAlign:"center",marginBottom:"24px"}}>
+        <div style={{color:"#42a5f5",fontSize:"13px",fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",marginBottom:"8px"}}>Pielāgoti AI risinājumi</div>
+        <h3 style={{color:"#e3f2fd",fontSize:"22px",fontWeight:800,margin:"0 0 10px",letterSpacing:"-0.02em"}}>🤖 Pieteikt pakalpojumu</h3>
+        <p style={{color:"#7ab8d4",fontSize:"14px",lineHeight:1.6,margin:"0 auto",maxWidth:500}}>
+          AI risinājumi jūsu biznesam — dokumentu šķirošana, apstrāde, datu ievade. Arī mājaslapas izveide.
+          Aprakstiet savu problēmu, mēs izanalizēsim un piedāvāsim risinājumu.
+        </p>
+      </div>
+
+      {/* Soļi */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:"10px",marginBottom:"28px"}}>
+        {[
+          {n:"1",t:"Aprakstiet problēmu","s":"Aizpildiet formu zemāk"},
+          {n:"2",t:"Mēs analizējam","s":"1–2 darba dienu laikā"},
+          {n:"3",t:"Piedāvājums","s":"Risinājums un cena"},
+          {n:"4",t:"Izveide","s":"Pielāgots rīks jums"},
+        ].map(s=>(
+          <div key={s.n} style={{textAlign:"center",padding:"14px 10px",background:"rgba(66,165,245,0.06)",borderRadius:"10px",border:"1px solid #1565c033"}}>
+            <div style={{width:28,height:28,borderRadius:"50%",background:"#1565c0",color:"#fff",fontSize:13,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 8px"}}>{s.n}</div>
+            <div style={{color:"#90caf9",fontSize:12,fontWeight:700,marginBottom:3}}>{s.t}</div>
+            <div style={{color:"#4a7a9a",fontSize:11}}>{s.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Forma */}
+      {pStatuss === 'ok' ? (
+        <div style={{textAlign:"center",padding:"28px",background:"rgba(66,165,245,0.08)",borderRadius:"12px",border:"1px solid #42a5f533"}}>
+          <div style={{fontSize:40,marginBottom:10}}>✅</div>
+          <div style={{color:"#90caf9",fontSize:16,fontWeight:700,marginBottom:6}}>Paldies, sazināsimies drīzumā!</div>
+          <div style={{color:"#4a7a9a",fontSize:13}}>Atbildēsim uz {pEpasts || 'jūsu e-pastu'} 1–2 darba dienu laikā.</div>
+          <button onClick={()=>setPStatuss(null)} style={{marginTop:14,padding:"8px 20px",background:"transparent",border:"1px solid #42a5f544",borderRadius:8,color:"#90caf9",fontSize:12,cursor:"pointer"}}>Sūtīt vēl vienu pieteikumu</button>
+        </div>
+      ) : (
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:12}}>
+            <div>
+              <div style={{color:"#7ab8d4",fontSize:12,fontWeight:600,marginBottom:5}}>Vārds (neobligāts)</div>
+              <input value={pVards} onChange={e=>setPVards(e.target.value)} placeholder="Jānis Bērziņš"
+                style={{width:"100%",padding:"10px 12px",background:"rgba(0,0,0,0.3)",border:"1px solid #1565c044",borderRadius:8,color:"#e3f2fd",fontSize:13,outline:"none",boxSizing:"border-box",fontFamily:F.family}} />
+            </div>
+            <div>
+              <div style={{color:"#7ab8d4",fontSize:12,fontWeight:600,marginBottom:5}}>E-pasts *</div>
+              <input type="email" value={pEpasts} onChange={e=>{setPEpasts(e.target.value);setPStatuss(null)}} placeholder="jusu@uznemums.lv"
+                style={{width:"100%",padding:"10px 12px",background:"rgba(0,0,0,0.3)",border:`1px solid ${pStatuss==='kluda_lauki'&&!pEpasts?"#ef535088":"#1565c044"}`,borderRadius:8,color:"#e3f2fd",fontSize:13,outline:"none",boxSizing:"border-box",fontFamily:F.family}} />
+            </div>
+          </div>
+          <div>
+            <div style={{color:"#7ab8d4",fontSize:12,fontWeight:600,marginBottom:5}}>Aprakstiet savu problēmu vai uzdevumu *</div>
+            <textarea value={pSaturs} onChange={e=>{setPSaturs(e.target.value);setPStatuss(null)}} rows={4}
+              placeholder="Piemēram: mums ir 500 dokumentu PDF formātā, kas jāklasificē un jāievada tabulā. Katru mēnesi..."
+              style={{width:"100%",padding:"10px 12px",background:"rgba(0,0,0,0.3)",border:`1px solid ${pStatuss==='kluda_lauki'&&!pSaturs?"#ef535088":"#1565c044"}`,borderRadius:8,color:"#e3f2fd",fontSize:13,outline:"none",boxSizing:"border-box",fontFamily:F.family,resize:"vertical",lineHeight:1.6}} />
+          </div>
+          {(pStatuss==='kluda_lauki'||pStatuss==='kluda') && (
+            <div style={{color:"#ef9a9a",fontSize:12,padding:"6px 10px",background:"rgba(239,83,80,0.08)",borderRadius:6}}>
+              ⚠️ {pStatuss==='kluda_lauki'?"Lūdzu aizpildiet e-pastu un ziņas lauku.":"Kļūda sūtot. Mēģiniet vēlreiz."}
+            </div>
+          )}
+          <button onClick={nosutitPieteikumu} disabled={pLade}
+            style={{width:"100%",padding:"13px",background:pLade?"#1a3060":"linear-gradient(135deg,#1565c0,#0d47a1)",color:"#fff",border:"none",borderRadius:8,fontSize:14,fontWeight:700,cursor:pLade?"not-allowed":"pointer",minHeight:46}}>
+            {pLade?"Sūta...":"📤 Nosūtīt pieteikumu"}
+          </button>
+        </div>
+      )}
     </div>
 
   </div>
