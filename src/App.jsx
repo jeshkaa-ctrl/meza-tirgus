@@ -70,7 +70,7 @@ const initialPage = urlParams.get('payment') === 'success'
   : 'landing'
 
 const [page,setPageRaw]=useState(initialPage)
-const { user, loading: authLoading, registreties, pieteikties, iziet, mainitParoli, nosutitParolesReset } = useAuth()
+const { user, loading: authLoading, registreties, pieteikties, iziet, mainitParoli, nosutitParolesReset, atjaunotProfilu, mainitEpastu } = useAuth()
 
 // Lapas izsekošana — ieraksta Supabase app_events tabulā (klusē ja tabulas nav)
 const sesijasId = React.useRef(
@@ -252,7 +252,7 @@ if(page==="noteikumi") return <NoteikumiPage onBack={()=>setPage("landing")}/>
 if(page==="parole")  return <ParoleLapa onBack={()=>setPage("main")} mainitParoli={mainitParoli}/>
 if(page==="profils") return (
   <React.Suspense fallback={<div style={{minHeight:"100vh",background:"#060d06"}}/>}>
-    <ProfilsPage user={user} onBack={()=>setPage("main")} mainitParoli={mainitParoli} iziet={iziet}/>
+    <ProfilsPage user={user} onBack={()=>setPage("main")} mainitParoli={mainitParoli} iziet={iziet} atjaunotProfilu={atjaunotProfilu} mainitEpastu={mainitEpastu}/>
   </React.Suspense>
 )
 if(page==="cenas")        return <CenuKalkulators onBack={()=>setPage("main")}/>

@@ -117,7 +117,14 @@ export function useAuth() {
     setUser(prev => ({ ...prev, ...dati }))
   }
 
-  return { user, loading, registreties, pieteikties, iziet, mainitParoli, nosutitParolesReset, atjaunotProfilu }
+  // E-pasta maiņa caur Supabase Auth (nosūta apstiprinājumu uz jauno e-pastu)
+  const mainitEpastu = async (jaunaisEpasts) => {
+    const { error } = await supabase.auth.updateUser({ email: jaunaisEpasts })
+    if (error) throw new Error(tulkotKludu(error.message))
+    // profiles.epasts atjaunojas automātiski onAuthStateChange pēc apstiprinājuma
+  }
+
+  return { user, loading, registreties, pieteikties, iziet, mainitParoli, nosutitParolesReset, atjaunotProfilu, mainitEpastu }
 }
 
 // Supabase kļūdu tulkošana latviski
