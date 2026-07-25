@@ -20,7 +20,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
   const [rUznemums, setRUznemums] = useState(user?.uznemums     || '')
   const [rDarbiba,  setRDarbiba]  = useState(user?.darbiba      || DARBIBAS_VEIDI[0])
   const [rTalrunis, setRTalrunis] = useState(user?.talrunis     || '')
-  const [rNovads,   setRNovads]   = useState(user?.bazesNovads  || '')
+  const [rNovads,   setRNovads]   = useState(user?.novads  || '')
   const [rPapNovadi, setRPapNovadi] = useState(user?.papilduNovadi || [])
   const [rTips,     setRTips]     = useState(user?.tips         || 'privatpersona')
   const [novadsIevade, setNovadsIevade] = useState('')
@@ -67,7 +67,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
         uznemums:      rTips === 'uznemums' ? rUznemums.trim() : '',
         darbiba:       rTips === 'uznemums' ? rDarbiba : '',
         talrunis:      rTips === 'uznemums' ? rTalrunis.trim() : '',
-        bazesNovads:   rTips === 'uznemums' ? rNovads : '',
+        novads:   rTips === 'uznemums' ? rNovads : '',
         papilduNovadi: rTips === 'uznemums' ? rPapNovadi : [],
         tips:          rTips,
       }
@@ -86,7 +86,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
   function atsauktRedigešanu() {
     setRVards(user?.vards || ''); setRUznemums(user?.uznemums || '')
     setRDarbiba(user?.darbiba || DARBIBAS_VEIDI[0]); setRTalrunis(user?.talrunis || '')
-    setRNovads(user?.bazesNovads || ''); setRPapNovadi(user?.papilduNovadi || [])
+    setRNovads(user?.novads || ''); setRPapNovadi(user?.papilduNovadi || [])
     setRTips(user?.tips || 'privatpersona')
     setRedRezims(false); setRedStatuss(null)
   }
@@ -186,7 +186,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
                 { nos: 'Uzņēmums',       val: user?.uznemums || '—',     tikai: 'uznemums' },
                 { nos: 'Darbības veids', val: user?.darbiba || '—',      tikai: 'uznemums' },
                 { nos: 'Tālrunis',       val: user?.talrunis || '—',     tikai: 'uznemums' },
-                { nos: 'Bāzes novads',   val: user?.bazesNovads || '—',  tikai: 'uznemums' },
+                { nos: 'Bāzes novads',   val: user?.novads || '—',  tikai: 'uznemums' },
                 { nos: 'Papildu novadi', val: (user?.papilduNovadi || []).join(', ') || '—', tikai: 'uznemums' },
               ].filter(r => !r.tikai || user?.tips === r.tikai).map(r => (
                 <div key={r.nos} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: `1px solid #0d1a0d` }}>

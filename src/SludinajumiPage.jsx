@@ -237,7 +237,7 @@ function FotoUpload({ fotos, setFotos }) {
 function IzsoleForm({ user, onSaglabat, onAtcelt }) {
   const [apraksts,   setApraksts]   = useState("")
   const [kadastrs,   setKadastrs]   = useState("")
-  const [novads,     setNovads]     = useState(user?.bazesNovads || "")
+  const [novads,     setNovads]     = useState(user?.novads || "")
   const [sakumcena,  setSakumcena]  = useState("")
   const [sakums,     setSakums]     = useState(() => { const d = new Date(); d.setDate(d.getDate() + 1);  return d.toISOString().split("T")[0] })
   const [beigas,     setBeigas]     = useState(() => { const d = new Date(); d.setDate(d.getDate() + 14); return d.toISOString().split("T")[0] })
@@ -849,7 +849,7 @@ function SludinajumsForm({ user, onSaglabat, onAtcelt, esosais }) {
   const [darbiba,          setDarbiba]          = useState(esosais?.darbiba || user?.darbiba || DARBIBAS_VEIDI[0])
   const [cena,             setCena]             = useState(esosais?.cena        || "")
   const [cenaPecVienosanas,setCenaPecVienosanas]= useState(esosais?.cenaPecVienosanas ?? false)
-  const [novadi,           setNovadi]           = useState(esosais?.novadi || (user?.bazesNovads ? [user.bazesNovads] : []))
+  const [novadi,           setNovadi]           = useState(esosais?.novadi || (user?.novads ? [user.novads] : []))
   const [kludas,           setKludas]           = useState("")
 
   const pievienotNovadu = (n) => { if (!novadi.includes(n)) setNovadi([...novadi, n]) }

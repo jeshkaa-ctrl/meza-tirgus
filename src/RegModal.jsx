@@ -83,7 +83,7 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, no
   const [uznemums, setUznemums] = useState("")
   const [darbiba, setDarbiba] = useState(DARBIBAS_VEIDI[0])
   const [talrunis, setTalrunis] = useState("")
-  const [bazesNovads, setBazesNovads] = useState("")
+  const [novads, setBazesNovads] = useState("")
   const [papilduNovadi, setPapilduNovadi] = useState([])
   const [epasts, setEpasts] = useState("")
   const paroleRef = useRef(null)
@@ -92,7 +92,7 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, no
   const [lade,   setLade]   = useState(false)
 
   const pievienotNovadu = (novads) => {
-    if (!papilduNovadi.includes(novads) && novads !== bazesNovads) {
+    if (!papilduNovadi.includes(novads) && novads !== novads) {
       setPapilduNovadi([...papilduNovadi, novads])
     }
   }
@@ -108,14 +108,14 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, no
     if (rezims === "jauns") {
       if (!vards.trim()) return setKludas("Lūdzu ievadi vārdu!")
       if (tips === "uznemums" && !uznemums.trim()) return setKludas("Ievadi uzņēmuma nosaukumu!")
-      if (tips === "uznemums" && !bazesNovads) return setKludas("Izvēlies bāzes novadu!")
+      if (tips === "uznemums" && !novads) return setKludas("Izvēlies bāzes novadu!")
       if (!epasts.includes("@")) return setKludas("Nepareizs e-pasts!")
       if (p1.length < 8) return setKludas("Parolei jābūt vismaz 8 simboli!")
       if (!/\d/.test(p1)) return setKludas("Parolei jābūt vismaz viens cipars!")
       if (p1 !== p2) return setKludas("Paroles nesakrīt!")
       setLade(true)
       try {
-        await onRegistreties({ vards, uznemums, darbiba, talrunis, bazesNovads, papilduNovadi, epasts, parole: p1, tips })
+        await onRegistreties({ vards, uznemums, darbiba, talrunis, novads, papilduNovadi, epasts, parole: p1, tips })
       } catch(e) {
         setKludas(e.message)
       } finally {
@@ -174,7 +174,7 @@ export default function RegModal({ onRegistreties, onPieteikties, onAizvērt, no
                 </div>
                 <div style={{marginBottom:"10px"}}>
                   <label style={{fontSize:"11px",fontWeight:"bold"}}>Bāzes novads: <span style={{color:"#c62828"}}>*</span></label><br/>
-                  <select value={bazesNovads} onChange={e=>setBazesNovads(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px"}}>
+                  <select value={novads} onChange={e=>setBazesNovads(e.target.value)} style={{width:"100%",padding:"6px",border:"1px solid #ccc",borderRadius:"4px",fontSize:"13px"}}>
                     <option value="">— izvēlies —</option>
                     {NOVADI.map(n=><option key={n}>{n}</option>)}
                   </select>

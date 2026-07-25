@@ -40,12 +40,12 @@ export function useAuth() {
         uznemums:      profile?.uznemums      || "",
         darbiba:       profile?.darbiba       || "",
         talrunis:      profile?.talrunis      || "",
-        bazesNovads:   profile?.bazesNovads   || "",
+        novads:   profile?.novads   || "",
         papilduNovadi: profile?.papilduNovadi || [],
         tips:          profile?.tips          || "privatpersona",
       })
     } catch {
-      setUser({ id: authUser.id, epasts: authUser.email, vards: "", uznemums: "", darbiba: "", talrunis: "", bazesNovads: "", papilduNovadi: [], tips: "privatpersona" })
+      setUser({ id: authUser.id, epasts: authUser.email, vards: "", uznemums: "", darbiba: "", talrunis: "", novads: "", papilduNovadi: [], tips: "privatpersona" })
     } finally {
       setLoading(false)
     }
@@ -73,7 +73,7 @@ export function useAuth() {
         uznemums:      dati.uznemums      || "",
         darbiba:       dati.darbiba       || "",
         talrunis:      dati.talrunis      || "",
-        bazesNovads:   dati.bazesNovads   || "",
+        novads:   dati.novads   || "",
         papilduNovadi: dati.papilduNovadi || [],
         tips:          dati.tips          || "privatpersona",
       })
