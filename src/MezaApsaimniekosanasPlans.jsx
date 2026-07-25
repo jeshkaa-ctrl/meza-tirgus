@@ -940,6 +940,8 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const laukaHoldStartRef  = useRef(null)
   const laukaHoldInterval  = useRef(null)
 
+  const [izstradeBannerAizvert, setIzstradeBannerAizvert] = useState(false)
+
   const mapDivRef           = useRef(null)
   const isMobile            = typeof window !== 'undefined' && window.innerWidth < 700
   const drawerAutoOpenedRef = useRef(false)
@@ -2144,6 +2146,17 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         </button>
       </div>
 
+      {/* Izstrādes paziņojums */}
+      {!izstradeBannerAizvert && (
+        <div style={{ background: DS.warnBg, borderBottom: `1px solid #ffa72644`, padding: '8px 16px', display: 'flex', alignItems: 'flex-start', gap: 10, flexShrink: 0 }}>
+          <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>🚧</span>
+          <span style={{ color: '#ffd080', fontSize: 12, flex: 1, lineHeight: 1.5 }}>
+            <b>Aktīvā izstrādē.</b> Visas funkcijas pieejamas (kadastra meklēšana, nogabalu dati, ģeometrijas labošana, PDF), bet drīzumā tiks pievienotas papildu iespējas. Ja kaut kas nedarbojas kā gaidīts — <b>Sazinies ar atbalstu</b>.
+          </span>
+          <button onClick={() => setIzstradeBannerAizvert(true)} style={{ background: 'none', border: 'none', color: '#ffa726', fontSize: 16, cursor: 'pointer', padding: '0 4px', flexShrink: 0, lineHeight: 1 }}>✕</button>
+        </div>
+      )}
+
       {/* Saturs */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Kreisais panelis */}
@@ -2295,6 +2308,17 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           <div style={{ color: DS.textDim, fontSize: 11 }}>{aizpilditi}/{kopā} nogabali ievadīti</div>
         </div>
       </div>
+
+      {/* Izstrādes paziņojums */}
+      {!izstradeBannerAizvert && (
+        <div style={{ background: DS.warnBg, borderBottom: `1px solid #ffa72644`, padding: '7px 12px', display: 'flex', alignItems: 'flex-start', gap: 8, flexShrink: 0, zIndex: 20 }}>
+          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>🚧</span>
+          <span style={{ color: '#ffd080', fontSize: 11, flex: 1, lineHeight: 1.5 }}>
+            <b>Aktīvā izstrādē.</b> Drīzumā — papildu iespējas. Problēmu gadījumā sazinies ar atbalstu.
+          </span>
+          <button onClick={() => setIzstradeBannerAizvert(true)} style={{ background: 'none', border: 'none', color: '#ffa726', fontSize: 15, cursor: 'pointer', padding: '0 4px', flexShrink: 0, lineHeight: 1, minHeight: 44, display: 'flex', alignItems: 'center' }}>✕</button>
+        </div>
+      )}
 
       {/* Karte — aizpilda atlikušo vietu */}
       <div style={{ flex: 1, position: 'relative', background: '#1a2e1a', zIndex: 1 }}>
