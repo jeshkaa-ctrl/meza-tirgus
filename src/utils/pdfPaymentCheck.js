@@ -1,6 +1,6 @@
 import { supabase } from '../supabaseClient'
 
-const FREE_EMAIL    = 'arsas.mezi@inbox.lv'
+const FREE_EMAIL    = 'mezatirgus.info@gmail.com'
 const MAP_PRICE     = 5.00
 const PDF_PRICE     = 2.50
 const BIZNESS_PLANS = ['business', 'business_sakuma', 'business_videjais', 'business_neierobezots']

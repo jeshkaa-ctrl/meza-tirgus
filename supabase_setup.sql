@@ -190,7 +190,7 @@ create policy "dalibnieki_pievienoties" on public.grupas_dalibnieki for insert w
 create policy "admin_visas_pavadzimes" on public.pavadzimes
   for select using (
     auth.uid() = user_id OR
-    auth.jwt() ->> 'email' = 'jeshkaa@inbox.lv'
+    auth.jwt() ->> 'email' = 'mezatirgus.info@gmail.com'
   );
 
 -- 14b. FK no posts uz profiles (ļauj PostgREST joinot profilus)
