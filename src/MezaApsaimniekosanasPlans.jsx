@@ -39,7 +39,7 @@ function nearestEdgeIdx(coords, lng, lat) {
 function MAPKarte({
   kadGeom, nogabali, onNogabalsKliks, mapRef, planAttels, overlayOpacity, overlayRedigets,
   hoverIdx, mapSlānis, onTileKluda, gpsAktivs, onGpsKluda, onGpsPozicija, marsruts, kadastrs,
-  merRezims, onMerUpdate,
+  merRezims, onMerUpdate, laukaRezims,
   // Ģeometrijas rediģēšana
   geomEditTarget, geomEditAddMode, geomEditDelMode, geomEditGpsPoint,
   onGeomEditCoords, onGeomAddModeDone, onGeomDelModeDone, onGeomGpsVertexDone,
@@ -73,6 +73,8 @@ function MAPKarte({
   const merDblClickHandlerRef = useRef(null)
   const geomEditStateRef      = useRef({ coords: null, rebuild: null })
   const geomEditDelModeRef    = useRef(false)
+  const laukaRezimRef         = useRef(laukaRezims)
+  useEffect(() => { laukaRezimRef.current = laukaRezims }, [laukaRezims])
 
   // Inicializē karti un kadastra slāni
   useEffect(() => {
@@ -383,6 +385,9 @@ function MAPKarte({
 
           if (onGpsKluda) onGpsKluda(null)
           if (onGpsPozicija) onGpsPozicija({ lat, lng })
+          if (laukaRezimRef.current) {
+            leafletRef.current.setView(latlng, leafletRef.current.getZoom())
+          }
         },
         (err) => { if (onGpsKluda) onGpsKluda(err.message) },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
@@ -1865,7 +1870,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             mapSlānis={mapSlānis} onTileKluda={setTileKluda}
             gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
             onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
-            merRezims={merRezims} onMerUpdate={setMerResultats}
+            merRezims={merRezims} onMerUpdate={setMerResultats} laukaRezims={laukaRezims}
             geomEditTarget={geomEditTarget} geomEditAddMode={geomEditAddMode}
             geomEditDelMode={geomEditDelMode} geomEditGpsPoint={geomEditGpsPoint}
             onGeomEditCoords={coords => { geomEditCoordsRef.current = coords }}
@@ -1997,7 +2002,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           mapSlānis={mapSlānis} onTileKluda={setTileKluda}
           gpsAktivs={gpsAktivs} onGpsKluda={setGpsKluda}
           onGpsPozicija={setGpsPozicija} marsruts={marsruts} kadastrs={kadInput.replace(/\s/g, '')}
-          merRezims={merRezims} onMerUpdate={setMerResultats}
+          merRezims={merRezims} onMerUpdate={setMerResultats} laukaRezims={laukaRezims}
           geomEditTarget={geomEditTarget} geomEditAddMode={geomEditAddMode}
           geomEditDelMode={geomEditDelMode} geomEditGpsPoint={geomEditGpsPoint}
           onGeomEditCoords={coords => { geomEditCoordsRef.current = coords }}
