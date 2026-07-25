@@ -221,6 +221,9 @@ async function handleJurists(req, res) {
   const apiKey = process.env.ANTHROPIC_KEY
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_KEY nav iestatīts Vercel' })
 
+  const šodien = new Date().toLocaleDateString('lv-LV', { year: 'numeric', month: 'long', day: 'numeric' })
+  const sistemaArDatumu = `Šodienas datums ir ${šodien}. Atbildot uz jautājumiem par medību sezonu termiņiem, VIENMĒR ņem vērā šo pašreizējo datumu, lai noteiktu, vai konkrēta medību darbība ir atļauta TIEŠI ŠOBRĪD.\n\n` + JURISTS_SISTEMA
+
   try {
     const upstream = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -232,7 +235,7 @@ async function handleJurists(req, res) {
       body: JSON.stringify({
         model:      'claude-sonnet-4-6',
         max_tokens: 1500,
-        system:     JURISTS_SISTEMA,
+        system:     sistemaArDatumu,
         messages:   [{ role: 'user', content: jautajums }],
       }),
     })
@@ -279,6 +282,14 @@ Reģistrēt lietotnē "Mednis" pēc nomedīšanas.
 
 🦌 STALTBRIEDIS (Cervus elaphus)
 Statuss: Limitēts | Termiņš: Buļļi 1.sept–15.febr | Buļļi līdz 2 g. 15.aug–31.marts | Govis 15.jūl–31.janv | Teļi 15.jūl–31.marts
+
+⚠️ STALTBRIEŽI 2026/2027 — IZŅĒMUMA SEZONAS SĀKUMS:
+Noteiktos VMD reģionos (kur pieņemts lēmums ierobežot populāciju) staltbriežu govju, teļu un līdz 2 gadus vecu buļļu medības ATĻAUTAS JAU NO 8. JŪLIJA (agrāk par parasto 15. jūliju).
+- No 8. līdz 15. jūlijam VMD aicina medīt govis BEZ teļiem (brīvprātīgs izvēles princips)
+- Teļu drīkst nomedīt gan ar teļa, gan ar pieauguša buļļa/govs medību atļauju
+- Līdz 2 gadus vecu bulli drīkst nomedīt gan ar buļļa, gan ar govs medību atļauju
+- Precīzs reģionu saraksts: https://www.vmd.gov.lv/lv/media/3418/download?attachment
+- Avots: VMD, publicēts 07.07.2026
 Svars: 150–250 kg (buļļi), 80–130 kg (govis) | Mūžs: 12–15 g.
 
 🦌 STIRNA (Capreolus capreolus)
