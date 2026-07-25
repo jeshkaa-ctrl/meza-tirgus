@@ -1,5 +1,18 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { SUGAS_KARTE, SUGAS_KODS, SUGAS_KRASA } from '../ipasums/constants'
+
+// Hex '#rrggbb' → [r,g,b]
+function h2r(hex) {
+  const n = parseInt((hex || '#4caf50').replace('#',''), 16)
+  return [(n>>16)&0xff, (n>>8)&0xff, n&0xff]
+}
+// Lighten (f>0→white) or darken (f<0→black)
+function tint(rgb, f) {
+  return f >= 0
+    ? rgb.map(c => Math.min(255, Math.round(c + (255-c)*f)))
+    : rgb.map(c => Math.max(0,   Math.round(c * (1+f))))
+}
 
 // ── Roboto fonts ar latviešu burtu atbalstu ───────────────────────────────────
 let _fontCache = {}
@@ -616,88 +629,171 @@ async function lapaKarte(doc, mapElement, nogabali, titullapa, kadastrs) {
   doc.setTextColor(...GRN)
   doc.text('Mežaudžu plāns', MAR, 20)
 
-  let karteY = 24
-  const kartH = 180
-  const kartW = A4W - 2 * MAR
+  const karteY = 24
+  const kartH  = 172
+  const kartW  = A4W - 2 * MAR
 
-  // Pārbauda vai nogabaliem ir ģeometrija
   const hasGeom = nogabali.some(n => n.geojson?.geometry != null)
 
   if (!hasGeom || !mapElement) {
-    // Nav ģeometrijas — rāda informatīvu ziņu
     doc.setFillColor(...GRN4)
     doc.rect(MAR, karteY, kartW, kartH, 'F')
-    doc.setDrawColor(...GRN3)
-    doc.setLineWidth(0.5)
+    doc.setDrawColor(...GRN3); doc.setLineWidth(0.5)
     doc.rect(MAR, karteY, kartW, kartH)
-    doc.setFont('Roboto', 'normal')
-    doc.setFontSize(10)
-    doc.setTextColor(...DIM)
+    doc.setFont('Roboto', 'normal'); doc.setFontSize(10); doc.setTextColor(...DIM)
     const cx = A4W / 2, cy = karteY + kartH / 2
     doc.text('Kartes attēls nav pieejams —', cx, cy - 12, { align: 'center' })
     doc.text('nogabalu ģeometrija netika ielādēta.', cx, cy - 4, { align: 'center' })
     doc.setFontSize(8)
     doc.text('Kad LVM GEO pieejams un nogabali ielādēti ar ģeometriju,', cx, cy + 6, { align: 'center' })
     doc.text('karte tiek centrēta uz īpašumu ar krāsotiem nogabaliem.', cx, cy + 13, { align: 'center' })
-    karteY += kartH + 4
   } else {
-    // Mēģina uzņemt ekrānuzņēmumu
     try {
       const html2canvas = (await import('html2canvas')).default
       const canvas = await html2canvas(mapElement, {
-        useCORS:    true,
-        allowTaint: false,
-        scale:      1.5,
-        logging:    false,
+        useCORS: true, allowTaint: false, scale: 1.5, logging: false,
         backgroundColor: '#1a2e1a',
       })
-      const imgData = canvas.toDataURL('image/jpeg', 0.85)
-      doc.addImage(imgData, 'JPEG', MAR, karteY, kartW, kartH)
-      karteY += kartH + 4
+      doc.addImage(canvas.toDataURL('image/jpeg', 0.85), 'JPEG', MAR, karteY, kartW, kartH)
     } catch {
       doc.setFillColor(26, 46, 26)
       doc.rect(MAR, karteY, kartW, kartH, 'F')
-      doc.setFont('Roboto', 'normal')
-      doc.setFontSize(9)
-      doc.setTextColor(100, 150, 100)
-      doc.text('[ Kartes attēls nav pieejams — atvērt lietojumprogrammu ]', A4W / 2, karteY + kartH / 2, { align: 'center' })
-      karteY += kartH + 4
+      doc.setFont('Roboto', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 150, 100)
+      doc.text('[ Kartes attēls nav pieejams ]', A4W / 2, karteY + kartH / 2, { align: 'center' })
     }
   }
 
-  // Krāsu leģenda
-  const LEGENDE = [
-    { krasa: [210, 80, 16],  nos: 'Priede' },
-    { krasa: [64, 64, 160],  nos: 'Egle'   },
-    { krasa: [32, 96, 192],  nos: 'Bērzs'  },
-    { krasa: [64, 160, 16],  nos: 'Apse'   },
-    { krasa: [208, 56, 128], nos: 'Melnalksnis' },
-    { krasa: [136, 136, 0],  nos: 'Osis'   },
-    { krasa: [120, 120, 120],nos: 'Cita suga' },
-  ]
+  // ── Ziemeļu bulta (virs kartes augšā labajā stūrī) ───────────────────────────
+  const naX = MAR + kartW - 9, naY = karteY + 11
+  doc.setFillColor(255, 255, 255)
+  doc.ellipse(naX, naY, 6.5, 6.5, 'F')
+  doc.setDrawColor(80, 130, 80); doc.setLineWidth(0.3)
+  doc.ellipse(naX, naY, 6.5, 6.5, 'D')
+  doc.setLineWidth(0.9); doc.setDrawColor(...GRN)
+  doc.line(naX, naY + 4, naX, naY - 4.5)
+  doc.line(naX, naY - 4.5, naX - 2, naY - 0.5)
+  doc.line(naX, naY - 4.5, naX + 2, naY - 0.5)
+  doc.setFont('Roboto', 'bold'); doc.setFontSize(5.5); doc.setTextColor(...GRN)
+  doc.text('Z', naX, naY + 5.8, { align: 'center' })
 
-  doc.setFont('Roboto', 'bold')
-  doc.setFontSize(8)
-  doc.setTextColor(...GRN)
-  doc.text('Krāsu leģenda', MAR, karteY + 4)
-  karteY += 6
-
-  LEGENDE.forEach((l, i) => {
-    const x = MAR + i * 26
-    doc.setFillColor(...l.krasa)
-    doc.rect(x, karteY, 5, 5, 'F')
-    doc.setFont('Roboto', 'normal')
-    doc.setFontSize(7)
-    doc.setTextColor(...BLK)
-    doc.text(l.nos, x + 6, karteY + 4)
+  // ── Mēroga josla (kartes apakšā kreisajā stūrī) ──────────────────────────────
+  const validCoords = []
+  nogabali.forEach(n => {
+    const geom = n.geojson?.geometry
+    if (!geom) return
+    const rings = geom.type === 'Polygon' ? geom.coordinates
+                : geom.type === 'MultiPolygon' ? geom.coordinates.flat(1) : []
+    rings.forEach(ring => ring.forEach(c => validCoords.push(c)))
   })
 
-  // Datums + paraksts
-  karteY += 12
-  doc.setFont('Roboto', 'normal')
-  doc.setFontSize(8)
-  doc.setTextColor(...DIM)
-  doc.text(`Sagatavots: ${new Date().toLocaleDateString('lv-LV')}  ·  Meža tirgus  ·  meža-tirgus.lv`, MAR, karteY)
+  if (validCoords.length > 1) {
+    const lngs = validCoords.map(c => c[0])
+    const lats  = validCoords.map(c => c[1])
+    const avgLat = (Math.min(...lats) + Math.max(...lats)) / 2
+    const widthM = (Math.max(...lngs) - Math.min(...lngs)) * 111000 * Math.cos(avgLat * Math.PI / 180)
+    const mPerMm = (widthM * 1.45) / kartW
+    const rawBar = mPerMm * 28
+    const niceM = [10,20,25,50,100,150,200,250,500,750,1000,1500,2000,3000,5000]
+      .reduce((p, c) => Math.abs(c - rawBar) < Math.abs(p - rawBar) ? c : p)
+    const barW = niceM / mPerMm
+    const sbX = MAR + 4, sbY = karteY + kartH - 8
+
+    doc.setFillColor(255, 255, 255)
+    doc.rect(sbX - 2, sbY - 5.5, barW + 4, 9, 'F')
+    doc.setFillColor(30, 30, 30)
+    doc.rect(sbX, sbY, barW / 2, 3, 'F')
+    doc.setFillColor(210, 210, 210)
+    doc.rect(sbX + barW / 2, sbY, barW / 2, 3, 'F')
+    doc.setDrawColor(40, 40, 40); doc.setLineWidth(0.3)
+    doc.rect(sbX, sbY, barW, 3, 'D')
+    doc.line(sbX, sbY, sbX, sbY - 1)
+    doc.line(sbX + barW / 2, sbY, sbX + barW / 2, sbY - 1)
+    doc.line(sbX + barW, sbY, sbX + barW, sbY - 1)
+    doc.setFont('Roboto', 'normal'); doc.setFontSize(5); doc.setTextColor(20, 20, 20)
+    doc.text('0', sbX, sbY - 1.5, { align: 'center' })
+    const half = niceM / 2
+    doc.text(half >= 1000 ? `${half / 1000}km` : `${half}m`, sbX + barW / 2, sbY - 1.5, { align: 'center' })
+    doc.text(niceM >= 1000 ? `${niceM / 1000}km` : `${niceM}m`, sbX + barW, sbY - 1.5, { align: 'center' })
+  }
+
+  // ── Leģenda zem kartes ────────────────────────────────────────────────────────
+  const legY  = karteY + kartH + 5
+  const cellS = 4.5   // colored square size mm
+  const cellG = 1.2   // gap between cells
+  const lblW  = 42    // left label column width mm
+
+  // Species that appear in the current nogabali (in frequency order)
+  const sugaFreq = {}
+  nogabali.forEach(n => { if (n.sugaKods > 0) sugaFreq[n.sugaKods] = (sugaFreq[n.sugaKods] || 0) + 1 })
+  const activeSugas = Object.keys(sugaFreq)
+    .sort((a, b) => sugaFreq[b] - sugaFreq[a])
+    .map(k => ({ kods: parseInt(k), nos: SUGAS_KARTE[k] || '?', kods2: SUGAS_KODS[k] || '?' }))
+
+  const AGE_GRUPAS = [
+    { nos: 'Jaunaudze (≤20g.)',    f:  0.55 },
+    { nos: 'Vid. vecuma (21–40g.)', f:  0.25 },
+    { nos: 'Briestaudze (41–80g.)', f:  0    },
+    { nos: 'Pāraugusi (>80g.)',     f: -0.30 },
+  ]
+
+  const gridX  = MAR + lblW
+  const gridTop = legY + 12  // space for rotated species name headers
+
+  // Title
+  doc.setFont('Roboto', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...GRN)
+  doc.text('Valdošās sugas un vecuma grupas', MAR, legY + 4)
+
+  // Column headers (rotated species codes + full name tooltip below)
+  activeSugas.forEach((s, ci) => {
+    const cx = gridX + ci * (cellS + cellG) + cellS / 2
+    doc.setFont('Roboto', 'bold'); doc.setFontSize(6); doc.setTextColor(...BLK)
+    doc.text(s.kods2, cx, gridTop - 8, { angle: 55, align: 'left' })
+  })
+
+  // Color grid (age groups × species)
+  AGE_GRUPAS.forEach((ag, ri) => {
+    const ry = gridTop + ri * (cellS + 1)
+    doc.setFont('Roboto', 'normal'); doc.setFontSize(6); doc.setTextColor(...BLK)
+    doc.text(ag.nos, MAR, ry + cellS - 0.5)
+    activeSugas.forEach((s, ci) => {
+      const base = h2r(SUGAS_KRASA[s.kods])
+      doc.setFillColor(...tint(base, ag.f))
+      doc.setDrawColor(160, 160, 160); doc.setLineWidth(0.1)
+      doc.rect(gridX + ci * (cellS + cellG), ry, cellS, cellS, 'FD')
+    })
+  })
+
+  // Species name reference row below the grid
+  const refY = gridTop + AGE_GRUPAS.length * (cellS + 1) + 2
+  activeSugas.forEach((s, ci) => {
+    const cx = gridX + ci * (cellS + cellG) + cellS / 2
+    doc.setFont('Roboto', 'normal'); doc.setFontSize(5); doc.setTextColor(...DIM)
+    doc.text(s.nos.length > 6 ? s.nos.slice(0, 5) + '.' : s.nos, cx, refY, { align: 'center' })
+  })
+
+  // ── Kategoriju leģenda (labajā pusē) ─────────────────────────────────────────
+  const rightX = gridX + Math.max(activeSugas.length, 1) * (cellS + cellG) + 10
+
+  if (rightX + 30 < A4W - MAR) {
+    doc.setFont('Roboto', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...GRN)
+    doc.text('Zemes kategorijas', rightX, legY + 4)
+
+    const KAT_LEG = [
+      { rgb: GRN,            nos: 'Mežaudze (MA)'        },
+      { rgb: [56,142,60],    nos: 'Iznīkusi audze (IzA)' },
+      { rgb: [180,130,60],   nos: 'Izcirtums (Izc)'      },
+      { rgb: [130,180,100],  nos: 'Meža lauce / Virsājs' },
+      { rgb: [80,130,160],   nos: 'Purvs / Ūdens (Pu)'  },
+      { rgb: DIM,            nos: 'Infrastruktūra'        },
+    ]
+    KAT_LEG.forEach((k, i) => {
+      const ky = legY + 9 + i * 6
+      doc.setFillColor(...k.rgb)
+      doc.rect(rightX, ky - 3.2, 4, 4, 'F')
+      doc.setFont('Roboto', 'normal'); doc.setFontSize(6); doc.setTextColor(...BLK)
+      doc.text(k.nos, rightX + 5.5, ky)
+    })
+  }
 }
 
 // ── Galvenā eksporta funkcija ─────────────────────────────────────────────────
