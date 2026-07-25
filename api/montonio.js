@@ -54,6 +54,15 @@ async function sbInsert(table, row) {
   if (!res.ok) throw new Error(`Supabase insert ${table}: ${await res.text()}`)
 }
 
+async function sbGet(table, filter) {
+  const res = await fetch(`${SB_URL}/rest/v1/${table}?${filter}&limit=1`, {
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` },
+  })
+  if (!res.ok) return null
+  const data = await res.json()
+  return Array.isArray(data) ? (data[0] || null) : null
+}
+
 async function sbPatch(table, filter, body) {
   const res = await fetch(`${SB_URL}/rest/v1/${table}?${filter}`, {
     method:  'PATCH',
@@ -68,17 +77,57 @@ async function sbPatch(table, filter, body) {
   if (!res.ok) throw new Error(`Supabase PATCH ${table}: ${await res.text()}`)
 }
 
+async function nosutitGuestApstiprinajumu(guestEmail, pdfTips) {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey || !guestEmail) return
+  const nosaukumi = {
+    CIRSMA_SKICE:       'Cirsmas skice',
+    CIRSMA_NOVERTESANA: 'Cirsmas novērtēšana',
+    CAURMERA_MERIJUMI:  'Caurmēra mērījumi',
+    DASTOJUMS:          'Dastojuma kalkulators',
+    REKINS:             'Rēķins',
+    KUBIKMETRI:         'Kubikmetru kalkulators',
+  }
+  const tips = nosaukumi[pdfTips] || 'PDF dokuments'
+  const html = `<!DOCTYPE html><html lang="lv"><body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0">
+<tr><td align="center"><table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden">
+<tr><td style="background:#2e7d32;padding:24px 32px"><div style="color:#fff;font-size:20px;font-weight:700">🌲 Meža Tirgus</div></td></tr>
+<tr><td style="padding:32px">
+<h2 style="margin:0 0 16px;color:#212529">Maksājums apstiprināts!</h2>
+<p style="margin:0 0 16px;color:#495057;line-height:1.6">Jūsu <b>${tips}</b> PDF ir apmaksāts.</p>
+<p style="margin:0 0 24px;color:#495057;line-height:1.6">
+  Atgriezieties uz <a href="${APP_URL}" style="color:#2e7d32">meza-tirgus.lv</a> un noklikšķiniet PDF pogu —
+  dokuments tiks ģenerēts uzreiz. Atļauja ir derīga 24 stundas no maksājuma brīža.
+</p>
+<p style="margin:0;font-size:13px;color:#6c757d">Jautājumi: <a href="mailto:mezatirgus.info@gmail.com" style="color:#2e7d32">mezatirgus.info@gmail.com</a></p>
+</td></tr>
+</table></td></tr></table>
+</body></html>`
+  await fetch('https://api.resend.com/emails', {
+    method:  'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body:    JSON.stringify({
+      from:    'Meža Tirgus <onboarding@resend.dev>',
+      to:      [guestEmail],
+      subject: `${tips} — PDF maksājums apstiprināts`,
+      html,
+    }),
+  }).catch(e => console.error('Resend kļūda:', e.message))
+}
+
 async function handleCheckout(req, res) {
   if (!ACCESS_KEY || !SECRET_KEY) return res.status(500).json({ error: 'Nav Montonio atslēgas' })
   if (!SB_KEY) return res.status(500).json({ error: 'Nav SUPABASE_SERVICE_KEY' })
 
-  const { type, grandTotal, pdfTips, planId, billingCycle, userId } = req.body
-  if (!grandTotal || !userId) return res.status(400).json({ error: 'Trūkst grandTotal vai userId' })
+  const { type, grandTotal, pdfTips, planId, billingCycle, userId, guestEmail } = req.body
+  if (!grandTotal) return res.status(400).json({ error: 'Trūkst grandTotal' })
 
   const timestamp = Date.now()
   let merchantReference, returnUrl, notifDescription
 
   if (type === 'pdf') {
+    if (!userId) return res.status(400).json({ error: 'Trūkst userId' })
     if (!pdfTips) return res.status(400).json({ error: 'Trūkst pdfTips' })
     merchantReference = `PDF-${pdfTips}-${timestamp}`
     returnUrl         = `${APP_URL}/?payment=success&type=pdf`
@@ -86,6 +135,21 @@ async function handleCheckout(req, res) {
 
     await sbInsert('pdf_payments', {
       user_id:      userId,
+      merchant_ref: merchantReference,
+      pdf_tips:     pdfTips,
+      summa:        parseFloat(grandTotal),
+    })
+
+  } else if (type === 'pdf_guest') {
+    if (!guestEmail) return res.status(400).json({ error: 'Trūkst guestEmail' })
+    if (!pdfTips) return res.status(400).json({ error: 'Trūkst pdfTips' })
+    merchantReference = `PDF-${pdfTips}-${timestamp}`
+    returnUrl         = `${APP_URL}/?payment=success&type=pdf`
+    notifDescription  = 'PDF lejupielāde (viesis) — Meža Tirgus'
+
+    await sbInsert('pdf_payments', {
+      user_id:      null,
+      guest_email:  guestEmail,
       merchant_ref: merchantReference,
       pdf_tips:     pdfTips,
       summa:        parseFloat(grandTotal),
@@ -163,7 +227,13 @@ async function handleWebhook(req, res) {
 
   try {
     if (ref.startsWith('PDF-')) {
+      // Ielādē ierakstu PIRMS PATCH — vajadzīgs guest_email e-pasta sūtīšanai
+      const payment = await sbGet('pdf_payments', `merchant_ref=eq.${encodeURIComponent(ref)}&select=guest_email,pdf_tips`)
       await sbPatch('pdf_payments', `merchant_ref=eq.${encodeURIComponent(ref)}`, { apmaksats: true })
+      // Viesa maksājums — sūta apstiprinājuma e-pastu
+      if (payment?.guest_email) {
+        await nosutitGuestApstiprinajumu(payment.guest_email, payment.pdf_tips)
+      }
     } else if (ref.startsWith('SUB-')) {
       console.log('SUB webhook — Daļa 4.2 vēl nav implementēta:', ref)
     }

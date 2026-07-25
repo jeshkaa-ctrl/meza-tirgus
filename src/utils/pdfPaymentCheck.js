@@ -18,7 +18,33 @@ export async function parbauditVaiMaksaPdf(lietotajs, pdfTips) {
   // a) Bezmaksas konts
   if (email === FREE_EMAIL) return { allowed: true }
 
-  // b) Pārbauda vienreizējo PDF maksājumu (der gan MAP, gan parasti PDF)
+  // b) Viesa maksājums (bez konta) — pārbauda sessionStorage merchant_ref
+  //    Šeit jo drīzāk, jo guest users nekad nesasniedz c/d/e sadaļas
+  if (!uid) {
+    const guestInfo = (() => {
+      try { return JSON.parse(sessionStorage.getItem('mt_pdf_payment') || 'null') } catch { return null }
+    })()
+    if (guestInfo?.isGuest && guestInfo?.merchantRef && guestInfo?.pdfTips === pdfTips) {
+      const { data: guestPaid } = await supabase
+        .from('pdf_payments')
+        .select('id')
+        .eq('merchant_ref', guestInfo.merchantRef)
+        .eq('pdf_tips', pdfTips)
+        .eq('apmaksats', true)
+        .eq('izmantots', false)
+        .maybeSingle()
+      if (guestPaid) {
+        supabase.from('pdf_payments').update({ izmantots: true }).eq('id', guestPaid.id).catch(() => {})
+        sessionStorage.removeItem('mt_pdf_payment')
+        return { allowed: true }
+      }
+    }
+    // Nav konta un nav derīga viesa maksājuma
+    if (pdfTips === 'MAP') return { allowed: false, price: MAP_PRICE, pdfTips }
+    return { allowed: false, price: PDF_PRICE, pdfTips }
+  }
+
+  // c) Pārbauda vienreizējo PDF maksājumu (der gan MAP, gan parasti PDF)
   if (uid) {
     const { data: paid } = await supabase
       .from('pdf_payments')
@@ -37,10 +63,10 @@ export async function parbauditVaiMaksaPdf(lietotajs, pdfTips) {
     }
   }
 
-  // c) MAP PDF — vienmēr 5€
+  // d) MAP PDF — vienmēr 5€
   if (pdfTips === 'MAP') return { allowed: false, price: MAP_PRICE, pdfTips }
 
-  // d) Pārējie PDF — pārbauda aktīvo Bizness abonementu
+  // e) Pārējie PDF — pārbauda aktīvo Bizness abonementu
   if (uid) {
     const { data } = await supabase
       .from('subscriptions')

@@ -46,7 +46,8 @@ export default function MaksajumsPaldies({ onTurpina }) {
             .eq('merchant_ref', pdfInfo.merchantRef)
             .maybeSingle()
           if (data?.apmaksats) {
-            sessionStorage.removeItem('mt_pdf_payment')
+            // Viesa gadījumā NEIZDZĒŠAM sessionStorage — rīks to izmantos PDF ģenerēšanai
+            if (!pdfInfo.isGuest) sessionStorage.removeItem('mt_pdf_payment')
             setStatuss('aktivs')
             return
           }
@@ -129,8 +130,12 @@ export default function MaksajumsPaldies({ onTurpina }) {
         )}
 
         {statuss === 'aktivs' && (() => {
-          const params  = new URLSearchParams(window.location.search)
-          const isPdf   = params.get('type') === 'pdf'
+          const params    = new URLSearchParams(window.location.search)
+          const isPdf     = params.get('type') === 'pdf'
+          const guestInfo = (() => {
+            try { return JSON.parse(sessionStorage.getItem('mt_pdf_payment') || 'null') } catch { return null }
+          })()
+          const isGuest = guestInfo?.isGuest
           return (
             <>
               <div style={{ fontSize: 56, marginBottom: S.md }}>✅</div>
@@ -149,6 +154,11 @@ export default function MaksajumsPaldies({ onTurpina }) {
                     Atgriezieties uz rīku un klikšķiniet PDF pogu — dokuments tiks ģenerēts uzreiz.
                     Šis atļaujas kods derīgs 24 stundas.
                   </div>
+                  {isGuest && (
+                    <div style={{ color: C.textDim, fontSize: F.sm, marginTop: 8, lineHeight: 1.6 }}>
+                      ✉️ Apstiprinājums nosūtīts uz {guestInfo.guestEmail}
+                    </div>
+                  )}
                 </div>
               ) : planId && (
                 <div style={{
