@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from "react"
+import { acmHeaders } from "./utils/acm"
 import EtikasTeksts from "./EtikasTeksts"
 import { ETIKAS_TEKSTI } from "./data/etika"
 
@@ -133,7 +134,7 @@ export default function SelekcijasKalkulators({ onBack }) {
 
       const r = await fetch("/api/ai?action=selektors", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: acmHeaders(),
         body: JSON.stringify({ zinojumi: [{ role: 'user', content: [...bildeSaturs, { type: 'text', text: userTeksts }] }] })
       })
       const d = await r.json()
@@ -158,7 +159,7 @@ export default function SelekcijasKalkulators({ onBack }) {
     if (!jautajums.trim()) return
     setLade(true); setKļūda(""); setRezultats("")
     try {
-      const r = await fetch("/api/ai?action=selektors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jautajums: jautajums.trim() }) })
+      const r = await fetch("/api/ai?action=selektors", { method: "POST", headers: acmHeaders(), body: JSON.stringify({ jautajums: jautajums.trim() }) })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || "Servera kļūda")
       setRezultats(d.teksts)
@@ -179,7 +180,7 @@ export default function SelekcijasKalkulators({ onBack }) {
     try {
       const r = await fetch("/api/ai?action=selektors", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: acmHeaders(),
         body: JSON.stringify({ zinojumi: jaunasZinojumi, suga: detektSuga })
       })
       const d = await r.json()

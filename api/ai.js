@@ -4,6 +4,7 @@
 //             VITE_SUPABASE_URL, SUPABASE_SERVICE_KEY
 
 import { createClient } from '@supabase/supabase-js'
+import { acmValidetToken } from '../src/utils/acm.js'
 
 // ═══════════════════════════════════════════════════════════
 // OPENAI IMAGE
@@ -603,6 +604,13 @@ async function handleSelektors(req, res) {
 // ═══════════════════════════════════════════════════════════
 
 export default async function handler(req, res) {
+  const token  = req.headers['x-acm-token'] || ''
+  const sesija = req.headers['x-sesija-id'] || ''
+  if (!acmValidetToken(token, sesija)) {
+    console.warn('[ACM] 🐗 Bloķēts pieprasījums uz /api/ai')
+    return res.status(403).json({ error: 'ACM_BLOCKED' })
+  }
+
   const url    = new URL(req.url, `https://${req.headers.host}`)
   const action = url.searchParams.get('action')
 

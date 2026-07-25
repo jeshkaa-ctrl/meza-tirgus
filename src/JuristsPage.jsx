@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react"
+import { acmHeaders } from "./utils/acm"
 import EtikasTeksts from "./EtikasTeksts"
 import { ETIKAS_TEKSTI } from "./data/etika"
 
@@ -77,7 +78,7 @@ export default function JuristsPage({ onBack }) {
     try {
       const r = await fetch("/api/ai?action=jurists", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: acmHeaders(),
         body: JSON.stringify({ jautajums: q }),
       })
       const d = await r.json()

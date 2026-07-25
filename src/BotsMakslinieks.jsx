@@ -137,7 +137,7 @@ export default function BotsMakslinieks({ initialData }) {
         || `Vivid professional outdoor product poster, ${category} theme, dramatic forest lighting`
       const dalleResp = await fetch('/api/ai?action=image', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: acmHeaders(),
         body: JSON.stringify({
           model: 'gpt-image-1',
           prompt,

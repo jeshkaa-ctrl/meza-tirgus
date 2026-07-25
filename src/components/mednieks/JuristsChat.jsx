@@ -1,5 +1,6 @@
 // Plāns iesaiņojums ap esošo JuristsPage loģiku — bez galvenes
 import { useState, useRef } from 'react'
+import { acmHeaders } from '../../utils/acm'
 import { EtikasTeksts } from './EtikasTeksts'
 import { ETIKAS_TEKSTI } from '../../data/etika'
 
@@ -47,7 +48,7 @@ export default function JuristsChat() {
     setLade(true); setKļūda(''); setAtbilde('')
     try {
       const r = await fetch('/api/ai?action=jurists', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: acmHeaders(),
         body: JSON.stringify({ jautajums: q }),
       })
       const d = await r.json()
