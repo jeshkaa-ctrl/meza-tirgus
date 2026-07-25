@@ -930,6 +930,8 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const [snapshotSaglabats,     setSnapshotSaglabats]     = useState(false)
   const [snapshotLade,          setSnapshotLade]          = useState(false)
   const [atgriestLade,          setAtgriestLade]          = useState(false)
+  const [kaiminsSync,           setKaiminsSync]           = useState(null)  // null | { neighbors: [...] }
+  const [kaiminsLade,           setKaiminsLade]           = useState(false)
   const [laukaRezims,           setLaukaRezims]           = useState(false)
   const [laukaAtbloketProgress, setLaukaAtbloketProgress] = useState(0)
   const [laukaWakeLockAtbalsts, setLaukaWakeLockAtbalsts] = useState(true)
@@ -1030,6 +1032,12 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
     return () => document.removeEventListener('visibilitychange', fn)
   }, [laukaRezims])
 
+  // Automātiski saglabā momentuzņēmumu pirms pirmās rediģēšanas
+  useEffect(() => {
+    if (!geomEditTarget || snapshotSaglabats || snapshotLade) return
+    saglabatMomentuznemumu()
+  }, [geomEditTarget]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const saglabatNogabalu = (saved) => {
     setNogabali(prev => {
       const arr = [...prev]
@@ -1065,13 +1073,17 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
         p_geojson: JSON.stringify(newGeometry),
       })
       if (error) throw new Error(error.message)
+      const affected = findAffectedNeighbors(coords, idx)
       setNogabali(prev => prev.map((nog, i) => i !== idx ? nog : {
         ...nog,
         geojson: { ...nog.geojson, geometry: newGeometry },
       }))
       setGeomEditTarget(null)
       setGeomEditDelMode(false)
+      setGeomManual(null)
+      setGeomSetVertex(null)
       geomEditCoordsRef.current = null
+      if (affected.length > 0) setKaiminsSync({ neighbors: affected })
     } catch (e) {
       setGeomEditKluda(e.message)
     } finally {
@@ -1126,6 +1138,76 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
       setGeomEditKluda('Atgriešana neizdevās: ' + e.message)
     } finally {
       setAtgriestLade(false)
+    }
+  }
+
+  // ── Fāze 2: kaimiņu sinhronizācija ──────────────────────────────────────────
+  const findAffectedNeighbors = (editedCoords, editedIdx) => {
+    const THRESH = 1e-5  // ~1m tolerance Latvijas platumā
+
+    const snapVtx = ([lng, lat]) => {
+      const hit = editedCoords.find(([eLng, eLat]) =>
+        Math.abs(lat - eLat) < THRESH && Math.abs(lng - eLng) < THRESH
+      )
+      return hit ? [hit, true] : [[lng, lat], false]
+    }
+
+    const mapRing = ring => {
+      let ch = false
+      const r = ring.map(c => { const [v, changed] = snapVtx(c); if (changed) ch = true; return v })
+      return [r, ch]
+    }
+
+    return nogabali.reduce((acc, n, i) => {
+      if (i === editedIdx) return acc
+      const geom = n.geojson?.geometry
+      if (!geom) return acc
+
+      let anyChanged = false
+      let newGeometry
+
+      if (geom.type === 'Polygon') {
+        const newRings = geom.coordinates.map(ring => { const [r, ch] = mapRing(ring); if (ch) anyChanged = true; return r })
+        if (!anyChanged) return acc
+        newGeometry = { type: 'Polygon', coordinates: newRings }
+      } else if (geom.type === 'MultiPolygon') {
+        const newParts = geom.coordinates.map(part => part.map(ring => { const [r, ch] = mapRing(ring); if (ch) anyChanged = true; return r }))
+        if (!anyChanged) return acc
+        newGeometry = { type: 'MultiPolygon', coordinates: newParts }
+      } else return acc
+
+      const firstRing = geom.type === 'Polygon' ? newGeometry.coordinates[0] : newGeometry.coordinates[0][0]
+      const latlngs = firstRing.slice(0, -1).map(([lng, lat]) => ({ lat, lng }))
+      const newPlatiba = polygonAreaHa(latlngs)
+      return [...acc, { n, idx: i, newGeometry, oldPlatiba: n.platiba, newPlatiba }]
+    }, [])
+  }
+
+  const sinhronizet = async () => {
+    if (!kaiminsSync) return
+    setKaiminsLade(true)
+    try {
+      for (const { n, idx: nIdx, newGeometry, newPlatiba } of kaiminsSync.neighbors) {
+        const { error } = await supabase.rpc('update_nogabals_geom', {
+          p_id: Number(n.id),
+          p_geojson: JSON.stringify(newGeometry),
+        })
+        if (error) throw new Error(error.message)
+        // Mēģina atjaunināt platību (nav kritisks ja neizdodas)
+        await supabase.from('meza_nogabali').update({ nog_plat: String(newPlatiba.toFixed(4)) }).eq('id', Number(n.id)).catch(() => {})
+      }
+      setNogabali(prev => {
+        const arr = [...prev]
+        for (const { idx: nIdx, newGeometry, newPlatiba } of kaiminsSync.neighbors) {
+          arr[nIdx] = { ...arr[nIdx], platiba: newPlatiba, geojson: { ...arr[nIdx].geojson, geometry: newGeometry } }
+        }
+        return arr
+      })
+      setKaiminsSync(null)
+    } catch (e) {
+      alert('Sinhronizācija neizdevās: ' + e.message)
+    } finally {
+      setKaiminsLade(false)
     }
   }
 
@@ -1944,6 +2026,56 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
     </>
   )
 
+  // ── Kaimiņu sinhronizācijas panelis ─────────────────────────────────────────
+  const KaiminsPanel = () => {
+    if (!kaiminsSync) return null
+    const { neighbors } = kaiminsSync
+    return (
+      <div style={{
+        position: 'absolute', top: geomEditTarget ? 72 : 10, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 1400, background: 'rgba(4,12,28,0.97)',
+        border: '1.5px solid #64b5f6', borderRadius: 10,
+        padding: '10px 14px', fontFamily: F.family,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
+        display: 'flex', gap: 6, alignItems: 'flex-start', flexWrap: 'wrap',
+        maxWidth: 'calc(100% - 32px)',
+      }}>
+        <div style={{ width: '100%', fontSize: 12, color: '#64b5f6', fontWeight: 700 }}>
+          🔗 {neighbors.length === 1 ? '1 kaimiņu nogabals' : `${neighbors.length} kaimiņu nogabali`} ar kopīgām virsotnēm
+        </div>
+        {neighbors.map(({ n, oldPlatiba, newPlatiba }) => {
+          const diff = newPlatiba - oldPlatiba
+          const diffColor = Math.abs(diff) < 0.005 ? '#81c784' : '#ffb74d'
+          return (
+            <div key={n.id} style={{ fontSize: 11, color: '#b3d4f5', background: 'rgba(100,181,246,0.10)', borderRadius: 5, padding: '3px 8px', whiteSpace: 'nowrap' }}>
+              <b>{n.nr_text}</b>: {oldPlatiba.toFixed(3)} → <span style={{ color: diffColor, fontWeight: 700 }}>{newPlatiba.toFixed(3)} ha</span>
+              {Math.abs(diff) >= 0.005 && <span style={{ color: diffColor, fontSize: 10 }}> ({diff > 0 ? '+' : ''}{diff.toFixed(3)})</span>}
+            </div>
+          )
+        })}
+        <div style={{ width: '100%', display: 'flex', gap: 6, marginTop: 2 }}>
+          <button
+            onClick={sinhronizet} disabled={kaiminsLade}
+            style={{
+              flex: 2, padding: '7px 10px', borderRadius: 7, fontSize: 12, fontWeight: 700,
+              border: '1px solid #64b5f6', background: '#1565c0',
+              color: '#fff', cursor: kaiminsLade ? 'wait' : 'pointer',
+              opacity: kaiminsLade ? 0.7 : 1, fontFamily: F.family,
+            }}
+          >{kaiminsLade ? '⏳ Sinhronizē...' : '🔗 Sinhronizēt kaimiņus'}</button>
+          <button
+            onClick={() => setKaiminsSync(null)} disabled={kaiminsLade}
+            style={{
+              flex: 1, padding: '7px 10px', borderRadius: 7, fontSize: 12,
+              border: `1px solid ${DS.greenBdr}`, background: 'transparent',
+              color: DS.textMut, cursor: 'pointer', fontFamily: F.family,
+            }}
+          >Izlaist</button>
+        </div>
+      </div>
+    )
+  }
+
   const TileKludaIndikators = () => !tileKluda ? null : (
     <div style={{
       position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
@@ -2050,6 +2182,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           <TileKludaIndikators />
           <GpsPoga />
           <GeomOverlays />
+          <KaiminsPanel />
           <OverlayPanel />
         </div>
       </div>
@@ -2185,6 +2318,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
         <TileKludaIndikators />
         <GpsPoga />
         <GeomOverlays />
+        <KaiminsPanel />
         <OverlayPanel />
       </div>
 
