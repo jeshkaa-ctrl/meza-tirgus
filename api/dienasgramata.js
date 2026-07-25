@@ -107,7 +107,7 @@ async function handleJautajums(req, res) {
     .select('*')
     .eq('user_id', userId)
     .eq('aktivitate', aktivitate)
-    .order('datums', { ascending: false })
+    .order('created_at', { ascending: false })
 
   const aktivitateNos = aktivitate === 'makskere' ? 'makšķerēšana' : 'medības'
 

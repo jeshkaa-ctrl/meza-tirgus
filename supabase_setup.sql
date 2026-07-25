@@ -210,3 +210,28 @@ create policy "admin_visas_pavadzimes" on public.pavadzimes
 
 -- 15. SVARĪGI: Supabase Dashboard → Authentication → Settings
 --    Izslēdz "Enable email confirmations" lai lietotāji var pieteikties uzreiz pēc reģistrācijas
+
+-- 16. Mednieka/Makšķernieka Dienasgrāmata
+create table if not exists public.medibu_dienasgramata (
+  id             uuid primary key default gen_random_uuid(),
+  user_id        uuid references auth.users(id) on delete cascade not null,
+  created_at     timestamptz default now() not null,
+  aktivitate     text not null default 'medibas',   -- 'medibas' | 'makskere'
+  teksts         text not null,
+  meness_faze    text,
+  suga           text,
+  nomedits       boolean default false,
+  svars          numeric,
+  dzimums        text,
+  nozveja_skaits integer,
+  vejs           text,
+  temperatura    numeric,
+  nokrisni       text,
+  laiks          text
+);
+
+alter table public.medibu_dienasgramata enable row level security;
+create policy "lasit_savus" on public.medibu_dienasgramata for select using (auth.uid() = user_id);
+create policy "rakstit_savus" on public.medibu_dienasgramata for insert with check (auth.uid() = user_id);
+create policy "dzest_savus" on public.medibu_dienasgramata for delete using (auth.uid() = user_id);
+create index if not exists idx_medibu_user_akt on public.medibu_dienasgramata (user_id, aktivitate, created_at desc);
