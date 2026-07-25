@@ -958,6 +958,28 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
     if (isMobile) setDrawerOpen(false)
   }, [isMobile])
 
+  const izslēgtLaukaRezimu = useCallback(() => {
+    setLaukaRezims(false)
+    setLaukaAtbloketProgress(0)
+    setLaukaWakeLockAtbalsts(true)
+    clearInterval(laukaHoldInterval.current)
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release().catch(() => {})
+      wakeLockRef.current = null
+    }
+  }, [])
+
+  // Re-acquire wake lock kad tab kļūst redzama un lauka režīms vēl aktīvs
+  useEffect(() => {
+    const fn = async () => {
+      if (document.visibilityState === 'visible' && laukaRezims && 'wakeLock' in navigator) {
+        try { wakeLockRef.current = await navigator.wakeLock.request('screen') } catch { /* silent */ }
+      }
+    }
+    document.addEventListener('visibilitychange', fn)
+    return () => document.removeEventListener('visibilitychange', fn)
+  }, [laukaRezims])
+
   const saglabatNogabalu = (saved) => {
     setNogabali(prev => {
       const arr = [...prev]
@@ -1421,28 +1443,6 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
       setLaukaWakeLockAtbalsts(false)
     }
   }
-
-  const izslēgtLaukaRezimu = useCallback(() => {
-    setLaukaRezims(false)
-    setLaukaAtbloketProgress(0)
-    setLaukaWakeLockAtbalsts(true)
-    clearInterval(laukaHoldInterval.current)
-    if (wakeLockRef.current) {
-      wakeLockRef.current.release().catch(() => {})
-      wakeLockRef.current = null
-    }
-  }, [])
-
-  // Re-acquire wake lock kad tab kļūst redzama un lauka režīms vēl aktīvs
-  useEffect(() => {
-    const fn = async () => {
-      if (document.visibilityState === 'visible' && laukaRezims && 'wakeLock' in navigator) {
-        try { wakeLockRef.current = await navigator.wakeLock.request('screen') } catch { /* silent */ }
-      }
-    }
-    document.addEventListener('visibilitychange', fn)
-    return () => document.removeEventListener('visibilitychange', fn)
-  }, [laukaRezims])
 
   const sakutTuret = (e) => {
     e.preventDefault()
