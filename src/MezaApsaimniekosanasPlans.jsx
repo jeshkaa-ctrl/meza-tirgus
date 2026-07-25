@@ -1096,7 +1096,7 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
     const kad = kadInput.replace(/\s/g, '')
     setSnapshotLade(true)
     try {
-      const r = await fetch('/api/snapshot-geom', {
+      const r = await fetch('/api/geom', {
         method: 'POST',
         headers: acmHeaders(),
         body: JSON.stringify({ action: 'saglabat', kadastrs: kad }),
@@ -1117,7 +1117,7 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
     setAtgriestLade(true)
     setGeomEditKluda(null)
     try {
-      const r = await fetch('/api/snapshot-geom', {
+      const r = await fetch('/api/geom', {
         method: 'POST',
         headers: acmHeaders(),
         body: JSON.stringify({ action: 'atgriezt', nogabala_id: n.id }),
