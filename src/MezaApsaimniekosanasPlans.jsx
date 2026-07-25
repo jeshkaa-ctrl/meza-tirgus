@@ -1435,7 +1435,9 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
     setLaukaRezims(true)
     if ('wakeLock' in navigator) {
       try {
-        wakeLockRef.current = await navigator.wakeLock.request('screen')
+        const lock = await navigator.wakeLock.request('screen')
+        lock.addEventListener('release', () => setLaukaWakeLockAtbalsts(false))
+        wakeLockRef.current = lock
       } catch {
         setLaukaWakeLockAtbalsts(false)
       }
@@ -1473,9 +1475,11 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           alignItems: 'center', justifyContent: 'flex-end',
           paddingBottom: 52,
           pointerEvents: 'all',
+          touchAction: 'none',
           userSelect: 'none', WebkitUserSelect: 'none',
         }}
         onContextMenu={e => e.preventDefault()}
+        onPointerDown={e => { if (e.target === e.currentTarget) e.stopPropagation() }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
           <div style={{
