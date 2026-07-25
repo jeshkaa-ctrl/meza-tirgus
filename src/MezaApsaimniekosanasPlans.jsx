@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import 'leaflet/dist/leaflet.css'
 import { supabase } from './supabaseClient'
 import { C as DS, F, spinnerCSS } from './ds'
@@ -878,8 +879,14 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const [geomEditDelMode, setGeomEditDelMode] = useState(false)
   const [geomEditGpsPoint,setGeomEditGpsPoint]= useState(null)
   const [geomEditLade,    setGeomEditLade]    = useState(false)
-  const [geomEditKluda,   setGeomEditKluda]   = useState(null)
-  const geomEditCoordsRef = useRef(null)
+  const [geomEditKluda,         setGeomEditKluda]         = useState(null)
+  const [laukaRezims,           setLaukaRezims]           = useState(false)
+  const [laukaAtbloketProgress, setLaukaAtbloketProgress] = useState(0)
+  const [laukaWakeLockAtbalsts, setLaukaWakeLockAtbalsts] = useState(true)
+  const geomEditCoordsRef  = useRef(null)
+  const wakeLockRef        = useRef(null)
+  const laukaHoldStartRef  = useRef(null)
+  const laukaHoldInterval  = useRef(null)
 
   const mapDivRef           = useRef(null)
   const isMobile            = typeof window !== 'undefined' && window.innerWidth < 700
@@ -1401,6 +1408,132 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
     </div>
   )
 
+  // ── Lauka režīms — Wake Lock + UI bloķēšana ─────────────────────────────────
+  const ieslegtLaukaRezimu = async () => {
+    setLaukaRezims(true)
+    if ('wakeLock' in navigator) {
+      try {
+        wakeLockRef.current = await navigator.wakeLock.request('screen')
+      } catch {
+        setLaukaWakeLockAtbalsts(false)
+      }
+    } else {
+      setLaukaWakeLockAtbalsts(false)
+    }
+  }
+
+  const izslēgtLaukaRezimu = useCallback(() => {
+    setLaukaRezims(false)
+    setLaukaAtbloketProgress(0)
+    setLaukaWakeLockAtbalsts(true)
+    clearInterval(laukaHoldInterval.current)
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release().catch(() => {})
+      wakeLockRef.current = null
+    }
+  }, [])
+
+  // Re-acquire wake lock kad tab kļūst redzama un lauka režīms vēl aktīvs
+  useEffect(() => {
+    const fn = async () => {
+      if (document.visibilityState === 'visible' && laukaRezims && 'wakeLock' in navigator) {
+        try { wakeLockRef.current = await navigator.wakeLock.request('screen') } catch { /* silent */ }
+      }
+    }
+    document.addEventListener('visibilitychange', fn)
+    return () => document.removeEventListener('visibilitychange', fn)
+  }, [laukaRezims])
+
+  const sakutTuret = (e) => {
+    e.preventDefault()
+    laukaHoldStartRef.current = Date.now()
+    laukaHoldInterval.current = setInterval(() => {
+      const progress = Math.min(100, ((Date.now() - laukaHoldStartRef.current) / 2000) * 100)
+      setLaukaAtbloketProgress(progress)
+      if (progress >= 100) {
+        clearInterval(laukaHoldInterval.current)
+        izslēgtLaukaRezimu()
+      }
+    }, 50)
+  }
+
+  const atceltTuret = () => {
+    clearInterval(laukaHoldInterval.current)
+    setLaukaAtbloketProgress(0)
+  }
+
+  const LaukaRezimOverlay = () => {
+    if (!laukaRezims) return null
+    return createPortal(
+      <div
+        style={{
+          position: 'fixed', inset: 0, zIndex: 2000,
+          background: 'rgba(0,8,0,0.10)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'flex-end',
+          paddingBottom: 52,
+          pointerEvents: 'all',
+          userSelect: 'none', WebkitUserSelect: 'none',
+        }}
+        onContextMenu={e => e.preventDefault()}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            fontSize: 11, color: 'rgba(255,255,255,0.8)',
+            background: 'rgba(0,0,0,0.65)',
+            padding: '4px 16px', borderRadius: 20,
+            backdropFilter: 'blur(6px)',
+            letterSpacing: 0.6, fontFamily: F.family,
+          }}>
+            🔒 LAUKA REŽĪMS AKTĪVS
+          </div>
+          {!laukaWakeLockAtbalsts && (
+            <div style={{
+              fontSize: 10, color: '#ffb74d',
+              background: 'rgba(0,0,0,0.75)',
+              padding: '5px 14px', borderRadius: 10,
+              maxWidth: 250, textAlign: 'center', lineHeight: 1.5,
+              fontFamily: F.family,
+            }}>
+              ⚠️ Šī ierīce neatbalsta ekrāna bloķēšanu — iestati manuāli garāku ekrāna izslēgšanās laiku ierīces iestatījumos
+            </div>
+          )}
+          <button
+            onPointerDown={sakutTuret}
+            onPointerUp={atceltTuret}
+            onPointerLeave={atceltTuret}
+            onPointerCancel={atceltTuret}
+            style={{
+              position: 'relative', overflow: 'hidden',
+              padding: '15px 34px', borderRadius: 34,
+              background: 'rgba(8,24,8,0.92)',
+              border: `2px solid ${DS.green}88`,
+              color: '#fff', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: F.family,
+              backdropFilter: 'blur(10px)',
+              boxShadow: '0 4px 28px rgba(0,0,0,0.65)',
+              touchAction: 'none', WebkitUserSelect: 'none',
+              minWidth: 200, textAlign: 'center',
+            }}
+          >
+            {/* Hold progress fill */}
+            <div style={{
+              position: 'absolute', left: 0, top: 0, bottom: 0,
+              width: `${laukaAtbloketProgress}%`,
+              background: `${DS.green}38`,
+              pointerEvents: 'none',
+              transition: laukaAtbloketProgress === 0 ? 'none' : 'width 0.05s linear',
+            }} />
+            <span style={{ position: 'relative' }}>
+              🔓 {laukaAtbloketProgress > 0 ? 'Tur nospiestu...' : 'Atbloķēt (turi 2s)'}
+            </span>
+          </button>
+        </div>
+      </div>,
+      document.body
+    )
+  }
+
   // ── Tile slāņu izvēlne ───────────────────────────────────────────────────────
   const TileSlāņiPanel = () => (
     <div style={{
@@ -1514,6 +1647,25 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           >🗑️</button>
         </div>
       )}
+
+      {/* Lauka režīms */}
+      <div style={{ height: 1, background: DS.greenBdr, margin: '2px 0' }} />
+      <button
+        onClick={laukaRezims ? izslēgtLaukaRezimu : ieslegtLaukaRezimu}
+        title="Bloķē ekrānu pret nejaušiem pieskārieniem un tur ekrānu ieslēgtu"
+        style={{
+          padding: '6px 11px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+          border: `1px solid ${laukaRezims ? DS.green : DS.greenBdr}`,
+          background: laukaRezims ? `${DS.green}33` : 'rgba(8,16,8,0.88)',
+          color: laukaRezims ? DS.green : DS.textMut,
+          cursor: 'pointer', textAlign: 'left',
+          backdropFilter: 'blur(6px)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
+          fontFamily: F.family,
+        }}
+      >
+        {laukaRezims ? '🔒 Aktīvs' : '🔒 Lauka režīms'}
+      </button>
     </div>
   )
 
@@ -1667,6 +1819,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
   if (!isMobile) return (
     <div style={{ height: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <style>{spinnerCSS}</style>
+      <LaukaRezimOverlay />
 
       {/* Header */}
       <div style={{ background: DS.glass, borderBottom: `1px solid ${DS.greenBdr}`, backdropFilter: 'blur(8px)', padding: '0 16px', height: 52, display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, zIndex: 10 }}>
@@ -1818,6 +1971,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
 
   return (
     <div style={{ minHeight: '100vh', background: DS.bg, color: DS.text, fontFamily: F.family, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <LaukaRezimOverlay />
       <PdfMaksasGate info={pdfMaksa} onClose={() => setPdfMaksa(null)} onReg={onReg} />
       <style>{spinnerCSS}</style>
 
