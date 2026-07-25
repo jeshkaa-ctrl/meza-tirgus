@@ -780,6 +780,7 @@ const SarakstaPane = memo(function SarakstaPane({
   nogabali, nogKluda, nogLade, ieladetNogabalus,
   atvertModalu, setHoverIdx, mapModal,
   maNogabali, visiGatavi, pdfLade, onPdfKliks,
+  onSnapshot, snapshotSaglabats, snapshotLade,
 }) {
   const sortedWithIdx = useMemo(() => {
     const nrKey = s => { const p = String(s || '').split(/[.\-]/).map(Number); return (p[0] || 0) * 10000 + (p[1] || 0) }
@@ -826,15 +827,38 @@ const SarakstaPane = memo(function SarakstaPane({
               Meklē VMD meža taksācijas datus pēc kadastra
             </div>
           </div>
-        ) : (
-          sortedWithIdx.map(({ n, originalIdx }) => (
+        ) : (<>
+          {!snapshotSaglabats && (
+            <div style={{ marginBottom: 8, padding: '8px 6px', borderRadius: 8, background: 'rgba(46,125,50,0.12)', border: `1px solid ${DS.greenBdr}` }}>
+              <div style={{ fontSize: 10, color: DS.textDim, marginBottom: 6, lineHeight: 1.5 }}>
+                Saglabā sākotnējo ģeometriju kā drošības tīklu pirms rediģēšanas
+              </div>
+              <button
+                onClick={onSnapshot} disabled={snapshotLade}
+                style={{
+                  width: '100%', padding: '9px 12px', borderRadius: 7,
+                  background: snapshotLade ? DS.bgDeep : `linear-gradient(135deg,${DS.green},${DS.greenDk})`,
+                  color: '#fff', border: 'none', fontSize: 12, fontWeight: 700,
+                  cursor: snapshotLade ? 'wait' : 'pointer', opacity: snapshotLade ? 0.7 : 1,
+                }}
+              >
+                {snapshotLade ? '⏳ Saglabā...' : '📸 Saglabāt sākotnējo stāvokli'}
+              </button>
+            </div>
+          )}
+          {snapshotSaglabats && (
+            <div style={{ marginBottom: 8, fontSize: 10, color: DS.green, padding: '5px 8px', borderRadius: 6, background: `${DS.green}11`, border: `1px solid ${DS.green}44` }}>
+              ✓ Sākotnējais stāvoklis saglabāts — ↺ atgriešana pieejama rediģēšanas panelī
+            </div>
+          )}
+          {sortedWithIdx.map(({ n, originalIdx }) => (
             <NogabalsRinda
               key={n.id} n={n} idx={originalIdx}
               onKliks={atvertModalu} onHover={setHoverIdx}
               aktīvs={mapModal?.index === originalIdx}
             />
-          ))
-        )}
+          ))}
+        </>)}
       </div>
       <div style={{ padding: '6px 10px 14px', flexShrink: 0 }}>
         {visiGatavi ? (
@@ -903,6 +927,9 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const [geomManual,      setGeomManual]      = useState(null) // null | { idx: null|number, lat:'', lng:'', kluda:'' }
   const [geomSetVertex,   setGeomSetVertex]   = useState(null) // null | { idx, lat, lng }
   const [geomEditKluda,         setGeomEditKluda]         = useState(null)
+  const [snapshotSaglabats,     setSnapshotSaglabats]     = useState(false)
+  const [snapshotLade,          setSnapshotLade]          = useState(false)
+  const [atgriestLade,          setAtgriestLade]          = useState(false)
   const [laukaRezims,           setLaukaRezims]           = useState(false)
   const [laukaAtbloketProgress, setLaukaAtbloketProgress] = useState(0)
   const [laukaWakeLockAtbalsts, setLaukaWakeLockAtbalsts] = useState(true)
@@ -1049,6 +1076,56 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
       setGeomEditKluda(e.message)
     } finally {
       setGeomEditLade(false)
+    }
+  }
+
+  // ── Ģeometrijas momentuzņēmums ───────────────────────────────────────────────
+  const saglabatMomentuznemumu = async () => {
+    const kad = kadInput.replace(/\s/g, '')
+    setSnapshotLade(true)
+    try {
+      const r = await fetch('/api/snapshot-geom', {
+        method: 'POST',
+        headers: acmHeaders(),
+        body: JSON.stringify({ action: 'saglabat', kadastrs: kad }),
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'Servera kļūda')
+      setSnapshotSaglabats(true)
+    } catch (e) {
+      alert('Momentuzņēmuma saglabāšana neizdevās: ' + e.message)
+    } finally {
+      setSnapshotLade(false)
+    }
+  }
+
+  const atgrieztSakotnejoGeom = async () => {
+    const { n, idx } = geomEditTarget
+    if (!window.confirm(`Atgriezt nogabalu ${n.nr_text} uz sākotnējo stāvokli? Nesaglabātās izmaiņas tiks zaudētas.`)) return
+    setAtgriestLade(true)
+    setGeomEditKluda(null)
+    try {
+      const r = await fetch('/api/snapshot-geom', {
+        method: 'POST',
+        headers: acmHeaders(),
+        body: JSON.stringify({ action: 'atgriezt', nogabala_id: n.id }),
+      })
+      const d = await r.json()
+      if (!r.ok) throw new Error(d.error || 'Servera kļūda')
+      setNogabali(prev => prev.map((nog, i) => i !== idx ? nog : {
+        ...nog,
+        geojson: { ...nog.geojson, geometry: d.geojson },
+      }))
+      setGeomEditTarget(null)
+      setGeomEditKluda(null)
+      setGeomEditAddMode(false)
+      setGeomEditDelMode(false)
+      setGeomManual(null)
+      setGeomSetVertex(null)
+    } catch (e) {
+      setGeomEditKluda('Atgriešana neizdevās: ' + e.message)
+    } finally {
+      setAtgriestLade(false)
     }
   }
 
@@ -1773,7 +1850,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
 
           <button
             onClick={saveGeomEdit}
-            disabled={geomEditLade}
+            disabled={geomEditLade || atgriestLade}
             style={{
               padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 700,
               border: '1px solid #e040fb', background: '#e040fb',
@@ -1781,6 +1858,18 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
               opacity: geomEditLade ? 0.7 : 1,
             }}
           >{geomEditLade ? '⏳' : '💾 Saglabāt'}</button>
+
+          <button
+            onClick={atgrieztSakotnejoGeom}
+            disabled={geomEditLade || atgriestLade}
+            title="Atgriezt uz sākotnējo stāvokli (ja tika saglabāts momentuzņēmums)"
+            style={{
+              padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+              border: '1px solid #e040fb66', background: 'rgba(224,64,251,0.12)',
+              color: atgriestLade ? '#e040fb' : '#e040fbaa',
+              cursor: atgriestLade ? 'wait' : 'pointer', fontFamily: F.family,
+            }}
+          >{atgriestLade ? '⏳' : '↺ Sākotnējais'}</button>
 
           <button
             onClick={() => { setGeomEditTarget(null); setGeomEditKluda(null); setGeomEditAddMode(false); setGeomEditDelMode(false); setGeomManual(null); setGeomSetVertex(null) }}
@@ -1933,6 +2022,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             ieladetNogabalus={ieladetNogabalus} atvertModalu={atvertModalu} setHoverIdx={setHoverIdx}
             mapModal={mapModal} maNogabali={maNogabali} visiGatavi={visiGatavi}
             pdfLade={pdfLade} onPdfKliks={() => setPdfModalOpen(true)}
+            onSnapshot={saglabatMomentuznemumu} snapshotSaglabats={snapshotSaglabats} snapshotLade={snapshotLade}
           />
         </div>
 
@@ -2146,6 +2236,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
               ieladetNogabalus={ieladetNogabalus} atvertModalu={atvertModalu} setHoverIdx={setHoverIdx}
               mapModal={mapModal} maNogabali={maNogabali} visiGatavi={visiGatavi}
               pdfLade={pdfLade} onPdfKliks={() => setPdfModalOpen(true)}
+              onSnapshot={saglabatMomentuznemumu} snapshotSaglabats={snapshotSaglabats} snapshotLade={snapshotLade}
             />
           </div>
         )}
