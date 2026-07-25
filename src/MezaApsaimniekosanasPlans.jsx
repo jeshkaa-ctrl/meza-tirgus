@@ -43,6 +43,7 @@ function MAPKarte({
   // Ģeometrijas rediģēšana
   geomEditTarget, geomEditAddMode, geomEditDelMode, geomEditGpsPoint,
   onGeomEditCoords, onGeomAddModeDone, onGeomDelModeDone, onGeomGpsVertexDone,
+  geomSetVertex, onGeomVertexSelect, onGeomSetVertexDone,
 }) {
   const leafletRef        = useRef(null)
   const kadLayRef         = useRef(null)
@@ -580,13 +581,17 @@ function MAPKarte({
 
           m.on('click', e => {
             L.DomEvent.stopPropagation(e.originalEvent)
-            if (!geomEditDelModeRef.current) return
-            if (editCoords.length <= 3) return
-            editCoords.splice(i, 1)
-            rebuildPoly()
-            buildVMarkers()
-            if (onGeomEditCoords) onGeomEditCoords([...editCoords])
-            if (onGeomDelModeDone) onGeomDelModeDone()
+            if (geomEditDelModeRef.current) {
+              if (editCoords.length <= 3) return
+              editCoords.splice(i, 1)
+              rebuildPoly()
+              buildVMarkers()
+              if (onGeomEditCoords) onGeomEditCoords([...editCoords])
+              if (onGeomDelModeDone) onGeomDelModeDone()
+            } else {
+              const [cLng, cLat] = editCoords[i]
+              if (onGeomVertexSelect) onGeomVertexSelect(i, cLat, cLng)
+            }
           })
 
           return m
@@ -667,6 +672,17 @@ function MAPKarte({
     if (onGeomEditCoords) onGeomEditCoords([...coords])
     if (onGeomGpsVertexDone) onGeomGpsVertexDone()
   }, [geomEditGpsPoint]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Virsotnes koordinātu atjauninājums (manuāla ievade) ─────────────────────
+  useEffect(() => {
+    if (!geomSetVertex) return
+    const { coords, rebuild } = geomEditStateRef.current
+    if (!coords || geomSetVertex.idx < 0 || geomSetVertex.idx >= coords.length) return
+    coords[geomSetVertex.idx] = [geomSetVertex.lng, geomSetVertex.lat]
+    rebuild?.()
+    if (onGeomEditCoords) onGeomEditCoords([...coords])
+    if (onGeomSetVertexDone) onGeomSetVertexDone()
+  }, [geomSetVertex]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return null
 }
@@ -884,6 +900,8 @@ export default function MezaApsaimniekosanasPlans({ onBack, onReg }) {
   const [geomEditDelMode, setGeomEditDelMode] = useState(false)
   const [geomEditGpsPoint,setGeomEditGpsPoint]= useState(null)
   const [geomEditLade,    setGeomEditLade]    = useState(false)
+  const [geomManual,      setGeomManual]      = useState(null) // null | { idx: null|number, lat:'', lng:'', kluda:'' }
+  const [geomSetVertex,   setGeomSetVertex]   = useState(null) // null | { idx, lat, lng }
   const [geomEditKluda,         setGeomEditKluda]         = useState(null)
   const [laukaRezims,           setLaukaRezims]           = useState(false)
   const [laukaAtbloketProgress, setLaukaAtbloketProgress] = useState(0)
@@ -1743,6 +1761,17 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           )}
 
           <button
+            onClick={() => { setGeomManual({ idx: null, lat: '', lng: '', kluda: '' }); setGeomEditAddMode(false); setGeomEditDelMode(false) }}
+            style={{
+              padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+              border: `1px solid ${geomManual ? '#e040fb' : '#e040fb66'}`,
+              background: geomManual ? '#e040fb33' : 'rgba(224,64,251,0.12)',
+              color: geomManual ? '#e040fb' : '#e040fbaa',
+              cursor: 'pointer', fontFamily: F.family,
+            }}
+          >⌨️ Koordinātas</button>
+
+          <button
             onClick={saveGeomEdit}
             disabled={geomEditLade}
             style={{
@@ -1754,7 +1783,7 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           >{geomEditLade ? '⏳' : '💾 Saglabāt'}</button>
 
           <button
-            onClick={() => { setGeomEditTarget(null); setGeomEditKluda(null); setGeomEditAddMode(false); setGeomEditDelMode(false) }}
+            onClick={() => { setGeomEditTarget(null); setGeomEditKluda(null); setGeomEditAddMode(false); setGeomEditDelMode(false); setGeomManual(null); setGeomSetVertex(null) }}
             style={{
               padding: '5px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
               border: `1px solid ${DS.greenBdr}`, background: 'transparent',
@@ -1772,6 +1801,52 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
               Klikšķini uz virsotnes (violetais punkts) lai to dzēstu
             </div>
           )}
+          {!geomEditAddMode && !geomEditDelMode && !geomManual && (
+            <div style={{ width: '100%', fontSize: 11, color: '#e040fb55', marginTop: 2 }}>
+              Klikšķini uz virsotnes lai redzētu/labotu tās koordinātas
+            </div>
+          )}
+          {geomManual && (() => {
+            const lat = parseFloat(geomManual.lat)
+            const lng = parseFloat(geomManual.lng)
+            const validNums = !isNaN(lat) && !isNaN(lng)
+            const outsideLatvia = validNums && (lat < 55.5 || lat > 58.5 || lng < 20.5 || lng > 28.5)
+            const inpStyle = { flex: 1, padding: '6px 8px', borderRadius: 5, background: '#110011', border: '1px solid #e040fb55', color: '#fff', fontSize: 12, fontFamily: F.family, outline: 'none' }
+            const apstradat = () => {
+              if (!validNums) { setGeomManual(m => ({ ...m, kluda: 'Ievadi skaitļus decimālgrādos (piem. 56.9234, 25.1234)' })); return }
+              if (geomManual.idx === null) {
+                setGeomEditGpsPoint({ lat, lng })
+              } else {
+                setGeomSetVertex({ idx: geomManual.idx, lat, lng })
+              }
+              setGeomManual(null)
+            }
+            return (
+              <div style={{ width: '100%', marginTop: 4, background: 'rgba(224,64,251,0.07)', borderRadius: 7, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <div style={{ fontSize: 11, color: '#e040fb', fontWeight: 600 }}>
+                  {geomManual.idx === null ? '➕ Jauna virsotne' : `✏️ Virsotne #${geomManual.idx + 1}`} — koordinātas
+                </div>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  <input placeholder="Platums (Lat) 56.xxxx" value={geomManual.lat}
+                    onChange={e => setGeomManual(m => ({ ...m, lat: e.target.value, kluda: '' }))}
+                    onKeyDown={e => e.key === 'Enter' && apstradat()}
+                    style={inpStyle} />
+                  <input placeholder="Garums (Lng) 25.xxxx" value={geomManual.lng}
+                    onChange={e => setGeomManual(m => ({ ...m, lng: e.target.value, kluda: '' }))}
+                    onKeyDown={e => e.key === 'Enter' && apstradat()}
+                    style={inpStyle} />
+                </div>
+                {outsideLatvia && <div style={{ fontSize: 10, color: '#ffb74d' }}>⚠️ Koordinātas šķiet ārpus Latvijas — pārliecinies par pareizību</div>}
+                {geomManual.kluda && <div style={{ fontSize: 10, color: DS.error }}>{geomManual.kluda}</div>}
+                <div style={{ display: 'flex', gap: 5 }}>
+                  <button onClick={apstradat} style={{ flex: 1, padding: '5px', borderRadius: 5, background: '#e040fb', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', fontFamily: F.family, fontWeight: 700 }}>
+                    {geomManual.idx === null ? 'Pievienot' : 'Atjaunot'}
+                  </button>
+                  <button onClick={() => setGeomManual(null)} style={{ padding: '5px 10px', borderRadius: 5, background: 'transparent', border: '1px solid #e040fb55', color: '#e040fbaa', fontSize: 12, cursor: 'pointer', fontFamily: F.family }}>✕</button>
+                </div>
+              </div>
+            )
+          })()}
           {geomEditKluda && (
             <div style={{ width: '100%', fontSize: 11, color: DS.error, marginTop: 2 }}>⚠️ {geomEditKluda}</div>
           )}
@@ -1877,6 +1952,9 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
             onGeomAddModeDone={() => setGeomEditAddMode(false)}
             onGeomDelModeDone={() => setGeomEditDelMode(false)}
             onGeomGpsVertexDone={() => setGeomEditGpsPoint(null)}
+            geomSetVertex={geomSetVertex}
+            onGeomVertexSelect={(idx, lat, lng) => setGeomManual({ idx, lat: lat.toFixed(7), lng: lng.toFixed(7), kluda: '' })}
+            onGeomSetVertexDone={() => setGeomSetVertex(null)}
           />
           <TileSlāņiPanel />
           <TileKludaIndikators />
@@ -2009,6 +2087,9 @@ Atbildi TIKAI ar JSON objektu. Bez markdown, bez komentāriem.`,
           onGeomAddModeDone={() => setGeomEditAddMode(false)}
           onGeomDelModeDone={() => setGeomEditDelMode(false)}
           onGeomGpsVertexDone={() => setGeomEditGpsPoint(null)}
+          geomSetVertex={geomSetVertex}
+          onGeomVertexSelect={(idx, lat, lng) => setGeomManual({ idx, lat: lat.toFixed(7), lng: lng.toFixed(7), kluda: '' })}
+          onGeomSetVertexDone={() => setGeomSetVertex(null)}
         />
         <TileSlāņiPanel />
         <TileKludaIndikators />
