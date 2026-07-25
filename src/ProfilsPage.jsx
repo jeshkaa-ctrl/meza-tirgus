@@ -27,6 +27,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
   const [novadsPiedavajumi, setNovadsPiedavajumi] = useState([])
   const [redLade,   setRedLade]   = useState(false)
   const [redStatuss, setRedStatuss] = useState(null) // null | 'ok' | 'kluda'
+  const [redKluda,  setRedKluda]  = useState('')
 
   // E-pasta maiņa
   const [epastsRezims, setEpastsRezims] = useState(false)
@@ -59,7 +60,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
 
   // ── Profila saglabāšana ──
   async function saglabtProfilu() {
-    setRedLade(true); setRedStatuss(null)
+    setRedLade(true); setRedStatuss(null); setRedKluda('')
     try {
       const dati = {
         vards:         rVards.trim(),
@@ -70,10 +71,15 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
         papilduNovadi: rTips === 'uznemums' ? rPapNovadi : [],
         tips:          rTips,
       }
+      console.log("Saglabā profilu:", JSON.stringify(dati))
       await atjaunotProfilu(dati)
       setRedStatuss('ok')
       setRedRezims(false)
-    } catch { setRedStatuss('kluda') }
+    } catch (e) {
+      console.error("saglabtProfilu catch:", e.message)
+      setRedStatuss('kluda')
+      setRedKluda(e.message)
+    }
     setRedLade(false)
   }
 
@@ -273,7 +279,7 @@ export default function ProfilsPage({ user, onBack, mainitParoli, iziet, atjauno
               </>}
 
               {redStatuss === 'kluda' && (
-                <div style={{ color: S.err, fontSize: 12 }}>⚠️ Kļūda saglabājot. Mēģiniet vēlreiz.</div>
+                <div style={{ color: S.err, fontSize: 12 }}>⚠️ Kļūda: {redKluda || 'Mēģiniet vēlreiz.'}</div>
               )}
               <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                 <button onClick={saglabtProfilu} disabled={redLade} style={{

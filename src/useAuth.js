@@ -111,9 +111,12 @@ export function useAuth() {
 
   // Profila atjaunošana
   const atjaunotProfilu = async (dati) => {
-    if (!user) return
+    if (!user) throw new Error("Nav pieslēgta sesija")
     const { error } = await supabase.from("profiles").update(dati).eq("id", user.id)
-    if (error) throw new Error(error.message)
+    if (error) {
+      console.error("atjaunotProfilu kļūda:", JSON.stringify(error))
+      throw new Error(error.message || error.code || JSON.stringify(error))
+    }
     setUser(prev => ({ ...prev, ...dati }))
   }
 
